@@ -12,7 +12,7 @@ import { Jobs } from '@mdf.js/core';
 
 export class MyStrategy implements Jobs.Strategy {
   constructor(public readonly name: string, public readonly count: number | string) {}
-  public do(process: Jobs.Object): Jobs.Object {
+  public do(process: Jobs.JobObject): Jobs.JobObject {
     if (typeof this.count === 'number') {
       process.data = process.data + this.count;
     } else if (typeof this.count === 'string') {

@@ -20,9 +20,9 @@ export class Aggregator extends EventEmitter {
   /** Instance unique identifier for trace purposes */
   public readonly componentId: string = v4();
   /** Components monitored by the aggregator */
-  #components: Map<string, Health.Component> = new Map();
+  private components: Map<string, Health.Component> = new Map();
   /** External checks, included in the aggregator to be exposed in the overall diagnostic */
-  #externalChecks: Map<string, Health.API.Check[]> = new Map();
+  private externalChecks: Map<string, Health.API.Check[]> = new Map();
   /** Create an instance of the Health aggregator */
   constructor() {
     super();
@@ -34,10 +34,10 @@ export class Aggregator extends EventEmitter {
   /** Aggregation of all components checks, plus external checks */
   get checks(): Health.API.Checks {
     let checks: Health.API.Checks = {};
-    for (const [, components] of this.#components) {
+    for (const [, components] of this.components) {
       checks = merge(checks, components.checks);
     }
-    for (const [key, externalChecks] of this.#externalChecks.entries()) {
+    for (const [key, externalChecks] of this.externalChecks.entries()) {
       checks = merge(checks, { [key]: externalChecks });
     }
     return checks;
@@ -49,10 +49,10 @@ export class Aggregator extends EventEmitter {
   public register(component: Health.Component | Health.Component[]): void {
     if (Array.isArray(component)) {
       for (const entry of component) {
-        this.#register(entry);
+        this._register(entry);
       }
     } else {
-      this.#register(component);
+      this._register(component);
     }
   }
   /**
@@ -76,25 +76,25 @@ export class Aggregator extends EventEmitter {
     if (
       (check.status && !Health.API.STATUS.includes(check.status)) ||
       typeof check.componentId !== 'string' ||
-      this.#externalChecks.size >= 100
+      this.externalChecks.size >= 100
     ) {
       return false;
     }
-    const checks = this.#externalChecks.get(`${component}:${measure}`) || [];
+    const checks = this.externalChecks.get(`${component}:${measure}`) || [];
     const entryIndex = checks.findIndex(entry => entry.componentId === check.componentId);
     if (entryIndex === -1) {
       checks.push(check);
     } else {
       checks[entryIndex] = check;
     }
-    this.#externalChecks.set(`${component}:${measure}`, checks);
+    this.externalChecks.set(`${component}:${measure}`, checks);
     return true;
   }
   /**
    * Return an error handler wrapping function for error event
    * @param name - component name
    */
-  #errorEventHandler = (subject: string): ((error: Crash | Error) => void) => {
+  private readonly errorEventHandler = (subject: string): ((error: Crash | Error) => void) => {
     return (rawError: Crash | Error): void => {
       const error = Crash.from(rawError);
       error.subject = error.subject === 'common' ? subject : error.subject;
@@ -107,7 +107,7 @@ export class Aggregator extends EventEmitter {
    * Event handler for error event
    * @param error - Error triggered by the component
    */
-  #statusEventHandler = (): void => {
+  private readonly statusEventHandler = (): void => {
     if (this.listenerCount('status') > 0) {
       this.emit('status', this.status);
     }
@@ -116,11 +116,11 @@ export class Aggregator extends EventEmitter {
    * Register a new subcomponent to be monitored
    * @param component - subcomponent to be registered
    */
-  #register = (component: Health.Component): void => {
-    if (!this.#components.has(component.name)) {
-      component.on('error', this.#errorEventHandler(component.name));
-      component.on('status', this.#statusEventHandler);
-      this.#components.set(component.name, component);
+  private readonly _register = (component: Health.Component): void => {
+    if (!this.components.has(component.name)) {
+      component.on('error', this.errorEventHandler(component.name));
+      component.on('status', this.statusEventHandler);
+      this.components.set(component.name, component);
     }
   };
 }

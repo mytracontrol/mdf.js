@@ -9,5 +9,5 @@
  * unless prior written permission is obtained from Mytra Control S.L.
  */
 export * from './Consumer';
+export * from './Gateway';
 export * from './Producer';
-export * from './Proxy';

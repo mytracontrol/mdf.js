@@ -142,7 +142,7 @@ export class ConsumerMap extends EventEmitter implements Health.Component {
     return { [`${this.name}:consumers`]: Array.from(this.map.values()) };
   }
   /** Perform the aging of the consumer map */
-  private aging = (): void => {
+  private readonly aging = (): void => {
     const emitAsAged: string[] = [];
     const checkTime = new Date().getTime();
     for (const [consumerId, consumer] of this.map.entries()) {

@@ -13,8 +13,8 @@ import { Counter, Gauge, Histogram } from '@mdf.js/metrics-service';
 
 /** Metric types */
 export type MetricInstances = {
-  api_all_job_processed_total: Counter<string>;
-  api_all_errors_job_processing_total: Counter<string>;
-  api_all_job_in_processing_total: Gauge<string>;
-  api_publishing_job_duration_milliseconds: Histogram<string>;
+  api_all_job_processed_total: Counter;
+  api_all_errors_job_processing_total: Counter;
+  api_all_job_in_processing_total: Gauge;
+  api_publishing_job_duration_milliseconds: Histogram;
 };

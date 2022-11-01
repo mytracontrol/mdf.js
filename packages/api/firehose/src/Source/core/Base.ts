@@ -137,30 +137,30 @@ export abstract class Base<T extends Plugs.Source.Any>
     }
   }
   /** Super/Plug error event handler */
-  private onErrorEvent = (rawError: Error | Crash) => {
+  private readonly onErrorEvent = (rawError: Error | Crash) => {
     this.error = Crash.from(rawError, this.componentId);
     // Stryker disable next-line all
     this.logger(`Error in source stream ${this.name}: ${this.error.message}`);
     this.emitStatus();
   };
   /** Plug status event handler */
-  private onStatusEvent = () => {
+  private readonly onStatusEvent = () => {
     this.emitStatus();
   };
   /** Super pause event handler */
-  private onPauseEvent = () => {
+  private readonly onPauseEvent = () => {
     // Stryker disable next-line all
     this.logger.extend('debug')(`Source stream ${this.plug.name} has been paused`);
     this.emitStatus();
   };
   /** Super resume event handler */
-  private onResumeEvent = () => {
+  private readonly onResumeEvent = () => {
     // Stryker disable next-line all
     this.logger.extend('debug')(`Source stream ${this.plug.name} has been resumed`);
     this.emitStatus();
   };
   /** Super close event handler */
-  private onCloseEvent = () => {
+  private readonly onCloseEvent = () => {
     // Stryker disable next-line all
     this.logger(`Source stream ${this.plug.name} has been closed`);
     this.emitStatus();
@@ -176,7 +176,7 @@ export abstract class Base<T extends Plugs.Source.Any>
     this.plugWrapper.on('status', this.onStatusEvent);
   }
   /** Manage the `done` event of a job */
-  private onJobDone = (uuid: string, jobResult: Jobs.Result, error?: Crash) => {
+  private readonly onJobDone = (uuid: string, jobResult: Jobs.Result, error?: Crash) => {
     if (error) {
       // Stryker disable next-line all
       this.logger(`Job ${jobResult.id} was finished with error: ${error.message}`);
@@ -192,9 +192,9 @@ export abstract class Base<T extends Plugs.Source.Any>
           this.logger.extend('silly')(`Job [${jobResult.jobId}] resolved with no result`);
         }
       })
-      .catch(error => {
+      .catch(plugError => {
         // Stryker disable next-line all
-        this.logger(`Job [${jobResult.jobId}] was not cleaned due to error: ${error.message}`);
+        this.logger(`Job [${jobResult.jobId}] was not cleaned due to error: ${plugError.message}`);
       })
       .finally(() => this.emit('done', uuid, jobResult, error));
   };

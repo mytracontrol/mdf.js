@@ -36,7 +36,7 @@ export declare interface Firehose<Type, Data> {
   /** Emitted on every state change */
   on(event: 'status', listener: (status: Health.API.Status) => void): this;
   /** Emitted when a job is created */
-  on(event: 'job', listener: (job: Jobs.Object<Type, Data>) => void): this;
+  on(event: 'job', listener: (job: Jobs.JobObject<Type, Data>) => void): this;
   /** Emitted when a job has ended */
   on(event: 'done', listener: (uuid: string, result: Jobs.Result, error?: Crash) => void): this;
 }
@@ -186,23 +186,23 @@ export class Firehose<Type extends string = string, Data = any>
     return typeof sink.multi === 'function' && typeof sink.single === 'function';
   }
   /** Sink/Source/Engine error event handler */
-  private onErrorEvent = (error: Error | Crash) => {
+  private readonly onErrorEvent = (error: Error | Crash) => {
     // Stryker disable next-line all
     this.logger(`${error.message}`);
     this.emit('error', error);
   };
   /** Sink/Source/Engine error event handler */
-  private onStatusEvent = (status: Health.API.Status) => {
+  private readonly onStatusEvent = (status: Health.API.Status) => {
     // Stryker disable next-line all
     this.logger(`Status message received from underlayer streams ${status}`);
     this.emit('status', this.overallStatus);
   };
   /** Source job create event handler */
-  private onJobEvent = (job: JobHandler<Type, Data>) => {
+  private readonly onJobEvent = (job: JobHandler<Type, Data>) => {
     this.emit('job', job.toObject());
   };
   /** Source job done error event handler */
-  private onJobDoneEvent = (uuid: string, result: Jobs.Result, error?: Crash) => {
+  private readonly onJobDoneEvent = (uuid: string, result: Jobs.Result, error?: Crash) => {
     if (error && this.errorRegisterHandler) {
       this.errorRegisterHandler.push(
         new Crash(`Job finished with errors`, error.uuid, {
@@ -214,7 +214,7 @@ export class Firehose<Type extends string = string, Data = any>
     this.emit('done', uuid, result, error);
   };
   /** Sink lost event handler */
-  private onLostEvent = (sink: Writable) => {
+  private readonly onLostEvent = (sink: Writable) => {
     if (!this.stopping) {
       this.engine.pipe(sink);
       this.engine.resume();

@@ -358,7 +358,7 @@ describe('#Firehose', () => {
     it('Should create a new Firehose with a Flow Source and a Jet Sink, start it and check is working with some strategies applied to jobs', done => {
       const service = new Observability(config);
       const mySinkPlug = new MyTapPlug();
-      jest.spyOn(mySinkPlug, 'single').mockImplementation(async (job: Jobs.Object<any>) => {
+      jest.spyOn(mySinkPlug, 'single').mockImplementation(async (job: Jobs.JobObject<any>) => {
         return new Promise<void>((resolve, reject) => {
           expect(job).toBeDefined();
           expect(job.jobId).toBeDefined();
@@ -396,7 +396,7 @@ describe('#Firehose', () => {
     it('Should add errors to the job if a strategy returns invalid data', done => {
       const service = new Observability(config);
       const mySinkPlug = new MyTapPlug();
-      jest.spyOn(mySinkPlug, 'single').mockImplementation(async (job: Jobs.Object<any>) => {
+      jest.spyOn(mySinkPlug, 'single').mockImplementation(async (job: Jobs.JobObject<any>) => {
         return new Promise<void>((resolve, reject) => {
           expect(job).toBeDefined();
           expect(job.jobId).toBeDefined();
@@ -443,7 +443,7 @@ describe('#Firehose', () => {
     it('Should add errors to the job if a strategy throws', done => {
       const service = new Observability(config);
       const mySinkPlug = new MyTapPlug();
-      jest.spyOn(mySinkPlug, 'single').mockImplementation(async (job: Jobs.Object<any>) => {
+      jest.spyOn(mySinkPlug, 'single').mockImplementation(async (job: Jobs.JobObject<any>) => {
         return new Promise<void>((resolve, reject) => {
           expect(job).toBeDefined();
           expect(job.jobId).toBeDefined();

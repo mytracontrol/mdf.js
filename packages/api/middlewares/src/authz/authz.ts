@@ -50,39 +50,53 @@ function authZ(role?: string | string[]): RequestHandler {
       return;
     }
     const token = parts[1];
-    jwt.verify(token, CONFIG_JWT_TOKEN_SECRET, (error, decoded) => {
-      if (error) {
-        next(BoomHelpers.unauthorized(`No valid token`, req.uuid));
-        return;
-      }
-      if (!decoded) {
-        next(new Crash(`Error verifying the JWT token`, req.uuid));
-        return;
-      }
-      if (typeof decoded === 'string') {
-        next(BoomHelpers.badRequest(`Malformed request, malformed authorization token`, req.uuid));
-        return;
-      }
-      req.user = decoded['user'];
-      req.role = decoded['role'];
+    jwt.verify(token, CONFIG_JWT_TOKEN_SECRET, verify(req, next, role));
+  };
+}
 
-      if (typeof req.user !== 'string' || typeof req.role !== 'string') {
-        next(BoomHelpers.badRequest(`Malformed request, malformed authorization token`, req.uuid));
+/**
+ * Verify the token
+ * @param req - request
+ * @param next - next function
+ * @param role - role to be checked
+ */
+function verify(
+  req: Request,
+  next: NextFunction,
+  role?: string | string[]
+): (error: jwt.VerifyErrors | null, decoded: string | jwt.JwtPayload | undefined) => void {
+  return (error: jwt.VerifyErrors | null, decoded: string | jwt.JwtPayload | undefined) => {
+    if (error) {
+      next(BoomHelpers.unauthorized(`No valid token`, req.uuid));
+      return;
+    }
+    if (!decoded) {
+      next(new Crash(`Error verifying the JWT token`, req.uuid));
+      return;
+    }
+    if (typeof decoded === 'string') {
+      next(BoomHelpers.badRequest(`Malformed request, malformed authorization token`, req.uuid));
+      return;
+    }
+    req.user = decoded['user'];
+    req.role = decoded['role'];
+
+    if (typeof req.user !== 'string' || typeof req.role !== 'string') {
+      next(BoomHelpers.badRequest(`Malformed request, malformed authorization token`, req.uuid));
+      return;
+    }
+    if (!isValidRole(role)) {
+      next(new Crash(`Error in the role authz middleware configuration`, req.uuid));
+      return;
+    }
+    if (role) {
+      const allowedRoles = Array.isArray(role) ? role : [role];
+      if (!allowedRoles.includes(decoded['role'])) {
+        next(BoomHelpers.unauthorized(`You are not authorized`, req.uuid));
         return;
       }
-      if (!isValidRole(role)) {
-        next(new Crash(`Error in the role authz middleware configuration`, req.uuid));
-        return;
-      }
-      if (role) {
-        const allowedRoles = Array.isArray(role) ? role : [role];
-        if (!allowedRoles.includes(decoded['role'])) {
-          next(BoomHelpers.unauthorized(`You are not authorized`, req.uuid));
-          return;
-        }
-      }
-      next();
-    });
+    }
+    next();
   };
 }
 

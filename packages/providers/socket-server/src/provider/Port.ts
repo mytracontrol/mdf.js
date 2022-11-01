@@ -106,16 +106,16 @@ export class Port extends Provider.Port<Server, Config> {
     }
   }
   /** Callback function for `error` event in the HTTP Provider */
-  private onErrorEvent = (error: Crash | Error) =>
+  private readonly onErrorEvent = (error: Crash | Error) =>
     this.onEvent('error', 'error', true, Crash.from(error) as Crash);
   /** Callback function for `connection` event in socket.io server */
-  private onConnectionEvent = (socket: IOSocket) => {
+  private readonly onConnectionEvent = (socket: IOSocket) => {
     // Stryker disable next-line all
     this.logger.debug(`New connection from ${socket.id}`);
     this.onEvent('connection', 'connection', false);
   };
   /** Callback function for `connection_error` event in engine.io */
-  private onConnectionErrorEvent = (error: ConnectionError) => {
+  private readonly onConnectionErrorEvent = (error: ConnectionError) => {
     // Stryker disable next-line all
     this.logger.debug(`Connection error: ${error.message}`);
     this.onEvent(

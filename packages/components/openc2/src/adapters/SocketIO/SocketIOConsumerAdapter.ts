@@ -48,7 +48,7 @@ export class SocketIOConsumerAdapter extends SocketIOAdapter implements Consumer
     }
   }
   /** Wrapper function for message adaptation */
-  private subscriptionAdapter = (
+  private readonly subscriptionAdapter = (
     incomingMessage: Control.CommandMessage,
     acknowledge: (message: Control.ResponseMessage) => void
   ): void => {

@@ -18,7 +18,7 @@ export declare interface Flow {
   /** Emitted when the source suffer some irrecoverable error processing an incoming job */
   on(event: 'error', listener: (error: Crash | Multi) => void): this;
   /** Emitted when there is a new job to be managed */
-  on(event: 'data', listener: (job: Jobs.Object) => void): this;
+  on(event: 'data', listener: (job: Jobs.JobObject) => void): this;
   /** Emitted on every status change */
   on(event: 'status', listener: (status: Health.API.Status) => void): this;
   /** Emitted when the sink is ready to start the consumption */

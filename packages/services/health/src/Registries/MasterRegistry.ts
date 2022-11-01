@@ -17,6 +17,7 @@ import { CONFIG_HEALTH_CLUSTER_UPDATE_INTERVAL } from '../const';
 import { HealthMessage, HealthMessageType, ServiceMetadata } from '../types';
 import { Registry } from './Registry';
 
+const SYSTEM_WORKER_HEALTH = 'system:workerHealth';
 export class MasterRegistry extends Registry {
   /** Request sequence number */
   private requestId: number;
@@ -57,7 +58,7 @@ export class MasterRegistry extends Registry {
     return merge(this.aggregator.checks, this.workerChecks);
   }
   /** Handler of health request */
-  private onSendRequest = (): void => {
+  private readonly onSendRequest = (): void => {
     this.requestId = this.requestId + 1;
     if (!Number.isFinite(this.requestId)) {
       this.requestId = 0;
@@ -115,7 +116,7 @@ export class MasterRegistry extends Registry {
           workerPid: worker.process.pid,
           time: new Date().toISOString(),
         });
-        checks['system:workerHealth'].push({
+        checks[SYSTEM_WORKER_HEALTH].push({
           componentId: `${worker.process.pid}`,
           componentType: 'process',
           status: 'fail',
@@ -150,8 +151,8 @@ export class MasterRegistry extends Registry {
       }));
       feed[entry] = feed[entry] ? feed[entry].concat(entryChecks) : entryChecks;
     }
-    if (feed['system:workerHealth']) {
-      const result = feed['system:workerHealth'].find(
+    if (feed[SYSTEM_WORKER_HEALTH]) {
+      const result = feed[SYSTEM_WORKER_HEALTH].find(
         workerEntry => workerEntry['workerId'] === worker.id
       );
       if (result) {

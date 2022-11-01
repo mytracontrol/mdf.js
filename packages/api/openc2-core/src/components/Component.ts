@@ -90,7 +90,7 @@ export abstract class Component<T extends ComponentAdapter, K extends ComponentO
    * Manage the error in the producer interface
    * @param error - error to be processed
    */
-  protected onErrorHandler = (error: unknown): void => {
+  protected readonly onErrorHandler = (error: unknown): void => {
     const crash = Crash.from(error);
     this.logger.crash(crash);
     if (this.listenerCount('error') > 0) {
@@ -101,7 +101,7 @@ export abstract class Component<T extends ComponentAdapter, K extends ComponentO
    * Manage the status change in the producer interface
    * @param status - status to be processed
    */
-  private onStatusHandler = (status: Health.API.Status): void => {
+  private readonly onStatusHandler = (status: Health.API.Status): void => {
     if (this.listenerCount('status') > 0) {
       this.emit('status', status);
     }

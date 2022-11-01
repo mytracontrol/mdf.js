@@ -14,13 +14,13 @@ import { v4 } from 'uuid';
 import {
   ConsumerAdapter,
   Control,
+  GatewayOptions,
   OnCommandHandler,
   ProducerAdapter,
-  ProxyOptions,
 } from '../../types';
-import { Proxy } from './Proxy';
+import { Gateway } from './Gateway';
 
-const options: ProxyOptions = {
+const options: GatewayOptions = {
   id: 'myId',
   actionTargetPairs: {
     query: ['features', 'x-netin:alarms', 'x-netin:devices'],
@@ -71,26 +71,26 @@ class MyProducerAdapter extends EventEmitter implements ProducerAdapter {
   subscribers = [];
 }
 
-describe('#OpenC2 #Proxy', () => {
+describe('#OpenC2 #Gateway', () => {
   describe('#Happy path', () => {
-    it(`Should create a valid proxy`, () => {
+    it(`Should create a valid gateway`, () => {
       const consumer = new MyConsumerAdapter();
       const producer = new MyProducerAdapter();
-      const proxy = new Proxy(consumer, producer, {
+      const gateway = new Gateway(consumer, producer, {
         ...options,
         lookupInterval: 1000000,
         lookupTimeout: 1000000 / 2 - 1,
       });
-      expect(proxy).toBeInstanceOf(Proxy);
-      expect(proxy.links).toEqual({
+      expect(gateway).toBeInstanceOf(Gateway);
+      expect(gateway.links).toEqual({
         openc2: {
           jobs: '/openc2/jobs',
           pendingJobs: '/openc2/pendingJobs',
           messages: '/openc2/messages',
         },
       });
-      expect(proxy.router).toBeDefined();
-      const checks = proxy.checks;
+      expect(gateway.router).toBeDefined();
+      const checks = gateway.checks;
       expect(checks).toEqual({
         'myAdapter:lastOperation': [
           {
@@ -120,46 +120,46 @@ describe('#OpenC2 #Proxy', () => {
     it(`Should start and stop properly`, async () => {
       const consumer = new MyConsumerAdapter();
       const producer = new MyProducerAdapter();
-      const proxy = new Proxy(consumer, producer, options);
+      const gateway = new Gateway(consumer, producer, options);
       //@ts-ignore - Test environment
-      expect(proxy.started).toBeFalsy();
+      expect(gateway.started).toBeFalsy();
       //@ts-ignore - Test environment
-      expect(proxy.health.listenerCount('error')).toEqual(0);
+      expect(gateway.health.listenerCount('error')).toEqual(0);
       //@ts-ignore - Test environment
-      expect(proxy.health.listenerCount('status')).toEqual(0);
+      expect(gateway.health.listenerCount('status')).toEqual(0);
       //@ts-ignore - Test environment
-      expect(proxy.started).toEqual(false);
-      await proxy.start();
+      expect(gateway.started).toEqual(false);
+      await gateway.start();
       //@ts-ignore - Test environment
-      expect(proxy.started).toEqual(true);
+      expect(gateway.started).toEqual(true);
       //@ts-ignore - Test environment
-      expect(proxy.started).toBeTruthy();
+      expect(gateway.started).toBeTruthy();
       //@ts-ignore - Test environment
-      expect(proxy.health.listenerCount('error')).toEqual(1);
+      expect(gateway.health.listenerCount('error')).toEqual(1);
       //@ts-ignore - Test environment
-      expect(proxy.health.listenerCount('status')).toEqual(1);
-      await proxy.start();
+      expect(gateway.health.listenerCount('status')).toEqual(1);
+      await gateway.start();
       //@ts-ignore - Test environment
-      expect(proxy.started).toBeTruthy();
+      expect(gateway.started).toBeTruthy();
       //@ts-ignore - Test environment
-      expect(proxy.health.listenerCount('error')).toEqual(1);
+      expect(gateway.health.listenerCount('error')).toEqual(1);
       //@ts-ignore - Test environment
-      expect(proxy.health.listenerCount('status')).toEqual(1);
-      await proxy.stop();
+      expect(gateway.health.listenerCount('status')).toEqual(1);
+      await gateway.stop();
       //@ts-ignore - Test environment
-      expect(proxy.started).toBeFalsy();
+      expect(gateway.started).toBeFalsy();
       //@ts-ignore - Test environment
-      expect(proxy.health.listenerCount('error')).toEqual(0);
+      expect(gateway.health.listenerCount('error')).toEqual(0);
       //@ts-ignore - Test environment
-      expect(proxy.health.listenerCount('status')).toEqual(0);
-      await proxy.stop();
+      expect(gateway.health.listenerCount('status')).toEqual(0);
+      await gateway.stop();
       //@ts-ignore - Test environment
-      expect(proxy.started).toBeFalsy();
+      expect(gateway.started).toBeFalsy();
       //@ts-ignore - Test environment
-      expect(proxy.health.listenerCount('error')).toEqual(0);
+      expect(gateway.health.listenerCount('error')).toEqual(0);
       //@ts-ignore - Test environment
-      expect(proxy.health.listenerCount('status')).toEqual(0);
-      const checks = proxy.checks;
+      expect(gateway.health.listenerCount('status')).toEqual(0);
+      const checks = gateway.checks;
       expect(checks).toEqual({
         'myAdapter:lastOperation': [
           {

@@ -12,6 +12,6 @@
 import { Jobs } from '@mdf.js/core';
 
 export type JobObject<Type extends string = string, Data = any> = Omit<
-  Jobs.Object<Type, Data>,
+  Jobs.JobObject<Type, Data>,
   'status'
 >;

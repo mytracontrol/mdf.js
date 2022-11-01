@@ -12,16 +12,16 @@
 import { Crash } from '@mdf.js/crash';
 import EventEmitter from 'events';
 import { v4 } from 'uuid';
-import { Consumer, Producer, Proxy } from '.';
+import { Consumer, Gateway, Producer } from '.';
 import {
   CommandJobHandler,
   ConsumerAdapter,
   ConsumerOptions,
   Control,
+  GatewayOptions,
   OnCommandHandler,
   ProducerAdapter,
   ProducerOptions,
-  ProxyOptions,
 } from '../types';
 
 const NOOP: () => void = () => {};
@@ -40,8 +40,8 @@ const consumerOptions: ConsumerOptions = {
   actuator: ['myActuator'],
   registerLimit: 2,
 };
-const proxyOptions: ProxyOptions = {
-  id: 'myProxy',
+const gatewayOptions: GatewayOptions = {
+  id: 'myGateway',
   actionTargetPairs: {},
   profiles: [],
   registerLimit: 2,
@@ -774,11 +774,11 @@ describe('#OpenC2 #Components', () => {
       await consumer1.stop();
       await producer.stop();
     }, 300);
-    it(`Should perform a valid command to one consumer, omitting responses for other providers or acks, behind a Proxy`, done => {
+    it(`Should perform a valid command to one consumer, omitting responses for other providers or acks, behind a Gateway`, done => {
       const consumerAdapter1 = new MyConsumerAdapter();
       const producerAdapter = new MyProducerAdapter();
-      const proxyConsumer = new MyConsumerAdapter();
-      const proxyProducer = new MyProducerAdapter();
+      const gatewayConsumer = new MyConsumerAdapter();
+      const gatewayProducer = new MyProducerAdapter();
 
       producerAdapter.on('message', message => {
         const onResponse = (error?: Crash | Error, response?: Control.ResponseMessage) => {
@@ -789,17 +789,17 @@ describe('#OpenC2 #Components', () => {
             producerAdapter.emit(response.request_id, response);
           }
         };
-        if (proxyConsumer.handler) {
-          proxyConsumer.handler(message, onResponse);
+        if (gatewayConsumer.handler) {
+          gatewayConsumer.handler(message, onResponse);
         }
       });
-      proxyProducer.on('message', message => {
+      gatewayProducer.on('message', message => {
         const onResponse = (error?: Crash | Error, response?: Control.ResponseMessage) => {
           if (error) {
             throw error;
           }
           if (response) {
-            proxyProducer.emit(response.request_id, response);
+            gatewayProducer.emit(response.request_id, response);
           }
         };
         if (consumerAdapter1.handler) {
@@ -814,8 +814,8 @@ describe('#OpenC2 #Components', () => {
         lookupInterval: 0,
         lookupTimeout: 0,
       });
-      const proxy = new Proxy(proxyConsumer, proxyProducer, {
-        ...proxyOptions,
+      const gateway = new Gateway(gatewayConsumer, gatewayProducer, {
+        ...gatewayOptions,
         bypassLookupIntervalChecks: true,
         lookupInterval: 100,
         lookupTimeout: 50,
@@ -824,12 +824,12 @@ describe('#OpenC2 #Components', () => {
         commandJob.done();
       };
       consumer1.on('command', onJob);
-      proxy.consumerMap.on('updated', () => {
+      gateway.consumerMap.on('updated', () => {
         producer
           .command({
             ...COMMAND,
             created: new Date().getTime(),
-            to: ['myProxy'],
+            to: ['myGateway'],
             content: { ...COMMAND.content, args: { duration: 30000 } },
           })
           .then(responses => {
@@ -840,7 +840,7 @@ describe('#OpenC2 #Components', () => {
                 request_id: responses[0].request_id,
                 status: 200,
                 created: responses[0].created,
-                from: 'myProxy',
+                from: 'myGateway',
                 to: ['myProducer'],
                 content: {
                   status: 200,
@@ -850,17 +850,17 @@ describe('#OpenC2 #Components', () => {
               },
             ]);
           })
-          .then(() => Promise.all([consumer1.stop(), producer.stop(), proxy.stop()]))
+          .then(() => Promise.all([consumer1.stop(), producer.stop(), gateway.stop()]))
           .then(() => done());
       });
-      Promise.all([consumer1.start(), producer.start(), proxy.start()]).then();
+      Promise.all([consumer1.start(), producer.start(), gateway.start()]).then();
     }, 300);
-    it(`Should perform a valid command to several consumers, omitting responses for other providers or acks, behind a Proxy`, done => {
+    it(`Should perform a valid command to several consumers, omitting responses for other providers or acks, behind a Gateway`, done => {
       const consumerAdapter1 = new MyConsumerAdapter();
       const consumerAdapter2 = new MyConsumerAdapter();
       const producerAdapter = new MyProducerAdapter();
-      const proxyConsumer = new MyConsumerAdapter();
-      const proxyProducer = new MyProducerAdapter();
+      const gatewayConsumer = new MyConsumerAdapter();
+      const gatewayProducer = new MyProducerAdapter();
 
       producerAdapter.on('message', message => {
         const onResponse = (error?: Crash | Error, response?: Control.ResponseMessage) => {
@@ -871,17 +871,17 @@ describe('#OpenC2 #Components', () => {
             producerAdapter.emit(response.request_id, response);
           }
         };
-        if (proxyConsumer.handler) {
-          proxyConsumer.handler(message, onResponse);
+        if (gatewayConsumer.handler) {
+          gatewayConsumer.handler(message, onResponse);
         }
       });
-      proxyProducer.on('message', message => {
+      gatewayProducer.on('message', message => {
         const onResponse = (error?: Crash | Error, response?: Control.ResponseMessage) => {
           if (error) {
             throw error;
           }
           if (response) {
-            proxyProducer.emit(response.request_id, response);
+            gatewayProducer.emit(response.request_id, response);
           }
         };
         if (consumerAdapter1.handler) {
@@ -900,8 +900,8 @@ describe('#OpenC2 #Components', () => {
         lookupInterval: 0,
         lookupTimeout: 0,
       });
-      const proxy = new Proxy(proxyConsumer, proxyProducer, {
-        ...proxyOptions,
+      const gateway = new Gateway(gatewayConsumer, gatewayProducer, {
+        ...gatewayOptions,
         bypassLookupIntervalChecks: true,
         lookupInterval: 100,
         lookupTimeout: 50,
@@ -912,7 +912,7 @@ describe('#OpenC2 #Components', () => {
       };
       consumer1.on('command', onJob);
       consumer2.on('command', onJob);
-      proxy.consumerMap.on('updated', () => {
+      gateway.consumerMap.on('updated', () => {
         producer
           .command({
             ...COMMAND,
@@ -928,7 +928,7 @@ describe('#OpenC2 #Components', () => {
                 request_id: responses[0].request_id,
                 status: 200,
                 created: responses[0].created,
-                from: 'myProxy',
+                from: 'myGateway',
                 to: ['myProducer'],
                 content: {
                   status: 200,
@@ -939,18 +939,18 @@ describe('#OpenC2 #Components', () => {
             ]);
           })
           .then(() =>
-            Promise.all([consumer1.stop(), consumer2.stop(), producer.stop(), proxy.stop()])
+            Promise.all([consumer1.stop(), consumer2.stop(), producer.stop(), gateway.stop()])
           )
           .then(() => done());
       });
-      Promise.all([consumer1.start(), consumer2.start(), producer.start(), proxy.start()]).then();
+      Promise.all([consumer1.start(), consumer2.start(), producer.start(), gateway.start()]).then();
     }, 300);
-    it(`Should perform a valid command to one consumer using asset_id, omitting responses for other providers or acks, behind a Proxy`, done => {
+    it(`Should perform a valid command to one consumer using asset_id, omitting responses for other providers or acks, behind a Gateway`, done => {
       const consumerAdapter1 = new MyConsumerAdapter();
       const consumerAdapter2 = new MyConsumerAdapter();
       const producerAdapter = new MyProducerAdapter();
-      const proxyConsumer = new MyConsumerAdapter();
-      const proxyProducer = new MyProducerAdapter();
+      const gatewayConsumer = new MyConsumerAdapter();
+      const gatewayProducer = new MyProducerAdapter();
 
       producerAdapter.on('message', message => {
         const onResponse = (error?: Crash | Error, response?: Control.ResponseMessage) => {
@@ -961,17 +961,17 @@ describe('#OpenC2 #Components', () => {
             producerAdapter.emit(response.request_id, response);
           }
         };
-        if (proxyConsumer.handler) {
-          proxyConsumer.handler(message, onResponse);
+        if (gatewayConsumer.handler) {
+          gatewayConsumer.handler(message, onResponse);
         }
       });
-      proxyProducer.on('message', message => {
+      gatewayProducer.on('message', message => {
         const onResponse = (error?: Crash | Error, response?: Control.ResponseMessage) => {
           if (error) {
             throw error;
           }
           if (response) {
-            proxyProducer.emit(response.request_id, response);
+            gatewayProducer.emit(response.request_id, response);
           }
         };
         if (consumerAdapter1.handler) {
@@ -990,8 +990,8 @@ describe('#OpenC2 #Components', () => {
         lookupInterval: 0,
         lookupTimeout: 0,
       });
-      const proxy = new Proxy(proxyConsumer, proxyProducer, {
-        ...proxyOptions,
+      const gateway = new Gateway(gatewayConsumer, gatewayProducer, {
+        ...gatewayOptions,
         bypassLookupIntervalChecks: true,
         lookupInterval: 100,
         lookupTimeout: 50,
@@ -1002,12 +1002,12 @@ describe('#OpenC2 #Components', () => {
       };
       consumer1.on('command', onJob);
       consumer2.on('command', onJob);
-      proxy.consumerMap.on('updated', () => {
+      gateway.consumerMap.on('updated', () => {
         producer
           .command({
             ...COMMAND,
             created: new Date().getTime(),
-            to: ['myProxy'],
+            to: ['myGateway'],
             content: {
               ...COMMAND.content,
               args: { duration: 100 },
@@ -1026,7 +1026,7 @@ describe('#OpenC2 #Components', () => {
                 request_id: responses[0].request_id,
                 status: 200,
                 created: responses[0].created,
-                from: 'myProxy',
+                from: 'myGateway',
                 to: ['myProducer'],
                 content: {
                   status: 200,
@@ -1037,11 +1037,11 @@ describe('#OpenC2 #Components', () => {
             ]);
           })
           .then(() =>
-            Promise.all([consumer1.stop(), consumer2.stop(), producer.stop(), proxy.stop()])
+            Promise.all([consumer1.stop(), consumer2.stop(), producer.stop(), gateway.stop()])
           )
           .then(() => done());
       });
-      Promise.all([consumer1.start(), consumer2.start(), producer.start(), proxy.start()]).then();
+      Promise.all([consumer1.start(), consumer2.start(), producer.start(), gateway.start()]).then();
     }, 300);
   });
   describe('#Sad path', () => {
@@ -1446,12 +1446,12 @@ describe('#OpenC2 #Components', () => {
       await producer.stop();
       jest.clearAllMocks();
     }, 300);
-    it(`Should reject the command if there is not enough time to perform the command, behind a Proxy`, done => {
+    it(`Should reject the command if there is not enough time to perform the command, behind a Gateway`, done => {
       const consumerAdapter1 = new MyConsumerAdapter();
       const consumerAdapter2 = new MyConsumerAdapter();
       const producerAdapter = new MyProducerAdapter();
-      const proxyConsumer = new MyConsumerAdapter();
-      const proxyProducer = new MyProducerAdapter();
+      const gatewayConsumer = new MyConsumerAdapter();
+      const gatewayProducer = new MyProducerAdapter();
 
       producerAdapter.on('message', message => {
         const onResponse = (error?: Crash | Error, response?: Control.ResponseMessage) => {
@@ -1462,17 +1462,17 @@ describe('#OpenC2 #Components', () => {
             producerAdapter.emit(response.request_id, response);
           }
         };
-        if (proxyConsumer.handler) {
-          proxyConsumer.handler(message, onResponse);
+        if (gatewayConsumer.handler) {
+          gatewayConsumer.handler(message, onResponse);
         }
       });
-      proxyProducer.on('message', message => {
+      gatewayProducer.on('message', message => {
         const onResponse = (error?: Crash | Error, response?: Control.ResponseMessage) => {
           if (error) {
             throw error;
           }
           if (response) {
-            proxyProducer.emit(response.request_id, response);
+            gatewayProducer.emit(response.request_id, response);
           }
         };
         if (consumerAdapter1.handler) {
@@ -1491,14 +1491,14 @@ describe('#OpenC2 #Components', () => {
         lookupInterval: 0,
         lookupTimeout: 0,
       });
-      const proxy = new Proxy(proxyConsumer, proxyProducer, {
-        ...proxyOptions,
+      const gateway = new Gateway(gatewayConsumer, gatewayProducer, {
+        ...gatewayOptions,
         bypassLookupIntervalChecks: true,
         lookupInterval: 100,
         lookupTimeout: 50,
         delay: 10000,
       });
-      proxy.on('error', error => {
+      gateway.on('error', error => {
         expect(error.message).toEqual('No enough time to perform the forwarding of the command');
       });
       const onJob = (commandJob: CommandJobHandler) => {
@@ -1506,12 +1506,12 @@ describe('#OpenC2 #Components', () => {
       };
       consumer1.on('command', onJob);
       consumer2.on('command', onJob);
-      proxy.consumerMap.on('updated', () => {
+      gateway.consumerMap.on('updated', () => {
         producer
           .command({
             ...COMMAND,
             created: new Date().getTime(),
-            to: ['myProxy'],
+            to: ['myGateway'],
             content: {
               ...COMMAND.content,
               args: { duration: 100 },
@@ -1519,19 +1519,19 @@ describe('#OpenC2 #Components', () => {
           })
           .catch(error => {
             expect(error.message).toEqual('Command was not fulfilled: [status 500]');
-            Promise.all([consumer1.stop(), consumer2.stop(), producer.stop(), proxy.stop()]).then(
+            Promise.all([consumer1.stop(), consumer2.stop(), producer.stop(), gateway.stop()]).then(
               () => done()
             );
           });
       });
-      Promise.all([consumer1.start(), consumer2.start(), producer.start(), proxy.start()]).then();
+      Promise.all([consumer1.start(), consumer2.start(), producer.start(), gateway.start()]).then();
     }, 300);
     it(`Should`, done => {
       const consumerAdapter1 = new MyConsumerAdapter();
       const consumerAdapter2 = new MyConsumerAdapter();
       const producerAdapter = new MyProducerAdapter();
-      const proxyConsumer = new MyConsumerAdapter();
-      const proxyProducer = new MyProducerAdapter();
+      const gatewayConsumer = new MyConsumerAdapter();
+      const gatewayProducer = new MyProducerAdapter();
 
       producerAdapter.on('message', message => {
         const onResponse = (error?: Crash | Error, response?: Control.ResponseMessage) => {
@@ -1542,17 +1542,17 @@ describe('#OpenC2 #Components', () => {
             producerAdapter.emit(response.request_id, response);
           }
         };
-        if (proxyConsumer.handler) {
-          proxyConsumer.handler(message, onResponse);
+        if (gatewayConsumer.handler) {
+          gatewayConsumer.handler(message, onResponse);
         }
       });
-      proxyProducer.on('message', message => {
+      gatewayProducer.on('message', message => {
         const onResponse = (error?: Crash | Error, response?: Control.ResponseMessage) => {
           if (error) {
             throw error;
           }
           if (response) {
-            proxyProducer.emit(response.request_id, response);
+            gatewayProducer.emit(response.request_id, response);
           }
         };
         if (consumerAdapter1.handler) {
@@ -1571,25 +1571,25 @@ describe('#OpenC2 #Components', () => {
         lookupInterval: 0,
         lookupTimeout: 0,
       });
-      const proxy = new Proxy(proxyConsumer, proxyProducer, {
-        ...proxyOptions,
+      const gateway = new Gateway(gatewayConsumer, gatewayProducer, {
+        ...gatewayOptions,
         bypassLookupIntervalChecks: true,
         lookupInterval: 100,
         lookupTimeout: 50,
         delay: 5,
       });
-      jest.spyOn(proxy.consumerMap, 'getConsumersWithPair').mockReturnValue([]);
+      jest.spyOn(gateway.consumerMap, 'getConsumersWithPair').mockReturnValue([]);
       const onJob = (commandJob: CommandJobHandler) => {
         commandJob.done();
       };
       consumer1.on('command', onJob);
       consumer2.on('command', onJob);
-      proxy.consumerMap.on('updated', () => {
+      gateway.consumerMap.on('updated', () => {
         producer
           .command({
             ...COMMAND,
             created: new Date().getTime(),
-            to: ['myProxy'],
+            to: ['myGateway'],
             content: {
               ...COMMAND.content,
               args: { duration: 100 },
@@ -1597,12 +1597,12 @@ describe('#OpenC2 #Components', () => {
           })
           .catch(error => {
             expect(error.message).toEqual('Command was not fulfilled: [status 500]');
-            Promise.all([consumer1.stop(), consumer2.stop(), producer.stop(), proxy.stop()]).then(
+            Promise.all([consumer1.stop(), consumer2.stop(), producer.stop(), gateway.stop()]).then(
               () => done()
             );
           });
       });
-      Promise.all([consumer1.start(), consumer2.start(), producer.start(), proxy.start()]).then();
+      Promise.all([consumer1.start(), consumer2.start(), producer.start(), gateway.start()]).then();
     }, 300);
   });
 });

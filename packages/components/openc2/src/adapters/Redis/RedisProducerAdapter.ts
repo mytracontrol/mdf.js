@@ -49,7 +49,11 @@ export class RedisProducerAdapter extends RedisAdapter implements ProducerAdapte
     }
   }
   /** Wrapper function for message adaptation */
-  private subscriptionAdapter = (pattern: string, topic: string, incomingMessage: string) => {
+  private readonly subscriptionAdapter = (
+    pattern: string,
+    topic: string,
+    incomingMessage: string
+  ) => {
     try {
       const message = JSON.parse(incomingMessage);
       this.emit(message.request_id, message);

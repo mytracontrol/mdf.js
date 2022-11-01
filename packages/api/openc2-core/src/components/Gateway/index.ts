@@ -8,19 +8,4 @@
  * Dissemination of this information or the reproduction of this material is strictly forbidden
  * unless prior written permission is obtained from Mytra Control S.L.
  */
-
-import { Headers } from './Headers.i';
-import { Status } from './Status.t';
-
-export interface Object<Type extends string = string, Data = any> {
-  /** Job type identification, used to identify specific job handlers to be applied */
-  type?: Type;
-  /** Job identification */
-  jobId: string;
-  /** Job payload */
-  data: Data;
-  /** Job meta information, used to pass specific information for sinks and sources */
-  headers?: Headers;
-  /** Job status */
-  status: Status;
-}
+export * from './Gateway';

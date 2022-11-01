@@ -28,7 +28,7 @@ export class Registry extends EventEmitter implements Health.Component {
   /** Uncleaned jobs check internal interval */
   private interval?: NodeJS.Timeout;
   /** Time in milliseconds assigned to check internal */
-  private timeInterval: number;
+  private readonly timeInterval: number;
   /** Represent the actual status of the register of jobs */
   private status: Health.API.Status = 'pass';
   /**
@@ -104,7 +104,7 @@ export class Registry extends EventEmitter implements Health.Component {
   /**
    * Check if there are pending jobs that have been pending for too long
    */
-  private checkOldPendingJobs = (): void => {
+  private readonly checkOldPendingJobs = (): void => {
     const now = Date.now();
     let newStatus: Health.API.Status = 'pass';
     for (const [, job] of this.pendingJobs[Symbol.iterator]()) {

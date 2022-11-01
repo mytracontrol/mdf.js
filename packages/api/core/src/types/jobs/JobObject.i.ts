@@ -9,12 +9,18 @@
  * unless prior written permission is obtained from Mytra Control S.L.
  */
 
-import { ConsumerOptions } from './ConsumerOptions.i';
-import { ProducerOptions } from './ProducerOptions.i';
+import { Headers } from './Headers.i';
+import { Status } from './Status.t';
 
-export interface ProxyOptions extends ConsumerOptions, ProducerOptions {
-  /** Proxy delay */
-  delay?: number;
-  /** Bypass lookup interval times checks */
-  bypassLookupIntervalChecks?: boolean;
+export interface JobObject<Type extends string = string, Data = any> {
+  /** Job type identification, used to identify specific job handlers to be applied */
+  type?: Type;
+  /** Job identification */
+  jobId: string;
+  /** Job payload */
+  data: Data;
+  /** Job meta information, used to pass specific information for sinks and sources */
+  headers?: Headers;
+  /** Job status */
+  status: Status;
 }

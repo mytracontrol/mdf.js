@@ -30,7 +30,7 @@ import { MetricConfig, MetricInstancesObject, MetricsResponse, METRIC_TYPES } fr
 /** MetricsAggregator, management of all the metrics for this artifact */
 export class Aggregator {
   /** Instance unique identifier for trace purposes */
-  readonly #uuid: string = v4();
+  private readonly uuid: string = v4();
   /** Registry used to store the metrics */
   private readonly registry: Registry | ClusterRegistry;
   /**
@@ -80,10 +80,10 @@ export class Aggregator {
    * @returns
    */
   public setMetrics<
-    T extends Record<string, Metric<string>> | void = void,
+    T extends Record<string, Metric> | void = void,
     K extends Record<string, MetricConfig> = Record<string, MetricConfig>
   >(metrics: K): MetricInstancesObject<T, K> {
-    const result: Record<string, Metric<string>> = {};
+    const result: Record<string, Metric> = {};
     try {
       for (const [name, config] of Object.entries(metrics)) {
         result[name] = this.setMetric(config);
@@ -93,7 +93,7 @@ export class Aggregator {
       const error = Crash.from(rawError);
       throw new Crash(
         `Error including new metrics in the aggregator: ${error.message}`,
-        this.#uuid,
+        this.uuid,
         { cause: error }
       );
     }
@@ -109,7 +109,7 @@ export class Aggregator {
    * Get a single metric from registry
    * @param name - name of metric
    */
-  public getMetric(name: string): Metric<string> | undefined {
+  public getMetric(name: string): Metric | undefined {
     return this.registry.getSingleMetric(name);
   }
   /**
@@ -135,14 +135,14 @@ export class Aggregator {
    * Cumulative metric that represents a single numerical value that only ever goes up
    * @param config - Configuration when creating a Counter metric. Name and Help is required.
    */
-  private addCounter(config: Omit<CounterConfiguration<string>, 'registers'>): Counter<string> {
+  private addCounter(config: Omit<CounterConfiguration<string>, 'registers'>): Counter {
     return new Counter({ ...config, registers: [this.registry] });
   }
   /**
    * Gauge is a metric that represents a single numerical value that can arbitrarily go up and down
    * @param config - Configuration when creating a Gauge metric. Name and Help is mandatory
    */
-  private addGauge(config: Omit<GaugeConfiguration<string>, 'registers'>): Gauge<string> {
+  private addGauge(config: Omit<GaugeConfiguration<string>, 'registers'>): Gauge {
     return new Gauge({ ...config, registers: [this.registry] });
   }
   /**
@@ -150,16 +150,14 @@ export class Aggregator {
    * counts them in configurable buckets
    * @param config - Configuration when creating the Histogram. Name and Help is mandatory
    */
-  private addHistogram(
-    config: Omit<HistogramConfiguration<string>, 'registers'>
-  ): Histogram<string> {
+  private addHistogram(config: Omit<HistogramConfiguration<string>, 'registers'>): Histogram {
     return new Histogram({ ...config, registers: [this.registry] });
   }
   /**
    * A summary samples observations
    * @param config - Configuration when creating Summary metric. Name and Help is mandatory
    */
-  private addSummary(config: Omit<SummaryConfiguration<string>, 'registers'>): Summary<string> {
+  private addSummary(config: Omit<SummaryConfiguration<string>, 'registers'>): Summary {
     return new Summary({ ...config, registers: [this.registry] });
   }
   /**
@@ -167,16 +165,16 @@ export class Aggregator {
    * @param config - Configuration for creating a metric. Name, help and type are mandatory
    * @returns
    */
-  private setMetric<T extends MetricConfig>(config: T): Metric<string> {
-    let result: Metric<string> | undefined;
+  private setMetric<T extends MetricConfig>(config: T): Metric {
+    let result: Metric | undefined;
     if (typeof config.name !== 'string' || config.name.length === 0) {
-      throw new Crash('Metric name is required', this.#uuid);
+      throw new Crash('Metric name is required', this.uuid);
     }
     if (typeof config.help !== 'string' || config.help.length === 0) {
-      throw new Crash('Metric help is required', this.#uuid);
+      throw new Crash('Metric help is required', this.uuid);
     }
     if (typeof config.type !== 'string' || !METRIC_TYPES.includes(config.type)) {
-      throw new Crash(`Metric type is required, and should be one of: ${METRIC_TYPES}`, this.#uuid);
+      throw new Crash(`Metric type is required, and should be one of: ${METRIC_TYPES}`, this.uuid);
     }
     switch (config.type) {
       case 'Counter':
@@ -192,7 +190,7 @@ export class Aggregator {
         result = this.addSummary(config);
         break;
       default:
-        throw new Crash(`Unknown metric type ${config.type}`, this.#uuid);
+        throw new Crash(`Unknown metric type ${config.type}`, this.uuid);
     }
     return result;
   }

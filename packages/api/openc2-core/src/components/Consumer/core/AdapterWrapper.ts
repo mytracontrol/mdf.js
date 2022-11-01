@@ -112,13 +112,13 @@ export class AdapterWrapper extends EventEmitter implements Health.Component {
     }
   }
   /** Register an error in the adapter operation */
-  private onOperationError = (rawError: Crash | Multi | Error): void => {
+  private readonly onOperationError = (rawError: Crash | Multi | Error): void => {
     this.lastOperationError = Crash.from(rawError, this.adapter.componentId);
     this.lastOperationDate = new Date();
     this.emitStatus();
   };
   /** Register an error in the adapter operation */
-  private onOperationSuccess = (): void => {
+  private readonly onOperationSuccess = (): void => {
     this.lastOperationError = undefined;
     this.lastOperationDate = new Date();
   };

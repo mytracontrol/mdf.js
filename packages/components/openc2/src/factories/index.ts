@@ -10,5 +10,5 @@
  */
 
 export { ConsumerFactory as Consumer } from './ConsumerFactory';
+export { GatewayFactory } from './GatewayFactory';
 export { ProducerFactory as Producer } from './ProducerFactory';
-export { ProxyFactory as Proxy } from './ProxyFactory';

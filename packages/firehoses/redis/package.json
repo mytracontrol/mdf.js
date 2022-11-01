@@ -30,6 +30,7 @@
   },
   "dependencies": {
     "@mdf.js/crash": "*",
+    "@mdf.js/core": "*",
     "@mdf.js/firehose": "*",
     "@mdf.js/redis-provider": "*",
     "@mdf.js/utils": "*",

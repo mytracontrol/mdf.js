@@ -88,18 +88,18 @@ const METRICS_DEFINITIONS: Record<string, MetricConfig> = {
 };
 /** Metric types */
 type MetricInstances = {
-  api_all_request_total: Counter<string>;
-  api_all_info_total: Counter<string>;
-  api_all_success_total: Counter<string>;
-  api_all_redirect_total: Counter<string>;
-  api_all_errors_total: Counter<string>;
-  api_all_client_error_total: Counter<string>;
-  api_all_server_error_total: Counter<string>;
-  api_all_request_in_processing_total: Gauge<string>;
-  api_request_total: Counter<string>;
-  api_request_duration_milliseconds: Histogram<string>;
-  api_request_size_bytes: Histogram<string>;
-  api_response_size_bytes: Histogram<string>;
+  api_all_request_total: Counter;
+  api_all_info_total: Counter;
+  api_all_success_total: Counter;
+  api_all_redirect_total: Counter;
+  api_all_errors_total: Counter;
+  api_all_client_error_total: Counter;
+  api_all_server_error_total: Counter;
+  api_all_request_in_processing_total: Gauge;
+  api_request_total: Counter;
+  api_request_duration_milliseconds: Histogram;
+  api_request_size_bytes: Histogram;
+  api_response_size_bytes: Histogram;
 };
 const CONTENT_LENGTH_HEADER = 'content-length';
 /** MetricsExpressMiddleware middleware */

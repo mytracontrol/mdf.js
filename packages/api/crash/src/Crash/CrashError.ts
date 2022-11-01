@@ -31,7 +31,7 @@ import { Cause, CrashObject, CrashOptions } from '../types';
  */
 export class Crash extends Base {
   /** Crash error cause */
-  private _cause?: Cause;
+  private readonly _cause?: Cause;
   /** Crash error */
   private readonly _isCrash = true;
   /**

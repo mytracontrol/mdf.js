@@ -28,9 +28,9 @@ export class RunningState implements State {
    * @param manageError - Provider error management function function
    */
   constructor(
-    private instance: AnyWrappedPort,
-    private changeState: (newState: State) => void,
-    private manageError: (error: unknown) => void
+    private readonly instance: AnyWrappedPort,
+    private readonly changeState: (newState: State) => void,
+    private readonly manageError: (error: unknown) => void
   ) {
     this.instance.once('error', this.errorEventHandler);
     this.instance.once('closed', this.errorEventHandler);

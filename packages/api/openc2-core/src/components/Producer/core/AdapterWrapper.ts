@@ -118,13 +118,13 @@ export class AdapterWrapper extends EventEmitter implements Health.Component {
     }
   }
   /** Register an error in the adapter operation */
-  private onOperationError = (rawError: Crash | Multi): void => {
+  private readonly onOperationError = (rawError: Crash | Multi): void => {
     this.lastOperationError = Crash.from(rawError, this.adapter.componentId);
     this.lastOperationDate = new Date();
     this.emitStatus();
   };
   /** Register an error in the adapter operation */
-  private onOperationSuccess = (): void => {
+  private readonly onOperationSuccess = (): void => {
     this.lastOperationError = undefined;
     this.lastOperationDate = new Date();
   };
@@ -132,8 +132,7 @@ export class AdapterWrapper extends EventEmitter implements Health.Component {
   public async publish(
     message: Control.Message
   ): Promise<Control.ResponseMessage | Control.ResponseMessage[] | void> {
-    const result = await this.wrappedOperation(this.publishOriginal, [message], this.retryOptions);
-    return result;
+    return await this.wrappedOperation(this.publishOriginal, [message], this.retryOptions);
   }
   /**
    * Return the status of the adapter in a standard format

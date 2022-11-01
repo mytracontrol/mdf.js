@@ -9,6 +9,7 @@
  * unless prior written permission is obtained from Mytra Control S.L.
  */
 
+export type ProcessesSupervised = 'upstart' | 'systemd' | 'unknown' | 'no';
 export interface ServerStats {
   /** Error parsing message */
   errorParsing?: string;
@@ -35,7 +36,7 @@ export interface ServerStats {
   /** PID of the server process */
   process_id: string;
   /** Supervised system ("upstart", "systemd", "unknown" or "no") */
-  process_supervised: 'upstart' | 'systemd' | 'unknown' | 'no';
+  process_supervised: ProcessesSupervised;
   /** Random value identifying the Redis server (to be used by Sentinel and Cluster) */
   run_id: string;
   /** TCP/IP listen port */

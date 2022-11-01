@@ -13,6 +13,7 @@ import { coerce, loadFile } from '@mdf.js/utils';
 import { Config } from '../provider';
 import { logger, nodeToNodes, selectAuth } from './utils';
 
+type ResurrectStrategy = 'ping' | 'optimistic' | 'none' | undefined;
 // *************************************************************************************************
 // #region Environment variables
 const CONFIG_ELASTIC_NODES = nodeToNodes(
@@ -26,11 +27,9 @@ const CONFIG_ELASTIC_REQUEST_TIMEOUT = coerce<number>(
   process.env['CONFIG_ELASTIC_REQUEST_TIMEOUT']
 );
 const CONFIG_ELASTIC_PING_TIMEOUT = coerce<number>(process.env['CONFIG_ELASTIC_PING_TIMEOUT']);
-const CONFIG_ELASTIC_RESURRECT_STRATEGY = process.env['CONFIG_ELASTIC_RESURRECT_STRATEGY'] as
-  | 'ping'
-  | 'optimistic'
-  | 'none'
-  | undefined;
+const CONFIG_ELASTIC_RESURRECT_STRATEGY = process.env[
+  'CONFIG_ELASTIC_RESURRECT_STRATEGY'
+] as ResurrectStrategy;
 const CONFIG_ELASTIC_PROXY = process.env['CONFIG_ELASTIC_PROXY'];
 
 const CONFIG_ELASTIC_NAME = process.env['CONFIG_ELASTIC_NAME'];

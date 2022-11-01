@@ -136,7 +136,7 @@ export class HealthFacade extends EventEmitter implements Health.Service {
    * @param error - Error triggered by the component
    * @param name - Component that triggered the error
    */
-  private errorEventHandler = (error: Crash | Error): void => {
+  private readonly errorEventHandler = (error: Crash | Error): void => {
     if (this.listenerCount('error') > 0) {
       this.emit('error', error);
     }

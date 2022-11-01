@@ -51,7 +51,7 @@ export class SocketIOProducerAdapter extends SocketIOAdapter implements Producer
     }
   }
   /** Wrapper function for message adaptation */
-  private subscriptionAdapter = (
+  private readonly subscriptionAdapter = (
     error: Error | null,
     incomingMessage: Control.ResponseMessage | Control.ResponseMessage[]
   ) => {

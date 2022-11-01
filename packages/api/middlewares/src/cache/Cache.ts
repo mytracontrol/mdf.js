@@ -72,11 +72,11 @@ const DEFAULT_CONFIG_CACHE: CacheConfig = {
 /** CacheRequest middleware */
 export class Cache {
   /** Middleware class name */
-  readonly #context: string = this.constructor.name;
+  private readonly context: string = this.constructor.name;
   /** Cache repository */
-  private repository: CacheRepository;
+  private readonly repository: CacheRepository;
   /** Cache options */
-  #options: CacheConfig;
+  private options: CacheConfig;
   /**
    * Cache middleware instance
    * @param client - redis client
@@ -101,7 +101,7 @@ export class Cache {
    */
   private constructor(repository: CacheRepository, options?: Partial<CacheConfig>) {
     this.repository = repository;
-    this.#options = merge(cloneDeep(DEFAULT_CONFIG_CACHE), options);
+    this.options = merge(cloneDeep(DEFAULT_CONFIG_CACHE), options);
   }
   /**
    * Cache middleware function
@@ -109,10 +109,10 @@ export class Cache {
    * @returns
    */
   public handler(options?: Partial<CacheConfig>): RequestHandler {
-    const localOptions = merge(cloneDeep(this.#options), options);
+    const localOptions = merge(cloneDeep(this.options), options);
     return (req: Request, res: Response, next: NextFunction) => {
       // Stryker disable next-line all
-      logger.debug(`New request for path [${req.url}]`, req.uuid, this.#context);
+      logger.debug(`New request for path [${req.url}]`, req.uuid, this.context);
       if (req.headers['x-cache-bypass']) {
         next();
       } else {
@@ -147,9 +147,9 @@ export class Cache {
     response: Response
   ): void {
     // Stryker disable next-line all
-    logger.debug(`The response was cached`, request.uuid, this.#context);
+    logger.debug(`The response was cached`, request.uuid, this.context);
     // Stryker disable next-line all
-    logger.silly(`${cachedResponse}`, request.uuid, this.#context);
+    logger.silly(`${cachedResponse}`, request.uuid, this.context);
     this.removeCacheHeaders(response);
     const headers = this.filterHeaders(options.headersBlacklist, response.getHeaders());
     Object.assign(headers, cachedResponse.headers, {
@@ -181,7 +181,7 @@ export class Cache {
     response.send = (body: any): Response => {
       if (this.isIncluded(options, request, response)) {
         // Stryker disable next-line all
-        logger.debug(`The response will be cached`, request.uuid, this.#context);
+        logger.debug(`The response will be cached`, request.uuid, this.context);
         this.removeCacheHeaders(response);
         response.setHeader('cache-control', `max-age=${options.duration}`);
         const wrappedResponse = wrappedSend(body);
@@ -204,7 +204,7 @@ export class Cache {
         return wrappedResponse;
       } else {
         // Stryker disable next-line all
-        logger.debug(`The response will NOT be cached`, request.uuid, this.#context);
+        logger.debug(`The response will NOT be cached`, request.uuid, this.context);
         return wrappedSend(body);
       }
     };
@@ -234,7 +234,7 @@ export class Cache {
    * @param res - Express response object
    */
   private isIncluded(options: CacheConfig, req: Request, res: Response): boolean {
-    const cachingEnabled = this.#options.enabled && options.enabled;
+    const cachingEnabled = this.options.enabled && options.enabled;
     const toggled = options.toggle && options.toggle(req, res);
 
     const codes = options.statusCodes;

@@ -11,4 +11,4 @@
 
 import { Jobs } from '@mdf.js/core';
 
-export type JobObject<Type extends string = string, Data = any> = Jobs.Object<Type, Data>;
+export type JobObject<Type extends string = string, Data = any> = Jobs.JobObject<Type, Data>;

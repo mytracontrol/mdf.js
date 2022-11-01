@@ -9,12 +9,13 @@
  * unless prior written permission is obtained from Mytra Control S.L.
  */
 
+export type AuditCategory = 'create' | 'modify' | 'execute' | 'access' | 'delete';
 /** Audit options */
 export interface AuditConfig {
   /** Access area */
   area: string;
   /** Access mode */
-  category: 'create' | 'modify' | 'execute' | 'access' | 'delete';
+  category: AuditCategory;
   /** Access details */
   details: string;
   /** Include body */

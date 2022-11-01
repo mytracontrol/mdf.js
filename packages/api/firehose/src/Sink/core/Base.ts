@@ -137,37 +137,37 @@ export abstract class Base<T extends Plugs.Sink.Any> extends Writable implements
     }
   }
   /** Super/Plug error event handler */
-  private onErrorEvent = (rawError: Error | Crash) => {
+  private readonly onErrorEvent = (rawError: Error | Crash) => {
     this.error = Crash.from(rawError, this.componentId);
     // Stryker disable next-line all
     this.logger(`Error in sink stream ${this.name}: ${this.error.message}`);
     this.emitStatus();
   };
   /** Plug status event handler */
-  private onStatusEvent = () => {
+  private readonly onStatusEvent = () => {
     this.emitStatus();
   };
   /** Super pipe event handler */
-  private onPipeEvent = () => {
+  private readonly onPipeEvent = () => {
     // Stryker disable next-line all
     this.logger.extend('debug')(`Sink stream ${this.plug.name} has been piped`);
     this.emitStatus();
   };
   /** Super unpipe event handler */
-  private onUnpipeEvent = () => {
+  private readonly onUnpipeEvent = () => {
     // Stryker disable next-line all
     this.logger.extend('debug')(`Sink stream ${this.plug.name} has been unpiped`);
     this.emitStatus();
     this.emit('lost', this);
   };
   /** Super drain event handler */
-  private onDrainEvent = () => {
+  private readonly onDrainEvent = () => {
     // Stryker disable next-line all
     this.logger.extend('debug')(`Sink stream ${this.plug.name} has been drained`);
     this.emitStatus();
   };
   /** Super close event handler */
-  private onCloseEvent = () => {
+  private readonly onCloseEvent = () => {
     // Stryker disable next-line all
     this.logger(`Sink stream ${this.plug.name} has been closed`);
     this.emitStatus();

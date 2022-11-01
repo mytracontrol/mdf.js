@@ -9,7 +9,7 @@
  * unless prior written permission is obtained from Mytra Control S.L.
  */
 
-import { Object as JobObject } from './Object.i';
+import { JobObject } from './JobObject.i';
 
 /** Base class for strategies */
 export interface Strategy<Type extends string = string, Data = any> {

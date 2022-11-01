@@ -146,12 +146,12 @@ export class PlugWrapper extends EventEmitter {
     ];
   }
   /** Register an error in the plug operation */
-  private onOperationError = (rawError: Crash | Multi): void => {
+  private readonly onOperationError = (rawError: Crash | Multi): void => {
     this.lastOperationError = Crash.from(rawError, this.plug.componentId);
     this.lastOperationDate = new Date();
   };
   /** Register an error in the plug operation */
-  private onOperationSuccess = (): void => {
+  private readonly onOperationSuccess = (): void => {
     this.lastOperationError = undefined;
     this.lastOperationDate = new Date();
   };

@@ -108,9 +108,9 @@ export class Port extends Provider.Port<Client, Config> {
     await this.stop();
   }
   /** Event handler for the `connect` event */
-  private onConnectEvent = () => this.emit('healthy');
+  private readonly onConnectEvent = () => this.emit('healthy');
   /** Event handler for the `disconnect` event */
-  private onDisconnectEvent = (reason: string) => {
+  private readonly onDisconnectEvent = (reason: string) => {
     // Stryker disable next-line all
     this.logger.debug(`Port disconnected: ${reason}`);
     if (!reason.includes('disconnect')) {

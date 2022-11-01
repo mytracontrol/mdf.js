@@ -33,9 +33,9 @@ export class ErrorState implements State {
    * @param manageError - Provider error management function function
    */
   constructor(
-    private instance: AnyWrappedPort,
-    private changeState: (newState: State) => void,
-    private manageError: (error: unknown) => void
+    private readonly instance: AnyWrappedPort,
+    private readonly changeState: (newState: State) => void,
+    private readonly manageError: (error: unknown) => void
   ) {
     this.instance.on('error', this.errorEventHandler);
     this.instance.on('unhealthy', this.errorEventHandler);

@@ -25,7 +25,7 @@ export declare interface JobHandler<Type, Data> {
 
 export class JobHandler<Type extends string = string, Data = any>
   extends EventEmitter
-  implements Jobs.Object<Type, Data>
+  implements Jobs.JobObject<Type, Data>
 {
   /** Job processing identification */
   public readonly uuid: string;
@@ -167,7 +167,7 @@ export class JobHandler<Type extends string = string, Data = any>
     };
   }
   /** Return an object with the key information of the job, this information is used by the plugs */
-  public toObject(): Jobs.Object<Type, Data> {
+  public toObject(): Jobs.JobObject<Type, Data> {
     return {
       data: this.data,
       type: this.type,

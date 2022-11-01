@@ -82,7 +82,7 @@ export class MetricsFacade extends EventEmitter implements Health.Service {
    * @returns
    */
   public setMetrics<
-    T extends Record<string, Metric<string>> | void = void,
+    T extends Record<string, Metric> | void = void,
     K extends Record<string, MetricConfig> = Record<string, MetricConfig>
   >(metrics: K): MetricInstancesObject<T, K> {
     return this.aggregator.setMetrics(metrics);
@@ -105,7 +105,7 @@ export class MetricsFacade extends EventEmitter implements Health.Service {
   /** Get a single metric from registry
    * @param name - name of metric
    */
-  public getMetric(name: string): Metric<string> | undefined {
+  public getMetric(name: string): Metric | undefined {
     return this.aggregator.getMetric(name);
   }
   /** Get a single metric value in Prometheus format

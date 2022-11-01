@@ -66,7 +66,11 @@ export class RedisConsumerAdapter extends RedisAdapter implements ConsumerAdapte
     }
   }
   /** Wrapper function for message adaptation */
-  private subscriptionAdapter = (pattern: string, topic: string, incomingMessage: string): void => {
+  private readonly subscriptionAdapter = (
+    pattern: string,
+    topic: string,
+    incomingMessage: string
+  ): void => {
     if (this.handler) {
       try {
         const message = JSON.parse(incomingMessage);

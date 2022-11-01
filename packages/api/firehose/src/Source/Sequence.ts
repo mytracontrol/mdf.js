@@ -104,7 +104,7 @@ export class Sequence extends Base<Plugs.Source.Sequence> {
    * Process the received jobs
    * @param job - job to be processed
    */
-  private _onJobReceived = (job: Plugs.Source.JobObject) => {
+  private readonly _onJobReceived = (job: Plugs.Source.JobObject) => {
     this.actualWindowSize++;
     // Stryker disable next-line all
     this.logger.extend('verbose')(`New job from consumer: ${job.jobId}`);

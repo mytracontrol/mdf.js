@@ -37,7 +37,7 @@ function authZ(options: AuthZOptions = {}): SocketIOMiddleware {
     const requestId = v4();
 
     hasValidAuthenticationInformation(token, requestId)
-      .then(token => verify(token, { secret, algorithms }, requestId))
+      .then(reportedToken => verify(reportedToken, { secret, algorithms }, requestId))
       .then(onAuthorization)
       .then(() => next())
       .catch(error => next(transformError(error)));

@@ -27,6 +27,8 @@ const ALLOWED_DISCONNECT_REASONS = [
   'server shutting down',
 ];
 
+const SUBJECT = 'Socket.IO OpenC2';
+
 export declare interface ServiceBus {
   /** Emitted when a server operation has some problem */
   on(event: 'error', listener: (error: Crash | Error) => void): this;
@@ -44,11 +46,17 @@ export class ServiceBus extends EventEmitter implements Health.Component {
   /** Component identification */
   public readonly componentId: string = v4();
   /** Socket.IO server instance */
-  private instance: SocketIOServer.Provider;
+  private readonly instance: SocketIOServer.Provider;
   /** OpenC2 Namespace */
-  private oc2Namespace: Namespace;
+  private readonly oc2Namespace: Namespace;
   /** Address mapper */
-  private addressMapper: AddressMapper;
+  private readonly addressMapper: AddressMapper;
+  /**
+   * Create a new ServiceBus instance
+   * @param serverOptions - Socket.IO server options
+   * @param options - Socket.IO client configuration options
+   * @param name - name of the service bus
+   */
   constructor(
     serverOptions: SocketIOServerOptions,
     options: ServiceBusOptions,
@@ -73,7 +81,7 @@ export class ServiceBus extends EventEmitter implements Health.Component {
    * Connection event handler for the OpenC2 namespace
    * @param socket - socket to be configured
    */
-  private onConnectionEventOC2Namespace = (socket: Socket): void => {
+  private readonly onConnectionEventOC2Namespace = (socket: Socket): void => {
     this.addressMapper.update(socket.id, socket.handshake.auth['nodeId']);
     if (socket.handshake.auth['type'] === 'producer') {
       socket.join('producer');
@@ -92,7 +100,7 @@ export class ServiceBus extends EventEmitter implements Health.Component {
    * @param command - command message from provider
    * @param callback - callback function, used as acknowledgement
    */
-  private eventHandler = (
+  private readonly eventHandler = (
     event: string,
     command: Control.CommandMessage,
     callback: (responses: Control.ResponseMessage[]) => void
@@ -103,7 +111,7 @@ export class ServiceBus extends EventEmitter implements Health.Component {
           new Crash(
             `Error in the acknowledgement callback function: ${error.message}`,
             this.componentId,
-            { info: { event, command, subject: 'Socket.IO OpenC2' } }
+            { info: { event, command, subject: SUBJECT } }
           )
         );
       } else if (!responses || (Array.isArray(responses) && responses.length === 0)) {
@@ -111,7 +119,7 @@ export class ServiceBus extends EventEmitter implements Health.Component {
           new Crash(
             'No responses returned in the acknowledgement callback function',
             this.componentId,
-            { info: { event, command, subject: 'Socket.IO OpenC2' } }
+            { info: { event, command, subject: SUBJECT } }
           )
         );
       } else {
@@ -147,13 +155,13 @@ export class ServiceBus extends EventEmitter implements Health.Component {
         new Crash(
           `Invalid command from or message in OpenC2 Socket.IO Server: ${event}`,
           this.componentId,
-          { info: { event, command, subject: 'Socket.IO OpenC2' } }
+          { info: { event, command, subject: SUBJECT } }
         )
       );
     }
   };
   /** Socket disconnection handler */
-  private onDisconnectEvent = (socketId: string): ((reason: string) => void) => {
+  private readonly onDisconnectEvent = (socketId: string): ((reason: string) => void) => {
     return (reason: string) => {
       const openC2Id = this.addressMapper.getBySocketId(socketId);
       const error = this.disconnectReasonToCrashError(reason, openC2Id || 'unknown');
@@ -174,7 +182,7 @@ export class ServiceBus extends EventEmitter implements Health.Component {
       return new Crash(
         `OpenC2 node ${openC2Id} has been disconnected due to: ${reason}`,
         this.componentId,
-        { info: { openC2Id: openC2Id, subject: 'Socket.IO OpenC2' } }
+        { info: { openC2Id: openC2Id, subject: SUBJECT } }
       );
     } else {
       return undefined;
@@ -184,7 +192,7 @@ export class ServiceBus extends EventEmitter implements Health.Component {
    * Manage the error in the service bus
    * @param error - error to be processed
    */
-  private onErrorHandler = (error: unknown) => {
+  private readonly onErrorHandler = (error: unknown) => {
     const crash = Crash.from(error);
     if (this.listenerCount('error') > 0) {
       this.emit('error', crash);
@@ -194,7 +202,7 @@ export class ServiceBus extends EventEmitter implements Health.Component {
    * Manage the status change in the service bus
    * @param status - status to be processed
    */
-  private onStatusHandler = (status: Health.API.Status): void => {
+  private readonly onStatusHandler = (status: Health.API.Status): void => {
     if (this.listenerCount('status') > 0) {
       this.emit('status', status);
     }

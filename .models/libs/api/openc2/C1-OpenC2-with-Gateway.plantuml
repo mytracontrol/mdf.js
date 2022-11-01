@@ -23,7 +23,7 @@ Component_Ext("JOBHANDLER3", "JobHandler", "Job", "Job handler, emitted by the c
 'CONSUMER
 Enterprise_Boundary(OPENC2, "OpenC2 Ecosystem", $tags="BoldLine") {
     Enterprise_Boundary(SITE, "OpenC2 Site") {
-        Container("PROXY", "Proxy", "Main", "Allow to interconnect a OpenC2 site with higher hierarchy level wrapping the site consumers", $tags=main+health)
+        Container("GATEWAY", "Gateway", "Main", "Allow to interconnect a OpenC2 site with higher hierarchy level wrapping the site consumers", $tags=main+health)
         SystemQueue("TRANSPORT1", "Transport", "Transport system used to interconnect the nodes that participate in the system (MQTT, Redis, Socket.IO ...)", $tags=reused)
         Container("CONSUMER1", "Consumer", "Main", "Manage the incoming commands, emitting jobs that should be resolved by the upper layers", $tags=main+health)
         Container("CONSUMER2", "Consumer", "Main", "Manage the incoming commands, emitting jobs that should be resolved by the upper layers", $tags=main+health)
@@ -40,11 +40,11 @@ Rel_U(PRODUCER1, UPPER_LAYER, "responses")
 Rel_D(PRODUCER1, TRANSPORT2, "OC2 command")
 Rel_U(TRANSPORT2, PRODUCER1, "OC2 respond")
 
-Rel_U(PROXY, TRANSPORT2, "OC2 command")
-Rel_D(TRANSPORT2, PROXY, "OC2 respond")
+Rel_U(GATEWAY, TRANSPORT2, "OC2 command")
+Rel_D(TRANSPORT2, GATEWAY, "OC2 respond")
 
-Rel_D(PROXY, TRANSPORT1, "OC2 command")
-Rel_U(TRANSPORT1, PROXY, "OC2 respond")
+Rel_D(GATEWAY, TRANSPORT1, "OC2 command")
+Rel_U(TRANSPORT1, GATEWAY, "OC2 respond")
 
 Rel_D(TRANSPORT1, CONSUMER1, "OC2 command")
 Rel_U(CONSUMER1, TRANSPORT1, "OC2 respond")

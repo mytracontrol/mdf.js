@@ -12,7 +12,7 @@
 import { Metric } from 'prom-client';
 
 export type MetricInstancesObject<T, K> = T extends void
-  ? Record<keyof K, Metric<string>>
-  : T extends Record<string, Metric<string>>
+  ? Record<keyof K, Metric>
+  : T extends Record<string, Metric>
   ? T
   : never;

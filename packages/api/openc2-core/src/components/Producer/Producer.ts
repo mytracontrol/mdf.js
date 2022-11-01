@@ -122,7 +122,7 @@ export class Producer extends Component<AdapterWrapper, ProducerOptions> {
     }
   }
   /** Perform the lookup of OpenC2 consumers */
-  private lookup: () => void = () => {
+  private readonly lookup: () => void = () => {
     const command = Helpers.queryFeatures(this.options.lookupTimeout || 30000);
     // Stryker disable next-line all
     this.logger.debug(`New lookup command will be emitted`);
@@ -268,13 +268,13 @@ export class Producer extends Component<AdapterWrapper, ProducerOptions> {
         result: void | Control.ResponseMessage | Control.ResponseMessage[]
       ) => {
         if (result) {
-          const responses = Array.isArray(result) ? result : [result];
-          for (const response of responses) {
+          const directResponses = Array.isArray(result) ? result : [result];
+          for (const response of directResponses) {
             incomingResponseHandler(response);
           }
           this.adapter.off(requestId, incomingResponseHandler);
           clearTimeout(timeoutTimer);
-          resolve(responses);
+          resolve(directResponses);
         }
       };
       // #endregion

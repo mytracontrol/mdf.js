@@ -28,7 +28,7 @@ export class Port extends Provider.Port<Client, Config> {
   /** Redis healthy state */
   private healthy: boolean;
   /** Time interval for ready check request */
-  private interval: number;
+  private readonly interval: number;
   /**
    * Implementation of functionalities of a Redis port instance.
    * @param config - Port configuration options
@@ -150,7 +150,7 @@ export class Port extends Provider.Port<Client, Config> {
     });
   }
   /** Check the server and memory status of the redis server instance  */
-  private statusCheck = () => {
+  private readonly statusCheck = () => {
     this.getInfoStats()
       .then(result => {
         // Stryker disable next-line all
@@ -184,7 +184,7 @@ export class Port extends Provider.Port<Client, Config> {
       message = `Error parsing the Redis INFO stats: ${parsingError}, please contact with the developers`;
       hasError = true;
     } else if (
-      result.memory.used_memory > result.memory.maxmemory &&
+      parseInt(result.memory.used_memory) > parseInt(result.memory.maxmemory) &&
       result.memory.maxmemory !== '0'
     ) {
       message = `The system is OOM - used ${result.memory.used_memory_human} - max ${result.memory.maxmemory_human}`;
@@ -242,19 +242,19 @@ export class Port extends Provider.Port<Client, Config> {
     }
   }
   /** Callback function for `connect` event */
-  private onConnectEvent = () => this.onEvent('connect', 'connect', false);
+  private readonly onConnectEvent = () => this.onEvent('connect', 'connect', false);
   /** Callback function for `ready` event */
-  private onReadyEvent = () => this.onEvent('ready', 'ready', true);
+  private readonly onReadyEvent = () => this.onEvent('ready', 'ready', true);
   /** Callback function for `error` event */
-  private onErrorEvent = (error: ReplyError) =>
+  private readonly onErrorEvent = (error: ReplyError) =>
     this.onEvent('error', 'error', true, this.errorParse(error));
   /** Callback function for `close` event */
-  private onCloseEvent = () => this.onEvent('close', 'close', false);
+  private readonly onCloseEvent = () => this.onEvent('close', 'close', false);
   /** Callback function for `reconnecting` event */
-  private onReconnectingEvent = (delay: number) =>
+  private readonly onReconnectingEvent = (delay: number) =>
     this.onEvent('reconnecting', 'reconnecting', false, delay);
   /** Callback function for `end` event */
-  private onEndEvent = () =>
+  private readonly onEndEvent = () =>
     this.onEvent(
       'end',
       'closed',
@@ -262,9 +262,9 @@ export class Port extends Provider.Port<Client, Config> {
       new Crash(`The connection was closed unexpectedly`, this.uuid)
     );
   /** Callback function for `+node` event */
-  private onPlusNodeEvent = () => this.onEvent('+node', '+node', false);
+  private readonly onPlusNodeEvent = () => this.onEvent('+node', '+node', false);
   /** Callback function for `-node` event */
-  private onMinusNodeEvent = () => this.onEvent('-node', '-node', false);
+  private readonly onMinusNodeEvent = () => this.onEvent('-node', '-node', false);
   /**
    * Transforms a ReplyError instance to a Crash instance
    * @param error - Error to be parsed

@@ -20,7 +20,7 @@ export class Port extends Provider.Port<Client, Config> {
   /** Ping interval */
   private timeInterval?: NodeJS.Timeout;
   /** Time out for ping/health request */
-  private interval: number;
+  private readonly interval: number;
   /** Is the first check */
   private isFirstCheck: boolean;
   /** Client connection state */
@@ -72,7 +72,7 @@ export class Port extends Provider.Port<Client, Config> {
     this.emit('closed');
   }
   /** Check the health of the system */
-  private statusCheck = () => {
+  private readonly statusCheck = () => {
     // Stryker disable next-line all
     this.logger.debug(`Pinging to the system`, this.uuid, this.name);
     const requestTimeout = Math.floor(this.interval * 0.9);

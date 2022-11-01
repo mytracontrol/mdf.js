@@ -73,7 +73,7 @@ export class Consumer extends Component<AdapterWrapper, ConsumerOptions> {
    * Process incoming command message from the adapter
    * @param incomingMessage - incoming message
    */
-  private onCommandHandler: OnCommandHandler = (
+  private readonly onCommandHandler: OnCommandHandler = (
     incomingMessage: Control.Message,
     done: (error?: Crash | Error, message?: Control.ResponseMessage) => void
   ): void => {
@@ -95,11 +95,10 @@ export class Consumer extends Component<AdapterWrapper, ConsumerOptions> {
       this.logger.debug(`New message from ${message.from} - ${message.request_id}`);
       if (Checkers.isCommandToInstance(message, this.options.id)) {
         return this.classifyCommand(message);
-      } else {
-        // Stryker disable next-line all
-        this.logger.debug(`${message.request_id} is not a command for this instance`);
-        return;
       }
+      // Stryker disable next-line all
+      this.logger.debug(`${message.request_id} is not a command for this instance`);
+      return;
     } catch (rawError) {
       const error = Crash.from(rawError);
       const crashError = new Crash(

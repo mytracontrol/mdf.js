@@ -67,7 +67,7 @@ export class Observability {
    * Error event handler
    * @param error - error to be registered
    */
-  private onErrorEvent = (error: Crash | Multi) => {
+  private readonly onErrorEvent = (error: Crash | Multi) => {
     this.registry.push(error);
   };
   /** Create an express app that offer all the services routes */

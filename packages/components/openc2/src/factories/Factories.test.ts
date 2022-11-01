@@ -8,12 +8,12 @@
  * Dissemination of this information or the reproduction of this material is strictly forbidden
  * unless prior written permission is obtained from Mytra Control S.L.
  */
-import { Consumer, Producer, Proxy, Registry } from '@mdf.js/openc2-core';
+import { Consumer, Gateway, Producer, Registry } from '@mdf.js/openc2-core';
 import { mockProperty, undoMocks } from '@mdf.js/utils';
 import cluster from 'cluster';
 import { ConsumerFactory } from './ConsumerFactory';
+import { GatewayFactory } from './GatewayFactory';
 import { ProducerFactory } from './ProducerFactory';
-import { ProxyFactory } from './ProxyFactory';
 
 describe('#Factories', () => {
   describe('#Happy path', () => {
@@ -91,41 +91,41 @@ describe('#Factories', () => {
       );
       undoMocks();
     });
-    it('Should create a valid instance of redis to socket.io based proxy', () => {
+    it('Should create a valid instance of redis to socket.io based gateway', () => {
       const registry = new Registry('myId');
-      const simple = ProxyFactory.RedisToWebSocketIO({ id: 'myId', actionTargetPairs: {} });
-      const simpleWithRegistry = ProxyFactory.RedisToWebSocketIO({
+      const simple = GatewayFactory.RedisToWebSocketIO({ id: 'myId', actionTargetPairs: {} });
+      const simpleWithRegistry = GatewayFactory.RedisToWebSocketIO({
         id: 'myId',
         actionTargetPairs: {},
         registry,
       });
-      expect(simple).toBeInstanceOf(Proxy);
-      expect(simpleWithRegistry).toBeInstanceOf(Proxy);
+      expect(simple).toBeInstanceOf(Gateway);
+      expect(simpleWithRegistry).toBeInstanceOf(Gateway);
       // @ts-ignore - private property
       expect(simpleWithRegistry.register).toBe(registry);
       // @ts-ignore - private property
       mockProperty(cluster, 'isWorker', true);
-      expect(() => ProxyFactory.RedisToWebSocketIO({ id: 'myId', actionTargetPairs: {} })).toThrow(
-        'OpenC2 Proxy can not be instantiated in a worker process'
-      );
+      expect(() =>
+        GatewayFactory.RedisToWebSocketIO({ id: 'myId', actionTargetPairs: {} })
+      ).toThrow('OpenC2 Gateway can not be instantiated in a worker process');
       undoMocks();
     });
-    it('Should create a valid instance of socket.io to redis based proxy', () => {
+    it('Should create a valid instance of socket.io to redis based gateway', () => {
       const registry = new Registry('myId');
-      const simple = ProxyFactory.SocketIOToRedis({ id: 'myId', actionTargetPairs: {} });
-      const simpleWithRegistry = ProxyFactory.SocketIOToRedis({
+      const simple = GatewayFactory.SocketIOToRedis({ id: 'myId', actionTargetPairs: {} });
+      const simpleWithRegistry = GatewayFactory.SocketIOToRedis({
         id: 'myId',
         registry,
         actionTargetPairs: {},
       });
-      expect(simple).toBeInstanceOf(Proxy);
-      expect(simpleWithRegistry).toBeInstanceOf(Proxy);
+      expect(simple).toBeInstanceOf(Gateway);
+      expect(simpleWithRegistry).toBeInstanceOf(Gateway);
       // @ts-ignore - private property
       expect(simpleWithRegistry.register).toBe(registry);
       // @ts-ignore - private property
       mockProperty(cluster, 'isWorker', true);
-      expect(() => ProxyFactory.SocketIOToRedis({ id: 'myId', actionTargetPairs: {} })).toThrow(
-        'OpenC2 Proxy can not be instantiated in a worker process'
+      expect(() => GatewayFactory.SocketIOToRedis({ id: 'myId', actionTargetPairs: {} })).toThrow(
+        'OpenC2 Gateway can not be instantiated in a worker process'
       );
       undoMocks();
     });

@@ -15,7 +15,7 @@ export class NoCache {
     return new NoCache().handler;
   }
   /** Request cache middleware handler */
-  private handler = (req: Request, res: Response, next: NextFunction): void => {
+  private readonly handler = (req: Request, res: Response, next: NextFunction): void => {
     if (res.getHeader('Cache-Control') === undefined) {
       res.setHeader('Surrogate-Control', 'no-store');
       res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');

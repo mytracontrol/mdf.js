@@ -115,7 +115,7 @@ export class SourceRepository<Type extends string = string, Data = any> {
    * @param entry - entry to be checked
    * @returns
    */
-  private createJobFromEntry = (
+  private readonly createJobFromEntry = (
     entry: [id: string, fields: string[]]
   ): Plugs.Source.JobObject<Type, Data> => {
     let data: Data;

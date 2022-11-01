@@ -33,7 +33,7 @@ export class Jet extends Base<Plugs.Sink.Jet> {
     callback: (error?: Crash | Error) => void
   ): void {
     // Stryker disable next-line all
-    this.logger.extend('verbose')(`Publishing job ${data.jobId} on single operation`);
+    this.logger.extend('verbose')(`Publishing job ${data.jobId} on single operation from Jet Sink`);
     this.plug
       .single(data.toObject())
       .then(() => data.done())

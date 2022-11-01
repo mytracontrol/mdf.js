@@ -73,7 +73,7 @@ export class MasterRegistry extends Registry {
     }
   }
   /** Handler of errors registry request */
-  private onSendRequest = (): void => {
+  private readonly onSendRequest = (): void => {
     this.requestId = this.requestId + 1;
     if (!Number.isFinite(this.requestId)) {
       this.requestId = 0;

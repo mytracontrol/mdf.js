@@ -8,7 +8,7 @@
  * Dissemination of this information or the reproduction of this material is strictly forbidden
  * unless prior written permission is obtained from Mytra Control S.L.
  */
-export { Consumer, Producer, Proxy } from './components';
+export { Consumer, Gateway, Producer } from './components';
 export { Accessors } from './helpers';
 export { Registry } from './modules';
 export {
@@ -17,8 +17,8 @@ export {
   ConsumerAdapter,
   ConsumerOptions,
   Control,
+  GatewayOptions,
   OnCommandHandler,
   ProducerAdapter,
   ProducerOptions,
-  ProxyOptions,
 } from './types';

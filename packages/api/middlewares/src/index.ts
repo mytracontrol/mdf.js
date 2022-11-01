@@ -41,7 +41,7 @@ export const Middleware = {
   RequestId,
 };
 
-export type { AuditConfig } from './audit';
+export type { AuditCategory, AuditConfig } from './audit';
 export type { CacheConfig } from './cache';
 export type { CorsConfig } from './cors';
 export type { RateLimitConfig } from './rateLimiter';

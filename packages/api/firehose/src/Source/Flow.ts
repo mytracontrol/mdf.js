@@ -31,7 +31,7 @@ export class Flow extends Base<Plugs.Source.Flow> {
    * Process the received jobs
    * @param job - job to be processed
    */
-  private _onJobReceived = (job: Plugs.Source.JobObject) => {
+  private readonly _onJobReceived = (job: Plugs.Source.JobObject) => {
     // Stryker disable next-line all
     this.logger.extend('verbose')(`New job from consumer: ${job.jobId}`);
     if (

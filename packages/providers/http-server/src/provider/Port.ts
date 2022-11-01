@@ -91,10 +91,10 @@ export class Port extends Provider.Port<Server, Config> {
     await this.stop();
   }
   /** Callback function for `error` event */
-  private onErrorEvent = (error: NodeJS.ErrnoException) =>
+  private readonly onErrorEvent = (error: NodeJS.ErrnoException) =>
     this.emit('error', this.errorParse(error));
   /** Callback function for `connection` event */
-  private onConnectionEvent = (socket: Socket) => {
+  private readonly onConnectionEvent = (socket: Socket) => {
     // Stryker disable next-line all
     this.logger.debug(`New connection from ${socket.remoteAddress}`);
   };
@@ -106,7 +106,7 @@ export class Port extends Provider.Port<Server, Config> {
   private errorParse(error: NodeJS.ErrnoException): Crash {
     let message = error.message;
     /** Server address already is use EADDRINUSE */
-    if (error.code == 'EADDRINUSE') {
+    if (error.code === 'EADDRINUSE') {
       message = `Server address is already in used: ${this.config.host}:${this.config.port}`;
     }
     if (error.code === 'ERR_SERVER_ALREADY_LISTEN') {

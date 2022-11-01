@@ -23,8 +23,8 @@ import {
   CommandJobHandler,
   ConsumerAdapter,
   Control,
+  GatewayOptions,
   ProducerAdapter,
-  ProxyOptions,
 } from '../../types';
 import { Consumer } from '../Consumer';
 import { Producer } from '../Producer';
@@ -33,23 +33,23 @@ import { ConsumerMap } from '../Producer/ConsumerMap';
 const MIN_LOOKUP_INTERVAL = 10000;
 const AGING_INTERVAL_FACTOR = 3;
 const MAX_AGED_FACTOR = 3;
-const MIN_PROXY_DELAY = 1000;
+const MIN_GATEWAY_DELAY = 1000;
 
-interface ProxyTimers {
+interface GatewayTimers {
   lookupInterval: number;
   lookupTimeout: number;
   agingInterval: number;
   maxAge: number;
   delay: number;
 }
-export declare interface Proxy {
+export declare interface Gateway {
   /** Emitted when a consumer's operation has some error */
   on(event: 'error', listener: (error: Crash | Error) => void): this;
   /** Emitted on every state change */
   on(event: 'status', listener: (status: Health.API.Status) => void): this;
 }
 
-export class Proxy extends EventEmitter implements Health.Component, Health.Service {
+export class Gateway extends EventEmitter implements Health.Component, Health.Service {
   /** Component identification */
   public readonly componentId: string = v4();
   /** Component commands and message register */
@@ -67,7 +67,7 @@ export class Proxy extends EventEmitter implements Health.Component, Health.Serv
   /** Registry router */
   private readonly _router: Router;
   /**
-   * Regular OpenC2 proxy implementation.
+   * Regular OpenC2 gateway implementation.
    * @param upstream - upstream consumer adapter interface
    * @param downstream - downstream producer adapter interface
    * @param options - configuration options
@@ -75,11 +75,11 @@ export class Proxy extends EventEmitter implements Health.Component, Health.Serv
   constructor(
     upstream: ConsumerAdapter,
     downstream: ProducerAdapter,
-    private readonly options: ProxyOptions
+    private readonly options: GatewayOptions
   ) {
     super();
     this.logger = SetContext(
-      this.options.logger ?? new DebugLogger(`mdf:oc2:proxy:${this.name}`),
+      this.options.logger ?? new DebugLogger(`mdf:oc2:gateway:${this.name}`),
       this.constructor.name,
       this.componentId
     );
@@ -98,7 +98,7 @@ export class Proxy extends EventEmitter implements Health.Component, Health.Serv
     this.producer.consumerMap.on('updated', this.updateConsumerOptions.bind(this));
     this.started = false;
     // Stryker disable next-line all
-    this.logger.debug(`OpenC2 Proxy created - [${options.id}]`);
+    this.logger.debug(`OpenC2 Gateway created - [${options.id}]`);
   }
   /** Component name */
   public get name(): string {
@@ -173,7 +173,7 @@ export class Proxy extends EventEmitter implements Health.Component, Health.Serv
    * @param options - configuration options
    * @returns
    */
-  private checkLookupTimes(options: ProxyOptions): ProxyTimers {
+  private checkLookupTimes(options: GatewayOptions): GatewayTimers {
     const lookupInterval = this.isHigherThan(MIN_LOOKUP_INTERVAL, options.lookupInterval);
     const lookupTimeout = this.isLowerThan(lookupInterval / 2, options.lookupTimeout);
     const agingInterval = this.isHigherThan(
@@ -181,7 +181,7 @@ export class Proxy extends EventEmitter implements Health.Component, Health.Serv
       options.agingInterval
     );
     const maxAge = this.isHigherThan(agingInterval * MAX_AGED_FACTOR, options.maxAge);
-    const delay = this.isHigherThan(MIN_PROXY_DELAY, options.delay);
+    const delay = this.isHigherThan(MIN_GATEWAY_DELAY, options.delay);
     const selectedOptions = {
       lookupInterval,
       lookupTimeout,
@@ -190,7 +190,7 @@ export class Proxy extends EventEmitter implements Health.Component, Health.Serv
       delay,
     };
     // Stryker disable next-line all
-    this.logger.debug(`Proxy options ${JSON.stringify(selectedOptions, null, 2)}`);
+    this.logger.debug(`Gateway options ${JSON.stringify(selectedOptions, null, 2)}`);
     return selectedOptions;
   }
   /**
@@ -215,7 +215,7 @@ export class Proxy extends EventEmitter implements Health.Component, Health.Serv
    * Forward the command to the downstream producer
    * @param job - job to be processed
    */
-  private onUpstreamCommandHandler = (job: CommandJobHandler): void => {
+  private readonly onUpstreamCommandHandler = (job: CommandJobHandler): void => {
     // Stryker disable all
     this.logger.debug(`Received command from upstream: ${job.data.request_id}`);
     this.logger.silly(`Direction: ${job.data.from} - ${job.data.to}`);
@@ -266,18 +266,18 @@ export class Proxy extends EventEmitter implements Health.Component, Health.Serv
    */
   private getArgs(command: Control.CommandMessage): Control.Arguments {
     const actualDelay = Accessors.getDelayFromCommandMessage(command);
-    if (actualDelay - (this.options.delay || MIN_PROXY_DELAY) > 0) {
+    if (actualDelay - (this.options.delay || MIN_GATEWAY_DELAY) > 0) {
       return {
         start_time: command.content.args?.start_time,
         stop_time: undefined,
-        duration: actualDelay - (this.options.delay || MIN_PROXY_DELAY),
+        duration: actualDelay - (this.options.delay || MIN_GATEWAY_DELAY),
         response_requested: command.content.args?.response_requested,
       };
     } else {
       const error = new Crash(
         `No enough time to perform the forwarding of the command`,
         this.componentId,
-        { info: { command, subject: 'OpenC2 Proxy' } }
+        { info: { command, subject: 'OpenC2 Gateway' } }
       );
       this.onErrorHandler(error);
       throw error;
@@ -303,14 +303,14 @@ export class Proxy extends EventEmitter implements Health.Component, Health.Serv
       return destinations;
     } else {
       const error = new Crash(`No valid destination found for this command`, this.componentId, {
-        info: { command, subject: 'OpenC2 Proxy' },
+        info: { command, subject: 'OpenC2 Gateway' },
       });
       this.onErrorHandler(error);
       throw error;
     }
   }
   /** Update the features of the upstream consumer based in the upstream consumer map */
-  private updateConsumerOptions = () => {
+  private readonly updateConsumerOptions = () => {
     const { pairs, profiles } = this.producer.consumerMap.getGroupedFeatures();
     this.consumer.pairs = pairs;
     this.consumer.profiles = profiles;

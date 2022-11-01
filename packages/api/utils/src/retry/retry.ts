@@ -13,7 +13,7 @@ import { Boom, Crash, Multi } from '@mdf.js/crash';
 
 export const WAIT_TIME = 100;
 export const MAX_WAIT_TIME = 15000;
-
+export type LoggerFunction = (error: Crash | Multi | Boom) => void;
 const DEFAULT_RETRY_OPTIONS = {
   logger: undefined,
   waitTime: WAIT_TIME,
@@ -24,7 +24,7 @@ const DEFAULT_RETRY_OPTIONS = {
 };
 
 export interface RetryOptions {
-  logger?: (error: Crash | Multi | Boom) => void;
+  logger?: LoggerFunction;
   waitTime?: number;
   maxWaitTime?: number;
   interrupt?: () => boolean;
@@ -32,7 +32,7 @@ export interface RetryOptions {
 }
 
 interface RetryParameters {
-  logger?: (error: Crash | Multi | Boom) => void;
+  logger?: LoggerFunction;
   waitTime: number;
   maxWaitTime: number;
   interrupt?: () => boolean;
@@ -53,10 +53,7 @@ const wait = (delay: number): Promise<void> => {
  * @param error - error to be logged
  * @param loggerFunc - logger function
  */
-const logging = (
-  error: Crash | Multi | Boom,
-  loggerFunc?: (error: Crash | Multi | Boom) => void
-) => {
+const logging = (error: Crash | Multi | Boom, loggerFunc?: LoggerFunction) => {
   if (loggerFunc) {
     loggerFunc(error);
   }

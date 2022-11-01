@@ -29,7 +29,7 @@ export class Port extends Provider.Port<Client, Config> {
   /** Mongo healthy state */
   private healthy: boolean;
   /** Last failed command */
-  private lastFailedCommands: string[] = [];
+  private readonly lastFailedCommands: string[] = [];
   /**
    * Implementation of functionalities of a Mongo port instance.
    * @param config - Port configuration options
@@ -92,7 +92,7 @@ export class Port extends Provider.Port<Client, Config> {
    * Manage the event of a command failed
    * @param event - event to be handled
    */
-  private onCommandFailed = (event: CommandFailedEvent): void => {
+  private readonly onCommandFailed = (event: CommandFailedEvent): void => {
     const time = new Date().toISOString();
     this.addCheck('lastCommand', {
       componentId: this.uuid,
@@ -119,7 +119,7 @@ export class Port extends Provider.Port<Client, Config> {
    * Manage the event of a command succeeded
    * @param event - event to be handled
    */
-  private onCommandSucceeded = (event: CommandSucceededEvent): void => {
+  private readonly onCommandSucceeded = (event: CommandSucceededEvent): void => {
     this.addCheck('lastCommand', {
       componentId: this.uuid,
       observedValue: 'succeeded',
@@ -133,7 +133,7 @@ export class Port extends Provider.Port<Client, Config> {
    * Manage the event of a heartbeat failed
    * @param event - event to be handled
    */
-  private onServerHeartbeatFailed = (event: ServerHeartbeatFailedEvent): void => {
+  private readonly onServerHeartbeatFailed = (event: ServerHeartbeatFailedEvent): void => {
     this.addCheck('heartbeat', {
       componentId: this.uuid,
       observedValue: 'failed',
@@ -154,7 +154,7 @@ export class Port extends Provider.Port<Client, Config> {
    * Manage the event of a server heartbeat succeeded
    * @param event - event to be handled
    */
-  private onServerHeartbeatSucceeded = (event: ServerHeartbeatSucceededEvent): void => {
+  private readonly onServerHeartbeatSucceeded = (event: ServerHeartbeatSucceededEvent): void => {
     this.addCheck('heartbeat', {
       componentId: this.uuid,
       observedValue: event,
@@ -173,7 +173,7 @@ export class Port extends Provider.Port<Client, Config> {
    * @param event - event to be handled
    * @returns
    */
-  private onEvent = (event: string): ((meta: unknown) => void) => {
+  private readonly onEvent = (event: string): ((meta: unknown) => void) => {
     return (meta: unknown): void => {
       this.logger.silly(`New incoming [${event}] event from Mongo with meta: ${inspect(meta)}`);
     };

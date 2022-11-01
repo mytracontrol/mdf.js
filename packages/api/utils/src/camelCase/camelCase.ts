@@ -141,7 +141,7 @@ function isTooShortString(input: string): boolean {
  */
 function transformShortString(
   input: string,
-  pascalCase?: boolean,
+  pascalCase = false,
   locale?: string | string[]
 ): string {
   if (input.length === 0) {
@@ -185,14 +185,14 @@ function hasUpperCase(input: string, locale?: string | string[]): boolean {
 /**
  * Preserve camel case in a string
  * @param input - string to be transformed
- * @param toLowerCase - string processor to convert a string to lower case
- * @param toUpperCase - string processor to convert strings to upper case
+ * @param toLowerCaseTransformer - string processor to convert a string to lower case
+ * @param toUpperCaseTransformer - string processor to convert strings to upper case
  * @returns
  */
 function preserveCamelCase(
   input: string,
-  toLowerCase: StringTransformer,
-  toUpperCase: StringTransformer
+  toLowerCaseTransformer: StringTransformer,
+  toUpperCaseTransformer: StringTransformer
 ): string {
   let isLastCharLower = false;
   let isLastCharUpper = false;
@@ -200,22 +200,24 @@ function preserveCamelCase(
   for (let index = 0; index < input.length; index++) {
     const character = input[index];
     if (isLastCharLower && UPPERCASE.test(character)) {
-      input = input.slice(0, index) + '-' + input.slice(index);
+      input = `${input.slice(0, index)} - ${input.slice(index)}`;
       isLastCharLower = false;
       isLastLastCharUpper = isLastCharUpper;
       isLastCharUpper = true;
       index++;
     } else if (isLastCharUpper && isLastLastCharUpper && LOWERCASE.test(character)) {
-      input = input.slice(0, index - 1) + '-' + input.slice(index - 1);
+      input = `${input.slice(0, index - 1)} - ${input.slice(index - 1)}`;
       isLastLastCharUpper = isLastCharUpper;
       isLastCharUpper = false;
       isLastCharLower = true;
     } else {
       isLastCharLower =
-        toLowerCase(character) === character && toUpperCase(character) !== character;
+        toLowerCaseTransformer(character) === character &&
+        toUpperCaseTransformer(character) !== character;
       isLastLastCharUpper = isLastCharUpper;
       isLastCharUpper =
-        toUpperCase(character) === character && toLowerCase(character) !== character;
+        toUpperCaseTransformer(character) === character &&
+        toLowerCaseTransformer(character) !== character;
     }
   }
   return input;
@@ -223,23 +225,26 @@ function preserveCamelCase(
 /**
  * Preserve consecutive uppercase characters
  * @param input - string to be processed
- * @param toLowerCase - string processor to convert strings to lower case
+ * @param toLowerCaseTransformer - string processor to convert strings to lower case
  * @returns
  */
-function preserveConsecutiveUppercase(input: string, toLowerCase: StringTransformer): string {
+function preserveConsecutiveUppercase(
+  input: string,
+  toLowerCaseTransformer: StringTransformer
+): string {
   LEADING_CAPITAL.lastIndex = 0;
-  return input.replace(LEADING_CAPITAL, m1 => toLowerCase(m1));
+  return input.replace(LEADING_CAPITAL, m1 => toLowerCaseTransformer(m1));
 }
 /**
  * Post processing of the transformed string
  * @param input - string to be processed
- * @param toUpperCase - string processor to convert strings to upper case
+ * @param toUpperCaseTransformer - string processor to convert strings to upper case
  * @returns
  */
-function postProcess(input: string, toUpperCase: StringTransformer): string {
+function postProcess(input: string, toUpperCaseTransformer: StringTransformer): string {
   SEPARATORS_AND_IDENTIFIER.lastIndex = 0;
   NUMBERS_AND_IDENTIFIER.lastIndex = 0;
   return input
-    .replace(SEPARATORS_AND_IDENTIFIER, (_, identifier) => toUpperCase(identifier))
-    .replace(NUMBERS_AND_IDENTIFIER, m => toUpperCase(m));
+    .replace(SEPARATORS_AND_IDENTIFIER, (_, identifier) => toUpperCaseTransformer(identifier))
+    .replace(NUMBERS_AND_IDENTIFIER, m => toUpperCaseTransformer(m));
 }

@@ -147,10 +147,9 @@ function manageJoiErrors(error: JoiError, options: BoomOptions, requestId: strin
 }
 /** Format Http errors to Boom error */
 function manageHttpErrors(error: HttpError, options: BoomOptions, requestId: string): Boom {
-  const formatError = new Boom(error.message, requestId, error.statusCode, {
+  return new Boom(error.message, requestId, error.statusCode, {
     ...options,
   });
-  return formatError;
 }
 
 export class ErrorHandler {

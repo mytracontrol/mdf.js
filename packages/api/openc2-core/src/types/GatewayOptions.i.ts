@@ -8,4 +8,13 @@
  * Dissemination of this information or the reproduction of this material is strictly forbidden
  * unless prior written permission is obtained from Mytra Control S.L.
  */
-export * from './Proxy';
+
+import { ConsumerOptions } from './ConsumerOptions.i';
+import { ProducerOptions } from './ProducerOptions.i';
+
+export interface GatewayOptions extends ConsumerOptions, ProducerOptions {
+  /** Gateway delay */
+  delay?: number;
+  /** Bypass lookup interval times checks */
+  bypassLookupIntervalChecks?: boolean;
+}

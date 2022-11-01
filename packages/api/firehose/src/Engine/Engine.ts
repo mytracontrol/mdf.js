@@ -179,26 +179,26 @@ export class Engine<Type extends string = string, Data = any>
     }
   }
   /** Super error event handler */
-  private onErrorEvent = (rawError: Error | Crash) => {
+  private readonly onErrorEvent = (rawError: Error | Crash) => {
     this.error = Crash.from(rawError, this.componentId);
     // Stryker disable next-line all
     this.logger(`Error in engine stream ${this.name}: ${this.error.message}`);
     this.emit('status', this.ownStatus);
   };
   /** Super close event handler */
-  private onCloseEvent = () => {
+  private readonly onCloseEvent = () => {
     // Stryker disable next-line all
     this.logger(`Engine stream ${this.name} has been closed`);
     this.emit('status', this.ownStatus);
   };
   /** Super drain event handler */
-  private onDrainEvent = () => {
+  private readonly onDrainEvent = () => {
     // Stryker disable next-line all
     this.logger.extend('debug')(`Engine stream ${this.name} has been drained`);
     this.emit('status', this.ownStatus);
   };
   /** Super pause event handler */
-  private onPauseEvent = () => {
+  private readonly onPauseEvent = () => {
     // Stryker disable next-line all
     this.logger.extend('debug')(`Engine stream ${this.name} has been paused`);
     this.emit('status', this.ownStatus);

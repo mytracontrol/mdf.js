@@ -10,7 +10,7 @@
  */
 
 export * from './Headers.i';
-export * from './Object.i';
+export * from './JobObject.i';
 export * from './Options.i';
 export * from './Result.i';
 export * from './Routing.i';

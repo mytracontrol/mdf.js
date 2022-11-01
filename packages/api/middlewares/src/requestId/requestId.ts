@@ -12,16 +12,20 @@
 import { NextFunction, Request, RequestHandler, Response } from 'express';
 import { v4 } from 'uuid';
 
+const xRequestId = 'X-Request-ID';
 export class RequestId {
   /** Request traceability middleware handler */
   public static handler(): RequestHandler {
     return new RequestId().handler;
   }
   /** Request traceability middleware handler */
-  private handler: RequestHandler = (req: Request, res: Response, next: NextFunction): void => {
-    req.headers['X-Request-ID'] =
-      req.headers['X-Request-ID'] || req.headers['x-request-id'] || v4();
-    req['uuid'] = req.headers['X-Request-ID'] as string;
+  private readonly handler: RequestHandler = (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): void => {
+    req.headers[xRequestId] = req.headers[xRequestId] || req.headers['x-request-id'] || v4();
+    req['uuid'] = req.headers[xRequestId] as string;
     next();
   };
 }

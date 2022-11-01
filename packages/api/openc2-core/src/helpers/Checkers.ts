@@ -15,6 +15,7 @@ import { ConsumerOptions, Control } from '../types';
 import { Accessors } from './Accessors';
 import { Helpers } from './Helpers';
 
+const responseRequested = 'content.args.response_requested';
 export class Checkers {
   /**
    * Check if the message is a valid message.
@@ -103,7 +104,7 @@ export class Checkers {
           options.profiles
         );
       } else {
-        set(command, 'content.args.response_requested', Control.ResponseType.Complete);
+        set(command, responseRequested, Control.ResponseType.Complete);
         return Helpers.badRequest(command, options.id, 'Invalid Query Features');
       }
     } else if (!this.isSupportedAction(command, options.actionTargetPairs)) {
@@ -192,7 +193,7 @@ export class Checkers {
    * @returns
    */
   public static isAckOnlyRequested(command: Control.CommandMessage): boolean {
-    return get(command, 'content.args.response_requested') === Control.ResponseType.ACK;
+    return get(command, responseRequested) === Control.ResponseType.ACK;
   }
   /**
    * Check if the command is a featured request
@@ -210,7 +211,7 @@ export class Checkers {
    * @returns
    */
   public static isValidQueryFeaturesRequest(command: Control.CommandMessage): boolean {
-    return get(command, 'content.args.response_requested') === Control.ResponseType.Complete;
+    return get(command, responseRequested) === Control.ResponseType.Complete;
   }
   /**
    * Return the delay allowed from command

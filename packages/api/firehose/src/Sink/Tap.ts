@@ -33,7 +33,7 @@ export class Tap extends Base<Plugs.Sink.Tap> {
     callback: (error?: Crash | Error) => void
   ): void {
     // Stryker disable next-line all
-    this.logger.extend('verbose')(`Publishing job ${data.jobId} on single operation`);
+    this.logger.extend('verbose')(`Publishing job ${data.jobId} on single operation from Tab Sink`);
     this.plug
       .single(data.toObject())
       .then(() => data.done())
