@@ -67,7 +67,7 @@ describe('#ServiceBus', () => {
             observedUnit: 'stats',
             observedValue: {
               clientsCount: 0,
-              hostname: 'devCenter',
+              hostname: checks['myServiceBus:serverStats'][0].observedValue.hostname,
               namespaces: [
                 {
                   name: '/',
