@@ -11,6 +11,7 @@ steps:
     inputs:
       projectDirectory: '.'
       arguments: 'lerna publish $(Build.BuildNumber) --amend --dist-tag latest --conventional-commits --loglevel silly -m "chore(release): publish %v" --yes'
+      customEndpoint: 'NPM-Registry'
     continueOnError: true
 
   - task: Yarn@3
@@ -19,6 +20,7 @@ steps:
     inputs:
       projectDirectory: '.'
       arguments: 'lerna publish $(Build.BuildNumber) --amend --pre-dist-tag beta --loglevel silly -m "chore(release): publish %v" --yes'
+      customEndpoint: 'NPM-Registry'
     continueOnError: true
 
   - task: Yarn@3
@@ -27,4 +29,5 @@ steps:
     inputs:
       projectDirectory: '.'
       arguments: 'lerna publish $(Build.BuildNumber) --amend --dist-tag alpha --loglevel silly -m "chore(release): publish %v" --yes'
+      customEndpoint: 'NPM-Registry'
     continueOnError: true
