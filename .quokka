@@ -1,0 +1,3 @@
+{
+    "node": "~/.nvm/current/bin/node"
+}

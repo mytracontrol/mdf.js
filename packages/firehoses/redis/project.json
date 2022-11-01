@@ -1,0 +1,37 @@
+{
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/firehoses/redis/src",
+  "projectType": "library",
+  "targets": {
+    "build": {
+      "executor": "@nrwl/js:tsc",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "dist/libs/firehoses/redis",
+        "tsConfig": "libs/firehoses/redis/tsconfig.lib.json",
+        "packageJson": "libs/firehoses/redis/package.json",
+        "main": "libs/firehoses/redis/src/index.ts",
+        "assets": ["libs/firehoses/redis/*.md"]
+      }
+    },
+    "lint": {
+      "executor": "@nrwl/linter:eslint",
+      "outputs": ["{options.outputFile}"],
+      "options": {
+        "lintFilePatterns": ["libs/firehoses/redis/**/*.ts"]
+      }
+    },
+    "test": {
+      "executor": "@nrwl/jest:jest",
+      "outputs": ["coverage/libs/firehoses/redis"],
+      "options": {
+        "jestConfig": "libs/firehoses/redis/jest.config.ts",
+        "passWithNoTests": false,
+        "coverage": true,
+        "detectOpenHandles": true,
+        "forceExit": true
+      }
+    }
+  },
+  "tags": []
+}

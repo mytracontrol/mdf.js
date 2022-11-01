@@ -1,0 +1,48 @@
+{
+  "name": "@mdf/redis-provider",
+  "version": "0.0.1",
+  "description": "MMS - Redis Port for Javascript/Typescript",
+  "keywords": [
+    "NodeJS",
+    "provider",
+    "MMS",
+    "redis"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://devopmytra.visualstudio.com/MytraManagementSystem/_git/MMS-microservices-nx",
+    "directory": "packages/providers/redis"
+  },
+  "license": "SEE LICENSE IN LICENSE.md",
+  "author": "Mytra Control S.L.",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist/**/*"
+  ],
+  "scripts": {
+    "clean": "rimraf \"{tsconfig.build.tsbuildinfo,dist}\"",
+    "build": "yarn clean && tsc -p tsconfig.build.json",
+    "test": "jest --config ./jest.config.js",
+    "mutants": "stryker run stryker.conf.js",
+    "licenses": "license-checker --start ./ --production --csv --out ../../../licenses/providers/redis/licenses.csv --customPath ../../../.config/customFormat.json"
+  },
+  "dependencies": {
+    "@mdf/crash": "*",
+    "@mdf/provider": "*",
+    "@mdf/utils": "*",
+    "@types/redis-errors": "^1.2.0",
+    "debug": "^4.3.4",
+    "ioredis": "^5.2.3",
+    "joi": "^17.6.3",
+    "redis-errors": "^1.2.0",
+    "tslib": "^2.4.0"
+  },
+  "devDependencies": {
+    "@types/debug": "^4.1.7",
+    "@types/redis-errors": "^1.2.0"
+  },
+  "engines": {
+    "node": ">=16.14.2"
+  }
+}

@@ -1,0 +1,45 @@
+{
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/services/register/src",
+  "projectType": "library",
+  "targets": {
+    "build": {
+      "executor": "@nrwl/js:tsc",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "dist/libs/services/register",
+        "tsConfig": "libs/services/register/tsconfig.lib.json",
+        "packageJson": "libs/services/register/package.json",
+        "main": "libs/services/register/src/index.ts",
+        "assets": ["libs/services/register/*.md"],
+        "updateBuildableProjectDepsInPackageJson": true,
+        "buildableProjectDepsInPackageJsonType": "dependencies"
+      }
+    },
+    "lint": {
+      "executor": "@nrwl/linter:eslint",
+      "outputs": ["{options.outputFile}"],
+      "options": {
+        "lintFilePatterns": ["libs/services/register/**/*.ts"]
+      }
+    },
+    "test": {
+      "executor": "@nrwl/jest:jest",
+      "outputs": ["coverage/libs/services/register"],
+      "options": {
+        "jestConfig": "libs/services/register/jest.config.ts",
+        "passWithNoTests": false,
+        "coverage": true,
+        "detectOpenHandles": true,
+        "forceExit": true
+      }
+    },
+    "mutants": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "stryker run libs/services/register/stryker.conf.json"
+      }
+    }
+  },
+  "tags": []
+}

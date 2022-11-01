@@ -1,0 +1,56 @@
+@startuml http-consumer-adapter-sequence
+
+skinparam sequenceArrowThickness 2
+skinparam roundcorner 20
+skinparam maxmessagesize 200
+
+skinparam ParticipantPadding 30
+skinparam BoxPadding 30
+skinparam SequenceBoxBackgroundColor AliceBlue
+skinparam ActorBorderColor SaddleBrown
+skinparam sequenceMessageAlign left
+
+
+participant "Producer" as Producer << (S, LightBlue) >> order 0
+participant "HTTPServer" as Transport << (C,#ADD1B2) >> order 1
+box "Consumer"
+participant "HTTPConsumerAdapter" as Adapter << (C,#ADD1B2) >> order 2
+participant "Consumer" as Consumer << (C,#ADD1B2) >> order 3
+end box
+box JobExecution
+participant JobHandler << (C,#ADD1B2) >> order 4
+end box
+participant "Upper Layer" as Upper << (S, LightBlue) >> order 5
+
+group Initialization
+Upper -> Consumer : subscribe("command")
+Consumer -> Adapter : subscribe(handler)
+end
+
+group POST /.well-known/openc2
+Producer -> Transport : POST /.well-known/openc2
+activate Transport
+Transport -> Adapter : execute(command)
+activate Adapter
+Adapter -> Consumer : handler(command, done)
+activate Consumer
+box JobExecution
+create JobHandler
+end box
+Consumer --> JobHandler : subscribe("done")
+activate JobHandler
+Consumer --> Upper : emit("command", JobHandler)
+activate Upper
+Upper -> JobHandler : done()
+deactivate Upper
+JobHandler --> Consumer : emit("done")
+deactivate JobHandler
+destroy JobHandler
+Consumer -> Adapter : done()
+deactivate Consumer
+Adapter -> Transport : done()
+deactivate Adapter
+Transport -> Producer : HTTP/1.1 200 OK
+end
+
+@enduml

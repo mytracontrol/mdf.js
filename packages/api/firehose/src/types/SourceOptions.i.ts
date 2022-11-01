@@ -1,0 +1,28 @@
+/**
+ * Copyright 2022 Mytra Control S.L. All rights reserved.
+ * Note: All information contained herein is, and remains the property of Mytra Control S.L. and its
+ * suppliers, if any. The intellectual and technical concepts contained herein are property of
+ * Mytra Control S.L. and its suppliers and may be covered by European and Foreign patents, patents
+ * in process, and are protected by trade secret or copyright.
+ *
+ * Dissemination of this information or the reproduction of this material is strictly forbidden
+ * unless prior written permission is obtained from Mytra Control S.L.
+ */
+
+import { RetryOptions } from '@mdf/utils';
+import { ReadableOptions } from 'stream';
+import { PostConsumeOptions } from './PostConsumeOptions.i';
+
+export interface SourceOptions {
+  /** Options for job retry operations */
+  retryOptions?: RetryOptions;
+  /** Readable streams options */
+  readableOptions?: ReadableOptions;
+  /**
+   * Indicates the quality of service for the job, indeed this indicate the number of sinks that
+   * must be successfully processed to consider the job as successfully processed
+   */
+  qos?: number;
+  /** Post consume operations options */
+  postConsumeOptions?: PostConsumeOptions;
+}

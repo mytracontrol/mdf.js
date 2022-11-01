@@ -1,0 +1,39 @@
+steps:
+- task: Yarn@3
+  displayName: 'Install node_modules with devDependencies'
+  inputs:
+    projectDirectory: '.'
+    arguments: 'install'
+    customRegistry: 'useFeed'
+    customFeed: '54947cc7-1c0a-4d71-a742-0f2cf64772d8'
+
+- task: Yarn@3
+  displayName: 'Execute compilation, unit test and mutants'
+  inputs:
+    projectDirectory: '.'
+    arguments: 'run test'
+  continueOnError: true
+
+- task: PublishTestResults@2
+  displayName: 'Publishing test result to Azure DevOps'
+  inputs:
+    testResultsFormat: 'JUnit'
+    testResultsFiles: |
+      coverage/**/test-results.xml
+    failTaskOnFailedTests: true
+    mergeTestResults: true
+    publishRunAttachments: false
+
+- task: reportgenerator@4
+  displayName: 'Create one report for all the repository'
+  inputs:
+    reports: '$(Build.SourcesDirectory)/coverage/**/cobertura-coverage.xml'
+    targetdir: 'coveragereport'
+    reporttypes: 'HtmlInline_AzurePipelines_Dark;Cobertura;Badges'
+
+- task: PublishCodeCoverageResults@1
+  displayName: 'Publish code coverage results to Azure DevOps'
+  inputs:
+    codeCoverageTool: Cobertura
+    summaryFileLocation: '$(Build.SourcesDirectory)/coveragereport/Cobertura.xml'
+    reportDirectory: '$(Build.SourcesDirectory)/coveragereport'

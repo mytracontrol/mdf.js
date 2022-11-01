@@ -1,0 +1,32 @@
+{
+  "entryPoints": [
+    "src/index.ts"
+  ],
+  "tsconfig": "tsconfig.build.json",
+  "entryPointStrategy": "resolve",
+  "exclude": [
+    "**/node_modules",
+    "src/**/*.test.ts",
+    "src/**/test/*.*"
+  ],
+  "externalPattern": [],
+  "excludeExternals": true,
+  "excludePrivate": true,
+  "excludeProtected": true,
+  "excludeInternal": true,
+  "includes": [],
+  "media": "assets",
+  "out": "../../../docs/api/crash",
+  "markedOptions": {
+    "gfm": true
+  },
+  "name": "@mdf/crash",
+  "includeVersion": true,
+  "disableSources": true,
+  "excludeTags": [],
+  "readme": "README.md",
+  "categorizeByGroup": false,
+  "categoryOrder": ["Crash", "Multi", "Boom", "*"],
+  "cleanOutputDir": true,
+  "gitRevision": "master"
+}

@@ -1,0 +1,1 @@
+mono /home/ubuntu/GitVersion/GitVersion.exe /output buildserver /nofetch

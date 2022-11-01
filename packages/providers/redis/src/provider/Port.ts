@@ -1,0 +1,323 @@
+/**
+ * Copyright 2022 Mytra Control S.L. All rights reserved.
+ * Note: All information contained herein is, and remains the property of Mytra Control S.L. and its
+ * suppliers, if any. The intellectual and technical concepts contained herein are property of
+ * Mytra Control S.L. and its suppliers and may be covered by European and Foreign patents, patents
+ * in process, and are protected by trade secret or copyright.
+ *
+ * Dissemination of this information or the reproduction of this material is strictly forbidden
+ * unless prior written permission is obtained from Mytra Control S.L.
+ */
+import { Boom, Crash, Multi } from '@mdf/crash';
+import { LoggerInstance, Provider } from '@mdf/provider';
+import IORedis, { RedisOptions } from 'ioredis';
+import { ReplyError } from 'redis-errors';
+import { CONFIG_PROVIDER_BASE_NAME } from '../config';
+import type { MemoryStats, ServerStats, Status } from './Status.i';
+import { Client, Config } from './types';
+
+export class Port extends Provider.Port<Client, Config> {
+  /** Redis connection handler */
+  private readonly instance: Client;
+  /** Event wrapping flags */
+  private isWrapped: boolean;
+  /** Time interval for status check */
+  private timeInterval: NodeJS.Timer | null;
+  /** Is the first check */
+  private isFirstCheck: boolean;
+  /** Redis healthy state */
+  private healthy: boolean;
+  /** Time interval for ready check request */
+  private interval: number;
+  /**
+   * Implementation of functionalities of a Redis port instance.
+   * @param config - Port configuration options
+   * @param logger - Port logger, to be used internally
+   */
+  constructor(config: Config, logger: LoggerInstance) {
+    super(config, logger, config.name || CONFIG_PROVIDER_BASE_NAME);
+    const cleanedOptions = {
+      ...this.config,
+      checkInterval: undefined,
+      disableChecks: undefined,
+    } as RedisOptions;
+    this.instance = new IORedis({ ...cleanedOptions, lazyConnect: true });
+    // Stryker disable next-line all
+    this.logger.debug(`New instance of Redis port created: ${this.uuid}`, this.uuid, this.name);
+    this.interval = this.config.checkInterval as number;
+    this.isWrapped = false;
+    this.healthy = false;
+    this.timeInterval = null;
+    this.isFirstCheck = true;
+  }
+  /** Return the underlying port instance */
+  public get client(): Client {
+    return this.instance;
+  }
+  /** Return the port state as a boolean value, true if the port is available, false in otherwise */
+  public get state(): boolean {
+    return this.instance.status === 'ready';
+  }
+  /** Start the port, making it available */
+  public async start(): Promise<void> {
+    this.eventsWrapping(this.instance);
+    if (['ready', 'connecting', 'reconnecting'].includes(this.instance.status)) {
+      throw new Crash(
+        `The instance is already connected or connecting: ${this.instance.status}`,
+        this.uuid
+      );
+    }
+    try {
+      await this.instance.connect();
+      if (!this.timeInterval && !this.config.disableChecks) {
+        this.timeInterval = setInterval(this.statusCheck, this.interval);
+        this.statusCheck();
+      }
+    } catch (rawError) {
+      const error = Crash.from(rawError, this.uuid);
+      throw new Crash(`Error performing the connection to Redis instance: ${error.message}`, {
+        cause: error,
+      });
+    }
+  }
+  /** Stop the port, making it unavailable */
+  public async stop(): Promise<void> {
+    try {
+      this.eventsUnwrapping(this.instance);
+      await this.instance.quit();
+    } catch (rawError) {
+      const error = Crash.from(rawError, this.uuid);
+      if (error.message !== 'Connection is closed.') {
+        throw new Crash(`Error performing the disconnection to Redis instance: ${error.message}`, {
+          cause: error,
+        });
+      }
+    } finally {
+      if (this.timeInterval) {
+        clearInterval(this.timeInterval);
+        this.timeInterval = null;
+      }
+      this.healthy = false;
+    }
+  }
+  /** Close the port, alias to stop */
+  public async close(): Promise<void> {
+    await this.stop();
+  }
+  /**
+   * Parse string formatted stats from Redis INFO command to JSON
+   * @param stat - stat to be parsed
+   * @returns
+   */
+  private parseStats<T>(stat: string): T {
+    try {
+      return JSON.parse(
+        `{${stat
+          .split('\r\n')
+          .slice(1, -1)
+          .map(entry => `"${entry.replace(':', '":"')}"`)
+          .join(',')}}`
+      );
+    } catch (rawError) {
+      const error = Crash.from(rawError, this.uuid);
+      // Stryker disable next-line all
+      this.logger.warn(`Error parsing instance stats: ${error.message}`, this.uuid, this.name);
+      return { errorParsing: error.message } as unknown as T;
+    }
+  }
+  /** Get the Memory and Server stats from Redis INFO command */
+  private getInfoStats(): Promise<Status> {
+    const stats: Status = {
+      server: {},
+      memory: {},
+    } as Status;
+    return new Promise((resolve, reject) => {
+      this.instance
+        .info('server')
+        .then(result => (stats.server = this.parseStats<ServerStats>(result)))
+        .then(() => this.instance.info('memory'))
+        .then(result => (stats.memory = this.parseStats<MemoryStats>(result)))
+        .then(() => resolve(stats))
+        .catch(rawError => {
+          let error: Crash | Multi | Boom;
+          if (rawError instanceof ReplyError) {
+            error = this.errorParse(rawError);
+          } else {
+            error = Crash.from(rawError, this.uuid);
+          }
+          reject(new Crash(`Error getting the Redis INFO stats`, this.uuid, { cause: error }));
+        });
+    });
+  }
+  /** Check the server and memory status of the redis server instance  */
+  private statusCheck = () => {
+    this.getInfoStats()
+      .then(result => {
+        // Stryker disable next-line all
+        this.logger.debug(`Status check command performed successfully`, this.uuid, this.name);
+        this.evaluateStats(result);
+      })
+      .catch(rawError => {
+        const error = Crash.from(rawError, this.uuid);
+        this.emit(
+          'error',
+          new Crash(`Error performing the status check of the Redis instance`, this.uuid, {
+            cause: error,
+          })
+        );
+      })
+      .finally(() => {
+        this.isFirstCheck = false;
+      });
+  };
+  /**
+   * Check the results and emit the healthy or unhealthy event
+   * @param result - The result of the status check
+   * @returns
+   */
+  private evaluateStats(result: Status): Status {
+    let message: string | undefined = undefined;
+    let hasError = false;
+    let observedValue = '- bytes / - bytes';
+    const parsingError = result.memory.errorParsing || result.server.errorParsing;
+    if (parsingError) {
+      message = `Error parsing the Redis INFO stats: ${parsingError}, please contact with the developers`;
+      hasError = true;
+    } else if (
+      result.memory.used_memory > result.memory.maxmemory &&
+      result.memory.maxmemory !== '0'
+    ) {
+      message = `The system is OOM - used ${result.memory.used_memory_human} - max ${result.memory.maxmemory_human}`;
+      hasError = true;
+      observedValue = `${result.memory.used_memory} / ${result.memory.maxmemory}`;
+    } else {
+      observedValue = `${result.memory.used_memory} / ${result.memory.maxmemory}`;
+    }
+    this.addCheck('memory', {
+      componentId: this.uuid,
+      observedValue,
+      observedUnit: 'used memory / max memory',
+      status: hasError ? 'fail' : 'pass',
+      output: message,
+      time: new Date().toISOString(),
+    });
+    if (hasError && (this.healthy || this.isFirstCheck)) {
+      this.emit(
+        'unhealthy',
+        new Crash(message || 'Unexpected error in the evaluation', this.uuid),
+        result
+      );
+      this.healthy = false;
+    } else if (!this.healthy) {
+      this.emit('healthy');
+      this.healthy = true;
+    }
+    return result;
+  }
+  /**
+   * Auxiliar function to log and emit events
+   * @param original - original event name
+   * @param wrapped - wrapped events name
+   * @param broadcasted - flag tp indicating that the event must be broadcasted
+   * @param args - arguments to be emitted with the event
+   */
+  private onEvent(
+    original: string,
+    wrapped: string,
+    broadcasted: boolean,
+    ...args: (Crash | Status | number)[]
+  ): void {
+    // Stryker disable all
+    this.logger.debug(
+      `Original event: ${original} was wrapped to ${wrapped}`,
+      this.uuid,
+      this.name
+    );
+    // Stryker enable all
+    for (const arg of args) {
+      this.logger.silly(`Event ${original} arg: ${arg}`);
+    }
+    if (broadcasted) {
+      this.emit(wrapped, ...args);
+    }
+  }
+  /** Callback function for `connect` event */
+  private onConnectEvent = () => this.onEvent('connect', 'connect', false);
+  /** Callback function for `ready` event */
+  private onReadyEvent = () => this.onEvent('ready', 'ready', true);
+  /** Callback function for `error` event */
+  private onErrorEvent = (error: ReplyError) =>
+    this.onEvent('error', 'error', true, this.errorParse(error));
+  /** Callback function for `close` event */
+  private onCloseEvent = () => this.onEvent('close', 'close', false);
+  /** Callback function for `reconnecting` event */
+  private onReconnectingEvent = (delay: number) =>
+    this.onEvent('reconnecting', 'reconnecting', false, delay);
+  /** Callback function for `end` event */
+  private onEndEvent = () =>
+    this.onEvent(
+      'end',
+      'closed',
+      true,
+      new Crash(`The connection was closed unexpectedly`, this.uuid)
+    );
+  /** Callback function for `+node` event */
+  private onPlusNodeEvent = () => this.onEvent('+node', '+node', false);
+  /** Callback function for `-node` event */
+  private onMinusNodeEvent = () => this.onEvent('-node', '-node', false);
+  /**
+   * Transforms a ReplyError instance to a Crash instance
+   * @param error - Error to be parsed
+   * @returns
+   */
+  private errorParse(error: ReplyError): Crash {
+    let message = error.message;
+    /** Redis is requesting AUTH */
+    if (error.message.includes('NOAUTH Authentication required')) {
+      message = 'No authentication config for RDB connection';
+    } else if (error.message.includes('ERR invalid password')) {
+      message = 'Wrong authentication config on RDB connection';
+    }
+    return new Crash(message, this.uuid, {
+      name: error.name,
+      cause: Crash.from(error, this.uuid),
+      info: {
+        uuid: this.uuid,
+        redisState: this.instance.status,
+      },
+    });
+  }
+  /**
+   * Adapts the `ioredis` instance events to standard Port events
+   * @param instance - Redis instance over which the events should be wrapped
+   */
+  private eventsWrapping(instance: Client): void {
+    if (this.isWrapped) {
+      return;
+    }
+    instance.on('connect', this.onConnectEvent);
+    instance.on('ready', this.onReadyEvent);
+    instance.on('error', this.onErrorEvent);
+    instance.on('close', this.onCloseEvent);
+    instance.on('reconnecting', this.onReconnectingEvent);
+    instance.on('end', this.onEndEvent);
+    instance.on('+node', this.onPlusNodeEvent);
+    instance.on('-node', this.onMinusNodeEvent);
+    this.isWrapped = true;
+  }
+  /**
+   * Clean all the events handlers
+   * @param instance - Redis instance over which the events should be cleaned
+   */
+  private eventsUnwrapping(instance: Client): void {
+    instance.off('connect', this.onConnectEvent);
+    instance.off('ready', this.onReadyEvent);
+    instance.off('error', this.onErrorEvent);
+    instance.off('close', this.onCloseEvent);
+    instance.off('reconnecting', this.onReconnectingEvent);
+    instance.off('end', this.onEndEvent);
+    instance.off('+node', this.onPlusNodeEvent);
+    instance.off('-node', this.onMinusNodeEvent);
+    this.isWrapped = false;
+  }
+}

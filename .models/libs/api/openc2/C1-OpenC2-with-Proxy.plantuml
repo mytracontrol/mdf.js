@@ -1,0 +1,65 @@
+@startuml C1-Consumer
+
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+
+skinparam linetype ortho
+skinparam nodesep 100
+skinparam ranksep 100
+
+AddElementTag("main", $bgColor="#0070C0", $fontColor="#FFFFFF", $legendText="Main component")
+AddElementTag("reused", $bgColor="#7030A0", $fontColor="#FFFFFF", $legendText="Interface componet, used in more schemas")
+AddElementTag("health", $borderColor="#FF0000", $legendText="Implement Health Component interface")
+
+AddRelTag("DottedLine", $lineStyle = DottedLine(), $legendText="Async event")
+
+
+'###################################################################################################
+'External components and systems
+System_Ext("UPPER_LAYER", "Upper layer", "Use the producer and consumer interface to perform command and control operations", $tags=reused)
+Component_Ext("JOBHANDLER1", "JobHandler", "Job", "Job handler, emitted by the consumer and revolved by the upper layers")
+Component_Ext("JOBHANDLER2", "JobHandler", "Job", "Job handler, emitted by the consumer and revolved by the upper layers")
+Component_Ext("JOBHANDLER3", "JobHandler", "Job", "Job handler, emitted by the consumer and revolved by the upper layers")
+'###################################################################################################
+'CONSUMER
+Enterprise_Boundary(OPENC2, "OpenC2 Ecosystem", $tags="BoldLine") {
+    Enterprise_Boundary(SITE, "OpenC2 Site") {
+        Container("PROXY", "Proxy", "Main", "Allow to interconnect a OpenC2 site with higher hierarchy level wrapping the site consumers", $tags=main+health)
+        SystemQueue("TRANSPORT1", "Transport", "Transport system used to interconnect the nodes that participate in the system (MQTT, Redis, Socket.IO ...)", $tags=reused)
+        Container("CONSUMER1", "Consumer", "Main", "Manage the incoming commands, emitting jobs that should be resolved by the upper layers", $tags=main+health)
+        Container("CONSUMER2", "Consumer", "Main", "Manage the incoming commands, emitting jobs that should be resolved by the upper layers", $tags=main+health)
+        Container("CONSUMER3", "Consumer", "Main", "Manage the incoming commands, emitting jobs that should be resolved by the upper layers", $tags=main+health)
+    }
+    Container("PRODUCER1", "Producer", "Main", "Allow upper layers to perform commands against the consumers that participate in the system", $tags=main+health)
+    SystemQueue("TRANSPORT2", "Transport", "Transport system used to interconnect the nodes that participate in the system (MQTT, Redis, Socket.IO ...)", $tags=reused)
+}
+
+
+Rel_D(UPPER_LAYER, PRODUCER1, "command")
+Rel_U(PRODUCER1, UPPER_LAYER, "responses")
+
+Rel_D(PRODUCER1, TRANSPORT2, "OC2 command")
+Rel_U(TRANSPORT2, PRODUCER1, "OC2 respond")
+
+Rel_U(PROXY, TRANSPORT2, "OC2 command")
+Rel_D(TRANSPORT2, PROXY, "OC2 respond")
+
+Rel_D(PROXY, TRANSPORT1, "OC2 command")
+Rel_U(TRANSPORT1, PROXY, "OC2 respond")
+
+Rel_D(TRANSPORT1, CONSUMER1, "OC2 command")
+Rel_U(CONSUMER1, TRANSPORT1, "OC2 respond")
+Rel_D(CONSUMER1, JOBHANDLER1, "emit", $tags="DottedLine")
+Rel_U(JOBHANDLER1, CONSUMER1, "done")
+
+Rel_D(TRANSPORT1, CONSUMER2, "OC2 command")
+Rel_U(CONSUMER2, TRANSPORT1, "OC2 respond")
+Rel_D(CONSUMER2, JOBHANDLER2, "emit", $tags="DottedLine")
+Rel_U(JOBHANDLER2, CONSUMER2, "done")
+
+Rel_D(TRANSPORT1, CONSUMER3, "OC2 command")
+Rel_U(CONSUMER3, TRANSPORT1, "OC2 respond")
+Rel_D(CONSUMER3, JOBHANDLER3, "emit", $tags="DottedLine")
+Rel_U(JOBHANDLER3, CONSUMER3, "done")
+
+SHOW_LEGEND()
+@enduml

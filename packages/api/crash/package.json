@@ -1,0 +1,47 @@
+{
+  "name": "@mdf/crash",
+  "version": "0.0.1",
+  "description": "MMS - API Crash - Enhanced error management library",
+  "keywords": [
+    "NodeJS",
+    "MMS",
+    "API",
+    "error",
+    "crash",
+    "multi",
+    "boom"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://devopmytra.visualstudio.com/MytraManagementSystem/_git/MMS-microservices-nx",
+    "directory": "libs/api/crash"
+  },
+  "license": "SEE LICENSE IN LICENSE.md",
+  "author": "Mytra Control S.L.",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist/**/*"
+  ],
+  "scripts": {
+    "clean": "rimraf \"{tsconfig.build.tsbuildinfo,dist}\"",
+    "build": "yarn clean && tsc -p tsconfig.build.json",
+    "lint": "eslint \"src/**/*.ts\" --quiet --fix",
+    "test": "jest --config ./jest.config.js",
+    "mutants": "stryker run stryker.conf.js",
+    "licenses": "license-checker --start ./ --production --csv --out ../../../licenses/api/crash/licenses.csv --customPath ../../../.config/customFormat.json",
+    "doc": "typedoc --options typedoc.json"
+  },
+  "dependencies": {
+    "tslib": "^2.4.0",
+    "uuid": "^9.0.0"
+  },
+  "devDependencies": {
+    "@mdf/repo-config": "*",
+    "@types/uuid": "^8.3.4",
+    "joi": "^17.6.3"
+  },
+  "engines": {
+    "node": ">=16.14.2"
+  }
+}

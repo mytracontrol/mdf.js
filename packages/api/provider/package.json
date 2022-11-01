@@ -1,0 +1,46 @@
+{
+  "name": "@mdf/provider",
+  "version": "0.0.1",
+  "description": "MMS - API Core - Provider wrapper",
+  "keywords": [
+    "NodeJS",
+    "MMS",
+    "API",
+    "provider"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://devopmytra.visualstudio.com/MytraManagementSystem/_git/MMS-microservices-nx",
+    "directory": "packages/api/provider"
+  },
+  "license": "SEE LICENSE IN LICENSE.md",
+  "author": "Mytra Control S.L.",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist/**/*"
+  ],
+  "scripts": {
+    "clean": "rimraf \"{tsconfig.build.tsbuildinfo,dist}\"",
+    "build": "yarn clean && tsc -p tsconfig.build.json",
+    "test": "jest --config ./jest.config.js",
+    "mutants": "stryker run stryker.conf.js",
+    "licenses": "license-checker --start ./ --production --csv --out ../../../licenses/api/provider/licenses.csv --customPath ../../../.config/customFormat.json"
+  },
+  "dependencies": {
+    "@mdf/core": "*",
+    "@mdf/crash": "*",
+    "@mdf/logger": "*",
+    "joi": "^17.6.3",
+    "lodash": "^4.17.21",
+    "tslib": "^2.4.0",
+    "uuid": "^9.0.0"
+  },
+  "devDependencies": {
+    "@types/lodash": "^4.14.186",
+    "@types/uuid": "^8.3.4"
+  },
+  "engines": {
+    "node": ">=16.14.2"
+  }
+}
