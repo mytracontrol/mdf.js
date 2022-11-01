@@ -9,6 +9,6 @@
  * unless prior written permission is obtained from Mytra Control S.L.
  */
 
-import { Jobs } from '@mdf/core';
+import { Jobs } from '@mdf.js/core';
 
 export type JobObject<Type extends string = string, Data = any> = Jobs.Object<Type, Data>;

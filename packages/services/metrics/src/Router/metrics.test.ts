@@ -10,7 +10,7 @@
  */
 // ************************************************************************************************
 // #region Component imports
-import { Boom, BoomHelpers, Crash, Multi } from '@mdf/crash';
+import { Boom, BoomHelpers, Crash, Multi } from '@mdf.js/crash';
 import express, { ErrorRequestHandler, NextFunction, Request, Response } from 'express';
 import { Registry as StandAloneRegister } from 'prom-client';
 import request from 'supertest';

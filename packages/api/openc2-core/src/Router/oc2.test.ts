@@ -9,8 +9,8 @@
  * unless prior written permission is obtained from Mytra Control S.L.
  */
 
-import { JobHandler } from '@mdf/core';
-import { Middleware } from '@mdf/middlewares';
+import { JobHandler } from '@mdf.js/core';
+import { Middleware } from '@mdf.js/middlewares';
 import express from 'express';
 import request from 'supertest';
 import { Accessors } from '../helpers';

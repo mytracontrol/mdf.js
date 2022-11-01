@@ -9,7 +9,7 @@
  * unless prior written permission is obtained from Netin System S.L.
  */
 
-import { BoomHelpers, Links } from '@mdf/crash';
+import { BoomHelpers, Links } from '@mdf.js/crash';
 import { NextFunction, Request, RequestHandler, Response } from 'express';
 
 export class Default {

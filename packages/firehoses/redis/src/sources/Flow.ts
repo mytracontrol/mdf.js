@@ -9,9 +9,9 @@
  * unless prior written permission is obtained from Netin System S.L.
  */
 
-import { Crash, Multi } from '@mdf/crash';
-import { Health, Jobs, Plugs } from '@mdf/firehose';
-import { Redis } from '@mdf/redis-provider';
+import { Crash, Multi } from '@mdf.js/crash';
+import { Health, Jobs, Plugs } from '@mdf.js/firehose';
+import { Redis } from '@mdf.js/redis-provider';
 import { Base } from './Base';
 
 export declare interface Flow {

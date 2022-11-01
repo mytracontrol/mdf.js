@@ -8,6 +8,6 @@
  * Dissemination of this information or the reproduction of this material is strictly forbidden
  * unless prior written permission is obtained from Mytra Control S.L.
  */
-export { LoggerInstance } from '@mdf/logger';
+export { LoggerInstance } from '@mdf.js/logger';
 export * as Provider from './api';
 export { PortConfigValidationStruct, ProviderOptions } from './types';

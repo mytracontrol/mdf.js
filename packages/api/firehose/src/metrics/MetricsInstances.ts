@@ -9,7 +9,7 @@
  * unless prior written permission is obtained from Netin System S.L.
  */
 
-import { Counter, Gauge, Histogram } from '@mdf/metrics-service';
+import { Counter, Gauge, Histogram } from '@mdf.js/metrics-service';
 
 /** Metric types */
 export type MetricInstances = {

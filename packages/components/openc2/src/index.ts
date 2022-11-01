@@ -9,7 +9,7 @@
  * unless prior written permission is obtained from Mytra Control S.L.
  */
 
-export { Control } from '@mdf/openc2-core';
+export { Control } from '@mdf.js/openc2-core';
 export * as Adapters from './adapters';
 export * as Factory from './factories';
 export { ServiceBus, ServiceBusOptions } from './serviceBus';

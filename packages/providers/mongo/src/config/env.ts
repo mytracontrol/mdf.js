@@ -9,7 +9,7 @@
  * unless prior written permission is obtained from Mytra Control S.L.
  */
 
-import { formatEnv, loadFile } from '@mdf/utils';
+import { formatEnv, loadFile } from '@mdf.js/utils';
 import { Config } from '../provider';
 import { logger } from './utils';
 

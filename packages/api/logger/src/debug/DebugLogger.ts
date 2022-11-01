@@ -9,7 +9,7 @@
  * unless prior written permission is obtained from Mytra Control S.L.
  */
 
-import { Boom, Crash, Multi } from '@mdf/crash';
+import { Boom, Crash, Multi } from '@mdf.js/crash';
 import Debug, { Debugger } from 'debug';
 import { LoggerFunction, LoggerInstance } from '../types';
 

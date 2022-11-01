@@ -9,9 +9,9 @@
  * unless prior written permission is obtained from Mytra Control S.L.
  */
 
-import { Health } from '@mdf/core';
-import { Crash, Multi } from '@mdf/crash';
-import { overallStatus, retryBind, RetryOptions } from '@mdf/utils';
+import { Health } from '@mdf.js/core';
+import { Crash, Multi } from '@mdf.js/crash';
+import { overallStatus, retryBind, RetryOptions } from '@mdf.js/utils';
 import EventEmitter from 'events';
 import { merge } from 'lodash';
 import { ConsumerAdapter, OnCommandHandler } from '../../../types';

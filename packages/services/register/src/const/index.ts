@@ -8,7 +8,7 @@
  * Dissemination of this information or the reproduction of this material is strictly forbidden
  * unless prior written permission is obtained from Mytra Control S.L.
  */
-import { coerce } from '@mdf/utils';
+import { coerce } from '@mdf.js/utils';
 
 const DEFAULT_CONFIG_REGISTER_CLUSTER_UPDATE_INTERVAL = 10000;
 const DEFAULT_CONFIG_REGISTER_INCLUDE_STACK = false;

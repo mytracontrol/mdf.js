@@ -8,7 +8,7 @@
  * Dissemination of this information or the reproduction of this material is strictly forbidden
  * unless prior written permission is obtained from Mytra Control S.L.
  */
-import { coerce } from '@mdf/utils';
+import { coerce } from '@mdf.js/utils';
 import { ReadableOptions } from 'stream';
 
 export const DEFAULT_CONFIG_SOURCE_PLUG_MAX_UNKNOWN_JOBS = 100;

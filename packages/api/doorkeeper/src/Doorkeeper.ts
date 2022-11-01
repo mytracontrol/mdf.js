@@ -8,7 +8,7 @@
  * Dissemination of this information or the reproduction of this material is strictly forbidden
  * unless prior written permission is obtained from Mytra Control S.L.
  */
-import { Crash, Multi } from '@mdf/crash';
+import { Crash, Multi } from '@mdf.js/crash';
 import AJV, { AnySchema, ErrorObject, Options, SchemaObject } from 'ajv';
 import AJVError from 'ajv-errors';
 import AJVFormats from 'ajv-formats';

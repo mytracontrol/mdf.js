@@ -272,7 +272,7 @@ export class Helpers {
     pairs: Control.ActionTargetPairs,
     profiles?: string[]
   ): Control.ResponseMessage {
-    const features: string[] = get(command, 'content.target.features', []);
+    const features: string[] = get(command, 'content.target.features', []) as string[];
     const results: Control.Results = {};
     results['pairs'] = features.includes('pairs') ? pairs : undefined;
     results['rate_limit'] = features.includes('rate_limit')

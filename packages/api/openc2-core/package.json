@@ -1,5 +1,5 @@
 {
-  "name": "@mdf/openc2-core",
+  "name": "@mdf.js/openc2-core",
   "version": "0.0.1",
   "description": "MMS - API Core - OpenC2",
   "keywords": [
@@ -10,7 +10,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://devopmytra.visualstudio.com/MytraManagementSystem/_git/MMS-microservices-nx",
+    "url": "https://github.com/mytracontrol/mdf.js.git",
     "directory": "packages/api/openc2-core"
   },
   "license": "SEE LICENSE IN LICENSE.md",
@@ -21,36 +21,41 @@
     "dist/**/*"
   ],
   "scripts": {
-    "clean": "rimraf \"{tsconfig.build.tsbuildinfo,dist}\"",
     "build": "yarn clean && tsc -p tsconfig.build.json",
-    "test": "jest --config ./jest.config.js",
+    "check-dependencies": "npm-check",
+    "clean": "rimraf \"{tsconfig.build.tsbuildinfo,dist}\"",
+    "licenses": "license-checker --start ./ --production --csv --out ../../../licenses/api/core/licenses.csv --customPath ../../../.config/customFormat.json",
     "mutants": "stryker run stryker.conf.js",
-    "licenses": "license-checker --start ./ --production --csv --out ../../../licenses/api/core/licenses.csv --customPath ../../../.config/customFormat.json"
+    "test": "jest --config ./jest.config.js"
   },
   "dependencies": {
-    "@mdf/core": "*",
-    "@mdf/crash": "*",
-    "@mdf/doorkeeper": "*",
-    "@mdf/logger": "*",
-    "@mdf/redis-provider": "*",
-    "@mdf/socket-client-provider": "*",
-    "@mdf/socket-server-provider": "*",
-    "@mdf/utils": "*",
+    "@mdf.js/core": "*",
+    "@mdf.js/crash": "*",
+    "@mdf.js/doorkeeper": "*",
+    "@mdf.js/logger": "*",
+    "@mdf.js/redis-provider": "*",
+    "@mdf.js/socket-client-provider": "*",
+    "@mdf.js/socket-server-provider": "*",
+    "@mdf.js/utils": "*",
     "@types/express": "^4.17.14",
     "express": "^4.18.2",
     "jsonwebtoken": "^8.5.1",
     "lodash": "^4.17.21",
     "socket.io": "^4.5.3",
-    "tslib": "^2.4.0",
+    "tslib": "^2.4.1",
     "uuid": "^9.0.0"
   },
   "devDependencies": {
-    "@mdf/middlewares": "*",
+    "@mdf.js/middlewares": "*",
+    "@mdf.js/repo-config": "*",
     "@types/jsonwebtoken": "^8.5.9",
-    "@types/lodash": "^4.14.186",
+    "@types/lodash": "^4.14.187",
     "@types/uuid": "^8.3.4"
   },
   "engines": {
     "node": ">=16.14.2"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }

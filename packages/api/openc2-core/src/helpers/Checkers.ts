@@ -157,7 +157,7 @@ export class Checkers {
     const wrongConfiguration =
       startTime !== undefined && stopTime !== undefined && duration !== undefined;
     const startTimeHasPassedBasedOnStartTime =
-      startTime !== undefined && startTime + duration < Date.now();
+      startTime !== undefined && duration !== undefined && startTime + duration < Date.now();
     const startTimeHasPassedBasedOnStopTime =
       startTime === undefined &&
       stopTime !== undefined &&

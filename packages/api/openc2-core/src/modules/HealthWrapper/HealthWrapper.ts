@@ -8,9 +8,9 @@
  * Dissemination of this information or the reproduction of this material is strictly forbidden
  * unless prior written permission is obtained from Mytra Control S.L.
  */
-import { Health } from '@mdf/core';
-import { Crash } from '@mdf/crash';
-import { overallStatus } from '@mdf/utils';
+import { Health } from '@mdf.js/core';
+import { Crash } from '@mdf.js/crash';
+import { overallStatus } from '@mdf.js/utils';
 import { EventEmitter } from 'events';
 import { v4 } from 'uuid';
 

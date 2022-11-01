@@ -9,9 +9,9 @@
  * unless prior written permission is obtained from Mytra Control S.L.
  */
 
-import { Health } from '@mdf/core';
-import { Crash } from '@mdf/crash';
-import { LoggerInstance, SetContext } from '@mdf/logger';
+import { Health } from '@mdf.js/core';
+import { Crash } from '@mdf.js/crash';
+import { LoggerInstance, SetContext } from '@mdf.js/logger';
 import { EventEmitter } from 'events';
 import { v4 } from 'uuid';
 

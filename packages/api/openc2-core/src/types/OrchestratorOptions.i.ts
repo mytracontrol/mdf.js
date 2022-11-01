@@ -9,8 +9,8 @@
  * unless prior written permission is obtained from Mytra Control S.L.
  */
 
-import { LoggerInstance } from '@mdf/logger';
-import { RetryOptions } from '@mdf/utils';
+import { LoggerInstance } from '@mdf.js/logger';
+import { RetryOptions } from '@mdf.js/utils';
 import { Registry } from '../modules';
 
 export interface OrchestratorOptions {

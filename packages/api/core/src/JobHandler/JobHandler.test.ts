@@ -10,7 +10,7 @@
  */
 // ************************************************************************************************
 // #region Component imports
-import { Crash, Multi } from '@mdf/crash';
+import { Crash, Multi } from '@mdf.js/crash';
 import { v5 } from 'uuid';
 import { Jobs } from '..';
 import { MMS_NAMESPACE_OID } from '../const';

@@ -10,7 +10,7 @@
  */
 // *************************************************************************************************
 // #region Build my own Express app for testing, including the mandatory middleware
-import mylogger from '@mdf/logger';
+import mylogger from '@mdf.js/logger';
 import express from 'express';
 import jwt from 'jsonwebtoken';
 import supertest from 'supertest';

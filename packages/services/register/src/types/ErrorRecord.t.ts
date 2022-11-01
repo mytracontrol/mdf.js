@@ -8,7 +8,7 @@
  * Dissemination of this information or the reproduction of this material is strictly forbidden
  * unless prior written permission is obtained from Mytra Control S.L.
  */
-import { CrashObject, MultiObject } from '@mdf/crash';
+import { CrashObject, MultiObject } from '@mdf.js/crash';
 
 interface ExtendedCrashObject extends CrashObject {
   workerId?: number;

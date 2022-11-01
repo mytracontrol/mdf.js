@@ -9,9 +9,9 @@
  * unless prior written permission is obtained from Mytra Control S.L.
  */
 
-import { Health } from '@mdf/core';
-import { Crash, Multi } from '@mdf/crash';
-import { DebugLogger, LoggerInstance } from '@mdf/logger';
+import { Health } from '@mdf.js/core';
+import { Crash, Multi } from '@mdf.js/crash';
+import { DebugLogger, LoggerInstance } from '@mdf.js/logger';
 import { EventEmitter } from 'events';
 import Joi, { ValidationError } from 'joi';
 import { cloneDeep, merge } from 'lodash';

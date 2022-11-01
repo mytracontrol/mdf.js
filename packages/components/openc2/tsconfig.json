@@ -1,5 +1,5 @@
 {
-  "extends": "@mdf/repo-config/tsconfig.base.json",
+  "extends": "@mdf.js/repo-config/tsconfig.base.json",
   "compilerOptions": {
     "outDir": "./dist",
     "rootDir": "./src",

@@ -20,6 +20,9 @@
     },
     "doc": {
       "outputs": []
+    },
+    "check-dependencies": {
+      "outputs": []
     }
   }
 }

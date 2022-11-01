@@ -12,13 +12,10 @@
 module.exports = {
   moduleFileExtensions: ['ts', 'js', 'html'],
   testMatch: [`<rootDir>/src/**/*.test.ts`],
-  globals: {
-    'ts-jest': {
-      tsconfig: `<rootDir>/tsconfig.spec.json`,
-    },
-  },
   transform: {
-    '^.+\\.ts$': 'ts-jest',
+    '^.+\\.ts$': ['ts-jest', {
+      tsconfig: `<rootDir>/tsconfig.spec.json`,
+  }],
   },
   moduleNameMapper: {
     uuid: require.resolve('uuid'),

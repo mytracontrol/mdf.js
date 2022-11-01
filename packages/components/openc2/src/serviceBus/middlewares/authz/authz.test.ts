@@ -9,7 +9,7 @@
  * unless prior written permission is obtained from Mytra Control S.L.
  */
 
-import { Boom } from '@mdf/crash';
+import { Boom } from '@mdf.js/crash';
 import jwt, { JwtPayload } from 'jsonwebtoken';
 import { AuthZ } from './authz';
 

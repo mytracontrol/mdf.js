@@ -8,7 +8,7 @@
  * Dissemination of this information or the reproduction of this material is strictly forbidden
  * unless prior written permission is obtained from Netin System S.L.
  */
-import { Logger } from '@mdf/logger';
+import { Logger } from '@mdf.js/logger';
 import { NextFunction, Request, RequestHandler, Response } from 'express';
 import { AuditConfig } from './AuditConfig.i';
 

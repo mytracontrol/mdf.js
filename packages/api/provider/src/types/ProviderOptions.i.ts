@@ -9,7 +9,7 @@
  * unless prior written permission is obtained from Mytra Control S.L.
  */
 
-import { LoggerInstance } from '@mdf/logger';
+import { LoggerInstance } from '@mdf.js/logger';
 import { PortConfigValidationStruct } from '.';
 
 export interface ProviderOptions<PortConfig> {

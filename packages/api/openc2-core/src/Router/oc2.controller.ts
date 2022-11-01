@@ -9,7 +9,7 @@
  * unless prior written permission is obtained from Mytra Control S.L.
  */
 
-import { BoomHelpers } from '@mdf/crash';
+import { BoomHelpers } from '@mdf.js/crash';
 import { NextFunction, Request, Response } from 'express';
 import { Service } from './oc2.service';
 

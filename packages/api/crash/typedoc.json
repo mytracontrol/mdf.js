@@ -20,7 +20,7 @@
   "markedOptions": {
     "gfm": true
   },
-  "name": "@mdf/crash",
+  "name": "@mdf.js/crash",
   "includeVersion": true,
   "disableSources": true,
   "excludeTags": [],

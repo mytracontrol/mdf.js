@@ -9,8 +9,8 @@
  * unless prior written permission is obtained from Mytra Control S.L.
  */
 
-import { Crash } from '@mdf/crash';
-import { Control } from '@mdf/openc2-core';
+import { Crash } from '@mdf.js/crash';
+import { Control } from '@mdf.js/openc2-core';
 import { SocketIOConsumerAdapter } from './SocketIOConsumerAdapter';
 
 const COMMAND: Control.CommandMessage = {

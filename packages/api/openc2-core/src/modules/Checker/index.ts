@@ -9,7 +9,7 @@
  * unless prior written permission is obtained from Mytra Control S.L.
  */
 
-import { DoorKeeper } from '@mdf/doorkeeper';
+import { DoorKeeper } from '@mdf.js/doorkeeper';
 import { Control } from '../../types';
 import * as Schemas from './control';
 

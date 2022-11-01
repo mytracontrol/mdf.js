@@ -9,14 +9,14 @@
  * unless prior written permission is obtained from Mytra Control S.L.
  */
 
-import { Health, JobHandler, Jobs } from '@mdf/core';
-import { Crash, Multi } from '@mdf/crash';
+import { Health, JobHandler, Jobs } from '@mdf.js/core';
+import { Crash, Multi } from '@mdf.js/crash';
 import Debug, { Debugger } from 'debug';
 import { merge } from 'lodash';
 import { Readable } from 'stream';
 import { Plugs, SourceOptions } from '../../types';
 
-import { overallStatus } from '@mdf/utils';
+import { overallStatus } from '@mdf.js/utils';
 import { DEFAULT_READABLE_OPTIONS } from './const';
 import { PlugWrapper } from './PlugWrapper';
 

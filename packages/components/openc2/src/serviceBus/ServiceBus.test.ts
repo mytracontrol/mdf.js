@@ -9,8 +9,8 @@
  * unless prior written permission is obtained from Mytra Control S.L.
  */
 
-import { Control } from '@mdf/openc2-core';
-import { mockProperty, undoMocks } from '@mdf/utils';
+import { Control } from '@mdf.js/openc2-core';
+import { mockProperty, undoMocks } from '@mdf.js/utils';
 import { ServiceBus } from './ServiceBus';
 
 const COMMAND: Control.CommandMessage = {

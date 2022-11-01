@@ -9,9 +9,9 @@
  * unless prior written permission is obtained from Mytra Control S.L.
  */
 
-import { JobHandler } from '@mdf/core';
-import { Crash } from '@mdf/crash';
-import { RetryOptions } from '@mdf/utils';
+import { JobHandler } from '@mdf.js/core';
+import { Crash } from '@mdf.js/crash';
+import { RetryOptions } from '@mdf.js/utils';
 import { WritableOptions } from 'stream';
 import { Plugs } from '../types';
 import { Base } from './core';

@@ -10,8 +10,8 @@
  */
 // ************************************************************************************************
 // #region Component imports
-import { Health } from '@mdf/core';
-import { mockProperty, undoMocks } from '@mdf/utils';
+import { Health } from '@mdf.js/core';
+import { mockProperty, undoMocks } from '@mdf.js/utils';
 import cluster from 'cluster';
 import EventEmitter from 'events';
 import request from 'supertest';

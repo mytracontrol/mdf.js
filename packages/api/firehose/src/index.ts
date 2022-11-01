@@ -9,6 +9,6 @@
  * unless prior written permission is obtained from Mytra Control S.L.
  */
 
-export { Health, Jobs } from '@mdf/core';
+export { Health, Jobs } from '@mdf.js/core';
 export * from './Firehose';
 export { Plugs } from './types';

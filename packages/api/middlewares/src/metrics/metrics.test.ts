@@ -10,7 +10,7 @@
  */
 // ************************************************************************************************
 // #region Component imports
-import { Service } from '@mdf/metrics-service';
+import { Service } from '@mdf.js/metrics-service';
 import express from 'express';
 import request from 'supertest';
 import { Middleware } from '..';

@@ -9,7 +9,7 @@
  * unless prior written permission is obtained from Netin System S.L.
  */
 
-import { Jobs } from '@mdf/core';
+import { Jobs } from '@mdf.js/core';
 
 export interface Routing extends Jobs.Routing {
   /** Define the maximum size of the stream */

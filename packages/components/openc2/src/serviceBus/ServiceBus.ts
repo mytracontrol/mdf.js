@@ -8,10 +8,10 @@
  * Dissemination of this information or the reproduction of this material is strictly forbidden
  * unless prior written permission is obtained from Mytra Control S.L.
  */
-import { Health } from '@mdf/core';
-import { Crash } from '@mdf/crash';
-import { Accessors, Control } from '@mdf/openc2-core';
-import { SocketIOServer } from '@mdf/socket-server-provider';
+import { Health } from '@mdf.js/core';
+import { Crash } from '@mdf.js/crash';
+import { Accessors, Control } from '@mdf.js/openc2-core';
+import { SocketIOServer } from '@mdf.js/socket-server-provider';
 import EventEmitter from 'events';
 import os from 'os';
 import { Namespace, Socket } from 'socket.io';

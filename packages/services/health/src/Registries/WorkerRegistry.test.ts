@@ -10,8 +10,8 @@
  */
 // ************************************************************************************************
 // #region Component imports
-import { Health } from '@mdf/core';
-import { undoMocks } from '@mdf/utils';
+import { Health } from '@mdf.js/core';
+import { undoMocks } from '@mdf.js/utils';
 import { WorkerRegistry } from '.';
 import { Aggregator } from '../Aggregator';
 import { OurProvider } from '../test/Health.assets';

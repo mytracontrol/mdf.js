@@ -9,7 +9,7 @@
  * unless prior written permission is obtained from Mytra Control S.L.
  */
 
-import { Jobs } from '@mdf/core';
+import { Jobs } from '@mdf.js/core';
 import { Control } from '../types';
 import { Model } from './oc2.model';
 

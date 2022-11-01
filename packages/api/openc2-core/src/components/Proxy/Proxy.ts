@@ -9,9 +9,9 @@
  * unless prior written permission is obtained from Mytra Control S.L.
  */
 
-import { Health } from '@mdf/core';
-import { Crash, Links } from '@mdf/crash';
-import { DebugLogger, LoggerInstance, SetContext } from '@mdf/logger';
+import { Health } from '@mdf.js/core';
+import { Crash, Links } from '@mdf.js/crash';
+import { DebugLogger, LoggerInstance, SetContext } from '@mdf.js/logger';
 import EventEmitter from 'events';
 import express from 'express';
 import { cloneDeep } from 'lodash';

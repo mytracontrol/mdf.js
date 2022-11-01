@@ -9,7 +9,7 @@
  * unless prior written permission is obtained from Mytra Control S.L.
  */
 
-import { Crash } from '@mdf/crash';
+import { Crash } from '@mdf.js/crash';
 import { Logger } from '../index';
 process.env['NODE_ENV'] = 'development';
 

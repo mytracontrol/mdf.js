@@ -8,7 +8,7 @@
  * Dissemination of this information or the reproduction of this material is strictly forbidden
  * unless prior written permission is obtained from Mytra Control S.L.
  */
-import { Crash, Multi } from '@mdf/crash';
+import { Crash, Multi } from '@mdf.js/crash';
 import { EventEmitter } from 'events';
 import { v4, v5 } from 'uuid';
 import { MMS_NAMESPACE_OID } from '../const';

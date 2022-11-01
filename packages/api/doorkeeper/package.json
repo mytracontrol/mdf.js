@@ -1,5 +1,5 @@
 {
-  "name": "@mdf/doorkeeper",
+  "name": "@mdf.js/doorkeeper",
   "version": "0.0.1",
   "description": "MMS - API - Doorkeeper",
   "keywords": [
@@ -10,7 +10,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://devopmytra.visualstudio.com/MytraManagementSystem/_git/MMS-microservices-nx",
+    "url": "https://github.com/mytracontrol/mdf.js.git",
     "directory": "packages/api/doorkeeper"
   },
   "license": "SEE LICENSE IN LICENSE.md",
@@ -21,27 +21,32 @@
     "dist/**/*"
   ],
   "scripts": {
-    "clean": "rimraf \"{tsconfig.build.tsbuildinfo,dist}\"",
     "build": "yarn clean && tsc -p tsconfig.build.json",
-    "test": "jest --config ./jest.config.js",
+    "check-dependencies": "npm-check",
+    "clean": "rimraf \"{tsconfig.build.tsbuildinfo,dist}\"",
+    "licenses": "license-checker --start ./ --production --csv --out ../../../licenses/api/doorkeeper/licenses.csv --customPath ../../../.config/customFormat.json",
     "mutants": "stryker run stryker.conf.js",
-    "licenses": "license-checker --start ./ --production --csv --out ../../../licenses/api/doorkeeper/licenses.csv --customPath ../../../.config/customFormat.json"
+    "test": "jest --config ./jest.config.js"
   },
   "dependencies": {
-    "@mdf/crash": "*",
+    "@mdf.js/crash": "*",
     "ajv": "^8.8.2",
     "ajv-errors": "^3.0.0",
     "ajv-formats": "^2.1.1",
     "ajv-keywords": "^5.1.0",
     "jsonpointer": "^5.0.0",
-    "tslib": "^2.4.0",
+    "tslib": "^2.4.1",
     "uuid": "^9.0.0"
   },
   "devDependencies": {
+    "@mdf.js/repo-config": "*",
     "@types/supertest": "^2.0.12",
     "@types/uuid": "^8.3.4"
   },
   "engines": {
     "node": ">=16.14.2"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }

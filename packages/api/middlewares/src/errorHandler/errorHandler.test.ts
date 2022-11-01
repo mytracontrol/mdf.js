@@ -10,7 +10,7 @@
  */
 // *************************************************************************************************
 // #region Build my own Express app for testing, including the mandatory middleware
-import { Crash } from '@mdf/crash';
+import { Crash } from '@mdf.js/crash';
 import express from 'express';
 import Joi from 'joi';
 import request from 'supertest';

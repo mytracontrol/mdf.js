@@ -8,7 +8,7 @@
  * Dissemination of this information or the reproduction of this material is strictly forbidden
  * unless prior written permission is obtained from Netin System S.L.
  */
-import { BoomHelpers } from '@mdf/crash';
+import { BoomHelpers } from '@mdf.js/crash';
 import { Socket } from 'socket.io';
 import { v4 } from 'uuid';
 import { SocketIOMiddleware, SocketIONextFunction, transformError } from '..';

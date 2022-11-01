@@ -9,9 +9,9 @@
  * unless prior written permission is obtained from Mytra Control S.L.
  */
 
-import { Crash } from '@mdf/crash';
-import { Control, ProducerAdapter } from '@mdf/openc2-core';
-import { Redis } from '@mdf/redis-provider';
+import { Crash } from '@mdf.js/crash';
+import { Control, ProducerAdapter } from '@mdf.js/openc2-core';
+import { Redis } from '@mdf.js/redis-provider';
 import { AdapterOptions } from '../../types';
 import { RedisAdapter } from './RedisAdapter';
 

@@ -9,7 +9,7 @@
  * unless prior written permission is obtained from Mytra Control S.L.
  */
 
-import { Provider } from '@mdf/provider';
+import { Provider } from '@mdf.js/provider';
 import { Port } from '../Port';
 import { Client } from './Client.t';
 import { Config } from './Config.t';

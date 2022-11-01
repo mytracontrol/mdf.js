@@ -9,8 +9,8 @@
  * unless prior written permission is obtained from Mytra Control S.L.
  */
 
-import { Crash } from '@mdf/crash';
-import { Proxy, ProxyOptions, Registry } from '@mdf/openc2-core';
+import { Crash } from '@mdf.js/crash';
+import { Proxy, ProxyOptions, Registry } from '@mdf.js/openc2-core';
 import cluster from 'cluster';
 import * as Adapters from '../adapters';
 import { RedisClientOptions, SocketIOClientOptions } from '../types';

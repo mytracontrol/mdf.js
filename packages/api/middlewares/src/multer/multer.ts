@@ -8,8 +8,8 @@
  * Dissemination of this information or the reproduction of this material is strictly forbidden
  * unless prior written permission is obtained from Netin System S.L.
  */
-import { BoomHelpers, Crash, Multi } from '@mdf/crash';
-import { coerce } from '@mdf/utils';
+import { BoomHelpers, Crash, Multi } from '@mdf.js/crash';
+import { coerce } from '@mdf.js/utils';
 import { NextFunction, Request, RequestHandler, Response } from 'express';
 import multer, { FileFilterCallback, MulterError, StorageEngine } from 'multer';
 const MEMORY_STORAGE = multer.memoryStorage();

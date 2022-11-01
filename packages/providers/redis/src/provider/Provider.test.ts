@@ -8,9 +8,9 @@
  * Dissemination of this information or the reproduction of this material is strictly forbidden
  * unless prior written permission is obtained from Mytra Control S.L.
  */
-import { Crash } from '@mdf/crash';
-import { LoggerInstance, Provider } from '@mdf/provider';
-import { mockProperty, undoMocks } from '@mdf/utils';
+import { Crash } from '@mdf.js/crash';
+import { LoggerInstance, Provider } from '@mdf.js/provider';
+import { mockProperty, undoMocks } from '@mdf.js/utils';
 import IORedis from 'ioredis';
 import { ReplyError } from 'redis-errors';
 import { Factory } from './Factory';

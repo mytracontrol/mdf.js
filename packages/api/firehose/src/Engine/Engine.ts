@@ -8,8 +8,8 @@
  * Dissemination of this information or the reproduction of this material is strictly forbidden
  * unless prior written permission is obtained from Mytra Control S.L.
  */
-import { Health, JobHandler, Jobs } from '@mdf/core';
-import { Crash, Multi } from '@mdf/crash';
+import { Health, JobHandler, Jobs } from '@mdf.js/core';
+import { Crash, Multi } from '@mdf.js/crash';
 import Debug, { Debugger } from 'debug';
 import { get, merge } from 'lodash';
 import { Transform, TransformOptions } from 'stream';

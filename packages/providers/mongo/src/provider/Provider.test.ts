@@ -8,9 +8,9 @@
  * Dissemination of this information or the reproduction of this material is strictly forbidden
  * unless prior written permission is obtained from Mytra Control S.L.
  */
-import { Crash } from '@mdf/crash';
-import { LoggerInstance, Provider } from '@mdf/provider';
-import { undoMocks } from '@mdf/utils';
+import { Crash } from '@mdf.js/crash';
+import { LoggerInstance, Provider } from '@mdf.js/provider';
+import { undoMocks } from '@mdf.js/utils';
 import { MongoClient } from 'mongodb';
 import { Factory } from './Factory';
 import { Port } from './Port';

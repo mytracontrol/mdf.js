@@ -9,7 +9,7 @@
  * unless prior written permission is obtained from Netin System S.L.
  */
 
-import { MetricConfig } from '@mdf/metrics-service';
+import { MetricConfig } from '@mdf.js/metrics-service';
 
 /** Jobs metrics for API */
 export const JOBS_METRICS_DEFINITIONS: Record<string, MetricConfig> = {

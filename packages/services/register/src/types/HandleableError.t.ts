@@ -8,6 +8,6 @@
  * Dissemination of this information or the reproduction of this material is strictly forbidden
  * unless prior written permission is obtained from Mytra Control S.L.
  */
-import { Crash, Multi } from '@mdf/crash';
+import { Crash, Multi } from '@mdf.js/crash';
 
 export type HandleableError = Crash | Multi;

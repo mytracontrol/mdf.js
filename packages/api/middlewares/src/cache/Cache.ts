@@ -9,10 +9,10 @@
  * unless prior written permission is obtained from Netin System S.L.
  */
 
-import { Crash } from '@mdf/crash';
-import logger from '@mdf/logger';
-import { Redis } from '@mdf/redis-provider';
-import { coerce } from '@mdf/utils';
+import { Crash } from '@mdf.js/crash';
+import logger from '@mdf.js/logger';
+import { Redis } from '@mdf.js/redis-provider';
+import { coerce } from '@mdf.js/utils';
 import cryto from 'crypto';
 import { NextFunction, Request, RequestHandler, Response } from 'express';
 import { OutgoingHttpHeaders } from 'http';

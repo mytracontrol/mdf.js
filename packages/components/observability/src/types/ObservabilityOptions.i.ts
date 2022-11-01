@@ -8,7 +8,7 @@
  * Dissemination of this information or the reproduction of this material is strictly forbidden
  * unless prior written permission is obtained from Mytra Control S.L.
  */
-import { ServiceMetadata } from '@mdf/health-service';
+import { ServiceMetadata } from '@mdf.js/health-service';
 
 export interface ObservabilityOptions extends ServiceMetadata {
   /** Port to listen for incoming requests */

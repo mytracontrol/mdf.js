@@ -9,7 +9,7 @@
  * unless prior written permission is obtained from Netin System S.L.
  */
 
-import { Redis } from '@mdf/redis-provider';
+import { Redis } from '@mdf.js/redis-provider';
 import { Sequence } from './Sequence';
 
 const XREAD_RESPONSE_OKEY: [string, [string, string[]][]][] = [

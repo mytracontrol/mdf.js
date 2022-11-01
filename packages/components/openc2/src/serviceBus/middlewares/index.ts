@@ -9,7 +9,7 @@
  * unless prior written permission is obtained from Mytra Control S.L.
  */
 
-import { Boom, Crash } from '@mdf/crash';
+import { Boom, Crash } from '@mdf.js/crash';
 import { Socket } from 'socket.io';
 export * from './authz';
 export * from './check';

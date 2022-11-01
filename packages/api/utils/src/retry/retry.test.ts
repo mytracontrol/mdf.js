@@ -10,7 +10,7 @@
  */
 // ************************************************************************************************
 // #region Component imports
-import { Boom, Crash, Multi } from '@mdf/crash';
+import { Boom, Crash, Multi } from '@mdf.js/crash';
 import { v4 } from 'uuid';
 import { retry, retryBind } from './retry';
 // #endregion

@@ -9,7 +9,7 @@
  * unless prior written permission is obtained from Mytra Control S.L.
  */
 
-import { Health, JobHandler } from '@mdf/core';
+import { Health, JobHandler } from '@mdf.js/core';
 import { Plugs, SourceOptions } from '../types';
 import { Base } from './core';
 

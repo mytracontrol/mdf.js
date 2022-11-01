@@ -9,7 +9,7 @@
  * unless prior written permission is obtained from Mytra Control S.L.
  */
 
-import { Boom, Crash, Multi } from '@mdf/crash';
+import { Boom, Crash, Multi } from '@mdf.js/crash';
 
 export const WAIT_TIME = 100;
 export const MAX_WAIT_TIME = 15000;

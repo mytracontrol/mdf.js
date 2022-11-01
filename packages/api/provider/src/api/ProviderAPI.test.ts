@@ -10,8 +10,8 @@
  */
 // *************************************************************************************************
 // #region Component imports
-import { BoomHelpers, Crash, Multi } from '@mdf/crash';
-import { DebugLogger, LoggerInstance } from '@mdf/logger';
+import { BoomHelpers, Crash, Multi } from '@mdf.js/crash';
+import { DebugLogger, LoggerInstance } from '@mdf.js/logger';
 import EventEmitter from 'events';
 import Joi from 'joi';
 import { v4 } from 'uuid';

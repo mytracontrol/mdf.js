@@ -44,6 +44,7 @@ docs
 .DS_Store
 Thumbs.db
 .env
+licenses
 
 # stryker temp files
 .stryker-tmp

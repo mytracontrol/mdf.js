@@ -8,4 +8,4 @@
  * Dissemination of this information or the reproduction of this material is strictly forbidden
  * unless prior written permission is obtained from Mytra Control S.L.
  */
-module.exports = require('@mdf/repo-config').getJestConfig(__dirname);
+module.exports = require('@mdf.js/repo-config').getJestConfig(__dirname);

@@ -9,7 +9,7 @@
  * unless prior written permission is obtained from Mytra Control S.L.
  */
 
-import { coerce, loadFile } from '@mdf/utils';
+import { coerce, loadFile } from '@mdf.js/utils';
 import { CreateAxiosDefaults as RequestDefaults } from 'axios';
 import { AgentOptions as HTTPAgentOptions } from 'http';
 import { AgentOptions as HTTPSAgentOptions } from 'https';

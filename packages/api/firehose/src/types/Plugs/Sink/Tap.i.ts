@@ -9,7 +9,7 @@
  * unless prior written permission is obtained from Mytra Control S.L.
  */
 
-import { Health } from '@mdf/core';
+import { Health } from '@mdf.js/core';
 import { JobObject } from './JobObject.t';
 
 export interface Tap<Type extends string = string, Data = any> extends Health.Component {

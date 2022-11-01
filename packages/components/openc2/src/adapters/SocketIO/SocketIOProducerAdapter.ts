@@ -9,8 +9,8 @@
  * unless prior written permission is obtained from Mytra Control S.L.
  */
 
-import { Crash } from '@mdf/crash';
-import { Accessors, Control, ProducerAdapter } from '@mdf/openc2-core';
+import { Crash } from '@mdf.js/crash';
+import { Accessors, Control, ProducerAdapter } from '@mdf.js/openc2-core';
 import { AdapterOptions, SocketIOClientOptions } from '../../types';
 import { SocketIOAdapter } from './SocketIOAdapter';
 

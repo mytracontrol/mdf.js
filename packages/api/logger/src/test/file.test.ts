@@ -9,8 +9,8 @@
  * unless prior written permission is obtained from Mytra Control S.L.
  */
 
-import { Crash } from '@mdf/crash';
-import { retry } from '@mdf/utils';
+import { Crash } from '@mdf.js/crash';
+import { retry } from '@mdf.js/utils';
 import fs from 'fs';
 import readline from 'readline';
 import { Logger } from '../index';

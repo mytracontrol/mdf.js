@@ -9,7 +9,7 @@
  * unless prior written permission is obtained from Mytra Control S.L.
  */
 
-import { RetryOptions } from '@mdf/utils';
+import { RetryOptions } from '@mdf.js/utils';
 import { ReadableOptions } from 'stream';
 import { PostConsumeOptions } from './PostConsumeOptions.i';
 

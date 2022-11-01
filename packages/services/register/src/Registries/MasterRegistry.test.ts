@@ -10,8 +10,8 @@
  */
 // ************************************************************************************************
 // #region Component imports
-import { Crash } from '@mdf/crash';
-import { mockProperty, undoMocks } from '@mdf/utils';
+import { Crash } from '@mdf.js/crash';
+import { mockProperty, undoMocks } from '@mdf.js/utils';
 import cluster from 'cluster';
 import { MasterRegistry } from '.';
 import { RegisterMessageType } from '../types';

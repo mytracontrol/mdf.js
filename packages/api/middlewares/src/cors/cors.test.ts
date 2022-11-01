@@ -10,7 +10,7 @@
  */
 // *************************************************************************************************
 // #region Build my own Express app for testing, including the mandatory middleware
-import standardLogger from '@mdf/logger';
+import standardLogger from '@mdf.js/logger';
 import express from 'express';
 import request from 'supertest';
 import { Middleware } from '..';

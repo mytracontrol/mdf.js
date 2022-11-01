@@ -10,8 +10,8 @@
  */
 // ************************************************************************************************
 // #region Component imports
-import { Crash } from '@mdf/crash';
-import { undoMocks } from '@mdf/utils';
+import { Crash } from '@mdf.js/crash';
+import { undoMocks } from '@mdf.js/utils';
 import { WorkerRegistry } from '.';
 import { RegisterMessage, RegisterMessageType } from '../types';
 const UUID_FAKE = 'a1e4e76a-8e1a-425c-883d-4d75760f9cee';

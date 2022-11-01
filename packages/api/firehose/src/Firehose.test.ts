@@ -10,9 +10,9 @@
  */
 process.env['CONFIG_SOURCE_PLUG_CHECK_UNCLEANED_INTERVAL'] = '1000';
 
-import { Health, Jobs } from '@mdf/core';
-import { Crash } from '@mdf/crash';
-import { Observability, ObservabilityOptions } from '@mdf/observability';
+import { Health, Jobs } from '@mdf.js/core';
+import { Crash } from '@mdf.js/crash';
+import { Observability, ObservabilityOptions } from '@mdf.js/observability';
 import { v4 } from 'uuid';
 import { Firehose, Plugs } from '.';
 import {

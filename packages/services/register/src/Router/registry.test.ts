@@ -8,8 +8,8 @@
  * Dissemination of this information or the reproduction of this material is strictly forbidden
  * unless prior written permission is obtained from Mytra Control S.L.
  */
-import { Crash } from '@mdf/crash';
-import { Middleware } from '@mdf/middlewares';
+import { Crash } from '@mdf.js/crash';
+import { Middleware } from '@mdf.js/middlewares';
 import express from 'express';
 import request from 'supertest';
 import { StandaloneRegistry } from '../Registries';

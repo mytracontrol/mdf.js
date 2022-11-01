@@ -9,8 +9,8 @@
  * unless prior written permission is obtained from Mytra Control S.L.
  */
 
-import { Health } from '@mdf/core';
-import { coerce } from '@mdf/utils';
+import { Health } from '@mdf.js/core';
+import { coerce } from '@mdf.js/utils';
 import cluster from 'cluster';
 import EventEmitter from 'events';
 import express from 'express';

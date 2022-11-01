@@ -9,10 +9,10 @@
  * unless prior written permission is obtained from Mytra Control S.L.
  */
 
-import { Health, JobHandler, Jobs } from '@mdf/core';
-import { Crash } from '@mdf/crash';
-import { Service as RegisterService } from '@mdf/register-service';
-import { overallStatus } from '@mdf/utils';
+import { Health, JobHandler, Jobs } from '@mdf.js/core';
+import { Crash } from '@mdf.js/crash';
+import { Service as RegisterService } from '@mdf.js/register-service';
+import { overallStatus } from '@mdf.js/utils';
 import Debug, { Debugger } from 'debug';
 import EventEmitter from 'events';
 import { Writable } from 'stream';

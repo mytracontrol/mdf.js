@@ -8,10 +8,10 @@
  * Dissemination of this information or the reproduction of this material is strictly forbidden
  * unless prior written permission is obtained from Mytra Control S.L.
  */
-import { Crash } from '@mdf/crash';
-import { HTTP } from '@mdf/http-server-provider';
-import { LoggerInstance, Provider } from '@mdf/provider';
-import { findNodeModule } from '@mdf/utils';
+import { Crash } from '@mdf.js/crash';
+import { HTTP } from '@mdf.js/http-server-provider';
+import { LoggerInstance, Provider } from '@mdf.js/provider';
+import { findNodeModule } from '@mdf.js/utils';
 import { instrument } from '@socket.io/admin-ui';
 import express, { Express } from 'express';
 import fs from 'fs';

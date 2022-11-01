@@ -11,9 +11,9 @@
 
 // ************************************************************************************************
 // #region Repository imports
-import { Crash } from '@mdf/crash';
-import { Redis } from '@mdf/redis-provider';
-import { mockProperty, undoMocks } from '@mdf/utils';
+import { Crash } from '@mdf.js/crash';
+import { Redis } from '@mdf.js/redis-provider';
+import { mockProperty, undoMocks } from '@mdf.js/utils';
 import { CacheRepository } from './CacheRepository';
 // #endregion
 // *************************************************************************************************

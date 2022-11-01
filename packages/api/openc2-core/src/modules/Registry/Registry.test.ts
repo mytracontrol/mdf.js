@@ -9,7 +9,7 @@
  * unless prior written permission is obtained from Mytra Control S.L.
  */
 
-import { JobHandler } from '@mdf/core';
+import { JobHandler } from '@mdf.js/core';
 import { Registry } from '.';
 import { Accessors } from '../../helpers';
 import { Control } from '../../types';

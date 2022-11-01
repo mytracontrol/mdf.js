@@ -9,7 +9,7 @@
  * unless prior written permission is obtained from Netin System S.L.
  */
 
-import { Counter, Gauge, Histogram, MetricConfig, Service } from '@mdf/metrics-service';
+import { Counter, Gauge, Histogram, MetricConfig, Service } from '@mdf.js/metrics-service';
 import { NextFunction, Request, RequestHandler, Response } from 'express';
 
 /** Global metric for API */

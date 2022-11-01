@@ -9,9 +9,9 @@
  * unless prior written permission is obtained from Mytra Control S.L.
  */
 
-import { Health } from '@mdf/core';
-import { Crash } from '@mdf/crash';
-import { Redis } from '@mdf/redis-provider';
+import { Health } from '@mdf.js/core';
+import { Crash } from '@mdf.js/crash';
+import { Redis } from '@mdf.js/redis-provider';
 import { AdapterOptions } from '../../types';
 import { Adapter } from '../Adapter';
 

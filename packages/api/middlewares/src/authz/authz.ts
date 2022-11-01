@@ -8,7 +8,7 @@
  * Dissemination of this information or the reproduction of this material is strictly forbidden
  * unless prior written permission is obtained from Netin System S.L.
  */
-import { BoomHelpers, Crash } from '@mdf/crash';
+import { BoomHelpers, Crash } from '@mdf.js/crash';
 import { NextFunction, Request, RequestHandler, Response } from 'express';
 import jwt from 'jsonwebtoken';
 import { v4 } from 'uuid';

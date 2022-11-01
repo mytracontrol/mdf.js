@@ -9,8 +9,8 @@
  * unless prior written permission is obtained from Netin System S.L.
  */
 
-import { JobHandler, Jobs } from '@mdf/core';
-import { Service } from '@mdf/metrics-service';
+import { JobHandler, Jobs } from '@mdf.js/core';
+import { Service } from '@mdf.js/metrics-service';
 import { Sources } from '../types';
 import { JOBS_METRICS_DEFINITIONS } from './MetricsDefinitions';
 import { MetricInstances } from './MetricsInstances';

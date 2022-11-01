@@ -8,7 +8,7 @@
  * Dissemination of this information or the reproduction of this material is strictly forbidden
  * unless prior written permission is obtained from Mytra Control S.L.
  */
-import { Crash, Links } from '@mdf/crash';
+import { Crash, Links } from '@mdf.js/crash';
 import { EventEmitter } from 'events';
 import express from 'express';
 

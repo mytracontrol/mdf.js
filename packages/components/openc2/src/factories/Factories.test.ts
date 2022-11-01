@@ -8,8 +8,8 @@
  * Dissemination of this information or the reproduction of this material is strictly forbidden
  * unless prior written permission is obtained from Mytra Control S.L.
  */
-import { Consumer, Producer, Proxy, Registry } from '@mdf/openc2-core';
-import { mockProperty, undoMocks } from '@mdf/utils';
+import { Consumer, Producer, Proxy, Registry } from '@mdf.js/openc2-core';
+import { mockProperty, undoMocks } from '@mdf.js/utils';
 import cluster from 'cluster';
 import { ConsumerFactory } from './ConsumerFactory';
 import { ProducerFactory } from './ProducerFactory';

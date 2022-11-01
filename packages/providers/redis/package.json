@@ -1,5 +1,5 @@
 {
-  "name": "@mdf/redis-provider",
+  "name": "@mdf.js/redis-provider",
   "version": "0.0.1",
   "description": "MMS - Redis Port for Javascript/Typescript",
   "keywords": [
@@ -10,7 +10,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://devopmytra.visualstudio.com/MytraManagementSystem/_git/MMS-microservices-nx",
+    "url": "https://github.com/mytracontrol/mdf.js.git",
     "directory": "packages/providers/redis"
   },
   "license": "SEE LICENSE IN LICENSE.md",
@@ -21,28 +21,33 @@
     "dist/**/*"
   ],
   "scripts": {
-    "clean": "rimraf \"{tsconfig.build.tsbuildinfo,dist}\"",
     "build": "yarn clean && tsc -p tsconfig.build.json",
-    "test": "jest --config ./jest.config.js",
+    "check-dependencies": "npm-check",
+    "clean": "rimraf \"{tsconfig.build.tsbuildinfo,dist}\"",
+    "licenses": "license-checker --start ./ --production --csv --out ../../../licenses/providers/redis/licenses.csv --customPath ../../../.config/customFormat.json",
     "mutants": "stryker run stryker.conf.js",
-    "licenses": "license-checker --start ./ --production --csv --out ../../../licenses/providers/redis/licenses.csv --customPath ../../../.config/customFormat.json"
+    "test": "jest --config ./jest.config.js"
   },
   "dependencies": {
-    "@mdf/crash": "*",
-    "@mdf/provider": "*",
-    "@mdf/utils": "*",
+    "@mdf.js/crash": "*",
+    "@mdf.js/provider": "*",
+    "@mdf.js/utils": "*",
     "@types/redis-errors": "^1.2.0",
     "debug": "^4.3.4",
     "ioredis": "^5.2.3",
     "joi": "^17.6.3",
     "redis-errors": "^1.2.0",
-    "tslib": "^2.4.0"
+    "tslib": "^2.4.1"
   },
   "devDependencies": {
+    "@mdf.js/repo-config": "*",
     "@types/debug": "^4.1.7",
     "@types/redis-errors": "^1.2.0"
   },
   "engines": {
     "node": ">=16.14.2"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }

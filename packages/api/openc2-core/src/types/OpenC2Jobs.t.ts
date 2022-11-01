@@ -9,7 +9,7 @@
  * unless prior written permission is obtained from Mytra Control S.L.
  */
 
-import { JobHandler, Jobs } from '@mdf/core';
+import { JobHandler, Jobs } from '@mdf.js/core';
 import { Control } from '.';
 
 export type CommandJobHandler = JobHandler<'command', Control.CommandMessage>;

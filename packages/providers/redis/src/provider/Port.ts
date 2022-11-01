@@ -8,8 +8,8 @@
  * Dissemination of this information or the reproduction of this material is strictly forbidden
  * unless prior written permission is obtained from Mytra Control S.L.
  */
-import { Boom, Crash, Multi } from '@mdf/crash';
-import { LoggerInstance, Provider } from '@mdf/provider';
+import { Boom, Crash, Multi } from '@mdf.js/crash';
+import { LoggerInstance, Provider } from '@mdf.js/provider';
 import IORedis, { RedisOptions } from 'ioredis';
 import { ReplyError } from 'redis-errors';
 import { CONFIG_PROVIDER_BASE_NAME } from '../config';

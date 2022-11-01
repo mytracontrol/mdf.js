@@ -8,7 +8,7 @@
  * Dissemination of this information or the reproduction of this material is strictly forbidden
  * unless prior written permission is obtained from Mytra Control S.L.
  */
-import { Crash } from '@mdf/crash';
+import { Crash } from '@mdf.js/crash';
 import Debug, { Debugger } from 'debug';
 import { ErrorRecord, HandleableError } from '../types';
 

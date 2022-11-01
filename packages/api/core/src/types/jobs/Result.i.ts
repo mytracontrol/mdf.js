@@ -9,7 +9,7 @@
  * unless prior written permission is obtained from Mytra Control S.L.
  */
 
-import { MultiObject } from '@mdf/crash';
+import { MultiObject } from '@mdf.js/crash';
 import { Status } from './Status.t';
 
 /** Job result interface */

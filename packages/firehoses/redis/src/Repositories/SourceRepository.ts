@@ -9,9 +9,9 @@
  * unless prior written permission is obtained from Netin System S.L.
  */
 
-import { Crash } from '@mdf/crash';
-import { Plugs } from '@mdf/firehose';
-import { Redis } from '@mdf/redis-provider';
+import { Crash } from '@mdf.js/crash';
+import { Plugs } from '@mdf.js/firehose';
+import { Redis } from '@mdf.js/redis-provider';
 
 /**
  * Information about the XREAD command response format for NetinDS jobs.

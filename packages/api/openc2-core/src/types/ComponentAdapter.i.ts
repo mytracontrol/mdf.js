@@ -9,8 +9,8 @@
  * unless prior written permission is obtained from Mytra Control S.L.
  */
 
-import { Health } from '@mdf/core';
-import { Crash } from '@mdf/crash';
+import { Health } from '@mdf.js/core';
+import { Crash } from '@mdf.js/crash';
 
 export declare interface ComponentAdapter {
   /** Emitted when a adapter's operation has some error */

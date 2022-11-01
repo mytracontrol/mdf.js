@@ -8,7 +8,7 @@
  * Dissemination of this information or the reproduction of this material is strictly forbidden
  * unless prior written permission is obtained from Mytra Control S.L.
  */
-import { Jobs } from '@mdf/core';
+import { Jobs } from '@mdf.js/core';
 
 export class MyStrategy implements Jobs.Strategy {
   constructor(public readonly name: string, public readonly count: number | string) {}

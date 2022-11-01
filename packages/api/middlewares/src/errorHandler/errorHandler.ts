@@ -8,8 +8,8 @@
  * Dissemination of this information or the reproduction of this material is strictly forbidden
  * unless prior written permission is obtained from Netin System S.L.
  */
-import { Boom, BoomHelpers, BoomOptions, Crash, Multi } from '@mdf/crash';
-import { Logger } from '@mdf/logger';
+import { Boom, BoomHelpers, BoomOptions, Crash, Multi } from '@mdf.js/crash';
+import { Logger } from '@mdf.js/logger';
 import { ErrorRequestHandler, NextFunction, Request, Response } from 'express';
 import { HttpError, isHttpError as checkHttpError } from 'http-errors';
 import { ValidationError as JoiError } from 'joi';

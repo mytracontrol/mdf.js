@@ -9,9 +9,9 @@
  * unless prior written permission is obtained from Mytra Control S.L.
  */
 
-import { Health } from '@mdf/core';
-import { Crash } from '@mdf/crash';
-import { SocketIOClient } from '@mdf/socket-client-provider';
+import { Health } from '@mdf.js/core';
+import { Crash } from '@mdf.js/crash';
+import { SocketIOClient } from '@mdf.js/socket-client-provider';
 import { AdapterOptions, SocketIOClientOptions } from '../../types';
 import { Adapter } from '../Adapter';
 

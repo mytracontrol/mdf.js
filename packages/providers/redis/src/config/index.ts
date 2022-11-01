@@ -9,7 +9,7 @@
  * unless prior written permission is obtained from Mytra Control S.L.
  */
 
-import { PortConfigValidationStruct } from '@mdf/provider';
+import { PortConfigValidationStruct } from '@mdf.js/provider';
 import { Config } from '../provider';
 import { defaultConfig } from './default';
 import { envBasedConfig } from './env';

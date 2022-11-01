@@ -1,3 +1,0 @@
-{
-  "extends": "@mdf/repo-config/tsconfig.base.json"
-}

@@ -9,9 +9,9 @@
  * unless prior written permission is obtained from Mytra Control S.L.
  */
 
-import { Health } from '@mdf/core';
-import { Crash, Multi } from '@mdf/crash';
-import { overallStatus, RetryOptions } from '@mdf/utils';
+import { Health } from '@mdf.js/core';
+import { Crash, Multi } from '@mdf.js/crash';
+import { overallStatus, RetryOptions } from '@mdf.js/utils';
 import Debug, { Debugger } from 'debug';
 import { merge } from 'lodash';
 import { Readable, Writable, WritableOptions } from 'stream';

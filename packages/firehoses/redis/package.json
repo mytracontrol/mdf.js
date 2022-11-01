@@ -1,5 +1,5 @@
 {
-  "name": "@mdf/redis-firehose",
+  "name": "@mdf.js/redis-firehose",
   "version": "0.0.1",
   "description": "MMS - Redis Port for Javascript/Typescript",
   "keywords": [
@@ -10,8 +10,8 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://devopmytra.visualstudio.com/MytraManagementSystem/_git/MMS-microservices-nx",
-    "directory": "libs/firehoses/redis"
+    "url": "https://github.com/mytracontrol/mdf.js.git",
+    "directory": "packages/firehoses/redis"
   },
   "license": "SEE LICENSE IN LICENSE.md",
   "author": "Mytra Control S.L.",
@@ -21,28 +21,33 @@
     "dist/**/*"
   ],
   "scripts": {
-    "clean": "rimraf \"{tsconfig.build.tsbuildinfo,dist}\"",
     "build": "yarn clean && tsc -p tsconfig.build.json",
-    "test": "jest --config ./jest.config.js",
+    "check-dependencies": "npm-check",
+    "clean": "rimraf \"{tsconfig.build.tsbuildinfo,dist}\"",
+    "licenses": "license-checker --start ./ --production --csv --out ../../../licenses/firehoses/redis/licenses.csv --customPath ../../../.config/customFormat.json",
     "mutants": "stryker run stryker.conf.js",
-    "licenses": "license-checker --start ./ --production --csv --out ../../../licenses/firehoses/redis/licenses.csv --customPath ../../../.config/customFormat.json"
+    "test": "jest --config ./jest.config.js"
   },
   "dependencies": {
-    "@mdf/crash": "*",
-    "@mdf/firehose": "*",
-    "@mdf/redis-provider": "*",
-    "@mdf/utils": "*",
+    "@mdf.js/crash": "*",
+    "@mdf.js/firehose": "*",
+    "@mdf.js/redis-provider": "*",
+    "@mdf.js/utils": "*",
     "debug": "^4.3.4",
     "lodash": "^4.17.21",
-    "tslib": "^2.2.0",
+    "tslib": "^2.4.1",
     "uuid": "^9.0.0"
   },
   "devDependencies": {
+    "@mdf.js/repo-config": "*",
     "@types/debug": "^4.1.7",
-    "@types/lodash": "^4.14.186",
+    "@types/lodash": "^4.14.187",
     "@types/uuid": "^8.3.4"
   },
   "engines": {
     "node": ">=16.14.2"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }

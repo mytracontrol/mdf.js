@@ -9,8 +9,8 @@
  * unless prior written permission is obtained from Netin System S.L.
  */
 
-import { Plugs } from '@mdf/firehose';
-import { Redis } from '@mdf/redis-provider';
+import { Plugs } from '@mdf.js/firehose';
+import { Redis } from '@mdf.js/redis-provider';
 import { Base } from './Base';
 
 export class Sequence extends Base implements Plugs.Source.Sequence {

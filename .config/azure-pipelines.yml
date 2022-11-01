@@ -20,7 +20,7 @@ variables:
     value: '18'
     ## Releases Wiki page
   - name: artifactWikiFileName
-    value: '@mdf%2Djs-%2D-API'
+    value: '@mdf.js%2Djs-%2D-API'
   ## GitFlow variables for branch maching
   - template: mdf-pipelines-variables.yml
 stages:

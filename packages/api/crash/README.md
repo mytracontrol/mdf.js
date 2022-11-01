@@ -1,7 +1,7 @@
-# **@mdf/crash**
+# **@mdf.js/crash**
 
 [![Build Status](https://devopmytra.visualstudio.com/NetinSystems/_apis/build/status/NS-Netin-Crash-TypeScript?repoName=NS-Netin-Crash-TypeScript&branchName=master)](https://devopmytra.visualstudio.com/NetinSystems/_build/latest?definitionId=318&repoName=NS-Netin-Crash-TypeScript&branchName=master)
-[![@mdf/crash package in Netin-Systems-Packages feed in Azure Artifacts](https://devopmytra.feeds.visualstudio.com/_apis/public/Packaging/Feeds/54947cc7-1c0a-4d71-a742-0f2cf64772d8/Packages/2f7e380e-6733-43a4-835a-63ac4923e4b1/Badge)](https://devopmytra.visualstudio.com/NetinSystems/_packaging?_a=package&feed=54947cc7-1c0a-4d71-a742-0f2cf64772d8&package=2f7e380e-6733-43a4-835a-63ac4923e4b1&preferRelease=true)
+[![@mdf.js/crash package in Netin-Systems-Packages feed in Azure Artifacts](https://devopmytra.feeds.visualstudio.com/_apis/public/Packaging/Feeds/54947cc7-1c0a-4d71-a742-0f2cf64772d8/Packages/2f7e380e-6733-43a4-835a-63ac4923e4b1/Badge)](https://devopmytra.visualstudio.com/NetinSystems/_packaging?_a=package&feed=54947cc7-1c0a-4d71-a742-0f2cf64772d8&package=2f7e380e-6733-43a4-835a-63ac4923e4b1&preferRelease=true)
 [![Node Version](https://img.shields.io/static/v1?style=flat&logo=node.js&logoColor=green&label=node&message=%3E=12%20||%2014&color=blue)](https://nodejs.org/en/)
 [![Typescript Version](https://img.shields.io/static/v1?style=flat&logo=typescript&label=Typescript&message=4.3&color=blue)](https://www.typescriptlang.org/)
 [![Known Vulnerabilities](https://img.shields.io/static/v1?style=flat&logo=snyk&label=Vulnerabilities&message=0&color=300A98F)](https://snyk.io/package/npm/snyk)
@@ -24,7 +24,7 @@ ___
 
 ## **Table of contents**
 
-- [**@mdf/crash**](#mmscrash)
+- [**@mdf.js/crash**](#mdfcrash)
   - [**Table of contents**](#table-of-contents)
   - [**Introduction**](#introduction)
   - [**Installation**](#installation)
@@ -41,20 +41,20 @@ ___
 
 ## **Introduction**
 
-The goal of **@mdf/crash** is to provide improved, but simplified, error handling, while standardizing error handling across all MMS modules.
+The goal of **@mdf.js/crash** is to provide improved, but simplified, error handling, while standardizing error handling across all MMS modules.
 
 ## **Installation**
 
 - **npm**
 
 ```shell
-npm install @mdf/crash
+npm install @mdf.js/crash
 ```
 
 - **yarn**
 
 ```shell
-yarn add @mdf/crash
+yarn add @mdf.js/crash
 ```
 
 ## **Information**
@@ -83,16 +83,16 @@ One of the main and common parameters of the three types of error is the message
 
 ### **Traceability identifier**
 
-According to the standard [RFC 4122](https://es.wikipedia.org/wiki/Identificador_%C3%BAnico_universal), it allows us to associate an identifier of operation or request to the error. This is especially useful for tracing errors in requests or transactions that occur between different systems or libraries. The identifier should be created by the process or system that initiates the operation (Frontend, Service ...), being included in all processes and registers (logging with @mdf/logger) so that this can be used in troubleshooting processes. identifier as _filter_, allowing easy extraction.
+According to the standard [RFC 4122](https://es.wikipedia.org/wiki/Identificador_%C3%BAnico_universal), it allows us to associate an identifier of operation or request to the error. This is especially useful for tracing errors in requests or transactions that occur between different systems or libraries. The identifier should be created by the process or system that initiates the operation (Frontend, Service ...), being included in all processes and registers (logging with @mdf.js/logger) so that this can be used in troubleshooting processes. identifier as _filter_, allowing easy extraction.
 
-![Logging example](.assets/logging-capture.png)
+![Logging example](assets/logging-capture.png)
 
 ### **Crash**
 
 Simple example of using the `Crash` error type.
 
 ```ts
-import { Crash } from '@mdf/crash'
+import { Crash } from '@mdf.js/crash'
 import { v4 } from 'uuid';
 
 const enhancedError = new Crash('Example', v4());
@@ -102,7 +102,7 @@ console.log(enhancedError.message); // 'Example'
 or even simpler
 
 ```ts
-import { Crash } from '@mdf/crash'
+import { Crash } from '@mdf.js/crash'
 
 const enhancedError = new Crash('Example');
 console.log(enhancedError.message); // 'Example'
@@ -153,7 +153,7 @@ ourPromiseThatRejectCrash()
 Simple example of using `Multi` type error.
 
 ```ts
-import { Multi } from '@mdf/crash'
+import { Multi } from '@mdf.js/crash'
 import { v4 } from 'uuid';
 
 const enhancedError = new Multi('Example', v4(), {
@@ -164,7 +164,7 @@ const enhancedError = new Multi('Example', v4(), {
 Errors can be added later, which can be especially useful in transformation processes where various errors can appear during execution.
 
 ```ts
-import { Multi, Crash } from '@mdf/crash'
+import { Multi, Crash } from '@mdf.js/crash'
 import { v4 } from 'uuid';
 
 const arrayOfNumbers: number[] = [];
@@ -201,7 +201,7 @@ The most typical way to use the `Boom` type of error is through helpers, thanks 
 
 ```ts
 import express from 'express';
-import { BoomHelpers } from '@mdf/crash';
+import { BoomHelpers } from '@mdf.js/crash';
 import { v4 } from 'uuid';
 const app = express();
 const port = 3000;
@@ -232,7 +232,7 @@ We can even provide more information to the user through the options.
 
 ```ts
 import express from 'express';
-import { BoomHelpers, Crash } from '@mdf/crash';
+import { BoomHelpers, Crash } from '@mdf.js/crash';
 import { v4 } from 'uuid';
 const app = express();
 const port = 3000;

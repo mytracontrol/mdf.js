@@ -9,10 +9,10 @@
  * unless prior written permission is obtained from Mytra Control S.L.
  */
 
-import { Jobs } from '@mdf/core';
-import { Service as MetricsService } from '@mdf/metrics-service';
-import { Service as RegisterService } from '@mdf/register-service';
-import { RetryOptions } from '@mdf/utils';
+import { Jobs } from '@mdf.js/core';
+import { Service as MetricsService } from '@mdf.js/metrics-service';
+import { Service as RegisterService } from '@mdf.js/register-service';
+import { RetryOptions } from '@mdf.js/utils';
 import { Plugs, PostConsumeOptions } from '.';
 
 export interface FirehoseOptions<Type extends string = string, Data = any> {

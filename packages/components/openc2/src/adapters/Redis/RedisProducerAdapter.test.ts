@@ -9,7 +9,7 @@
  * unless prior written permission is obtained from Mytra Control S.L.
  */
 
-import { Control } from '@mdf/openc2-core';
+import { Control } from '@mdf.js/openc2-core';
 import { RedisProducerAdapter } from './RedisProducerAdapter';
 
 const COMMAND: Control.CommandMessage = {

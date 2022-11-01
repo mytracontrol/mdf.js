@@ -8,7 +8,7 @@
  * Dissemination of this information or the reproduction of this material is strictly forbidden
  * unless prior written permission is obtained from Mytra Control S.L.
  */
-import { LoggerInstance, Provider } from '@mdf/provider';
+import { LoggerInstance, Provider } from '@mdf.js/provider';
 import axios from 'axios';
 import { Agent as HTTPAgent } from 'http';
 import { Agent as HTTPSAgent } from 'https';

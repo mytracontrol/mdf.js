@@ -9,9 +9,9 @@
  * unless prior written permission is obtained from Mytra Control S.L.
  */
 
-import { Redis } from '@mdf/redis-provider';
-import { SocketIOClient } from '@mdf/socket-client-provider';
-import { SocketIOServer } from '@mdf/socket-server-provider';
+import { Redis } from '@mdf.js/redis-provider';
+import { SocketIOClient } from '@mdf.js/socket-client-provider';
+import { SocketIOServer } from '@mdf.js/socket-server-provider';
 
 export type RedisClientOptions = Redis.Config;
 export type SocketIOClientOptions = SocketIOClient.Config;

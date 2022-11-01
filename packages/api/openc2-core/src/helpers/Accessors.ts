@@ -9,7 +9,7 @@
  * unless prior written permission is obtained from Mytra Control S.L.
  */
 
-import { Health } from '@mdf/core';
+import { Health } from '@mdf.js/core';
 import { get } from 'lodash';
 import { Control } from '../types';
 import { Constants } from './Constants';

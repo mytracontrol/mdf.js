@@ -9,7 +9,7 @@
  * unless prior written permission is obtained from Mytra Control S.L.
  */
 
-import { LoggerInstance } from '@mdf/provider';
+import { LoggerInstance } from '@mdf.js/provider';
 import { Config } from './Config.t';
 
 /** Factory configuration options */

@@ -9,14 +9,14 @@
  * unless prior written permission is obtained from Mytra Control S.L.
  */
 
-import { Health } from '@mdf/core';
-import { Crash, Links, Multi } from '@mdf/crash';
-import { Service as HealthService } from '@mdf/health-service';
-import { HTTP } from '@mdf/http-server-provider';
-import { Service as MetricsService } from '@mdf/metrics-service';
-import { Middleware } from '@mdf/middlewares';
-import { Service as RegisterService } from '@mdf/register-service';
-import { coerce } from '@mdf/utils';
+import { Health } from '@mdf.js/core';
+import { Crash, Links, Multi } from '@mdf.js/crash';
+import { Service as HealthService } from '@mdf.js/health-service';
+import { HTTP } from '@mdf.js/http-server-provider';
+import { Service as MetricsService } from '@mdf.js/metrics-service';
+import { Middleware } from '@mdf.js/middlewares';
+import { Service as RegisterService } from '@mdf.js/register-service';
+import { coerce } from '@mdf.js/utils';
 import cluster from 'cluster';
 import express, { Express, NextFunction, Request, Response } from 'express';
 import { createProxyMiddleware } from 'http-proxy-middleware';

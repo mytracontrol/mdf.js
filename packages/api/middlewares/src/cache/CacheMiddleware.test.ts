@@ -13,10 +13,10 @@
 process.env['CONFIG_CACHE_HEADERS_BLACK_LIST'] = 'test,test2';
 process.env['CONFIG_CACHE_STATUS_CODES_EXCLUDED'] = '10,20';
 process.env['CONFIG_CACHE_STATUS_CODES_INCLUDED'] = '30,40';
-import { Crash } from '@mdf/crash';
-import logger from '@mdf/logger';
-import { Redis } from '@mdf/redis-provider';
-import { mockProperty, undoMocks } from '@mdf/utils';
+import { Crash } from '@mdf.js/crash';
+import logger from '@mdf.js/logger';
+import { Redis } from '@mdf.js/redis-provider';
+import { mockProperty, undoMocks } from '@mdf.js/utils';
 // #endregion
 // ************************************************************************************************
 // #region Middleware imports

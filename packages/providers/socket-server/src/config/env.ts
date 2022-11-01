@@ -9,7 +9,7 @@
  * unless prior written permission is obtained from Mytra Control S.L.
  */
 
-import { coerce, formatEnv } from '@mdf/utils';
+import { coerce, formatEnv } from '@mdf.js/utils';
 import { Config } from '../provider';
 
 // *************************************************************************************************

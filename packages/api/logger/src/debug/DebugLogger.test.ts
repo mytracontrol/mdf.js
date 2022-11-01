@@ -10,7 +10,7 @@
  */
 // *************************************************************************************************
 process.env['DEBUG'] = '*myLogger*';
-import { Crash } from '@mdf/crash';
+import { Crash } from '@mdf.js/crash';
 import { DebugLogger } from '.';
 const uuid = '02ef7b85-b88e-4134-b611-4056820cd689';
 

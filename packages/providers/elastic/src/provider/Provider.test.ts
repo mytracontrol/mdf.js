@@ -9,9 +9,9 @@
  * unless prior written permission is obtained from Mytra Control S.L.
  */
 import { Client } from '@elastic/elasticsearch';
-import { Crash } from '@mdf/crash';
-import { LoggerInstance, Provider } from '@mdf/provider';
-import { undoMocks } from '@mdf/utils';
+import { Crash } from '@mdf.js/crash';
+import { LoggerInstance, Provider } from '@mdf.js/provider';
+import { undoMocks } from '@mdf.js/utils';
 import { Factory } from './Factory';
 import { Port } from './Port';
 import { Config } from './types';

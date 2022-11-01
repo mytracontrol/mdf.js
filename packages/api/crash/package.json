@@ -1,5 +1,5 @@
 {
-  "name": "@mdf/crash",
+  "name": "@mdf.js/crash",
   "version": "0.0.1",
   "description": "MMS - API Crash - Enhanced error management library",
   "keywords": [
@@ -13,8 +13,8 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://devopmytra.visualstudio.com/MytraManagementSystem/_git/MMS-microservices-nx",
-    "directory": "libs/api/crash"
+    "url": "https://github.com/mytracontrol/mdf.js.git",
+    "directory": "packages/api/crash"
   },
   "license": "SEE LICENSE IN LICENSE.md",
   "author": "Mytra Control S.L.",
@@ -24,24 +24,28 @@
     "dist/**/*"
   ],
   "scripts": {
-    "clean": "rimraf \"{tsconfig.build.tsbuildinfo,dist}\"",
     "build": "yarn clean && tsc -p tsconfig.build.json",
-    "lint": "eslint \"src/**/*.ts\" --quiet --fix",
-    "test": "jest --config ./jest.config.js",
-    "mutants": "stryker run stryker.conf.js",
+    "check-dependencies": "npm-check",
+    "clean": "rimraf \"{tsconfig.build.tsbuildinfo,dist}\"",
+    "doc": "typedoc --options typedoc.json",
     "licenses": "license-checker --start ./ --production --csv --out ../../../licenses/api/crash/licenses.csv --customPath ../../../.config/customFormat.json",
-    "doc": "typedoc --options typedoc.json"
+    "lint": "eslint \"src/**/*.ts\" --quiet --fix",
+    "mutants": "stryker run stryker.conf.js",
+    "test": "jest --config ./jest.config.js"
   },
   "dependencies": {
-    "tslib": "^2.4.0",
+    "tslib": "^2.4.1",
     "uuid": "^9.0.0"
   },
   "devDependencies": {
-    "@mdf/repo-config": "*",
+    "@mdf.js/repo-config": "*",
     "@types/uuid": "^8.3.4",
     "joi": "^17.6.3"
   },
   "engines": {
     "node": ">=16.14.2"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }

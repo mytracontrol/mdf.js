@@ -10,7 +10,7 @@
  */
 // ************************************************************************************************
 // #region Component imports
-import { mockProperty, undoMocks } from '@mdf/utils';
+import { mockProperty, undoMocks } from '@mdf.js/utils';
 import cluster from 'cluster';
 import {
   AggregatorRegistry as ClusterRegistry,

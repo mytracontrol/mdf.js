@@ -9,7 +9,7 @@
  * unless prior written permission is obtained from Mytra Control S.L.
  */
 
-import { coerce } from '@mdf/utils';
+import { coerce } from '@mdf.js/utils';
 import { Config } from '../provider';
 import { CONFIG_ARTIFACT_ID, reconnectOnError, retryStrategy } from './utils';
 
