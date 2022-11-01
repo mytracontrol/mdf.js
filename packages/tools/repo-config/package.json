@@ -4,6 +4,7 @@
   "description": "MMS - Repo Config",
   "author": "Mytra Control S.L.",
   "main": "src/index.js",
+  "private": true,
   "files": [
     "src/**/*"
   ]
