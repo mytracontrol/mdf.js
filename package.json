@@ -45,6 +45,7 @@
     "jest-html-reporter": "^3.7.0",
     "jest-junit": "^14.0.1",
     "jest-slow-test-reporter": "^1.0.0",
+    "lerna": "^6.0.1",
     "license-checker": "^25.0.1",
     "npm-check": "^6.0.1",
     "prettier": "^2.7.1",
