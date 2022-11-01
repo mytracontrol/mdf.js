@@ -12,8 +12,8 @@ const fs = require('fs');
 const glob = require('glob');
 glob("packages/*/*", (err, folders) => {
   console.log(folders);
-  fs.writeFileSync('sonar-project.properties', `sonar.projectKey=Mytra-Digitalization-Framework-(NDF)-TypeScript\n`);
-  fs.appendFileSync('sonar-project.properties', `sonar.projectName=Mytra Digitalization Framework -(NDF) - TypeScript\n`);
+  fs.writeFileSync('sonar-project.properties', `sonar.projectKey=Mytra-Development-Framework-NDF-TypeScript\n`);
+  fs.appendFileSync('sonar-project.properties', `sonar.projectName=Mytra Development Framework - NDF - TypeScript\n`);
   fs.appendFileSync('sonar-project.properties', `sonar.projectVersion=${folders.map((folder) => {
     const parts = folder.split('/');
     return `${parts[parts.length - 2]}-${parts[parts.length - 1]}`;
