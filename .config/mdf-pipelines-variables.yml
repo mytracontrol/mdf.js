@@ -1,5 +1,5 @@
 variables:
-  #- group: Netin-Snyk
+  - group: NPM-Secrets
   #- group: Netin-Signing
   #- group: Netin-Release
   - name: isMaster
