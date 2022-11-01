@@ -4,8 +4,6 @@ steps:
     inputs:
       projectDirectory: '.'
       arguments: 'install'
-      customRegistry: 'useFeed'
-      customFeed: '54947cc7-1c0a-4d71-a742-0f2cf64772d8'
 
   - task: Yarn@3
     displayName: Publish package to internal feed as oficial version
@@ -13,8 +11,6 @@ steps:
     inputs:
       projectDirectory: '.'
       arguments: 'lerna publish $(Build.BuildNumber) --amend --dist-tag latest --conventional-commits --loglevel silly -m "chore(release): publish %v" --yes'
-      customRegistry: 'useFeed'
-      customFeed: '54947cc7-1c0a-4d71-a742-0f2cf64772d8'
     continueOnError: true
 
   - task: Yarn@3
@@ -23,8 +19,6 @@ steps:
     inputs:
       projectDirectory: '.'
       arguments: 'lerna publish $(Build.BuildNumber) --amend --pre-dist-tag beta --loglevel silly -m "chore(release): publish %v" --yes'
-      customRegistry: 'useFeed'
-      customFeed: '54947cc7-1c0a-4d71-a742-0f2cf64772d8'
     continueOnError: true
 
   - task: Yarn@3
@@ -33,6 +27,4 @@ steps:
     inputs:
       projectDirectory: '.'
       arguments: 'lerna publish $(Build.BuildNumber) --amend --dist-tag alpha --loglevel silly -m "chore(release): publish %v" --yes'
-      customRegistry: 'useFeed'
-      customFeed: '54947cc7-1c0a-4d71-a742-0f2cf64772d8'
     continueOnError: true

@@ -4,8 +4,6 @@ steps:
   inputs:
     projectDirectory: '.'
     arguments: 'install'
-    customRegistry: 'useFeed'
-    customFeed: '54947cc7-1c0a-4d71-a742-0f2cf64772d8'
 
 - task: Yarn@3
   displayName: 'Execute compilation, unit test and mutants'
