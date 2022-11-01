@@ -60,7 +60,7 @@ export abstract class Base<T extends Plugs.Sink.Any> extends Writable implements
   /** Flag to indicate that an unhealthy status has been emitted recently */
   private lastStatusEmitted?: Health.API.Status;
   /** Wrapped source plug */
-  private plugWrapper: PlugWrapper;
+  private readonly plugWrapper: PlugWrapper;
   /**
    * Create a new instance for a firehose sink
    * @param plug - sink plug instance

@@ -132,7 +132,7 @@ export class AdapterWrapper extends EventEmitter implements Health.Component {
   public async publish(
     message: Control.Message
   ): Promise<Control.ResponseMessage | Control.ResponseMessage[] | void> {
-    return await this.wrappedOperation(this.publishOriginal, [message], this.retryOptions);
+    return this.wrappedOperation(this.publishOriginal, [message], this.retryOptions);
   }
   /**
    * Return the status of the adapter in a standard format

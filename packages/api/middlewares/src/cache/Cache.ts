@@ -76,7 +76,7 @@ export class Cache {
   /** Cache repository */
   private readonly repository: CacheRepository;
   /** Cache options */
-  private options: CacheConfig;
+  private readonly options: CacheConfig;
   /**
    * Cache middleware instance
    * @param client - redis client

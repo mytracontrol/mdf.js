@@ -20,9 +20,9 @@ export class Aggregator extends EventEmitter {
   /** Instance unique identifier for trace purposes */
   public readonly componentId: string = v4();
   /** Components monitored by the aggregator */
-  private components: Map<string, Health.Component> = new Map();
+  private readonly components: Map<string, Health.Component> = new Map();
   /** External checks, included in the aggregator to be exposed in the overall diagnostic */
-  private externalChecks: Map<string, Health.API.Check[]> = new Map();
+  private readonly externalChecks: Map<string, Health.API.Check[]> = new Map();
   /** Create an instance of the Health aggregator */
   constructor() {
     super();

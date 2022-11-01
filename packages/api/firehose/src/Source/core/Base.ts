@@ -55,7 +55,7 @@ export abstract class Base<T extends Plugs.Source.Any>
   /** Flag to indicate that an unhealthy status has been emitted recently */
   private lastStatusEmitted?: Health.API.Status;
   /** Wrapped source plug */
-  private plugWrapper: PlugWrapper;
+  private readonly plugWrapper: PlugWrapper;
   /**
    * Indicates the quality of service for the job, indeed this indicate the number of sinks that
    * must be successfully processed to consider the job as successfully processed

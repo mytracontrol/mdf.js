@@ -73,7 +73,7 @@ export class RedisConsumerAdapter extends RedisAdapter implements ConsumerAdapte
   ): void => {
     if (this.handler) {
       try {
-        const message = JSON.parse(incomingMessage);
+        const parsedMessage = JSON.parse(incomingMessage);
         const onDone = async (
           error?: Crash | Error,
           message?: Control.ResponseMessage
@@ -84,7 +84,7 @@ export class RedisConsumerAdapter extends RedisAdapter implements ConsumerAdapte
             this.onErrorHandler(error);
           }
         };
-        this.handler(message, onDone.bind(this));
+        this.handler(parsedMessage, onDone.bind(this));
       } catch (rawError) {
         const error = Crash.from(rawError);
         this.onErrorHandler(
