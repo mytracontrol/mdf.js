@@ -22,6 +22,9 @@
     "OpenC2",
     "OPENC2",
   ],
+  "sonarlint.connectedMode.project": {
+    "projectKey": "Mytra-Development-Framework-NDF-TypeScript"
+  },
   "typescript.tsdk": "node_modules/typescript/lib",
   "terminal.integrated.shell.windows": "C:\\Program Files\\Git\\bin\\bash.exe",
   "plantuml.diagramsRoot": ".models",

@@ -37,17 +37,10 @@ ___
 
 ## **Use**
 
-## **Collaboration**
 
-As in the rest of the **MMS** repositories, any collaboration is always welcome.
-
-If you think there is a bug, create a [bug] (https://docs.microsoft.com/en-us/azure/devops/boards/backlogs/manage-bugs) providing as much information as possible.
-
-If you want to make a new contribution, create a new branch, taking into account the flow established by [GitFlow](https://www.atlassian.com/es/git/tutorials/comparing-workflows/gitflow-workflow) , make your modifications to it and request their approval through [Pull Request](https://docs.microsoft.com/en-us/azure/devops/repos/git/pull-requests?view=azure-devops ), correctly filling in the template.
 
 ## **License**
 
 Copyright 2022 Mytra Control S.L. All rights reserved.
-Note: All information contained herein is, and remains the property of Mytra Control S.L. and its suppliers, if any. The intellectual and technical concepts contained herein are property of Mytra Control S.L. and its suppliers and may be covered by European and Foreign patents, patents in process, and are protected by trade secret or copyright.
 
-Dissemination of this information or the reproduction of this material is strictly forbidden unless prior written permission is obtained from Mytra Control S.L.
+Use of this source code is governed by an MIT-style license that can be found in the LICENSE file or at https://opensource.org/licenses/MIT.
