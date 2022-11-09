@@ -7,20 +7,17 @@
 
 import { JobHandler } from '@mdf.js/core';
 import { Crash } from '@mdf.js/crash';
-import { RetryOptions } from '@mdf.js/utils';
-import { WritableOptions } from 'stream';
-import { Plugs } from '../types';
+import { Plugs, SinkOptions } from '../types';
 import { Base } from './core';
 
 export class Tap extends Base<Plugs.Sink.Tap> {
   /**
    * Create a new Tap instance
    * @param plug - Tap sink plug
-   * @param retryOptions - options for job retry operations
-   * @param options - writable streams options
+   * @param options - sink options
    */
-  constructor(plug: Plugs.Sink.Tap, retryOptions?: RetryOptions, options?: WritableOptions) {
-    super(plug, retryOptions, options);
+  constructor(plug: Plugs.Sink.Tap, options?: SinkOptions) {
+    super(plug, options);
   }
   /** Perform the publication of the information on the sink destination */
   override _write(
@@ -29,7 +26,7 @@ export class Tap extends Base<Plugs.Sink.Tap> {
     callback: (error?: Crash | Error) => void
   ): void {
     // Stryker disable next-line all
-    this.logger.extend('verbose')(`Publishing job ${data.jobId} on single operation from Tab Sink`);
+    this.logger.verbose(`Publishing job ${data.jobId} on single operation from Tab Sink`);
     this.plug
       .single(data.toObject())
       .then(() => data.done())

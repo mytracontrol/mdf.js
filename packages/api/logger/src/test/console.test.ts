@@ -52,9 +52,9 @@ describe('#Logger #console', () => {
 
       expect(stderr).toHaveBeenCalled();
       expect(stderr.mock.calls[0][0]).toContain(
-        '| mms-app      | error   | 00000000-0000-0000-0000-000000000000 | unknown      | logging'
+        '| mdf-app      | error   | 00000000-0000-0000-0000-000000000000 | unknown      | logging'
       );
-      expect(stderr.mock.calls[0][0]).toMatch(/\d{4}-\d{2}-\d{2}T[\d.: ]*Z \|[\d ]*\|\smms-app\s*/);
+      expect(stderr.mock.calls[0][0]).toMatch(/\d{4}-\d{2}-\d{2}T[\d.: ]*Z \|[\d ]*\|\smdf-app\s*/);
     }, 300);
     it('error level - w/o uuid and context based on Crash', () => {
       const stderr = mockError();
@@ -67,63 +67,63 @@ describe('#Logger #console', () => {
       );
       expect(stderr).toHaveBeenCalled();
       expect(stderr.mock.calls[0][0]).toContain(
-        '| mms-app      | error   | 02ef7b85-b88e-4134-b611-4056820cd689 | unknown      | Crash error'
+        '| mdf-app      | error   | 02ef7b85-b88e-4134-b611-4056820cd689 | unknown      | Crash error'
       );
-      expect(stderr.mock.calls[0][0]).toMatch(/\d{4}-\d{2}-\d{2}T[\d.: ]*Z \|[\d ]*\|\smms-app\s*/);
+      expect(stderr.mock.calls[0][0]).toMatch(/\d{4}-\d{2}-\d{2}T[\d.: ]*Z \|[\d ]*\|\smdf-app\s*/);
     }, 300);
     it('warn level - w/o uuid and context', () => {
       const stderr = mockError();
       logger.warn('logging');
       expect(stderr).toHaveBeenCalled();
       expect(stderr.mock.calls[0][0]).toContain(
-        '| mms-app      | warn    | 00000000-0000-0000-0000-000000000000 | unknown      | logging'
+        '| mdf-app      | warn    | 00000000-0000-0000-0000-000000000000 | unknown      | logging'
       );
-      expect(stderr.mock.calls[0][0]).toMatch(/\d{4}-\d{2}-\d{2}T[\d.: ]*Z \|[\d ]*\|\smms-app\s*/);
+      expect(stderr.mock.calls[0][0]).toMatch(/\d{4}-\d{2}-\d{2}T[\d.: ]*Z \|[\d ]*\|\smdf-app\s*/);
     }, 300);
     it('info level - w/o uuid and context', () => {
       const stdout = mockRegular();
       logger.info('logging');
       expect(stdout).toHaveBeenCalled();
       expect(stdout.mock.calls[0][0]).toContain(
-        '| mms-app      | info    | 00000000-0000-0000-0000-000000000000 | unknown      | logging'
+        '| mdf-app      | info    | 00000000-0000-0000-0000-000000000000 | unknown      | logging'
       );
-      expect(stdout.mock.calls[0][0]).toMatch(/\d{4}-\d{2}-\d{2}T[\d.: ]*Z \|[\d ]*\|\smms-app\s*/);
+      expect(stdout.mock.calls[0][0]).toMatch(/\d{4}-\d{2}-\d{2}T[\d.: ]*Z \|[\d ]*\|\smdf-app\s*/);
     }, 300);
     it('verbose level - w/o uuid and context', () => {
       const stdout = mockRegular();
       logger.verbose('logging');
       expect(stdout).toHaveBeenCalled();
       expect(stdout.mock.calls[0][0]).toContain(
-        '| mms-app      | verbose | 00000000-0000-0000-0000-000000000000 | unknown      | logging'
+        '| mdf-app      | verbose | 00000000-0000-0000-0000-000000000000 | unknown      | logging'
       );
-      expect(stdout.mock.calls[0][0]).toMatch(/\d{4}-\d{2}-\d{2}T[\d.: ]*Z \|[\d ]*\|\smms-app\s*/);
+      expect(stdout.mock.calls[0][0]).toMatch(/\d{4}-\d{2}-\d{2}T[\d.: ]*Z \|[\d ]*\|\smdf-app\s*/);
     }, 300);
     it('debug level - w/o uuid and context', () => {
       const stdout = mockRegular();
       logger.debug('logging');
       expect(stdout).toHaveBeenCalled();
       expect(stdout.mock.calls[0][0]).toContain(
-        '| mms-app      | debug   | 00000000-0000-0000-0000-000000000000 | unknown      | logging'
+        '| mdf-app      | debug   | 00000000-0000-0000-0000-000000000000 | unknown      | logging'
       );
-      expect(stdout.mock.calls[0][0]).toMatch(/\d{4}-\d{2}-\d{2}T[\d.: ]*Z \|[\d ]*\|\smms-app\s*/);
+      expect(stdout.mock.calls[0][0]).toMatch(/\d{4}-\d{2}-\d{2}T[\d.: ]*Z \|[\d ]*\|\smdf-app\s*/);
     }, 300);
     it('silly level - w/o uuid and context', () => {
       const stdout = mockRegular();
       logger.silly('logging');
       expect(stdout).toHaveBeenCalled();
       expect(stdout.mock.calls[0][0]).toContain(
-        '| mms-app      | silly   | 00000000-0000-0000-0000-000000000000 | unknown      | logging'
+        '| mdf-app      | silly   | 00000000-0000-0000-0000-000000000000 | unknown      | logging'
       );
-      expect(stdout.mock.calls[0][0]).toMatch(/\d{4}-\d{2}-\d{2}T[\d.: ]*Z \|[\d ]*\|\smms-app\s*/);
+      expect(stdout.mock.calls[0][0]).toMatch(/\d{4}-\d{2}-\d{2}T[\d.: ]*Z \|[\d ]*\|\smdf-app\s*/);
     }, 300);
     it('error level - with uuid and context', () => {
       const stderr = mockError();
       logger.error('logging', uuid, context);
       expect(stderr).toHaveBeenCalled();
       expect(stderr.mock.calls[0][0]).toContain(
-        '| mms-app      | error   | 02ef7b85-b88e-4134-b611-4056820cd689 | VERY-LONG-CO | logging'
+        '| mdf-app      | error   | 02ef7b85-b88e-4134-b611-4056820cd689 | VERY-LONG-CO | logging'
       );
-      expect(stderr.mock.calls[0][0]).toMatch(/\d{4}-\d{2}-\d{2}T[\d.: ]*Z \|[\d ]*\|\smms-app\s*/);
+      expect(stderr.mock.calls[0][0]).toMatch(/\d{4}-\d{2}-\d{2}T[\d.: ]*Z \|[\d ]*\|\smdf-app\s*/);
     }, 300);
     it('error level - with uuid and context by Crash', () => {
       const stderr = mockError();
@@ -137,16 +137,16 @@ describe('#Logger #console', () => {
       );
       expect(stderr).toHaveBeenCalled();
       expect(stderr.mock.calls[0][0]).toContain(
-        '| mms-app      | error   | 02ef7b85-b88e-4134-b611-4056820cd689 | VERY-LONG-CO | Crash error'
+        '| mdf-app      | error   | 02ef7b85-b88e-4134-b611-4056820cd689 | VERY-LONG-CO | Crash error'
       );
-      expect(stderr.mock.calls[0][0]).toMatch(/\d{4}-\d{2}-\d{2}T[\d.: ]*Z \|[\d ]*\|\smms-app\s*/);
+      expect(stderr.mock.calls[0][0]).toMatch(/\d{4}-\d{2}-\d{2}T[\d.: ]*Z \|[\d ]*\|\smdf-app\s*/);
     }, 300);
     it('warn level - with uuid and context', () => {
       const stderr = mockError();
       logger.warn('logging', uuid, context);
       expect(stderr).toHaveBeenCalled();
       expect(stderr.mock.calls[0][0]).toContain(
-        '| mms-app      | warn    | 02ef7b85-b88e-4134-b611-4056820cd689 | VERY-LONG-CO | logging'
+        '| mdf-app      | warn    | 02ef7b85-b88e-4134-b611-4056820cd689 | VERY-LONG-CO | logging'
       );
     }, 300);
     it('info level - with uuid and context', () => {
@@ -154,16 +154,16 @@ describe('#Logger #console', () => {
       logger.info('logging', uuid, context);
       expect(stdout).toHaveBeenCalled();
       expect(stdout.mock.calls[0][0]).toContain(
-        '| mms-app      | info    | 02ef7b85-b88e-4134-b611-4056820cd689 | VERY-LONG-CO | logging'
+        '| mdf-app      | info    | 02ef7b85-b88e-4134-b611-4056820cd689 | VERY-LONG-CO | logging'
       );
-      expect(stdout.mock.calls[0][0]).toMatch(/\d{4}-\d{2}-\d{2}T[\d.: ]*Z \|[\d ]*\|\smms-app\s*/);
+      expect(stdout.mock.calls[0][0]).toMatch(/\d{4}-\d{2}-\d{2}T[\d.: ]*Z \|[\d ]*\|\smdf-app\s*/);
     }, 300);
     it('verbose level - with uuid and context', () => {
       const stdout = mockRegular();
       logger.verbose('logging', uuid, context);
       expect(stdout).toHaveBeenCalled();
       expect(stdout.mock.calls[0][0]).toContain(
-        '| mms-app      | verbose | 02ef7b85-b88e-4134-b611-4056820cd689 | VERY-LONG-CO | logging'
+        '| mdf-app      | verbose | 02ef7b85-b88e-4134-b611-4056820cd689 | VERY-LONG-CO | logging'
       );
       expect(stdout.mock.calls[0][0]).toMatch(
         /[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9.:\s]*Z |[0-9\s]*|\slogger[\s]*/
@@ -174,18 +174,18 @@ describe('#Logger #console', () => {
       logger.debug('logging', uuid, context);
       expect(stdout).toHaveBeenCalled();
       expect(stdout.mock.calls[0][0]).toContain(
-        '| mms-app      | debug   | 02ef7b85-b88e-4134-b611-4056820cd689 | VERY-LONG-CO | logging'
+        '| mdf-app      | debug   | 02ef7b85-b88e-4134-b611-4056820cd689 | VERY-LONG-CO | logging'
       );
-      expect(stdout.mock.calls[0][0]).toMatch(/\d{4}-\d{2}-\d{2}T[\d.: ]*Z \|[\d ]*\|\smms-app\s*/);
+      expect(stdout.mock.calls[0][0]).toMatch(/\d{4}-\d{2}-\d{2}T[\d.: ]*Z \|[\d ]*\|\smdf-app\s*/);
     });
     it('silly level - with uuid and context', () => {
       const stdout = mockRegular();
       logger.silly('logging', uuid, context);
       expect(stdout).toHaveBeenCalled();
       expect(stdout.mock.calls[0][0]).toContain(
-        '| mms-app      | silly   | 02ef7b85-b88e-4134-b611-4056820cd689 | VERY-LONG-CO | logging'
+        '| mdf-app      | silly   | 02ef7b85-b88e-4134-b611-4056820cd689 | VERY-LONG-CO | logging'
       );
-      expect(stdout.mock.calls[0][0]).toMatch(/\d{4}-\d{2}-\d{2}T[\d.: ]*Z \|[\d ]*\|\smms-app\s*/);
+      expect(stdout.mock.calls[0][0]).toMatch(/\d{4}-\d{2}-\d{2}T[\d.: ]*Z \|[\d ]*\|\smdf-app\s*/);
     }, 300);
   });
 });

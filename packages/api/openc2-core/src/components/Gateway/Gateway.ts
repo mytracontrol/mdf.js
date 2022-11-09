@@ -75,7 +75,7 @@ export class Gateway extends EventEmitter implements Health.Component, Health.Se
   ) {
     super();
     this.logger = SetContext(
-      this.options.logger ?? new DebugLogger(`mdf:oc2:gateway:${this.name}`),
+      this.options.logger ?? new DebugLogger(`oc2:gateway:${this.name}`),
       this.constructor.name,
       this.componentId
     );
@@ -90,8 +90,8 @@ export class Gateway extends EventEmitter implements Health.Component, Health.Se
       registry: this.register,
     });
     this.health = new HealthWrapper(this.options.id, [this.consumer, this.producer]);
-    this.consumer.on('command', this.onUpstreamCommandHandler.bind(this));
-    this.producer.consumerMap.on('updated', this.updateConsumerOptions.bind(this));
+    this.consumer.on('command', this.onUpstreamCommandHandler);
+    this.producer.consumerMap.on('updated', this.updateConsumerOptions);
     this.started = false;
     // Stryker disable next-line all
     this.logger.debug(`OpenC2 Gateway created - [${options.id}]`);

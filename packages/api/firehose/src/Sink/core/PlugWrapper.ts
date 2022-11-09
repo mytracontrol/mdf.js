@@ -39,14 +39,14 @@ export class PlugWrapper<Type extends string = string, Data = any> extends Event
       throw new Crash(`Plug ${this.plug.name} does not implement the single method properly`);
     } else {
       this.singleOriginal = this.plug.single;
-      this.plug.single = this.single.bind(this);
+      this.plug.single = this.single;
     }
     if (this.plug.multi) {
       if (typeof this.plug.multi !== 'function') {
         throw new Crash(`Plug ${this.plug.name} not implement the multi method properly`);
       } else {
         this.multiOriginal = this.plug.multi;
-        this.plug.multi = this.multi.bind(this);
+        this.plug.multi = this.multi;
       }
     }
   }
@@ -79,19 +79,19 @@ export class PlugWrapper<Type extends string = string, Data = any> extends Event
    * Perform the processing of a single Job
    * @param job - job to be processed
    */
-  private async single(job: Plugs.Sink.JobObject<Type, Data>): Promise<void> {
+  private readonly single = async (job: Plugs.Sink.JobObject<Type, Data>): Promise<void> => {
     await this.wrappedOperation(this.singleOriginal, [job]);
-  }
+  };
   /**
    * Perform the processing of several Jobs
    * @param jobs - jobs to be processed
    */
-  private async multi(jobs: Plugs.Sink.JobObject<Type, Data>[]): Promise<void> {
+  private readonly multi = async (jobs: Plugs.Sink.JobObject<Type, Data>[]): Promise<void> => {
     if (!this.multiOriginal) {
       throw new Crash(`Plug ${this.plug.name} does not implement the multi method`);
     }
     await this.wrappedOperation(this.multiOriginal, [jobs]);
-  }
+  };
   /**
    * Return the status of the stream in a standard format
    * @returns _check object_ as defined in the draft standard

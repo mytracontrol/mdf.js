@@ -6,6 +6,7 @@
  */
 
 import { Crash } from '@mdf.js/crash';
+import { LoggerInstance } from '@mdf.js/logger';
 import fs from 'fs';
 
 /**
@@ -13,10 +14,10 @@ import fs from 'fs';
  * @param path - path to file
  * @returns
  */
-export function loadFile(path?: string, logger?: (message: string) => void): Buffer | undefined {
+export function loadFile(path?: string, logger?: LoggerInstance): Buffer | undefined {
   const ownLogger = (message: string) => {
     if (logger) {
-      logger(message);
+      logger.debug(message);
     }
   };
   if (!path) {

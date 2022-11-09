@@ -16,7 +16,7 @@
     "url": "https://github.com/mytracontrol/mdf.js.git",
     "directory": "packages/api/crash"
   },
-  "license": "SEE LICENSE IN LICENSE.md",
+  "license": "MIT",
   "author": "Mytra Control S.L.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -47,5 +47,11 @@
   },
   "publishConfig": {
     "access": "public"
+  },
+  "typedoc": {
+    "entryPoint": "./src/index.ts",
+    "readmeFile": "./README.md",
+    "displayName": "@mdf.js/crash",
+    "tsconfig": "./tsconfig.build.json"
   }
 }

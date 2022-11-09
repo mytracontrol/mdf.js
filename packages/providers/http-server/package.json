@@ -14,7 +14,7 @@
     "url": "http-servers://devopmytra.visualstudio.com/MytraManagementSystem/_git/MMS-microservices-nx",
     "directory": "packages/providers/http-server"
   },
-  "license": "SEE LICENSE IN LICENSE.md",
+  "license": "MIT",
   "author": "Mytra Control S.L.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

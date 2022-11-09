@@ -39,9 +39,9 @@ export class AdapterWrapper extends EventEmitter implements Health.Component {
     this.checkMandatoryMethods();
     this.subscribeOriginal = this.adapter.subscribe;
     this.unsubscribeOriginal = this.adapter.unsubscribe;
-    this.adapter.subscribe = this.subscribe.bind(this);
-    this.adapter.unsubscribe = this.unsubscribe.bind(this);
-    this.adapter.on('error', this.onOperationError.bind(this));
+    this.adapter.subscribe = this.subscribe;
+    this.adapter.unsubscribe = this.unsubscribe;
+    this.adapter.on('error', this.onOperationError);
   }
   /** Component name */
   public get name(): string {
@@ -119,13 +119,13 @@ export class AdapterWrapper extends EventEmitter implements Health.Component {
     this.lastOperationDate = new Date();
   };
   /** Subscribe the incoming message handler to the underlayer transport system */
-  public async subscribe(handler: OnCommandHandler): Promise<void> {
+  public subscribe = async (handler: OnCommandHandler): Promise<void> => {
     return this.wrappedOperation(this.subscribeOriginal, [handler], this.retryOptions);
-  }
+  };
   /** Unsubscribe the incoming message handler from the underlayer transport system*/
-  public async unsubscribe(handler: OnCommandHandler): Promise<void> {
+  public unsubscribe = async (handler: OnCommandHandler): Promise<void> => {
     return this.wrappedOperation(this.unsubscribeOriginal, [handler], this.retryOptions);
-  }
+  };
   /**
    * Return the status of the adapter in a standard format
    * @returns _check object_ as defined in the draft standard

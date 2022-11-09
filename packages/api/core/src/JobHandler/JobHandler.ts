@@ -7,10 +7,13 @@
 import { Crash, Multi } from '@mdf.js/crash';
 import { EventEmitter } from 'events';
 import { v4, v5 } from 'uuid';
-import { MMS_NAMESPACE_OID } from '../const';
+import { MDF_NAMESPACE_OID } from '../const';
 import { Jobs } from '../types';
 
-/** JobHandler events*/
+/**
+ * JobHandler events
+ * @category @mdf.js/core
+ */
 export declare interface JobHandler<Type, Data> {
   /** Emitted when a job has ended */
   on(
@@ -60,7 +63,7 @@ export class JobHandler<Type extends string = string, Data = any>
         { name: 'ValidationError' }
       );
     }
-    this.uuid = v5(this.jobId, MMS_NAMESPACE_OID);
+    this.uuid = v5(this.jobId, MDF_NAMESPACE_OID);
     if (data === undefined || data === null) {
       throw new Crash('Error creating a valid JobHandler, data is mandatory', this.uuid, {
         name: 'ValidationError',

@@ -1,7 +1,7 @@
 # **@mdf.js**
 
-[![Node Version](https://img.shields.io/static/v1?style=flat&logo=node.js&logoColor=green&label=node&message=%3E=12%20||%2014&color=blue)](https://nodejs.org/en/)
-[![Typescript Version](https://img.shields.io/static/v1?style=flat&logo=typescript&label=Typescript&message=4.3&color=blue)](https://www.typescriptlang.org/)
+[![Node Version](https://img.shields.io/static/v1?style=flat&logo=node.js&logoColor=green&label=node&message=%3E=16%20||%2018&color=blue)](https://nodejs.org/en/)
+[![Typescript Version](https://img.shields.io/static/v1?style=flat&logo=typescript&label=Typescript&message=4.8&color=blue)](https://www.typescriptlang.org/)
 [![Known Vulnerabilities](https://img.shields.io/static/v1?style=flat&logo=snyk&label=Vulnerabilities&message=0&color=300A98F)](https://snyk.io/package/npm/snyk)
 
 <!-- markdownlint-disable MD033 MD041 -->
@@ -11,8 +11,8 @@
   </div>
 </p>
 
-<h1 style="text-align:center;margin-bottom:0">Mytra Development Framework - @mdf.js </h1>
-<h5 style="text-align:center;margin-top:0">Typescript tools for development</h5>
+<h1 style="text-align:center;margin-bottom:0">MongoDB Provider for @mdf.js</h1>
+<h5 style="text-align:center;margin-top:0">Mytra Development Framework - @mdf.js</h5>
 
 <!-- markdownlint-enable MD033 -->
 
@@ -20,24 +20,35 @@ ___
 
 ## **Table of contents**
 
-- [**@mdf.js**](#mdf)
+- [**@mdf.js**](#mdfjs)
   - [**Table of contents**](#table-of-contents)
   - [**Introduction**](#introduction)
   - [**Installation**](#installation)
   - [**Information**](#information)
   - [**Use**](#use)
-  - [**Collaboration**](#collaboration)
   - [**License**](#license)
 
 ## **Introduction**
 
+This is the [MongoDB](https://www.mongodb.com/) provider encapsulation for [@mdf.js](https://github.com/mytracontrol/mdf.js) based on the official [MongoDB NodeJS Driver](https://www.npmjs.com/package/mongodb).
+
 ## **Installation**
+
+- **npm**
+
+```shell
+npm install @mdf.js/mongo-provider
+```
+
+- **yarn**
+
+```shell
+yarn add @mdf.js/mongo-provider
+```
 
 ## **Information**
 
 ## **Use**
-
-
 
 ## **License**
 

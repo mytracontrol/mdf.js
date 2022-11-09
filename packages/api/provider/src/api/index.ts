@@ -5,5 +5,7 @@
  * or at https://opensource.org/licenses/MIT.
  */
 
+import _Factory from './Factory';
 export { Manager } from './Manager';
 export { Port } from './Port';
+export { _Factory as Factory };

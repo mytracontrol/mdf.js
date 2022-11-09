@@ -39,7 +39,7 @@ export class AdapterWrapper extends EventEmitter implements Health.Component {
     }
     this.checkMandatoryMethods();
     this.publishOriginal = this.adapter.publish;
-    this.adapter.publish = this.publish.bind(this);
+    this.adapter.publish = this.publish;
     this.on('newListener', (event, listener) => {
       if (validate(event)) {
         this.adapter.on(event, listener);
@@ -125,11 +125,11 @@ export class AdapterWrapper extends EventEmitter implements Health.Component {
     this.lastOperationDate = new Date();
   };
   /** Perform the publication of the message in the underlayer transport system */
-  public async publish(
+  public readonly publish = async (
     message: Control.Message
-  ): Promise<Control.ResponseMessage | Control.ResponseMessage[] | void> {
+  ): Promise<Control.ResponseMessage | Control.ResponseMessage[] | void> => {
     return this.wrappedOperation(this.publishOriginal, [message], this.retryOptions);
-  }
+  };
   /**
    * Return the status of the adapter in a standard format
    * @returns _check object_ as defined in the draft standard

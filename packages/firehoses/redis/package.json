@@ -13,7 +13,7 @@
     "url": "https://github.com/mytracontrol/mdf.js.git",
     "directory": "packages/firehoses/redis"
   },
-  "license": "SEE LICENSE IN LICENSE.md",
+  "license": "MIT",
   "author": "Mytra Control S.L.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -29,8 +29,8 @@
     "test": "jest --config ./jest.config.js"
   },
   "dependencies": {
-    "@mdf.js/crash": "*",
     "@mdf.js/core": "*",
+    "@mdf.js/crash": "*",
     "@mdf.js/firehose": "*",
     "@mdf.js/redis-provider": "*",
     "@mdf.js/utils": "*",
@@ -42,7 +42,7 @@
   "devDependencies": {
     "@mdf.js/repo-config": "*",
     "@types/debug": "^4.1.7",
-    "@types/lodash": "^4.14.187",
+    "@types/lodash": "^4.14.188",
     "@types/uuid": "^8.3.4"
   },
   "engines": {

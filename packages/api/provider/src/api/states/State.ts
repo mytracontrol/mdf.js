@@ -8,7 +8,11 @@
 import { Crash } from '@mdf.js/crash';
 import { ProviderState } from '../../types';
 
-/** Provider state interface */
+/**
+ * Provider state interface
+ * @category State
+ * @public
+ */
 export interface State {
   /** Actual provider state */
   state: ProviderState;
@@ -21,8 +25,4 @@ export interface State {
    * @param error - incoming error from provider
    */
   fail(error: Crash | Error): Promise<void>;
-  /** Pause the process: pause internal jobs */
-  pause(): Promise<void>;
-  /** Resume the process: resume internal jobs */
-  resume(): Promise<void>;
 }

@@ -14,7 +14,7 @@
     "url": "https://github.com/mytracontrol/mdf.js.git",
     "directory": "packages/providers/socket-client"
   },
-  "license": "SEE LICENSE IN LICENSE.md",
+  "license": "MIT",
   "author": "Mytra Control S.L.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

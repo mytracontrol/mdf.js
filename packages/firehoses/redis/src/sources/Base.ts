@@ -39,7 +39,7 @@ export abstract class Base extends EventEmitter {
    */
   constructor(protected readonly provider: Redis.Provider, protected readonly streamId: string) {
     super();
-    this.logger = Debug(`mdf:coupling:redis:source`);
+    this.logger = Debug(`coupling:redis:source`);
     this.repository = new SourceRepository(provider);
   }
   /** Provider unique identifier for trace purposes */

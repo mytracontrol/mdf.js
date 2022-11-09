@@ -11,6 +11,7 @@ import { DebugLogger, LoggerInstance } from '@mdf.js/logger';
 import EventEmitter from 'events';
 import Joi from 'joi';
 import { v4 } from 'uuid';
+import { Factory } from './Factory';
 import { Manager } from './Manager';
 import { Port } from './Port';
 // #endregion
@@ -66,7 +67,6 @@ class MyWrapperPort extends Port<MyPortInstance, MyPortConfig> {
     this._instance.on('error', error => this.emit('error', error));
     this._instance.on('closed', error => this.emit('closed', error));
     this._instance.on('unhealthy', error => this.emit('unhealthy', error));
-    this._instance.on('ready', () => this.emit('ready'));
     this._instance.on('healthy', state => this.emit('healthy', state));
     this.addCheck('myMeasure', { componentId: 'myComponentId', status: 'fail' });
     this.addCheck('myMeasure', { componentId: 'myComponentId', status: 'pass' });
@@ -131,6 +131,23 @@ describe('#Provider #API', () => {
       );
       expect(provider).toBeDefined();
     }, 300);
+    it('Should create a correct instance of the provider with default values using the Factory mixin', () => {
+      const fakeLogger = new FakeLogger();
+      const factory = Factory(
+        MyWrapperPort,
+        {
+          defaultConfig: { myParam: 'myValue' },
+          envBasedConfig: { myParam: 'myValue' },
+          schema: Joi.object({ myParam: Joi.string().required(), fail: Joi.boolean() }),
+        },
+        'myProvider',
+        'myType'
+      );
+      //@ts-ignore - we are testing the logger
+      const provider = factory.create({ logger: fakeLogger });
+      expect(provider).toBeDefined();
+      expect(fakeLogger.entry).toBe('Changing state to stopped');
+    }, 300);
     it('Should create a correct instance of the provider with own logger', () => {
       const fakeLogger = new FakeLogger();
       const provider = new Manager<MyPortInstance, MyPortConfig, MyWrapperPort>(
@@ -151,7 +168,7 @@ describe('#Provider #API', () => {
       expect(provider).toBeDefined();
       expect(fakeLogger.entry).toBe('Changing state to stopped');
     }, 300);
-    it(`When provider is in "stopped" state, should do nothing when events "healthy", "unhealthy", "close", "ready" are emitted by the underlying port`, async () => {
+    it(`When provider is in "stopped" state, should do nothing when events "healthy", "error", "close", "ready" are emitted by the underlying port`, async () => {
       const provider = new Manager<MyPortInstance, MyPortConfig, MyWrapperPort>(
         MyWrapperPort,
         {
@@ -179,14 +196,14 @@ describe('#Provider #API', () => {
       expect(provider.state).toEqual('stopped');
       provider.client.emit('closed', new Crash('myError'));
       expect(provider.state).toEqual('stopped');
-      provider.client.emit('unhealthy', new Crash('myError'), { myStatus: 'unhealthy' });
+      provider.client.emit('error', new Crash('myError'));
       expect(provider.state).toEqual('stopped');
-      provider.client.emit('healthy', { myStatus: 'unhealthy' });
+      provider.client.emit('healthy', { myStatus: 'healthy' });
       expect(provider.state).toEqual('stopped');
-      expect(errorCount).toEqual(0);
+      expect(errorCount).toEqual(1);
       expect(stateCount).toEqual(0);
     }, 300);
-    it(`When provider is in "stopped" state, should change to "error" state if the event "error" is emitted by the underlying port`, async () => {
+    it(`When provider is in "stopped" state, should change to "error" state if the event "unhealthy" is emitted by the underlying port`, async () => {
       const provider = new Manager<MyPortInstance, MyPortConfig, MyWrapperPort>(
         MyWrapperPort,
         {
@@ -210,7 +227,7 @@ describe('#Provider #API', () => {
           stateCount++;
         });
       expect(provider.state).toEqual('stopped');
-      provider.client.emit('error', new Error('myError'));
+      provider.client.emit('unhealthy', new Error('myError'));
       expect(provider.state).toEqual('error');
       expect(provider.error?.message).toEqual('myError');
       expect(errorCount).toEqual(1);
@@ -239,8 +256,6 @@ describe('#Provider #API', () => {
         .on('status', () => {
           stateCount++;
         });
-      expect(provider.state).toEqual('stopped');
-      await provider.pause();
       expect(provider.state).toEqual('stopped');
       await provider.stop();
       expect(provider.state).toEqual('stopped');
@@ -380,36 +395,7 @@ describe('#Provider #API', () => {
       expect(errorCount).toEqual(1);
       expect(stateCount).toEqual(1);
     }, 300);
-    it(`When provider is in "stopped" state, should change to "running" state if it receives a request to go to RESUME, that is executed without problems`, async () => {
-      const provider = new Manager<MyPortInstance, MyPortConfig, MyWrapperPort>(
-        MyWrapperPort,
-        {
-          name: 'myProvider',
-          type: 'myType',
-          validation: {
-            defaultConfig: { myParam: 'myValue' },
-            envBasedConfig: { myParam: 'myValue' },
-            schema: Joi.object({ myParam: Joi.string().required(), fail: Joi.boolean() }),
-          },
-        },
-        { myParam: 'myValue' }
-      );
-      let errorCount = 0;
-      let stateCount = 0;
-      provider
-        .on('error', () => {
-          errorCount++;
-        })
-        .on('status', () => {
-          stateCount++;
-        });
-      expect(provider.state).toEqual('stopped');
-      await provider.resume();
-      expect(provider.state).toEqual('running');
-      expect(errorCount).toEqual(0);
-      expect(stateCount).toEqual(1);
-    }, 300);
-    it(`When provider is in "running" state, should do nothing when events "healthy" or "ready" are emitted by the underlying port`, async () => {
+    it(`When provider is in "stopped" state, should change to "running" state if it receives a request to go to START, that is executed without problems`, async () => {
       const provider = new Manager<MyPortInstance, MyPortConfig, MyWrapperPort>(
         MyWrapperPort,
         {
@@ -435,14 +421,10 @@ describe('#Provider #API', () => {
       expect(provider.state).toEqual('stopped');
       await provider.start();
       expect(provider.state).toEqual('running');
-      provider.client.emit('ready');
-      expect(provider.state).toEqual('running');
-      provider.client.emit('healthy', { myStatus: 'unhealthy' });
-      expect(provider.state).toEqual('running');
       expect(errorCount).toEqual(0);
       expect(stateCount).toEqual(1);
     }, 300);
-    it(`When provider is in "running" state, should change to "error" state if the event "error" is emitted by the underlying port`, async () => {
+    it(`When provider is in "running" state, should do nothing when events "healthy" is emitted by the underlying port`, async () => {
       const provider = new Manager<MyPortInstance, MyPortConfig, MyWrapperPort>(
         MyWrapperPort,
         {
@@ -468,11 +450,10 @@ describe('#Provider #API', () => {
       expect(provider.state).toEqual('stopped');
       await provider.start();
       expect(provider.state).toEqual('running');
-      provider.client.emit('error', new Error('myError'));
-      expect(provider.state).toEqual('error');
-      expect(provider.error?.message).toEqual('myError');
-      expect(errorCount).toEqual(1);
-      expect(stateCount).toEqual(2);
+      provider.client.emit('healthy', { myStatus: 'healthy' });
+      expect(provider.state).toEqual('running');
+      expect(errorCount).toEqual(0);
+      expect(stateCount).toEqual(1);
     }, 300);
     it(`When provider is in "running" state, should change to "error" state if the event "closed" is emitted by the underlying port`, async () => {
       const provider = new Manager<MyPortInstance, MyPortConfig, MyWrapperPort>(
@@ -538,7 +519,7 @@ describe('#Provider #API', () => {
       expect(errorCount).toEqual(1);
       expect(stateCount).toEqual(2);
     }, 300);
-    it(`When provider is in "running" state, should do nothing if it receives a request to go to RESUME or START, that is executed without problems`, async () => {
+    it(`When provider is in "running" state, should do nothing if it receives a request to go START, that is executed without problems`, async () => {
       const provider = new Manager<MyPortInstance, MyPortConfig, MyWrapperPort>(
         MyWrapperPort,
         {
@@ -562,8 +543,6 @@ describe('#Provider #API', () => {
           stateCount++;
         });
       await provider.start();
-      expect(provider.state).toEqual('running');
-      await provider.resume();
       expect(provider.state).toEqual('running');
       await provider.start();
       expect(provider.state).toEqual('running');
@@ -678,7 +657,7 @@ describe('#Provider #API', () => {
       expect(errorCount).toEqual(1);
       expect(stateCount).toEqual(2);
     }, 300);
-    it(`When provider is in "running" state, should change to "stopped" state if it receives a request to go to PAUSE, that is executed without problems`, async () => {
+    it(`When provider is in "running" state, should change to "stopped" state if it receives a request to go to STOP, that is executed without problems`, async () => {
       const provider = new Manager<MyPortInstance, MyPortConfig, MyWrapperPort>(
         MyWrapperPort,
         {
@@ -703,7 +682,7 @@ describe('#Provider #API', () => {
         });
       await provider.start();
       expect(provider.state).toEqual('running');
-      await provider.pause();
+      await provider.stop();
       expect(provider.state).toEqual('stopped');
       expect(errorCount).toEqual(0);
       expect(stateCount).toEqual(2);
@@ -844,7 +823,7 @@ describe('#Provider #API', () => {
       expect(errorCount).toEqual(2);
       expect(stateCount).toEqual(1);
     }, 300);
-    it(`When provider is in "error" state, Should change to "running" state if receives a request to go to RESUME, that is executed without problems`, async () => {
+    it(`When provider is in "error" state, Should change to "running" state if receives a request to go to START, that is executed without problems`, async () => {
       const provider = new Manager<MyPortInstance, MyPortConfig, MyWrapperPort>(
         MyWrapperPort,
         {
@@ -871,7 +850,7 @@ describe('#Provider #API', () => {
       await provider.fail(new Error('myError'));
       expect(provider.error?.message).toEqual('myError');
       expect(provider.state).toEqual('error');
-      await provider.resume();
+      await provider.start();
       expect(provider.state).toEqual('running');
       expect(errorCount).toEqual(1);
       expect(stateCount).toEqual(2);
@@ -948,7 +927,7 @@ describe('#Provider #API', () => {
       expect(errorCount).toEqual(2);
       expect(stateCount).toEqual(1);
     }, 300);
-    it(`When provider is in "error" state, should change to "stopped" state if receives a request to go to PAUSE, that is executed without problems`, async () => {
+    it(`When provider is in "error" state, should change to "stopped" state if receives a request to go to STOP, that is executed without problems`, async () => {
       const provider = new Manager<MyPortInstance, MyPortConfig, MyWrapperPort>(
         MyWrapperPort,
         {
@@ -975,12 +954,12 @@ describe('#Provider #API', () => {
       await provider.fail(new Error('myError'));
       expect(provider.error?.message).toEqual('myError');
       expect(provider.state).toEqual('error');
-      await provider.pause();
+      await provider.stop();
       expect(provider.state).toEqual('stopped');
       expect(errorCount).toEqual(1);
       expect(stateCount).toEqual(2);
     }, 300);
-    it(`When provider is in "error" state, should manage the error if the events "error" or "unhealthy" are emitted by the underlying port`, async () => {
+    it(`When provider is in "error" state, should manage the error if the event "unhealthy" are emitted by the underlying port`, async () => {
       const provider = new Manager<MyPortInstance, MyPortConfig, MyWrapperPort>(
         MyWrapperPort,
         {
@@ -1007,13 +986,10 @@ describe('#Provider #API', () => {
       await provider.fail(new Error('myError'));
       expect(provider.error?.message).toEqual('myError');
       expect(provider.state).toEqual('error');
-      provider.client.emit('error', new Error('otherError'));
-      expect(provider.state).toEqual('error');
-      expect(provider.error?.message).toEqual('otherError');
       provider.client.emit('unhealthy', new Error('finalError'), { myParam: 'myValue' });
       expect(provider.state).toEqual('error');
       expect(provider.error?.message).toEqual('finalError');
-      expect(errorCount).toEqual(3);
+      expect(errorCount).toEqual(2);
       expect(stateCount).toEqual(1);
     }, 300);
     it(`When provider is in "error" state, should change to "stopped" state if the event "closed" is emitted by the underlying port`, async () => {
@@ -1047,39 +1023,6 @@ describe('#Provider #API', () => {
       await new Promise(resolve => setTimeout(resolve, 200));
       expect(provider.state).toEqual('stopped');
       expect(provider.error?.message).toEqual('myError');
-      expect(errorCount).toEqual(1);
-      expect(stateCount).toEqual(2);
-    }, 300);
-    it(`When provider is in "error" state, should change to "start" state if the event "ready" is emitted by the underlying port`, async () => {
-      const provider = new Manager<MyPortInstance, MyPortConfig, MyWrapperPort>(
-        MyWrapperPort,
-        {
-          name: 'myProvider',
-          type: 'myType',
-          validation: {
-            defaultConfig: { myParam: 'myValue' },
-            envBasedConfig: { myParam: 'myValue' },
-            schema: Joi.object({ myParam: Joi.string().required(), fail: Joi.boolean() }),
-          },
-        },
-        { myParam: 'myValue' }
-      );
-      let errorCount = 0;
-      let stateCount = 0;
-      provider
-        .on('error', () => {
-          errorCount++;
-        })
-        .on('status', () => {
-          stateCount++;
-        });
-      expect(provider.state).toEqual('stopped');
-      await provider.fail(new Error('myError'));
-      expect(provider.error?.message).toEqual('myError');
-      expect(provider.state).toEqual('error');
-      provider.client.emit('ready');
-      await new Promise(resolve => setTimeout(resolve, 200));
-      expect(provider.state).toEqual('running');
       expect(errorCount).toEqual(1);
       expect(stateCount).toEqual(2);
     }, 300);

@@ -1,12 +1,8 @@
 # **@mdf.js/crash**
 
-[![Build Status](https://devopmytra.visualstudio.com/NetinSystems/_apis/build/status/NS-Netin-Crash-TypeScript?repoName=NS-Netin-Crash-TypeScript&branchName=master)](https://devopmytra.visualstudio.com/NetinSystems/_build/latest?definitionId=318&repoName=NS-Netin-Crash-TypeScript&branchName=master)
-[![@mdf.js/crash package in Netin-Systems-Packages feed in Azure Artifacts](https://devopmytra.feeds.visualstudio.com/_apis/public/Packaging/Feeds/54947cc7-1c0a-4d71-a742-0f2cf64772d8/Packages/2f7e380e-6733-43a4-835a-63ac4923e4b1/Badge)](https://devopmytra.visualstudio.com/NetinSystems/_packaging?_a=package&feed=54947cc7-1c0a-4d71-a742-0f2cf64772d8&package=2f7e380e-6733-43a4-835a-63ac4923e4b1&preferRelease=true)
-[![Node Version](https://img.shields.io/static/v1?style=flat&logo=node.js&logoColor=green&label=node&message=%3E=12%20||%2014&color=blue)](https://nodejs.org/en/)
-[![Typescript Version](https://img.shields.io/static/v1?style=flat&logo=typescript&label=Typescript&message=4.3&color=blue)](https://www.typescriptlang.org/)
+[![Node Version](https://img.shields.io/static/v1?style=flat&logo=node.js&logoColor=green&label=node&message=%3E=16%20||%2018&color=blue)](https://nodejs.org/en/)
+[![Typescript Version](https://img.shields.io/static/v1?style=flat&logo=typescript&label=Typescript&message=4.8&color=blue)](https://www.typescriptlang.org/)
 [![Known Vulnerabilities](https://img.shields.io/static/v1?style=flat&logo=snyk&label=Vulnerabilities&message=0&color=300A98F)](https://snyk.io/package/npm/snyk)
-[![Sonarqube](https://badgen.net/badge/icon/sonarqube?icon=sonarqube&label)](https://sonarqube.mytracloud.es/dashboard?id=NS-Netin-Crash-TypeScript)
-[![Documentation](https://img.shields.io/static/v1?style=flat&logo=readthedocs&logoColor=white&label=Documentation&message=API&color=blue)](https://docs.netin.io/apis/NS-Netin-Crash-TypeScript/index.html)
 
 <!-- markdownlint-disable MD033 MD041 -->
 <p align="center">
@@ -15,7 +11,7 @@
   </div>
 </p>
 
-<h1 style="text-align:center;margin-bottom:0">Crash</h1>
+<h1 style="text-align:center;margin-bottom:0">@mdf.js/crash</h1>
 <h5 style="text-align:center;margin-top:0">Improved, but simplified, error handling</h5>
 
 <!-- markdownlint-enable MD033 -->
@@ -24,7 +20,7 @@ ___
 
 ## **Table of contents**
 
-- [**@mdf.js/crash**](#mdfcrash)
+- [**@mdf.js/crash**](#mdfjscrash)
   - [**Table of contents**](#table-of-contents)
   - [**Introduction**](#introduction)
   - [**Installation**](#installation)
@@ -36,7 +32,6 @@ ___
     - [**Multi**](#multi)
     - [**Boom**](#boom)
   - [**API**](#api)
-  - [**Collaboration**](#collaboration)
   - [**License**](#license)
 
 ## **Introduction**
@@ -85,7 +80,7 @@ One of the main and common parameters of the three types of error is the message
 
 According to the standard [RFC 4122](https://es.wikipedia.org/wiki/Identificador_%C3%BAnico_universal), it allows us to associate an identifier of operation or request to the error. This is especially useful for tracing errors in requests or transactions that occur between different systems or libraries. The identifier should be created by the process or system that initiates the operation (Frontend, Service ...), being included in all processes and registers (logging with @mdf.js/logger) so that this can be used in troubleshooting processes. identifier as _filter_, allowing easy extraction.
 
-![Logging example](assets/logging-capture.png)
+![Logging example](media/logging-capture.png)
 
 ### **Crash**
 
@@ -316,8 +311,6 @@ Any request to the previous endpoint will return the following result:
 - {@link Crash}
 - {@link Multi}
 - {@link Boom}
-
-
 
 ## **License**
 

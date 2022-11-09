@@ -86,12 +86,8 @@ export class Port extends Provider.Port<Server, Config> {
    * @param args - arguments to be emitted with the event
    */
   private onEvent(original: string, wrapped: string, broadcasted: boolean, ...args: Crash[]): void {
-    // Stryker disable all
-    this.logger.debug(
-      `Original event: ${original} was wrapped to ${wrapped}`,
-      this.uuid,
-      this.name
-    );
+    // Stryker disable next-line all
+    this.logger.debug(`Original event: ${original} was wrapped to ${wrapped}`);
     // Stryker enable all
     for (const arg of args) {
       // Stryker disable next-line all

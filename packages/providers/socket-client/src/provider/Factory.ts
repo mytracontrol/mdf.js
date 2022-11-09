@@ -8,33 +8,11 @@
 import { Provider } from '@mdf.js/provider';
 import { configEntry, CONFIG_PROVIDER_BASE_NAME } from '../config';
 import { Port } from './Port';
-import { Client, Config, FactoryOptions, ProviderInstance } from './types';
+import { Client, Config } from './types';
 
-export class Factory {
-  /** Provider */
-  private readonly provider: ProviderInstance;
-  /**
-   * Create a new HTTP-S Client provider
-   * @param options - Provider configuration options
-   */
-  public static create(options?: FactoryOptions): ProviderInstance {
-    return new Factory(options).provider;
-  }
-  /**
-   * Private constructor for HTTP-S Client provider factory
-   * @param options - Provider configuration options
-   */
-  private constructor(options?: FactoryOptions) {
-    this.provider = new Provider.Manager<Client, Config, Port>(
-      Port,
-      {
-        name: options?.name || CONFIG_PROVIDER_BASE_NAME,
-        type: 'service',
-        validation: configEntry,
-        useEnvironment: options?.useEnvironment ?? true,
-        logger: options?.logger,
-      },
-      options?.config
-    );
-  }
-}
+export const Factory = Provider.Factory<Client, Config, Port>(
+  Port,
+  configEntry,
+  CONFIG_PROVIDER_BASE_NAME,
+  'service'
+);

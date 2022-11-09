@@ -117,6 +117,11 @@ export class Aggregator extends EventEmitter {
       component.on('error', this.errorEventHandler(component.name));
       component.on('status', this.statusEventHandler);
       this.components.set(component.name, component);
+      //@ts-ignore - if the property exists, it's okey to use it
+      if ('error' in component && component.error instanceof Error) {
+        //@ts-ignore - if the property exists, it's okey to use it
+        this.errorEventHandler(component.name)(component.error);
+      }
     }
   };
 }

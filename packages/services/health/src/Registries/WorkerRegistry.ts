@@ -18,13 +18,13 @@ export class WorkerRegistry extends Registry {
    */
   constructor(service: ServiceMetadata, private readonly aggregator: Aggregator) {
     super(service);
-    process.on('message', this.onHealthRequestHandler.bind(this));
+    process.on('message', this.onHealthRequestHandler);
   }
   /** Handler of health request */
   onHealthRequestHandler = (message: HealthMessage) => {
     if (message.type === HealthMessageType.REQ && process.send) {
       // Stryker disable next-line all
-      this.logger(`Health request on worker [${process.pid}]`);
+      this.logger.debug(`Health request on worker [${process.pid}]`);
       process.send({
         type: HealthMessageType.RES,
         requestId: message.requestId,

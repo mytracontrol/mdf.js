@@ -13,7 +13,7 @@ const { File } = transports;
 
 const DEFAULT_ENABLED_STATE = false;
 const DEFAULT_LOG_LEVEL = 'info';
-const DEFAULT_FILE_NAME = 'logs/mms-app.log';
+const DEFAULT_FILE_NAME = 'logs/mdf-app.log';
 const DEFAULT_MAX_FILES = 10;
 const DEFAULT_MAX_FILE_SIZE = 10 * 1024 * 1024;
 const DEFAULT_ZIP_FILES = false;

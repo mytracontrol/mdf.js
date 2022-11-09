@@ -28,7 +28,7 @@ export class Sequence extends Base<Plugs.Source.Sequence> {
   _read(size: number): void {
     if (this.pendingRequest) {
       // Stryker disable next-line all
-      this.logger.extend('verbose')(`New ingestion request received when there is pending request`);
+      this.logger.verbose(`New ingestion request received when there is pending request`);
       return;
     }
     this.pendingRequest = true;
@@ -38,11 +38,8 @@ export class Sequence extends Base<Plugs.Source.Sequence> {
     // The wrapped ensure that this ingest is always retried in order to ensure the correct
     // operation of the firehose
     this.plug.ingestData(size).then(result => {
-      // Stryker disable all
-      this.logger.extend('verbose')(
-        `The request has been resolved, more request should be accepted`
-      );
-      // Stryker restore all
+      // Stryker disable next-line all
+      this.logger.verbose(`The request has been resolved, more request should be accepted`);
       this.processJobs(result);
       this.pendingRequest = false;
       this.plug.off('data', this._onJobReceived);
@@ -90,11 +87,8 @@ export class Sequence extends Base<Plugs.Source.Sequence> {
         )
       );
     }
-    // Stryker disable all
-    this.logger.extend('verbose')(
-      `${this.actualWindowSize}/${this.requestedWindowSize} jobs processed`
-    );
-    // Stryker restore all
+    // Stryker disable next-line all
+    this.logger.verbose(`${this.actualWindowSize}/${this.requestedWindowSize} jobs processed`);
   }
   /**
    * Process the received jobs
@@ -103,7 +97,7 @@ export class Sequence extends Base<Plugs.Source.Sequence> {
   private readonly _onJobReceived = (job: Plugs.Source.JobObject) => {
     this.actualWindowSize++;
     // Stryker disable next-line all
-    this.logger.extend('verbose')(`New job from consumer: ${job.jobId}`);
+    this.logger.verbose(`New job from consumer: ${job.jobId}`);
     if (
       !this.push(
         this.subscribeJob(
@@ -112,12 +106,9 @@ export class Sequence extends Base<Plugs.Source.Sequence> {
       )
     ) {
       // Stryker disable next-line all
-      this.logger.extend('verbose')(`No more job could be processed right now`);
+      this.logger.verbose(`No more job could be processed right now`);
     }
-    // Stryker disable all
-    this.logger.extend('verbose')(
-      `${this.actualWindowSize}/${this.requestedWindowSize} jobs processed`
-    );
-    // Stryker restore all
+    // Stryker disable next-line all
+    this.logger.verbose(`${this.actualWindowSize}/${this.requestedWindowSize} jobs processed`);
   };
 }

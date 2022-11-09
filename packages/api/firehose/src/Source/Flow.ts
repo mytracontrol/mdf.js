@@ -29,7 +29,7 @@ export class Flow extends Base<Plugs.Source.Flow> {
    */
   private readonly _onJobReceived = (job: Plugs.Source.JobObject) => {
     // Stryker disable next-line all
-    this.logger.extend('verbose')(`New job from consumer: ${job.jobId}`);
+    this.logger.verbose(`New job from consumer: ${job.jobId}`);
     if (
       !this.push(
         this.subscribeJob(
@@ -38,7 +38,7 @@ export class Flow extends Base<Plugs.Source.Flow> {
       )
     ) {
       // Stryker disable next-line all
-      this.logger.extend('verbose')(`No more job could be processed right now`);
+      this.logger.verbose(`No more job could be processed right now`);
       this.plug.pause();
     }
   };

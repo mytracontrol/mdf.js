@@ -38,7 +38,7 @@ export class MasterRegistry extends Registry {
   /** Start to polling health diagnostic from workers */
   public start(): void {
     if (!this.timeInterval) {
-      this.timeInterval = setInterval(this.onSendRequest.bind(this), this.interval);
+      this.timeInterval = setInterval(this.onSendRequest, this.interval);
       this.onSendRequest();
     }
   }
@@ -65,7 +65,9 @@ export class MasterRegistry extends Registry {
     const onWorkerResponse = (worker: Worker, message: HealthMessage) => {
       if (message.requestId !== this.requestId) {
         // Stryker disable next-line all
-        this.logger(`Health response from worker [${worker.process.pid}] out of the valid period`);
+        this.logger.debug(
+          `Health response from worker [${worker.process.pid}] out of the valid period`
+        );
         return;
       }
       if (message.type === HealthMessageType.RES) {
@@ -81,7 +83,9 @@ export class MasterRegistry extends Registry {
     };
     const onTimeOut = () => {
       // Stryker disable next-line all
-      this.logger(`Timeout waiting for health response from workers - ${pendingResponses} pending`);
+      this.logger.debug(
+        `Timeout waiting for health response from workers - ${pendingResponses} pending`
+      );
       cluster.off('message', onWorkerResponse);
       this.workerChecks = updatedChecks;
     };
@@ -89,7 +93,7 @@ export class MasterRegistry extends Registry {
     cluster.on('message', onWorkerResponse);
     for (const worker of Object.values(this.workers)) {
       if (worker && worker.isConnected()) {
-        this.logger(`Sending an health update request to worker [${worker.process.pid}]`);
+        this.logger.debug(`Sending an health update request to worker [${worker.process.pid}]`);
         worker.send({
           type: HealthMessageType.REQ,
           requestId: this.requestId,

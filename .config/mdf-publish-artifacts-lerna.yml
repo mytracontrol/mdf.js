@@ -25,7 +25,7 @@ steps:
 
   - task: Yarn@3
     displayName: Publish package to internal feed as alfa version
-    condition: and(succeeded(), or(eq(variables['Build.SourceBranch'], 'refs/heads/develop'), startsWith(variables['Build.SourceBranch'], 'refs/heads/feature/')))
+    condition: and(succeeded(), eq(variables.isDevelop, true))
     inputs:
       projectDirectory: '.'
       arguments: 'lerna publish $(Build.BuildNumber) --amend --dist-tag alpha --loglevel silly -m "chore(release): publish %v" --yes'

@@ -40,14 +40,19 @@ export class Port extends Provider.Port<Client, Config> {
   }
   /** Initialize the port instance */
   public async start(): Promise<void> {
-    this.emit('ready');
+    // Stryker disable next-line all
+    this.logger.debug(`Starting HTTP Client port: ${this.uuid}`);
+    return;
   }
   /** Stop the port instance */
   public async stop(): Promise<void> {
-    this.emit('closed');
+    // Stryker disable next-line all
+    this.logger.debug(`Stopping HTTP Client port: ${this.uuid}`);
+    return;
   }
   /** Close the port instance */
   public async close(): Promise<void> {
     await this.stop();
+    return;
   }
 }

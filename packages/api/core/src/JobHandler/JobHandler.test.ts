@@ -9,7 +9,7 @@
 import { Crash, Multi } from '@mdf.js/crash';
 import { v5 } from 'uuid';
 import { Jobs } from '..';
-import { MMS_NAMESPACE_OID } from '../const';
+import { MDF_NAMESPACE_OID } from '../const';
 import { Status } from '../types/jobs';
 import { JobHandler } from './JobHandler';
 
@@ -27,13 +27,13 @@ describe('#JobHandler', () => {
       expect(job.status).toEqual(Status.PROCESSING);
       expect(job.type).toEqual('myType');
       expect(job.jobId).toEqual('myId');
-      expect(job.uuid).toEqual(v5('myId', MMS_NAMESPACE_OID));
+      expect(job.uuid).toEqual(v5('myId', MDF_NAMESPACE_OID));
       expect(job.createdAt).toBeInstanceOf(Date);
       expect(job.errors).toBeUndefined();
       expect(job.hasErrors).toBeFalsy();
       expect(job.processTime).toEqual(-1);
       expect(job.result()).toEqual({
-        id: v5('myId', MMS_NAMESPACE_OID),
+        id: v5('myId', MDF_NAMESPACE_OID),
         createdAt: job.createdAt.toISOString(),
         resolvedAt: '',
         quantity: 1,
@@ -49,7 +49,7 @@ describe('#JobHandler', () => {
       expect(job.errors).toBeUndefined();
       expect(job.hasErrors).toBeFalsy();
       expect(job.result()).toEqual({
-        id: v5('myId', MMS_NAMESPACE_OID),
+        id: v5('myId', MDF_NAMESPACE_OID),
         createdAt: job.createdAt.toISOString(),
         resolvedAt: '',
         quantity: 1,
@@ -65,7 +65,7 @@ describe('#JobHandler', () => {
       expect(job.errors).toBeDefined();
       expect(job.hasErrors).toBeTruthy();
       expect(job.result()).toEqual({
-        id: v5('myId', MMS_NAMESPACE_OID),
+        id: v5('myId', MDF_NAMESPACE_OID),
         createdAt: job.createdAt.toISOString(),
         resolvedAt: '',
         quantity: 1,
@@ -77,7 +77,7 @@ describe('#JobHandler', () => {
           subject: 'common',
           timestamp: job.errors?.date.toISOString(),
           trace: ['CrashError: myError', 'CrashError: myError'],
-          uuid: v5('myId', MMS_NAMESPACE_OID),
+          uuid: v5('myId', MDF_NAMESPACE_OID),
         },
         jobId: 'myId',
         type: 'myType',
@@ -87,9 +87,9 @@ describe('#JobHandler', () => {
     it(`Should be possible to finnish the job without errors`, done => {
       const job = new JobHandler<string>('myData', 'myId', 'myType');
       job.on('done', (uuid: string, result: Jobs.Result<string>, error?: Multi) => {
-        expect(uuid).toEqual(v5('myId', MMS_NAMESPACE_OID));
+        expect(uuid).toEqual(v5('myId', MDF_NAMESPACE_OID));
         expect(result).toEqual({
-          id: v5('myId', MMS_NAMESPACE_OID),
+          id: v5('myId', MDF_NAMESPACE_OID),
           createdAt: job.createdAt.toISOString(),
           resolvedAt: result.resolvedAt,
           quantity: 1,
@@ -109,9 +109,9 @@ describe('#JobHandler', () => {
       const job = new JobHandler<string>('myData', 'myId', 'myType');
       const myError = new Crash('myError');
       job.on('done', (uuid: string, result: Jobs.Result<string>, error?: Multi) => {
-        expect(uuid).toEqual(v5('myId', MMS_NAMESPACE_OID));
+        expect(uuid).toEqual(v5('myId', MDF_NAMESPACE_OID));
         expect(result).toEqual({
-          id: v5('myId', MMS_NAMESPACE_OID),
+          id: v5('myId', MDF_NAMESPACE_OID),
           createdAt: job.createdAt.toISOString(),
           resolvedAt: result.resolvedAt,
           quantity: 1,
@@ -123,7 +123,7 @@ describe('#JobHandler', () => {
             subject: 'common',
             timestamp: job.errors?.date.toISOString(),
             trace: ['CrashError: myError'],
-            uuid: v5('myId', MMS_NAMESPACE_OID),
+            uuid: v5('myId', MDF_NAMESPACE_OID),
           },
           jobId: 'myId',
           type: 'myType',

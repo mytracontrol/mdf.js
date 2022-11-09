@@ -25,8 +25,8 @@ export class HealthWrapper extends EventEmitter implements Health.Component {
   constructor(public readonly name: string, private readonly components: Health.Component[]) {
     super();
     for (const component of this.components) {
-      component.on('status', this.emitStatus.bind(this));
-      component.on('error', this.onErrorHandler.bind(this));
+      component.on('status', this.emitStatus);
+      component.on('error', this.onErrorHandler);
     }
   }
   /**
@@ -35,8 +35,8 @@ export class HealthWrapper extends EventEmitter implements Health.Component {
    */
   public add(component: Health.Component): void {
     this.components.push(component);
-    component.on('status', this.emitStatus.bind(this));
-    component.on('error', this.onErrorHandler.bind(this));
+    component.on('status', this.emitStatus);
+    component.on('error', this.onErrorHandler);
     this.emitStatus();
   }
   /**
@@ -50,23 +50,23 @@ export class HealthWrapper extends EventEmitter implements Health.Component {
     }, {} as Health.API.Checks);
   }
   /** Emit the status if it's different from the last emitted status */
-  private emitStatus(): void {
+  private emitStatus = (): void => {
     const actualStatus = overallStatus(this.checks);
     if (this.lastStatusEmitted !== actualStatus) {
       this.lastStatusEmitted = this.overallStatus;
       this.emit('status', this.overallStatus);
     }
-  }
+  };
   /**
    * Manage the error in the producer interface
    * @param error - error to be processed
    */
-  private onErrorHandler(error: unknown): void {
+  private onErrorHandler = (error: unknown): void => {
     const crash = Crash.from(error);
     if (this.listenerCount('error') > 0) {
       this.emit('error', crash);
     }
-  }
+  };
   /** Overall component status */
   private get overallStatus(): Health.API.Status {
     return overallStatus(this.checks);

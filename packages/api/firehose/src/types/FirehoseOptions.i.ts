@@ -6,6 +6,7 @@
  */
 
 import { Jobs } from '@mdf.js/core';
+import { LoggerInstance } from '@mdf.js/logger';
 import { Service as MetricsService } from '@mdf.js/metrics-service';
 import { Service as RegisterService } from '@mdf.js/register-service';
 import { RetryOptions } from '@mdf.js/utils';
@@ -30,4 +31,6 @@ export interface FirehoseOptions<Type extends string = string, Data = any> {
   registerService?: RegisterService;
   /** Define the number of sinks that must confirm a job, default options is all of them */
   atLeastOne?: boolean;
+  /** Logger instance for deep debugging tasks */
+  logger?: LoggerInstance;
 }

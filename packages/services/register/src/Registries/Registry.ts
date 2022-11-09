@@ -5,9 +5,9 @@
  * or at https://opensource.org/licenses/MIT.
  */
 import { Crash } from '@mdf.js/crash';
-import Debug, { Debugger } from 'debug';
 import { ErrorRecord, HandleableError } from '../types';
 
+import { DebugLogger, LoggerInstance } from '@mdf.js/logger';
 import { CONFIG_REGISTER_INCLUDE_STACK, CONFIG_REGISTER_MAX_LIST_SIZE } from '../const';
 
 export abstract class Registry {
@@ -16,14 +16,14 @@ export abstract class Registry {
   /** Last update date */
   #lastUpdate: string = new Date().toISOString();
   /** Debugger logger */
-  protected readonly logger: Debugger;
+  protected readonly logger: LoggerInstance;
   /**
    * Create an instance of Registry class
    * @param maxSize - Maximum number of errors to be registered in this registry
    */
   constructor(protected readonly maxSize: number = CONFIG_REGISTER_MAX_LIST_SIZE) {
     // Stryker disable next-line all
-    this.logger = Debug(`register`);
+    this.logger = new DebugLogger(`register`);
     if (maxSize < 1) {
       this.maxSize = CONFIG_REGISTER_MAX_LIST_SIZE;
     }

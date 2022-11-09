@@ -26,7 +26,9 @@ module.exports = {
     'src/**/*.ts',
     '!src/**/test/*.ts',
     '!src/**/*.test.ts',
-    '!src/**/index.ts'
+    '!src/**/index.ts',
+    '!src/**/*.t.ts',
+    '!src/**/*.i.ts',
   ],
   coverageReporters: ['clover', 'json', 'lcov', ['text', { skipFull: false }], 'cobertura'],
   coverageThreshold: {

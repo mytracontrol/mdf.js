@@ -5,7 +5,17 @@
  * or at https://opensource.org/licenses/MIT.
  */
 
+/**
+ * Simple link expressed as a regular string
+ * @category Boom
+ * @public
+ */
 export type SimpleLink = string;
+/**
+ * Context links, expressed as map of key-value pairs
+ * @category Boom
+ * @public
+ */
 export type ContextLink = { [context: string]: SimpleLink };
 /**
  * Links that leads to further details about this particular occurrence of the problem.

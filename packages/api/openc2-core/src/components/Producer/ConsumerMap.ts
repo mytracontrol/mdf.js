@@ -122,7 +122,7 @@ export class ConsumerMap extends EventEmitter implements Health.Component {
     }
     this.emitStatus();
     if (!this.agingTimer && this.map.size > 0) {
-      this.agingTimer = setInterval(this.aging.bind(this), this.agingInterval);
+      this.agingTimer = setInterval(this.aging, this.agingInterval);
     }
   }
   /**

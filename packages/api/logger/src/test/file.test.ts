@@ -65,7 +65,7 @@ describe('#Logger #file', () => {
           expect(line).toContain('"meta":[]');
           expect(line).toContain('"message":"logging"');
           expect(line).toContain('"level":"error"');
-          expect(line).toContain('"label":"mms-app"');
+          expect(line).toContain('"label":"mdf-app"');
           expect(line).toContain('"pid":"');
           expect(line).toContain('"timestamp":"');
           lineNumber += 1;
@@ -75,7 +75,7 @@ describe('#Logger #file', () => {
           expect(line).toContain('"meta":[]');
           expect(line).toContain('"level":"error"');
           expect(line).toContain('"message":"logging"');
-          expect(line).toContain('"label":"mms-app"');
+          expect(line).toContain('"label":"mdf-app"');
           expect(line).toContain('"pid":"');
           expect(line).toContain('"timestamp":"');
 
@@ -90,7 +90,7 @@ describe('#Logger #file', () => {
           );
           expect(line).toContain('"context":"VERY-LONG-CONTEXT"');
           expect(line).toContain('"info":{"extra":"extra"}');
-          expect(line).toContain('"label":"mms-app"');
+          expect(line).toContain('"label":"mdf-app"');
           expect(line).toContain('"level":"error"');
           expect(line).toContain('"message":"Crash error"');
           expect(line).toContain('"uuid":"02ef7b85-b88e-4134-b611-4056820cd689"');

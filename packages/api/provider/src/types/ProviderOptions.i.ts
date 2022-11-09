@@ -8,6 +8,10 @@
 import { LoggerInstance } from '@mdf.js/logger';
 import { PortConfigValidationStruct } from '.';
 
+/**
+ * Provider configuration options
+ * @param PortConfig - Port configuration object, could be an extended version of the client config
+ */
 export interface ProviderOptions<PortConfig> {
   /** Provider name, used for human-readable logs and identification */
   name: string;
@@ -19,10 +23,14 @@ export interface ProviderOptions<PortConfig> {
   /** Port validation options */
   validation: PortConfigValidationStruct<PortConfig>;
   /**
-   * Boolean flag indicating that the build in environment configuration should be used, merged with
-   * the default values and the configuration passed as argumento to the provider
+   * Flag indicating that the environment configuration variables should be used, merged with
+   * the default values and the configuration passed as argument to the provider.
+   *
+   * If a string is passed this will be used as prefix for the environment configuration variables,
+   * represented in `SCREAMING_SNAKE_CASE`, that will parsed to `camelCase` and merged with the rest
+   * of the configuration.
    */
-  useEnvironment?: boolean;
+  useEnvironment?: boolean | string;
   /** Port and provider logger, to be used internally */
   logger?: LoggerInstance;
 }

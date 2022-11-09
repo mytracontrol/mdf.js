@@ -178,27 +178,6 @@ describe('#Port #Redis', () => {
       port.start().then();
       expect(port.client.listenerCount('connect')).toEqual(1);
     }, 300);
-    it('Should perform the event wrapping properly for "ready"', done => {
-      const port = new Port(DEFAULT_CONFIG, new FakeLogger() as LoggerInstance);
-      expect(port).toBeDefined();
-      jest.spyOn(port.client, 'connect').mockResolvedValue();
-      jest.spyOn(port.client, 'quit').mockResolvedValue('OK');
-      jest.spyOn(port.client, 'info').mockResolvedValue(memory);
-      port.on('error', error => {
-        throw error;
-      });
-      port.on('ready', () => {
-        done();
-      });
-      port.start().then();
-      //This is only for test the code of events that are not emitted
-      port.client.emit('connect');
-      port.client.emit('close');
-      port.client.emit('reconnecting');
-      port.client.emit('+node');
-      port.client.emit('-node');
-      port.client.emit('ready');
-    }, 300);
     it('Should perform the event wrapping properly for "error" on ReplyError', done => {
       const port = new Port(DEFAULT_CONFIG, new FakeLogger() as LoggerInstance);
       expect(port).toBeDefined();

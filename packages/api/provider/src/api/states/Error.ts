@@ -10,16 +10,18 @@ import { AnyWrappedPort, ProviderState } from '../../types';
 import { RunningState } from './Running';
 import { StoppedState } from './Stopped';
 
-/** Stopped state */
+/**
+ * Provider Error state
+ * @category State
+ * @public
+ */
 export class ErrorState implements State {
   /** Actual provider state */
   public readonly state: ProviderState = 'error';
   /** Handler for disconnected or unhealthy events */
   private readonly errorEventHandler = (error: Crash | Error): Promise<void> => this.fail(error);
-
   /** Handler for auto-fix events */
   private readonly fixedEventHandler = (): Promise<void> => this.start();
-
   /** Handler for close event */
   private readonly closeEventHandler = (): Promise<void> => this.stop();
   /**
@@ -33,11 +35,9 @@ export class ErrorState implements State {
     private readonly changeState: (newState: State) => void,
     private readonly manageError: (error: unknown) => void
   ) {
-    this.instance.on('error', this.errorEventHandler);
     this.instance.on('unhealthy', this.errorEventHandler);
     this.instance.once('closed', this.closeEventHandler);
     this.instance.once('healthy', this.fixedEventHandler);
-    this.instance.once('ready', this.fixedEventHandler);
   }
   /** Stop the process: internal jobs, external dependencies connections ... */
   public async stop(): Promise<void> {
@@ -68,20 +68,10 @@ export class ErrorState implements State {
   public async fail(error: Crash | Error): Promise<void> {
     this.manageError(error);
   }
-  /** Pause the process: pause internal jobs */
-  public async pause(): Promise<void> {
-    await this.stop();
-  }
-  /** Resume the process: resume internal jobs */
-  public async resume(): Promise<void> {
-    await this.start();
-  }
   /** Clean event handlers for error state */
   public cleanEventHandlers(): void {
-    this.instance.off('error', this.errorEventHandler);
     this.instance.off('unhealthy', this.errorEventHandler);
     this.instance.off('closed', this.closeEventHandler);
     this.instance.off('healthy', this.fixedEventHandler);
-    this.instance.off('ready', this.fixedEventHandler);
   }
 }

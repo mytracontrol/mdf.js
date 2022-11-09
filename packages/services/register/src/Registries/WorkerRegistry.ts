@@ -15,13 +15,13 @@ export class WorkerRegistry extends Registry {
    */
   constructor(maxSize?: number) {
     super(maxSize);
-    process.on('message', this.onMasterRequestHandler.bind(this));
+    process.on('message', this.onMasterRequestHandler);
   }
   /** Handler of master requests */
   onMasterRequestHandler = (message: RegisterMessage) => {
     if (message.type === RegisterMessageType.REQ && process.send) {
       // Stryker disable next-line all
-      this.logger(`New update request received with requestId [${message.requestId}]`);
+      this.logger.debug(`New update request received with requestId [${message.requestId}]`);
       process.send({
         type: RegisterMessageType.RES,
         requestId: message.requestId,
@@ -30,7 +30,7 @@ export class WorkerRegistry extends Registry {
     }
     if (message.type === RegisterMessageType.CLR_REQ) {
       // Stryker disable next-line all
-      this.logger(`New clear request received on worker [${process.pid}] from master`);
+      this.logger.debug(`New clear request received on worker [${process.pid}] from master`);
       this.clear();
     }
   };
@@ -49,11 +49,11 @@ export class WorkerRegistry extends Registry {
   /** Start to polling errors registries from workers */
   public start(): void {
     // Stryker disable next-line all
-    this.logger('Starting registry');
+    this.logger.debug('Starting registry');
   }
   /** Stop polling errors registries from workers */
   public stop(): void {
     // Stryker disable next-line all
-    this.logger('Stopping registry');
+    this.logger.debug('Stopping registry');
   }
 }

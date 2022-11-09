@@ -16,7 +16,7 @@
     "url": "https://github.com/mytracontrol/mdf.js.git",
     "directory": "packages/api/core"
   },
-  "license": "SEE LICENSE IN LICENSE.md",
+  "license": "MIT",
   "author": "Mytra Control S.L.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

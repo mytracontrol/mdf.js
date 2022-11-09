@@ -7,5 +7,4 @@
 
 export * from './Client.t';
 export * from './Config.t';
-export * from './FactoryOptions.i';
 export * from './ProviderInstance.t';

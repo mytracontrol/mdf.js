@@ -80,7 +80,7 @@ export class RedisConsumerAdapter extends RedisAdapter implements ConsumerAdapte
             this.onErrorHandler(error);
           }
         };
-        this.handler(parsedMessage, onDone.bind(this));
+        this.handler(parsedMessage, onDone);
       } catch (rawError) {
         const error = Crash.from(rawError);
         this.onErrorHandler(

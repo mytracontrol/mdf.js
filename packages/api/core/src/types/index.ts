@@ -5,5 +5,12 @@
  * or at https://opensource.org/licenses/MIT.
  */
 
+/**
+ * Health check
+ * @category @mdf.js/core
+ */
 export * as Health from './health';
+/**
+ * @category @mdf.js/core
+ */
 export * as Jobs from './jobs';

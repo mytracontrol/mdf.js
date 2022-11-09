@@ -14,7 +14,7 @@ describe('#File transport', () => {
       const file = new FileTransport('label', v4());
       const config = file.config;
       expect(config?.enabled).toBeFalsy();
-      expect(config?.filename).toEqual('logs/mms-app.log');
+      expect(config?.filename).toEqual('logs/mdf-app.log');
       expect(config?.json).toBeFalsy();
       expect(config?.level).toEqual('info');
       expect(config?.maxFiles).toEqual(10);
@@ -25,7 +25,7 @@ describe('#File transport', () => {
       const file = new FileTransport('label', v4(), { enabled: true });
       const config = file.config;
       expect(config?.enabled).toBeTruthy();
-      expect(config?.filename).toEqual('logs/mms-app.log');
+      expect(config?.filename).toEqual('logs/mdf-app.log');
       expect(config?.json).toBeFalsy();
       expect(config?.level).toEqual('info');
       expect(config?.maxFiles).toEqual(10);
@@ -39,7 +39,7 @@ describe('#File transport', () => {
       expect(config).toEqual({
         enabled: false,
         level: 'info',
-        filename: 'logs/mms-app.log',
+        filename: 'logs/mdf-app.log',
         maxFiles: 10,
         maxsize: 10485760,
         zippedArchive: false,

@@ -33,9 +33,7 @@ export class SocketIOProducerAdapter extends SocketIOAdapter implements Producer
         Accessors.getDelayFromCommandMessage(message) + DEFAULT_EXTRA_DELAY_TIME_FOR_RESPONSE;
       const topics = this.defineTopics(message);
       for (const topic of topics) {
-        this.provider.client
-          .timeout(timeout)
-          .emit(topic, message, this.subscriptionAdapter.bind(this));
+        this.provider.client.timeout(timeout).emit(topic, message, this.subscriptionAdapter);
       }
     } catch (rawError) {
       const error = Crash.from(rawError);

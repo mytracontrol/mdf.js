@@ -7,9 +7,9 @@
 
 import { Health, JobHandler, Jobs } from '@mdf.js/core';
 import { Crash } from '@mdf.js/crash';
+import { DebugLogger, LoggerInstance, SetContext } from '@mdf.js/logger';
 import { Service as RegisterService } from '@mdf.js/register-service';
 import { overallStatus } from '@mdf.js/utils';
-import Debug, { Debugger } from 'debug';
 import EventEmitter from 'events';
 import { Writable } from 'stream';
 import { v4 } from 'uuid';
@@ -42,7 +42,7 @@ export class Firehose<Type extends string = string, Data = any>
   implements Health.Component
 {
   /** Debug logger for development and deep troubleshooting */
-  private readonly logger: Debugger;
+  private readonly logger: LoggerInstance;
   /** Provider unique identifier for trace purposes */
   readonly componentId: string = v4();
   /** Engine stream */
@@ -65,7 +65,11 @@ export class Firehose<Type extends string = string, Data = any>
   constructor(public readonly name: string, private readonly options: FirehoseOptions) {
     super();
     // Stryker disable next-line all
-    this.logger = Debug(`mdf:firehose:${this.name}`);
+    this.logger = SetContext(
+      options?.logger || new DebugLogger(`firehose:${this.name}`),
+      this.name,
+      this.componentId
+    );
     if (this.options.sinks.length < 1) {
       throw new Crash(`Firehose must have at least one sink`, this.componentId);
     }
@@ -77,8 +81,10 @@ export class Firehose<Type extends string = string, Data = any>
       this.options.sources,
       this.options.atLeastOne ? 1 : this.sinks.length
     );
-    this.engine = new Engine(this.name, this.options.strategies, {
-      highWaterMark: this.options.bufferSize,
+    this.engine = new Engine(this.name, {
+      strategies: this.options.strategies,
+      transformOptions: { highWaterMark: this.options.bufferSize },
+      logger: this.options.logger,
     });
     if (this.options.metricsService) {
       this.metricsHandler = MetricsHandler.enroll(this.options.metricsService);
@@ -106,6 +112,7 @@ export class Firehose<Type extends string = string, Data = any>
             qos,
             readableOptions: { highWaterMark: this.options.bufferSize },
             postConsumeOptions: this.options.postConsumeOptions,
+            logger: this.options.logger,
           })
         );
       } else if (this.isSequenceSource(source)) {
@@ -115,6 +122,7 @@ export class Firehose<Type extends string = string, Data = any>
             qos,
             readableOptions: { highWaterMark: this.options.bufferSize },
             postConsumeOptions: this.options.postConsumeOptions,
+            logger: this.options.logger,
           })
         );
       } else {
@@ -133,14 +141,18 @@ export class Firehose<Type extends string = string, Data = any>
     for (const sink of sinks) {
       if (this.isJetSink(sink)) {
         sinkStreams.push(
-          new Sink.Jet(sink, this.options.retryOptions, {
-            highWaterMark: this.options.bufferSize,
+          new Sink.Jet(sink, {
+            retryOptions: this.options.retryOptions,
+            writableOptions: { highWaterMark: this.options.bufferSize },
+            logger: this.options.logger,
           })
         );
       } else if (this.isTapSink(sink)) {
         sinkStreams.push(
-          new Sink.Tap(sink, this.options.retryOptions, {
-            highWaterMark: this.options.bufferSize,
+          new Sink.Tap(sink, {
+            retryOptions: this.options.retryOptions,
+            writableOptions: { highWaterMark: this.options.bufferSize },
+            logger: this.options.logger,
           })
         );
       } else {
@@ -184,13 +196,13 @@ export class Firehose<Type extends string = string, Data = any>
   /** Sink/Source/Engine error event handler */
   private readonly onErrorEvent = (error: Error | Crash) => {
     // Stryker disable next-line all
-    this.logger(`${error.message}`);
+    this.logger.error(`${error.message}`);
     this.emit('error', error);
   };
   /** Sink/Source/Engine error event handler */
   private readonly onStatusEvent = (status: Health.API.Status) => {
     // Stryker disable next-line all
-    this.logger(`Status message received from underlayer streams ${status}`);
+    this.logger.debug(`Status message received from underlayer streams ${status}`);
     this.emit('status', this.overallStatus);
   };
   /** Source job create event handler */

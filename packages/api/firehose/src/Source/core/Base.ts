@@ -7,12 +7,11 @@
 
 import { Health, JobHandler, Jobs } from '@mdf.js/core';
 import { Crash, Multi } from '@mdf.js/crash';
-import Debug, { Debugger } from 'debug';
+import { DebugLogger, LoggerInstance, SetContext } from '@mdf.js/logger';
+import { overallStatus } from '@mdf.js/utils';
 import { merge } from 'lodash';
 import { Readable } from 'stream';
 import { Plugs, SourceOptions } from '../../types';
-
-import { overallStatus } from '@mdf.js/utils';
 import { DEFAULT_READABLE_OPTIONS } from './const';
 import { PlugWrapper } from './PlugWrapper';
 
@@ -45,7 +44,7 @@ export abstract class Base<T extends Plugs.Source.Any>
   implements Health.Component
 {
   /** Debug logger for development and deep troubleshooting */
-  protected readonly logger: Debugger;
+  protected readonly logger: LoggerInstance;
   /** Store the last error detected in the stream */
   protected error?: Multi | Crash;
   /** Flag to indicate that an unhealthy status has been emitted recently */
@@ -66,7 +65,11 @@ export abstract class Base<T extends Plugs.Source.Any>
     super(merge(DEFAULT_READABLE_OPTIONS, options?.readableOptions));
     this.qos = options?.qos ?? this.qos;
     // Stryker disable next-line all
-    this.logger = Debug(`mdf:stream:source:${this.plug.name}`);
+    this.logger = SetContext(
+      options?.logger || new DebugLogger(`stream:source:${this.plug.name}`),
+      'Source',
+      this.plug.componentId
+    );
     this.plugWrapper = new PlugWrapper(
       this.plug,
       options?.retryOptions,
@@ -136,7 +139,7 @@ export abstract class Base<T extends Plugs.Source.Any>
   private readonly onErrorEvent = (rawError: Error | Crash) => {
     this.error = Crash.from(rawError, this.componentId);
     // Stryker disable next-line all
-    this.logger(`Error in source stream ${this.name}: ${this.error.message}`);
+    this.logger.error(`Error in source stream ${this.name}: ${this.error.message}`);
     this.emitStatus();
   };
   /** Plug status event handler */
@@ -146,19 +149,19 @@ export abstract class Base<T extends Plugs.Source.Any>
   /** Super pause event handler */
   private readonly onPauseEvent = () => {
     // Stryker disable next-line all
-    this.logger.extend('debug')(`Source stream ${this.plug.name} has been paused`);
+    this.logger.debug(`Source stream ${this.plug.name} has been paused`);
     this.emitStatus();
   };
   /** Super resume event handler */
   private readonly onResumeEvent = () => {
     // Stryker disable next-line all
-    this.logger.extend('debug')(`Source stream ${this.plug.name} has been resumed`);
+    this.logger.debug(`Source stream ${this.plug.name} has been resumed`);
     this.emitStatus();
   };
   /** Super close event handler */
   private readonly onCloseEvent = () => {
     // Stryker disable next-line all
-    this.logger(`Source stream ${this.plug.name} has been closed`);
+    this.logger.info(`Source stream ${this.plug.name} has been closed`);
     this.emitStatus();
   };
   /** Wrap super and plug events in the same to aggregate them in one component */
@@ -175,22 +178,24 @@ export abstract class Base<T extends Plugs.Source.Any>
   private readonly onJobDone = (uuid: string, jobResult: Jobs.Result, error?: Crash) => {
     if (error) {
       // Stryker disable next-line all
-      this.logger(`Job ${jobResult.id} was finished with error: ${error.message}`);
+      this.logger.debug(`Job ${jobResult.id} was finished with error: ${error.message}`);
     }
     this.plug
       .postConsume(jobResult.jobId)
       .then(postConsumeResult => {
         if (postConsumeResult) {
           // Stryker disable next-line all
-          this.logger.extend('silly')(`Job [${jobResult.jobId}] resolved properly`);
+          this.logger.silly(`Job [${jobResult.jobId}] resolved properly`);
         } else {
           // Stryker disable next-line all
-          this.logger.extend('silly')(`Job [${jobResult.jobId}] resolved with no result`);
+          this.logger.silly(`Job [${jobResult.jobId}] resolved with no result`);
         }
       })
       .catch(plugError => {
         // Stryker disable next-line all
-        this.logger(`Job [${jobResult.jobId}] was not cleaned due to error: ${plugError.message}`);
+        this.logger.error(
+          `Job [${jobResult.jobId}] was not cleaned due to error: ${plugError.message}`
+        );
       })
       .finally(() => this.emit('done', uuid, jobResult, error));
   };
@@ -199,7 +204,7 @@ export abstract class Base<T extends Plugs.Source.Any>
    * @param job - job object
    */
   protected subscribeJob(job: JobHandler<any>): JobHandler<any> {
-    job.once('done', this.onJobDone.bind(this));
+    job.once('done', this.onJobDone);
     this.emit('job', job);
     return job;
   }

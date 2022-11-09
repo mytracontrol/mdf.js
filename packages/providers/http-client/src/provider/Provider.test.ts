@@ -109,15 +109,10 @@ describe('#Port #HTTP-Client', () => {
       port.on('error', error => {
         throw error;
       });
-      port.on('closed', () => {
-        done();
-      });
-      port.on('ready', () => {
-        port.close().then();
-      });
       port
         .start()
-        .then()
+        .then(() => port.close())
+        .then(() => done())
         .catch(error => {
           throw error;
         });

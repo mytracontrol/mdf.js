@@ -13,7 +13,7 @@
     "url": "https://github.com/mytracontrol/mdf.js.git",
     "directory": "packages/components/openc2"
   },
-  "license": "SEE LICENSE IN LICENSE.md",
+  "license": "MIT",
   "author": "Mytra Control S.L.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -37,25 +37,25 @@
     "@mdf.js/metrics-service": "*",
     "@mdf.js/middlewares": "*",
     "@mdf.js/openc2-core": "*",
-    "@mdf.js/register-service": "*",
-    "@mdf.js/utils": "*",
     "@mdf.js/redis-provider": "*",
+    "@mdf.js/register-service": "*",
     "@mdf.js/socket-client-provider": "*",
     "@mdf.js/socket-server-provider": "*",
-    "jsonwebtoken": "^8.5.1",
-    "socket.io": "^4.5.3",
+    "@mdf.js/utils": "*",
     "express": "^4.18.2",
     "http-proxy-middleware": "^2.0.6",
+    "jsonwebtoken": "^8.5.1",
     "lodash": "^4.17.21",
+    "socket.io": "^4.5.3",
     "uuid": "^9.0.0"
   },
   "devDependencies": {
     "@mdf.js/repo-config": "*",
     "@types/express": "^4.17.14",
-    "@types/lodash": "^4.14.187",
+    "@types/jsonwebtoken": "^8.5.9",
+    "@types/lodash": "^4.14.188",
     "@types/supertest": "^2.0.12",
-    "@types/uuid": "^8.3.4",
-    "@types/jsonwebtoken": "^8.5.9"
+    "@types/uuid": "^8.3.4"
   },
   "engines": {
     "node": ">=16.14.2"

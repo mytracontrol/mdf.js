@@ -89,16 +89,18 @@ export class Port extends Provider.Port<Client, Config> {
    * @param event - event to be handled
    */
   private readonly onCommandFailed = (event: CommandFailedEvent): void => {
-    const time = new Date().toISOString();
+    const date = new Date();
     this.addCheck('lastCommand', {
       componentId: this.uuid,
       observedValue: 'failed',
       observedUnit: 'command result',
       status: 'fail',
       output: `${event.commandName} - ${event.failure.message}`,
-      time,
+      time: date.toISOString(),
     });
-    this.lastFailedCommands.push(`${time} - ${event.commandName} - ${event.failure.message}`);
+    this.lastFailedCommands.push(
+      `${date.toISOString()} - ${event.commandName} - ${event.failure.message}`
+    );
     if (this.lastFailedCommands.length > 10) {
       this.lastFailedCommands.shift();
     }
@@ -108,8 +110,14 @@ export class Port extends Provider.Port<Client, Config> {
       observedUnit: 'last failed commands',
       status: 'pass',
       output: undefined,
-      time,
+      time: date.toISOString(),
     });
+    this.emit(
+      'error',
+      new Crash(`${event.commandName} - ${event.failure.message}`, this.uuid, {
+        info: { date, event },
+      })
+    );
   };
   /**
    * Manage the event of a command succeeded
@@ -171,6 +179,7 @@ export class Port extends Provider.Port<Client, Config> {
    */
   private readonly onEvent = (event: string): ((meta: unknown) => void) => {
     return (meta: unknown): void => {
+      // Stryker disable next-line all
       this.logger.silly(`New incoming [${event}] event from Mongo with meta: ${inspect(meta)}`);
     };
   };
@@ -189,7 +198,7 @@ export class Port extends Provider.Port<Client, Config> {
     return instance;
   }
   /**
-   * Remove all the events
+   * Remove all the events listeners
    * @param instance - client where the event managers will be unattached
    */
   private eventsUnwrapping(instance: MongoClient): MongoClient {

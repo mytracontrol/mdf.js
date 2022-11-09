@@ -60,7 +60,7 @@ export class SocketIOConsumerAdapter extends SocketIOAdapter implements Consumer
             this.onErrorHandler(error);
           }
         };
-        this.handler(incomingMessage, onDone.bind(this));
+        this.handler(incomingMessage, onDone);
       } catch (rawError) {
         const error = Crash.from(rawError);
         this.onErrorHandler(

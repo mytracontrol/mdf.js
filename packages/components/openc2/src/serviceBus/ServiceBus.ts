@@ -69,9 +69,9 @@ export class ServiceBus extends EventEmitter implements Health.Component {
     if (options.useJwt) {
       this.oc2Namespace.use(AuthZ.handler({ secret: options.secret }));
     }
-    this.oc2Namespace.on('connection', this.onConnectionEventOC2Namespace.bind(this));
-    this.instance.on('error', this.onErrorHandler.bind(this));
-    this.instance.on('status', this.onStatusHandler.bind(this));
+    this.oc2Namespace.on('connection', this.onConnectionEventOC2Namespace);
+    this.instance.on('error', this.onErrorHandler);
+    this.instance.on('status', this.onStatusHandler);
   }
   /**
    * Connection event handler for the OpenC2 namespace
@@ -87,8 +87,8 @@ export class ServiceBus extends EventEmitter implements Health.Component {
         socket.join(actuator);
       }
     }
-    socket.onAny(this.eventHandler.bind(this));
-    socket.on('disconnect', this.onDisconnectEvent.bind(this));
+    socket.onAny(this.eventHandler);
+    socket.on('disconnect', this.onDisconnectEvent);
   };
   /**
    * Manage the incoming commands events from provider

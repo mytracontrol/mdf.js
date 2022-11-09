@@ -14,13 +14,16 @@
   ],
   "eslint.workingDirectories": [{"pattern": "packages/**/*/"}],
   "cSpell.words": [
+    "Artermis",
     "binded",
     "firehoses",
+    "jolokia",
+    "Jolokia",
     "middlewares",
     "Middlewares",
     "openc2",
     "OpenC2",
-    "OPENC2",
+    "OPENC2"
   ],
   "sonarlint.connectedMode.project": {
     "projectKey": "Mytra-Development-Framework-NDF-TypeScript"

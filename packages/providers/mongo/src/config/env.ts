@@ -5,7 +5,7 @@
  * or at https://opensource.org/licenses/MIT.
  */
 
-import { formatEnv, loadFile } from '@mdf.js/utils';
+import { loadFile } from '@mdf.js/utils';
 import { Config } from '../provider';
 import { logger } from './utils';
 
@@ -21,6 +21,5 @@ export const envBasedConfig: Config = {
   ca: CONFIG_MONGO_CA,
   cert: CONFIG_MONGO_CERT,
   key: CONFIG_MONGO_KEY,
-  ...formatEnv('CONFIG_MONGO_'),
 };
 // #endregion

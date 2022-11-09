@@ -14,14 +14,13 @@ export {
   BoomOptions,
   Cause,
   Context,
+  ContextLink,
   CrashObject,
   CrashOptions,
   Links,
   MultiObject,
   MultiOptions,
+  SimpleLink,
   ValidationError,
   ValidationErrorItem,
 } from './types';
-export * from './types/JoiTypes';
-
-// Path: packages/api/crash/src/Boom.ts

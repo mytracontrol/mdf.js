@@ -66,9 +66,9 @@ export class Logger implements LoggerInstance {
    * @param configuration - logger configuration
    */
   constructor(label: string, configuration: LoggerConfig);
-  constructor(private label = 'mms-app', configuration?: LoggerConfig) {
+  constructor(private label = 'mdf-app', configuration?: LoggerConfig) {
     // Stryker disable all
-    this.#debug = Debug('mms:logger');
+    this.#debug = Debug('mdf:logger');
     this.#debug(`${process.pid} - New instance of logger for ${label}`);
     this.#debug(`${process.pid} - Configuration in the constructor %O`, configuration);
     // Stryker enable all

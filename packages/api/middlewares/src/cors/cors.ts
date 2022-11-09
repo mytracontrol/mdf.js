@@ -39,7 +39,6 @@ export class Cors {
   private constructor(configuration?: CorsConfig) {
     this.#config = configuration;
     this.#enable = this.#config && this.#config.enabled === false ? false : true;
-    this.originFilter = this.originFilter.bind(this);
     // *****************************************************************************************
     // #region Cors options
     this.#corsOptions.methods = this.#config?.methods;
@@ -84,10 +83,10 @@ export class Cors {
    * @param requestOrigin - request to analyze
    * @param callback - callback to define if the request is allowed or not
    */
-  private originFilter(
+  private readonly originFilter = (
     requestOrigin: string | undefined,
     callback: (err: Error | null, allow: boolean) => void
-  ): void {
+  ): void => {
     let regexMatch = false;
     if (!requestOrigin || this.#whitelist.indexOf(requestOrigin) !== -1) {
       callback(null, true);
@@ -103,5 +102,5 @@ export class Cors {
         callback(null, false);
       }
     }
-  }
+  };
 }

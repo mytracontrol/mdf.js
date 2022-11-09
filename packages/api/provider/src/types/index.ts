@@ -9,3 +9,4 @@ export * from './AnyWrappedPort.t';
 export * from './PortConfigValidationStruct.i';
 export * from './ProviderOptions.i';
 export * from './ProviderState.t';
+export * from './FactoryOptions.i';

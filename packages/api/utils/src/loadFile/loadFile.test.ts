@@ -10,24 +10,33 @@ describe('#loadFile #Utils', () => {
   describe('#Happy path', () => {
     it('Should return undefined if not path is provided the file if exist', () => {
       let logged = false;
-      const file = loadFile(undefined, (message: string) => {
-        console.log(message);
-        logged = true;
+      //@ts-ignore - we are testing the happy path
+      const file = loadFile(undefined, {
+        debug: (message: string) => {
+          console.log(message);
+          logged = true;
+        },
       });
       expect(logged).toBeTruthy();
       expect(file).toBeUndefined();
     });
     it('Should read the file if exist', () => {
-      const file = loadFile(__dirname + '/test/test.txt', (message: string) => {
-        console.log(message);
+      //@ts-ignore - we are testing the happy path
+      const file = loadFile(__dirname + '/test/test.txt', {
+        debug: (message: string) => {
+          console.log(message);
+        },
       });
       expect(file).toBeDefined();
     });
     it('Should NOT read the file if NOT exist', () => {
       let logged = false;
-      const file = loadFile(__dirname + '/test/other.txt', (message: string) => {
-        console.log(message);
-        logged = true;
+      //@ts-ignore - we are testing the happy path
+      const file = loadFile(__dirname + '/test/other.txt', {
+        debug: (message: string) => {
+          console.log(message);
+          logged = true;
+        },
       });
       expect(logged).toBeTruthy();
       expect(file).toBeUndefined();

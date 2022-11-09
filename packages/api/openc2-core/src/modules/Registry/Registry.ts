@@ -62,7 +62,7 @@ export class Registry extends EventEmitter implements Health.Component {
       }
     }
     if (!this.interval && this.pendingJobs.size > 0) {
-      this.interval = setInterval(this.checkOldPendingJobs.bind(this), this.timeInterval);
+      this.interval = setInterval(this.checkOldPendingJobs, this.timeInterval);
     }
   }
   /** Perform the cleaning of all the resources */

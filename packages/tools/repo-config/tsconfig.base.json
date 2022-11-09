@@ -28,6 +28,7 @@
     "noImplicitOverride": true,
     "noPropertyAccessFromIndexSignature": true,
     "noFallthroughCasesInSwitch": true,
+    "allowSyntheticDefaultImports": true
   },
   "exclude": ["node_modules", "tmp", "**/jest*"]
 }

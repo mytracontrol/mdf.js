@@ -32,15 +32,15 @@ export class MasterRegistry extends Registry {
   /** Start to polling errors registries from workers */
   public start(): void {
     // Stryker disable next-line all
-    this.logger('Starting registry');
+    this.logger.debug('Starting registry');
     if (!this.timeInterval) {
-      this.timeInterval = setInterval(this.onSendRequest.bind(this), this.interval);
+      this.timeInterval = setInterval(this.onSendRequest, this.interval);
       this.onSendRequest();
     }
   }
   /** Stop polling errors registries from workers */
   public stop(): void {
-    this.logger('Stopping registry');
+    this.logger.debug('Stopping registry');
     if (this.timeInterval) {
       clearInterval(this.timeInterval);
       this.timeInterval = undefined;
@@ -61,7 +61,7 @@ export class MasterRegistry extends Registry {
     for (const worker of Object.values(this.workers)) {
       if (worker && worker.isConnected()) {
         // Stryker disable next-line all
-        this.logger(`Sending an clear register request to worker [${worker.process.pid}]`);
+        this.logger.debug(`Sending an clear register request to worker [${worker.process.pid}]`);
         worker.send({
           type: RegisterMessageType.CLR_REQ,
         });
@@ -80,7 +80,9 @@ export class MasterRegistry extends Registry {
     const onWorkerResponse = (worker: Worker, message: RegisterMessage) => {
       if (message.requestId !== this.requestId) {
         // Stryker disable next-line all
-        this.logger(`Update response from worker [${worker.process.pid}] out of the valid period`);
+        this.logger.debug(
+          `Update response from worker [${worker.process.pid}] out of the valid period`
+        );
         return;
       }
       if (message.type === RegisterMessageType.RES) {
@@ -96,7 +98,7 @@ export class MasterRegistry extends Registry {
     };
     const onTimeOut = () => {
       // Stryker disable next-line all
-      this.logger(`Timeout for update response from workers - ${pendingResponses} pending`);
+      this.logger.debug(`Timeout for update response from workers - ${pendingResponses} pending`);
       cluster.off('message', onWorkerResponse);
       this.workersErrors = updatedRegistries;
     };
@@ -105,7 +107,9 @@ export class MasterRegistry extends Registry {
     for (const worker of Object.values(this.workers)) {
       if (worker && worker.isConnected()) {
         // Stryker disable next-line all
-        this.logger(`Sending an errors register update request to worker [${worker.process.pid}]`);
+        this.logger.debug(
+          `Sending an errors register update request to worker [${worker.process.pid}]`
+        );
         worker.send({
           type: RegisterMessageType.REQ,
           requestId: this.requestId,

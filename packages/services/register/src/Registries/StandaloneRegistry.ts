@@ -31,11 +31,11 @@ export class StandaloneRegistry extends Registry {
   /** Start to polling errors registries from workers */
   public start(): void {
     // Stryker disable next-line all
-    this.logger('Starting registry');
+    this.logger.debug('Starting registry');
   }
   /** Stop polling errors registries from workers */
   public stop(): void {
     // Stryker disable next-line all
-    this.logger('Stopping registry');
+    this.logger.debug('Stopping registry');
   }
 }

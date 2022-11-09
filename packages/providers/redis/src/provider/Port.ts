@@ -223,14 +223,10 @@ export class Port extends Provider.Port<Client, Config> {
     broadcasted: boolean,
     ...args: (Crash | Status | number)[]
   ): void {
-    // Stryker disable all
-    this.logger.debug(
-      `Original event: ${original} was wrapped to ${wrapped}`,
-      this.uuid,
-      this.name
-    );
-    // Stryker enable all
+    // Stryker disable next-line all
+    this.logger.debug(`Original event: ${original} was wrapped to ${wrapped}`);
     for (const arg of args) {
+      // Stryker disable next-line all
       this.logger.silly(`Event ${original} arg: ${arg}`);
     }
     if (broadcasted) {
@@ -240,7 +236,7 @@ export class Port extends Provider.Port<Client, Config> {
   /** Callback function for `connect` event */
   private readonly onConnectEvent = () => this.onEvent('connect', 'connect', false);
   /** Callback function for `ready` event */
-  private readonly onReadyEvent = () => this.onEvent('ready', 'ready', true);
+  private readonly onReadyEvent = () => this.onEvent('ready', 'ready', false);
   /** Callback function for `error` event */
   private readonly onErrorEvent = (error: ReplyError) =>
     this.onEvent('error', 'error', true, this.errorParse(error));

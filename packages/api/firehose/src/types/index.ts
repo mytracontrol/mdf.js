@@ -5,9 +5,11 @@
  * or at https://opensource.org/licenses/MIT.
  */
 
+export * from './EngineOptions.i';
 export * from './FirehoseOptions.i';
 export * as Plugs from './Plugs';
 export * from './PostConsumeOptions.i';
+export * from './SinkOptions.i';
 export * from './SourceOptions.i';
 export * from './WrappableSinkPlug.i';
 export * from './WrappableSourcePlug.i';

@@ -48,7 +48,7 @@ export class Observability {
     this.metrics = MetricsService.create(options.isCluster);
     this.registry = RegisterService.create(options.maxSize, options.isCluster);
     this.services = [this.health, this.metrics, this.registry];
-    this.health.on('error', this.onErrorEvent.bind(this));
+    this.health.on('error', this.onErrorEvent);
     this.router = express.Router();
     this.app = !this.options.isCluster || cluster.isPrimary ? this.primaryApp() : this.workerApp();
   }

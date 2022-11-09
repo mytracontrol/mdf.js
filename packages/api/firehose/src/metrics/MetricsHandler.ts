@@ -32,7 +32,7 @@ export class MetricsHandler {
    * Update the job processing metrics of a firehose
    * @param job - job to be managed
    */
-  private onJobEventHandler(job: JobHandler<any>): void {
+  private readonly onJobEventHandler = (job: JobHandler<any>): void => {
     this.metrics.api_all_job_in_processing_total.inc({ type: job.type });
     const onDoneHandler: (uuid: string, result: Jobs.Result) => void = (
       uuid: string,
@@ -48,12 +48,12 @@ export class MetricsHandler {
       this.metrics.api_publishing_job_duration_milliseconds.observe({ type: job.type }, duration);
     };
     job.once('done', onDoneHandler);
-  }
+  };
   /**
    * Register the metrics handler to a firehose source
    * @param source - Source to be managed
    */
   public register(source: Sources): void {
-    source.on('job', this.onJobEventHandler.bind(this));
+    source.on('job', this.onJobEventHandler);
   }
 }

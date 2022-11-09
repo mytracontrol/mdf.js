@@ -8,7 +8,7 @@ import Joi from 'joi';
 import { v4 } from 'uuid';
 import { BoomOptions } from '../types';
 import { Boom } from './BoomError';
-import * as BoomHelpers from './BoomHelpers';
+import { BoomHelpers } from './BoomHelpers';
 const uuidTest = v4();
 const testError = new SyntaxError('Syntax');
 const optionsTest: BoomOptions = {

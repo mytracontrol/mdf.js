@@ -103,8 +103,7 @@ describe('#Port #Elastic', () => {
       expect(port.state).toBeFalsy();
       expect(port.checks).toEqual({});
     }, 300);
-    it(`Should emit a ready event and healthy event if health receive the expected response`, done => {
-      let readyDone = false;
+    it(`Should emit a healthy event if health receive the expected response`, done => {
       const port = new Port(
         {
           node: 'http://192.168.1.5:9200',
@@ -116,16 +115,11 @@ describe('#Port #Elastic', () => {
       expect(port).toBeDefined();
       //@ts-ignore - Test environment
       jest.spyOn(port.client.cat, 'health').mockResolvedValue({ body: [] });
-      port.on('ready', () => {
-        readyDone = true;
-      });
       port.on('closed', () => {
         done();
       });
       port.on('healthy', () => {
-        if (readyDone) {
-          port.close().then();
-        }
+        port.close().then();
         const checks = port.checks;
         expect(checks).toEqual({
           nodes: [
@@ -216,7 +210,7 @@ describe('#Port #Elastic', () => {
       });
       port.start().then();
     });
-    it(`Should emit an error event if there is a problem ready the health status of the system,`, done => {
+    it(`Should emit an error event if there is a problem checking the health status of the system,`, done => {
       const port = new Port(
         {
           node: 'http://192.168.1.5:9200',

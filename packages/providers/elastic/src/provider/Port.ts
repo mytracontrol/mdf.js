@@ -34,7 +34,7 @@ export class Port extends Provider.Port<Client, Config> {
     );
     this.instance = new Client(this.config);
     // Stryker disable next-line all
-    this.logger.debug(`New instance of Redis port created: ${this.uuid}`);
+    this.logger.debug(`New instance of Elastic port created: ${this.uuid}`);
     this.interval = this.config.pingTimeout as number;
     this.healthy = false;
     this.isFirstCheck = true;
@@ -115,7 +115,6 @@ export class Port extends Provider.Port<Client, Config> {
       this.emit('unhealthy', new Crash(message || 'Unexpected error in the evaluation', this.uuid));
       this.healthy = false;
     } else if (!this.healthy) {
-      this.emit('ready');
       this.emit('healthy');
       this.healthy = true;
     }

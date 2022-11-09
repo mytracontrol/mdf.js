@@ -157,7 +157,7 @@ export class Consumer extends Component<AdapterWrapper, ConsumerOptions> {
         }
         resolve(response);
       };
-      job.once('done', onCommandJobDone.bind(this));
+      job.once('done', onCommandJobDone);
       this.emit('command', job);
     });
   }

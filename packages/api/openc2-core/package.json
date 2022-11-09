@@ -13,7 +13,7 @@
     "url": "https://github.com/mytracontrol/mdf.js.git",
     "directory": "packages/api/openc2-core"
   },
-  "license": "SEE LICENSE IN LICENSE.md",
+  "license": "MIT",
   "author": "Mytra Control S.L.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -49,7 +49,7 @@
     "@mdf.js/middlewares": "*",
     "@mdf.js/repo-config": "*",
     "@types/jsonwebtoken": "^8.5.9",
-    "@types/lodash": "^4.14.187",
+    "@types/lodash": "^4.14.188",
     "@types/uuid": "^8.3.4"
   },
   "engines": {

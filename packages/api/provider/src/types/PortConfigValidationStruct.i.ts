@@ -6,7 +6,10 @@
  */
 import { Schema } from 'joi';
 
-/** Validation process options */
+/**
+ * Port configuration validation structure
+ * @param PortConfig - Port configuration object, could be an extended version of the client config
+ */
 export interface PortConfigValidationStruct<PortConfig> {
   /** Default configuration options */
   defaultConfig: PortConfig;

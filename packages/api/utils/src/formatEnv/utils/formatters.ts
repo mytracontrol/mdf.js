@@ -57,5 +57,5 @@ function transformKey(key: string, format?: Format | FormatFunction): string {
  * @returns
  */
 function trimLeft(key: string, find: string): string {
-  return key.replace(new RegExp(`^[${find}]+`), '');
+  return key.replace(new RegExp(`^${find}`), '');
 }

@@ -7,20 +7,17 @@
 
 import { JobHandler } from '@mdf.js/core';
 import { Crash } from '@mdf.js/crash';
-import { RetryOptions } from '@mdf.js/utils';
-import { WritableOptions } from 'stream';
-import { Plugs } from '../types';
+import { Plugs, SinkOptions } from '../types';
 import { Base } from './core';
 
 export class Jet extends Base<Plugs.Sink.Jet> {
   /**
    * Create a new Jet instance
    * @param plug - Jet sink plug
-   * @param retryOptions - options for job retry operations
-   * @param options - writable streams options
+   * @param options - sink options
    */
-  constructor(plug: Plugs.Sink.Jet, retryOptions?: RetryOptions, options?: WritableOptions) {
-    super(plug, retryOptions, options);
+  constructor(plug: Plugs.Sink.Jet, options?: SinkOptions) {
+    super(plug, options);
   }
   /** Perform the publication of the information on the sink destination */
   override _write(
@@ -29,7 +26,7 @@ export class Jet extends Base<Plugs.Sink.Jet> {
     callback: (error?: Crash | Error) => void
   ): void {
     // Stryker disable next-line all
-    this.logger.extend('verbose')(`Publishing job ${data.jobId} on single operation from Jet Sink`);
+    this.logger.verbose(`Publishing job ${data.jobId} on single operation from Jet Sink`);
     this.plug
       .single(data.toObject())
       .then(() => data.done())
@@ -42,13 +39,13 @@ export class Jet extends Base<Plugs.Sink.Jet> {
     callback: (error?: Crash | Error) => void
   ): void {
     // Stryker disable next-line all
-    this.logger.extend('verbose')(`Publishing ${data.length} jobs on bulk operation`);
+    this.logger.verbose(`Publishing ${data.length} jobs on bulk operation`);
     this.plug
       .multi(data.map(entry => entry.chunk.toObject()))
       .then(() => {
         for (const entry of data) {
           // Stryker disable next-line all
-          this.logger.extend('verbose')(`Job ${entry.chunk.jobId} finished`);
+          this.logger.verbose(`Job ${entry.chunk.jobId} finished`);
           entry.chunk.done();
         }
       })

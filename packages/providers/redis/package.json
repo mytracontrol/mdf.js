@@ -13,7 +13,7 @@
     "url": "https://github.com/mytracontrol/mdf.js.git",
     "directory": "packages/providers/redis"
   },
-  "license": "SEE LICENSE IN LICENSE.md",
+  "license": "MIT",
   "author": "Mytra Control S.L.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -34,7 +34,7 @@
     "@mdf.js/utils": "*",
     "@types/redis-errors": "^1.2.0",
     "debug": "^4.3.4",
-    "ioredis": "^5.2.3",
+    "ioredis": "^5.2.4",
     "joi": "^17.6.3",
     "redis-errors": "^1.2.0",
     "tslib": "^2.4.1"

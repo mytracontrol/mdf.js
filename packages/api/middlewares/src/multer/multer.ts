@@ -179,7 +179,7 @@ export class Multer {
         headerPairs: CONFIG_API_MAX_HEADERS,
       },
       preservePath: true,
-      fileFilter: this.fileFilter.bind(this),
+      fileFilter: this.fileFilter,
     });
   }
   /**
@@ -188,11 +188,11 @@ export class Multer {
    * @param file - file information
    * @param callback - callback function to return the final decision
    */
-  private fileFilter(
+  private readonly fileFilter = (
     request: Request,
     file: Express.Multer.File,
     callback: FileFilterCallback
-  ): void {
+  ): void => {
     if (this.#allowedMimeTypes.length === 0 || this.#allowedMimeTypes.includes(file.mimetype)) {
       callback(null, true);
     } else {
@@ -211,7 +211,7 @@ export class Multer {
         )
       );
     }
-  }
+  };
   /**
    * Accept a single file with the name fieldName. The single file will be stored in req.file
    * @param fieldName - name of the file

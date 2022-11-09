@@ -65,14 +65,14 @@ export class PlugWrapper extends EventEmitter {
       throw new Crash(`Plug ${this.plug.name} does not implement the postConsume method properly`);
     } else {
       this.postConsumeOriginal = this.plug.postConsume;
-      this.plug.postConsume = this.postConsume.bind(this);
+      this.plug.postConsume = this.postConsume;
     }
     if (this.plug.ingestData) {
       if (typeof this.plug.ingestData !== 'function') {
         throw new Crash(`Plug ${this.plug.name} does not implement the ingestData method properly`);
       } else {
         this.ingestDataOriginal = this.plug.ingestData;
-        this.plug.ingestData = this.ingestData.bind(this);
+        this.plug.ingestData = this.ingestData;
       }
     }
   }
@@ -86,7 +86,7 @@ export class PlugWrapper extends EventEmitter {
       return;
     }
     this.interval = setInterval(
-      this.checkPendingJobs.bind(this),
+      this.checkPendingJobs,
       this.postConsumeOptions.checkUncleanedInterval
     );
     this.emitStatus();
@@ -107,7 +107,7 @@ export class PlugWrapper extends EventEmitter {
     }
   }
   /** Try to clean all the buffered entries pending for cleaning and return the uncleaned entries */
-  private checkPendingJobs(): void {
+  private readonly checkPendingJobs = (): void => {
     const tasks = this.uncleanedEntries.map(this.plug.postConsume);
     Promise.allSettled(tasks).then(result => {
       for (const entry of result) {
@@ -117,7 +117,7 @@ export class PlugWrapper extends EventEmitter {
       }
     });
     this.stopUncleanedCheckInterval();
-  }
+  };
   /** Overall component status */
   private get overallStatus(): Health.API.Status {
     return overallStatus(this.checks);
@@ -183,7 +183,7 @@ export class PlugWrapper extends EventEmitter {
    * @returns - the job entry identification that has been correctly removed or undefined if the job
    * was not found
    */
-  private async postConsume(jobId: string): Promise<string | undefined> {
+  private readonly postConsume = async (jobId: string): Promise<string | undefined> => {
     try {
       // Post consume operation is only retried one time, if it fails the job is registered
       // as uncleaned and will be removed in the next check
@@ -204,16 +204,16 @@ export class PlugWrapper extends EventEmitter {
       this.startUncleanedCheckInterval();
       throw error;
     }
-  }
+  };
   /** Perform the ingestion of new data */
-  private async ingestData(size?: number): Promise<any> {
+  private readonly ingestData = async (size?: number): Promise<any> => {
     if (!this.ingestDataOriginal) {
       throw new Crash(`Plug ${this.plug.name} does not implement the ingestData method`);
     }
     // Ingest data operation is retried infinitely using the default values, in other way the normal
     // ingestion process will be blocked
     return this.wrappedOperation(this.ingestDataOriginal, [size]);
-  }
+  };
   /**
    * Return the status of the stream in a standard format
    * @returns _check object_ as defined in the draft standard

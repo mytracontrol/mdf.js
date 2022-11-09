@@ -160,6 +160,11 @@ describe('#Port #Mongo', () => {
       //@ts-ignore - Test environment
       jest.spyOn(provider.client, 'connect').mockResolvedValue();
       await provider.start();
+      let errors = 0;
+      provider.on('error', error => {
+        expect(error.message).toEqual('test - myMessage');
+        errors++;
+      });
       provider.client.emit('commandFailed', {
         commandName: 'test',
         // @ts-ignore - Test environment
@@ -244,6 +249,7 @@ describe('#Port #Mongo', () => {
           },
         ],
       });
+      expect(errors).toEqual(13);
     });
     it('Should register serverHeartbeatFailed and serverHeartbeatSucceeded events', done => {
       const provider = Factory.create();

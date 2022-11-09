@@ -2,20 +2,21 @@
   "entryPoints": [
     "src/index.ts"
   ],
-  "tsconfig": "tsconfig.build.json",
+  "tsconfig": "./tsconfig.build.json",
   "entryPointStrategy": "resolve",
   "exclude": [
+    "**/dist/**",
     "**/node_modules",
     "src/**/*.test.ts",
     "src/**/test/*.*"
   ],
-  "externalPattern": [],
+  "externalPattern": ["**/node_modules/**"],
   "excludeExternals": true,
   "excludePrivate": true,
   "excludeProtected": true,
   "excludeInternal": true,
   "includes": [],
-  "media": "assets",
+  "media": "media",
   "out": "../../../docs/api/crash",
   "markedOptions": {
     "gfm": true
@@ -28,5 +29,5 @@
   "categorizeByGroup": false,
   "categoryOrder": ["Crash", "Multi", "Boom", "*"],
   "cleanOutputDir": true,
-  "gitRevision": "master"
+  "gitRevision": "master",
 }

@@ -13,7 +13,7 @@
     "url": "https://github.com/mytracontrol/mdf.js.git",
     "directory": "packages/api/firehose"
   },
-  "license": "SEE LICENSE IN LICENSE.md",
+  "license": "MIT",
   "author": "Mytra Control S.L.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -31,6 +31,7 @@
   "dependencies": {
     "@mdf.js/core": "*",
     "@mdf.js/crash": "*",
+    "@mdf.js/logger": "*",
     "@mdf.js/metrics-service": "*",
     "@mdf.js/register-service": "*",
     "@mdf.js/utils": "*",
@@ -43,7 +44,7 @@
     "@mdf.js/observability": "*",
     "@mdf.js/repo-config": "*",
     "@types/debug": "^4.1.7",
-    "@types/lodash": "^4.14.187",
+    "@types/lodash": "^4.14.188",
     "@types/uuid": "^8.3.4"
   },
   "engines": {

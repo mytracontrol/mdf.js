@@ -5,6 +5,7 @@
  * or at https://opensource.org/licenses/MIT.
  */
 
+import { LoggerInstance } from '@mdf.js/logger';
 import { RetryOptions } from '@mdf.js/utils';
 import { ReadableOptions } from 'stream';
 import { PostConsumeOptions } from './PostConsumeOptions.i';
@@ -21,4 +22,6 @@ export interface SourceOptions {
   qos?: number;
   /** Post consume operations options */
   postConsumeOptions?: PostConsumeOptions;
+  /** Debug logger for development and deep troubleshooting */
+  logger?: LoggerInstance;
 }

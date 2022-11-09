@@ -407,10 +407,7 @@ export class Producer extends Component<AdapterWrapper, ProducerOptions> {
       // #endregion
       this.adapter.on(requestId, incomingResponseHandler);
       const timeoutTimer = setTimeout(onTimeout, timeout);
-      this.adapter
-        .publish(command)
-        .then(onDirectResponse.bind(this))
-        .catch(onPublishError.bind(this));
+      this.adapter.publish(command).then(onDirectResponse).catch(onPublishError);
     });
   }
 }

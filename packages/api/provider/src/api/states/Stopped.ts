@@ -11,7 +11,11 @@ import { AnyWrappedPort, ProviderState } from '../../types';
 import { ErrorState } from './Error';
 import { RunningState } from './Running';
 
-/** Stopped state */
+/**
+ * Provider Stopped state
+ * @category State
+ * @public
+ */
 export class StoppedState implements State {
   /** Actual provider state */
   public readonly state: ProviderState = 'stopped';
@@ -28,7 +32,7 @@ export class StoppedState implements State {
     private readonly changeState: (newState: State) => void,
     private readonly manageError: (error: unknown) => void
   ) {
-    this.instance.once('error', this.errorEventHandler);
+    this.instance.once('unhealthy', this.errorEventHandler);
   }
   /** Stop the process: internal jobs, external dependencies connections ... */
   public async stop(): Promise<void> {
@@ -59,16 +63,8 @@ export class StoppedState implements State {
     this.manageError(error);
     this.changeState(new ErrorState(this.instance, this.changeState, this.manageError));
   }
-  /** Pause the process: pause internal jobs */
-  public async pause(): Promise<void> {
-    await this.stop();
-  }
-  /** Resume the process: resume internal jobs */
-  public async resume(): Promise<void> {
-    await this.start();
-  }
   /** Clean event handlers for error state */
   private cleanEventHandlers(): void {
-    this.instance.off('error', this.errorEventHandler);
+    this.instance.off('unhealthy', this.errorEventHandler);
   }
 }

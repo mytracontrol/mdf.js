@@ -7,6 +7,5 @@
 
 export * from './Client.t';
 export * from './Config.t';
-export * from './FactoryOptions.i';
 export * from './MongoEvents.t';
 export * from './ProviderInstance.t';

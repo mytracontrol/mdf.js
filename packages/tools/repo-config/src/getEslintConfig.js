@@ -7,13 +7,13 @@
 
 const config = {
   parserOptions: {
-    ecmaVersion: 2018, // Allows for the parsing of modern ECMAScript features
+    ecmaVersion: 2019, // Allows for the parsing of modern ECMAScript features
     sourceType: 'module', // Allows for the use of imports
     project: ['./tsconfig.lint.json'],
   },
   ignorePatterns: ['**/node_modules/*', '**/dist/*', '**/coverage/*', '**/*.js'],
   parser: '@typescript-eslint/parser', // Specifies the ESLint parser
-  plugins: ['eslint-plugin-tsdoc'],
+  plugins: ['@typescript-eslint/eslint-plugin', 'eslint-plugin-tsdoc'],
   extends: [
     // Uses the recommended rules from the @typescript-eslint/eslint-plugin
     'plugin:@typescript-eslint/recommended',

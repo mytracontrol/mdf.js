@@ -6,10 +6,11 @@
  */
 import { Health, JobHandler, Jobs } from '@mdf.js/core';
 import { Crash, Multi } from '@mdf.js/crash';
-import Debug, { Debugger } from 'debug';
+import { DebugLogger, LoggerInstance, SetContext } from '@mdf.js/logger';
 import { get, merge } from 'lodash';
-import { Transform, TransformOptions } from 'stream';
+import { Transform } from 'stream';
 import { v4 } from 'uuid';
+import { EngineOptions } from '../types';
 
 import { DEFAULT_TRANSFORM_OPTIONS } from './const';
 
@@ -41,25 +42,22 @@ export class Engine<Type extends string = string, Data = any>
   /** Provider unique identifier for trace purposes */
   readonly componentId: string = v4();
   /** Debug logger for development and deep troubleshooting */
-  private readonly logger: Debugger;
+  private readonly logger: LoggerInstance;
   /** Store the last error emitted by the super class */
   private error?: Crash | Multi;
   /**
    * Create a new instance of the datapoint filter stream
    * @param name - name of the transform
-   * @param strategies - strategies to be applied over the jobs
-   * @param options - optional parameters of the stream
+   * @param options - engine options
    */
-  constructor(
-    public readonly name: string,
-    private readonly strategies?: {
-      [type: string]: Jobs.Strategy<Type, Data>[];
-    },
-    options?: TransformOptions
-  ) {
+  constructor(public readonly name: string, private readonly options?: EngineOptions<Type, Data>) {
     super(merge(DEFAULT_TRANSFORM_OPTIONS, options));
     // Stryker disable next-line all
-    this.logger = Debug(`fh:stream:engine`);
+    this.logger = SetContext(
+      options?.logger || new DebugLogger(`stream:engine:${name}`),
+      'Engine',
+      this.componentId
+    );
     this.wrappingEvents();
   }
   /**
@@ -72,22 +70,22 @@ export class Engine<Type extends string = string, Data = any>
     callback: (error?: Crash, chunk?: any) => void
   ): void {
     // Stryker disable next-line all
-    this.logger(`Appling filters to a ${job.type} - ${job.uuid}`);
-    const strategies = get(this.strategies, job.type, []);
+    this.logger.debug(`Appling filters to a ${job.type} - ${job.uuid}`);
+    const strategies = get(this.options?.strategies, job.type, []);
     for (const strategy of strategies) {
       const hrStart = process.hrtime();
       job = this.executeStrategy(job, strategy);
       const hrEnd = process.hrtime(hrStart);
       // Stryker disable all
-      this.logger(
-        `Working time for strategy [${strategy.name}] - time (hr): %ds %dms`,
-        hrEnd[0],
-        hrEnd[1] / 1000000
+      this.logger.debug(
+        `Working time for strategy [${strategy.name}] - time (hr): ${hrEnd[0]}s ${
+          hrEnd[1] / 1000000
+        }ms`
       );
       // Stryker enable all
     }
     // Stryker disable next-line all
-    this.logger(`Filters applied to a ${job.type} - ${job.uuid}`);
+    this.logger.debug(`Filters applied to a ${job.type} - ${job.uuid}`);
     callback(undefined, job);
   }
   /**
@@ -178,25 +176,25 @@ export class Engine<Type extends string = string, Data = any>
   private readonly onErrorEvent = (rawError: Error | Crash) => {
     this.error = Crash.from(rawError, this.componentId);
     // Stryker disable next-line all
-    this.logger(`Error in engine stream ${this.name}: ${this.error.message}`);
+    this.logger.error(`Error in engine stream ${this.name}: ${this.error.message}`);
     this.emit('status', this.ownStatus);
   };
   /** Super close event handler */
   private readonly onCloseEvent = () => {
     // Stryker disable next-line all
-    this.logger(`Engine stream ${this.name} has been closed`);
+    this.logger.info(`Engine stream ${this.name} has been closed`);
     this.emit('status', this.ownStatus);
   };
   /** Super drain event handler */
   private readonly onDrainEvent = () => {
     // Stryker disable next-line all
-    this.logger.extend('debug')(`Engine stream ${this.name} has been drained`);
+    this.logger.debug(`Engine stream ${this.name} has been drained`);
     this.emit('status', this.ownStatus);
   };
   /** Super pause event handler */
   private readonly onPauseEvent = () => {
     // Stryker disable next-line all
-    this.logger.extend('debug')(`Engine stream ${this.name} has been paused`);
+    this.logger.debug(`Engine stream ${this.name} has been paused`);
     this.emit('status', this.ownStatus);
   };
   /** Wrap super and plug events in the same to aggregate them in one component */

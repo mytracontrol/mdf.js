@@ -6,7 +6,7 @@
  */
 
 import { Health } from '@mdf.js/core';
-import Debug, { Debugger } from 'debug';
+import { DebugLogger, LoggerInstance } from '@mdf.js/logger';
 import { merge } from 'lodash';
 import { v4 } from 'uuid';
 import { ServiceMetadata } from '../types';
@@ -15,7 +15,7 @@ export abstract class Registry {
   /** Instance unique identifier for trace purposes */
   public readonly componentId: string = v4();
   /** Debugger logger */
-  protected readonly logger: Debugger;
+  protected readonly logger: LoggerInstance;
   /** Service metadata */
   protected readonly metadata: ServiceMetadata;
   /** Base Health Status*/
@@ -25,7 +25,8 @@ export abstract class Registry {
    * @param service - Service metadata
    */
   constructor(service: ServiceMetadata) {
-    this.logger = Debug(`${service.name}:health`);
+    // Stryker disable next-line all
+    this.logger = new DebugLogger(`health`);
     this.metadata = service;
     this.baseHealth = {
       version: this.metadata.version,
@@ -43,7 +44,7 @@ export abstract class Registry {
    * @returns Health status
    */
   public health(uuid?: string): Health.API.Health {
-    this.logger(`New service status request with uuid [${uuid}]`);
+    this.logger.debug(`New service status request with uuid [${uuid}]`);
     let checks: Health.API.Checks = this.checks;
     if (checks[`${this.metadata.name}:uptime`]) {
       checks[`${this.metadata.name}:uptime`].push(...this.uptime[`${this.metadata.name}:uptime`]);

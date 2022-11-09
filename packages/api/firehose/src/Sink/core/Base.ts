@@ -7,13 +7,13 @@
 
 import { Health } from '@mdf.js/core';
 import { Crash, Multi } from '@mdf.js/crash';
-import { overallStatus, RetryOptions } from '@mdf.js/utils';
-import Debug, { Debugger } from 'debug';
+import { overallStatus } from '@mdf.js/utils';
 import { merge } from 'lodash';
-import { Readable, Writable, WritableOptions } from 'stream';
-import { Plugs } from '../../types';
+import { Readable, Writable } from 'stream';
+import { Plugs, SinkOptions } from '../../types';
 import { PlugWrapper } from './PlugWrapper';
 
+import { DebugLogger, LoggerInstance, SetContext } from '@mdf.js/logger';
 import { DEFAULT_WRITABLE_OPTIONS } from './const';
 
 export declare interface Base<T extends Plugs.Sink.Any> {
@@ -50,7 +50,7 @@ export declare interface Base<T extends Plugs.Sink.Any> {
 /** Firehose sink (Writable) plug class */
 export abstract class Base<T extends Plugs.Sink.Any> extends Writable implements Health.Component {
   /** Debug logger for development and deep troubleshooting */
-  protected readonly logger: Debugger;
+  protected readonly logger: LoggerInstance;
   /** Store the last error detected in the stream */
   protected error?: Multi | Crash;
   /** Flag to indicate that an unhealthy status has been emitted recently */
@@ -60,18 +60,17 @@ export abstract class Base<T extends Plugs.Sink.Any> extends Writable implements
   /**
    * Create a new instance for a firehose sink
    * @param plug - sink plug instance
-   * @param retryOptions - options for job retry operations
-   * @param options - writable streams options
+   * @param options - sink options
    */
-  constructor(
-    protected readonly plug: T,
-    private readonly retryOptions?: RetryOptions,
-    options?: WritableOptions
-  ) {
-    super(merge(DEFAULT_WRITABLE_OPTIONS, options));
+  constructor(protected readonly plug: T, options?: SinkOptions) {
+    super(merge(DEFAULT_WRITABLE_OPTIONS, options?.writableOptions));
     // Stryker disable next-line all
-    this.logger = Debug(`mdf:stream:sink:${this.plug.name}`);
-    this.plugWrapper = new PlugWrapper(this.plug, this.retryOptions);
+    this.logger = SetContext(
+      options?.logger || new DebugLogger(`stream:sink:${this.plug.name}`),
+      'Sink',
+      this.plug.componentId
+    );
+    this.plugWrapper = new PlugWrapper(this.plug, options?.retryOptions);
     this.wrappingEvents(this.plug);
   }
   /** Component identification */
@@ -136,7 +135,7 @@ export abstract class Base<T extends Plugs.Sink.Any> extends Writable implements
   private readonly onErrorEvent = (rawError: Error | Crash) => {
     this.error = Crash.from(rawError, this.componentId);
     // Stryker disable next-line all
-    this.logger(`Error in sink stream ${this.name}: ${this.error.message}`);
+    this.logger.error(`Error in sink stream ${this.name}: ${this.error.message}`);
     this.emitStatus();
   };
   /** Plug status event handler */
@@ -146,26 +145,26 @@ export abstract class Base<T extends Plugs.Sink.Any> extends Writable implements
   /** Super pipe event handler */
   private readonly onPipeEvent = () => {
     // Stryker disable next-line all
-    this.logger.extend('debug')(`Sink stream ${this.plug.name} has been piped`);
+    this.logger.debug(`Sink stream ${this.plug.name} has been piped`);
     this.emitStatus();
   };
   /** Super unpipe event handler */
   private readonly onUnpipeEvent = () => {
     // Stryker disable next-line all
-    this.logger.extend('debug')(`Sink stream ${this.plug.name} has been unpiped`);
+    this.logger.debug(`Sink stream ${this.plug.name} has been unpiped`);
     this.emitStatus();
     this.emit('lost', this);
   };
   /** Super drain event handler */
   private readonly onDrainEvent = () => {
     // Stryker disable next-line all
-    this.logger.extend('debug')(`Sink stream ${this.plug.name} has been drained`);
+    this.logger.debug(`Sink stream ${this.plug.name} has been drained`);
     this.emitStatus();
   };
   /** Super close event handler */
   private readonly onCloseEvent = () => {
     // Stryker disable next-line all
-    this.logger(`Sink stream ${this.plug.name} has been closed`);
+    this.logger.info(`Sink stream ${this.plug.name} has been closed`);
     this.emitStatus();
   };
   /** Wrap super and plug events in the same to aggregate them in one component */
