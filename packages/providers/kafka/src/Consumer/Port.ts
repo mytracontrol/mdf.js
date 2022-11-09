@@ -6,29 +6,27 @@
  */
 import { Crash } from '@mdf.js/crash';
 import { LoggerInstance, Provider } from '@mdf.js/provider';
-import { Sender } from '../Client';
-import { CONFIG_PROVIDER_BASE_NAME } from '../config';
-import { Config } from '../types';
-import { AwaitableSender as RheaSender } from './types';
+import { Consumer, SystemStatus } from '../Client';
+import { CONFIG_PROVIDER_BASE_NAME } from './config';
+import { Config, Consumer as KafkaConsumer } from './types';
 
-export class Port extends Provider.Port<RheaSender, Config> {
-  /** Receiver connection handler */
-  private readonly instance: Sender;
+export class Port extends Provider.Port<KafkaConsumer, Config> {
+  /** Consumer connection handler */
+  private readonly instance: Consumer;
   /**
-   * Implementation of functionalities of an AMQP Sender port instance.
+   * Implementation of functionalities of an Elastic port instance.
    * @param config - Port configuration options
    * @param logger - Port logger, to be used internally
    */
   constructor(config: Config, logger: LoggerInstance) {
-    super(config, logger, config.receiver_options?.name ?? CONFIG_PROVIDER_BASE_NAME);
-    this.instance = new Sender(config);
+    super(config, logger, config.client.clientId ?? CONFIG_PROVIDER_BASE_NAME);
+    this.instance = new Consumer(config.client, config.consumer);
     // Stryker disable next-line all
-    this.logger.debug(`New instance of AMQP Receiver port created: ${this.uuid}`);
+    this.logger.debug(`New instance of Kafka Consumer port created: ${this.uuid}`);
   }
   /** Return the underlying port instance */
-  public get client(): RheaSender {
-    //@ts-ignore - testing options
-    return this.instance.client;
+  public get client(): KafkaConsumer {
+    return this.instance.consumer;
   }
   /** Return the port state as a boolean value, true if the port is available, false in otherwise */
   public get state(): boolean {
@@ -38,7 +36,6 @@ export class Port extends Provider.Port<RheaSender, Config> {
   public async start(): Promise<void> {
     await this.instance.start();
     this.eventsWrapping(this.instance);
-    this.onMessageEvent();
   }
   /** Stop the port instance */
   public async stop(): Promise<void> {
@@ -49,66 +46,49 @@ export class Port extends Provider.Port<RheaSender, Config> {
   public async close(): Promise<void> {
     await this.stop();
   }
-  /**
-   * Handler for the error event
-   * @param error - Error instance
-   */
-  private readonly onErrorEvent = (error: Crash): void => {
-    this.emit('error', error);
-    this.onMessageEvent();
-  };
-  /**
-   * Handler for the closed event
-   * @param error - Error instance
-   */
-  private readonly onClosedEvent = (error: Crash): void => {
-    this.emit('closed', error);
-    this.onMessageEvent();
-  };
   /** Handler for the healthy event */
-  private readonly onHealthyEvent = (): void => {
+  private readonly onHealthyEvent = (status: SystemStatus): void => {
+    this.addCheck('topics', {
+      componentId: this.uuid,
+      observedValue: status,
+      observedUnit: 'topics',
+      status: 'pass',
+      output: undefined,
+      time: new Date().toISOString(),
+    });
     this.emit('healthy');
-    this.onMessageEvent();
   };
   /**
    * Handler for the unhealthy event
    * @param error - Error instance
    */
   private readonly onUnhealthyEvent = (error: Crash): void => {
-    this.emit('unhealthy', error);
-    this.onMessageEvent();
-  };
-  /** Handler for the message event */
-  private readonly onMessageEvent = (): void => {
-    this.addCheck('credits', {
+    this.addCheck('topics', {
       componentId: this.uuid,
-      observedValue: this.instance.client.credit,
-      observedUnit: 'credits',
-      status: this.instance.client.credit ? 'pass' : 'warn',
-      output: this.instance.client.credit ? undefined : 'No credits available',
+      observedValue: {},
+      observedUnit: 'topics',
+      status: 'fail',
+      output: error.message,
       time: new Date().toISOString(),
     });
+    this.emit('unhealthy', error);
   };
   /**
    * Attach all the events and log for debugging
    * @param instance - AMQP Receiver client instance
    */
-  private eventsWrapping(instance: Sender): Sender {
-    instance.on('error', this.onErrorEvent);
+  private eventsWrapping(instance: Consumer): Consumer {
     instance.on('healthy', this.onHealthyEvent);
     instance.on('unhealthy', this.onUnhealthyEvent);
-    instance.on('closed', this.onClosedEvent);
     return instance;
   }
   /**
    * Attach all the events and log for debugging
    * @param instance - AMQP Receiver client instance
    */
-  private eventsUnWrapping(instance: Sender): Sender {
-    instance.off('error', this.onErrorEvent);
+  private eventsUnWrapping(instance: Consumer): Consumer {
     instance.off('healthy', this.onHealthyEvent);
     instance.off('unhealthy', this.onUnhealthyEvent);
-    instance.off('closed', this.onClosedEvent);
     return instance;
   }
 }

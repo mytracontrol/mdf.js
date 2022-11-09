@@ -21,11 +21,11 @@ import { inspect } from 'util';
 import { v4 } from 'uuid';
 
 export class Container extends EventEmitter {
-  /** Connection process id */
+  /** Instance identification */
   protected readonly componentId = v4();
   /** Connection instance */
   protected readonly connection: Connection;
-  /** Logger instance */
+  /** Debug logger for development and deep troubleshooting */
   protected readonly logger: LoggerInstance;
   /**
    * Creates an instance of AMQP Container

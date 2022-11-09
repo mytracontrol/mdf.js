@@ -5,5 +5,6 @@
  * or at https://opensource.org/licenses/MIT.
  */
 
-export * as Consumer from './Consumer';
-export * as Producer from './Producer';
+export * from './Client.t';
+export * from './Config.t';
+export * from './ProviderInstance.t';

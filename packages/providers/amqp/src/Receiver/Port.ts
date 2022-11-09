@@ -25,7 +25,7 @@ export class Port extends Provider.Port<RheaReceiver, Config> {
   /** Artemis monitor body */
   private readonly monitorBodyRequest?: { type: 'read'; mbean: string };
   /**
-   * Implementation of functionalities of an Elastic port instance.
+   * Implementation of functionalities of an AMQP Receiver port instance.
    * @param config - Port configuration options
    * @param logger - Port logger, to be used internally
    */

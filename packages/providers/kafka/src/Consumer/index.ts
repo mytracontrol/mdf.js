@@ -5,5 +5,5 @@
  * or at https://opensource.org/licenses/MIT.
  */
 
-export * as Consumer from './Consumer';
-export * as Producer from './Producer';
+export { Factory } from './Factory';
+export { Config, Consumer, ProviderInstance as Provider } from './types';
