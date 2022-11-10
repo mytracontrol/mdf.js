@@ -98,7 +98,7 @@ export abstract class Client extends EventEmitter {
     const logMessage = `${logger} - ${entry.label} - ${entry.namespace} - ${message}`;
     this.logger.debug(logMessage);
     if (others) {
-      this.logger.silly(JSON.stringify(others, null, 2));
+      this.logger.silly(inspect(others, false, 6));
     }
   };
   /** Perform the connection of the instance to the system */
@@ -174,10 +174,9 @@ export abstract class Client extends EventEmitter {
       }
       this.emit('status', this.status);
       if (!this.isFirstCheck && !this.healthy) {
-        this.emit('healthy');
         this.healthy = true;
+        this.emit('healthy');
       }
-      this.isFirstCheck = false;
     } catch (error) {
       this.status = undefined;
       this.emit('status', this.status);
@@ -192,10 +191,9 @@ export abstract class Client extends EventEmitter {
         // times we want to transmit the healthy event if the system is not healthy
         this.healthy = true;
       } else if (this.healthy) {
-        this.emit('unhealthy', crash);
         this.healthy = false;
+        this.emit('unhealthy', crash);
       }
-      this.isFirstCheck = false;
     } finally {
       // Stryker disable next-line all
       this.logger.silly(`STATUS: ${JSON.stringify(this.status, null, 2)}`);

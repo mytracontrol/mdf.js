@@ -617,6 +617,14 @@ describe('#Port #Kafka #Producer', () => {
     }, 300);
     it(`Should create a valid instance`, () => {
       const port = new Port(DEFAULT_CONFIG, new FakeLogger() as LoggerInstance);
+      //@ts-ignore - Test environment
+      expect(port.instance.interval).toEqual(33000);
+      //@ts-ignore - Test environment
+      expect(port.instance.options.logCreator).toBeDefined();
+      //@ts-ignore - Test environment
+      expect(port.instance.producerOptions.retry).toBeDefined();
+      //@ts-ignore - Test environment
+      expect(port.instance.logger.context).toEqual('kafka');
       expect(port).toBeDefined();
       expect(port.state).toBeFalsy();
       expect(port.checks).toEqual({});
@@ -727,12 +735,15 @@ describe('#Port #Kafka #Producer', () => {
       });
       port.start().then(() => port.close());
     }, 300);
-    it(`Should reject to start if admin client rejects`, () => {
+    it(`Should reject to start if admin client rejects`, async () => {
       const port = new Port(DEFAULT_CONFIG, new FakeLogger() as LoggerInstance);
       expect(port).toBeDefined();
       //@ts-ignore - Test environment
       jest.spyOn(port.instance.admin, 'connect').mockRejectedValue(new Error('myError'));
-      return port.start().catch(error => {
+      try {
+        await port.start();
+        throw new Error('Should not be here');
+      } catch (error: any) {
         expect(error.message).toEqual(
           'Error in port initialization: Error in initial connection process: Error setting the monitoring client: myError'
         );
@@ -741,22 +752,25 @@ describe('#Port #Kafka #Producer', () => {
         );
         expect(error.cause.cause.message).toEqual('Error setting the monitoring client: myError');
         expect(error.cause.cause.cause.message).toEqual('myError');
-      });
+      }
     }, 300);
-    it(`Should reject to start if consumer rejects`, () => {
+    it(`Should reject to start if producer rejects`, async () => {
       const port = new Port(DEFAULT_CONFIG, new FakeLogger() as LoggerInstance);
       expect(port).toBeDefined();
       //@ts-ignore - Test environment
       jest.spyOn(port.instance.admin, 'connect').mockResolvedValue();
       //@ts-ignore - Test environment
       jest.spyOn(port.instance.client, 'connect').mockRejectedValue(new Error('myError'));
-      return port.start().catch(error => {
+      try {
+        await port.start();
+        throw new Error('Should not be here');
+      } catch (error: any) {
         expect(error.message).toEqual(
           'Error in port initialization: Error in initial connection process: myError'
         );
         expect(error.cause.message).toEqual('Error in initial connection process: myError');
         expect(error.cause.cause.message).toEqual('myError');
-      });
+      }
     }, 300);
     it(`Should reject to stop if admin rejects`, async () => {
       const port = new Port(DEFAULT_CONFIG, new FakeLogger() as LoggerInstance);
@@ -795,7 +809,7 @@ describe('#Port #Kafka #Producer', () => {
         expect(error.cause.cause.cause.message).toEqual('myError');
       }
     }, 300);
-    it(`Should reject to stop if consumer rejects`, async () => {
+    it(`Should reject to stop if producer rejects`, async () => {
       const port = new Port(DEFAULT_CONFIG, new FakeLogger() as LoggerInstance);
       expect(port).toBeDefined();
       //@ts-ignore - Test environment

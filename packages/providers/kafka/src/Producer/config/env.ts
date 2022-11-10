@@ -8,8 +8,8 @@
 import { coerce, loadFile } from '@mdf.js/utils';
 import { Mechanism, SASLMechanismOptions } from 'kafkajs';
 import { ConnectionOptions } from 'tls';
+import { logger } from '../../Common';
 import { Config as ProducerConfig } from '../types';
-import { logger } from './utils';
 
 type AllowedMechanisms = 'plain' | 'scram-sha-256' | 'scram-sha-512' | undefined;
 // *************************************************************************************************

@@ -16,4 +16,4 @@ export const configEntry: PortConfigValidationStruct<Config> = {
   defaultConfig,
   schema,
 };
-export { CONFIG_PROVIDER_BASE_NAME } from './utils';
+export { CONFIG_PROVIDER_BASE_NAME } from '../../Common';
