@@ -11,33 +11,34 @@ import { Client } from './Client';
 
 export class Producer extends Client {
   /** Kafka Producer */
-  private readonly _producer: KafkaProducer;
+  private readonly producer: KafkaProducer;
   /** Kafka Producer configuration options */
   private readonly producerOptions: ProducerConfig;
   /**
    * Creates an instance of KafkaProducer
    * @param clientOptions - Kafka client configuration options
    * @param producerOptions - Kafka producer configuration options
+   * @param interval - Period of health check interval
    */
-  constructor(clientOptions: KafkaConfig, producerOptions: ProducerConfig) {
-    super(clientOptions);
+  constructor(clientOptions: KafkaConfig, producerOptions?: ProducerConfig, interval?: number) {
+    super(clientOptions, interval);
     this.producerOptions = {
       ...producerOptions,
-      retry: producerOptions.retry ?? { restartOnFailure: this.onFailure },
+      retry: producerOptions?.retry ?? { restartOnFailure: this.onFailure },
     };
-    this._producer = this.client.producer(this.producerOptions);
+    this.producer = this.instance.producer(this.producerOptions);
   }
   /** Return the producer of this class instance */
-  get producer(): KafkaProducer {
-    return this._producer;
+  public get client(): KafkaProducer {
+    return this.producer;
   }
   /** Perform the connection of the instance to the system */
   public override async start(): Promise<void> {
     try {
       await super.start();
-      await this._producer.connect();
-      for (const event of Object.values(this._producer.events)) {
-        this._producer.on(event, this.eventLogging);
+      await this.producer.connect();
+      for (const event of Object.values(this.producer.events)) {
+        this.producer.on(event, this.eventLogging);
       }
     } catch (error) {
       const cause = Crash.from(error, this.componentId);
@@ -50,10 +51,10 @@ export class Producer extends Client {
   public override async stop(): Promise<void> {
     try {
       await super.stop();
-      await this._producer.disconnect();
+      await this.producer.disconnect();
     } catch (error) {
       const cause = Crash.from(error, this.componentId);
-      throw new Crash(`Error in final disconnection process: ${cause.message}`, this.componentId, {
+      throw new Crash(`Error in disconnection process: ${cause.message}`, this.componentId, {
         cause,
       });
     }

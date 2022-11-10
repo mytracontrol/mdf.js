@@ -5,9 +5,6 @@
  * or at https://opensource.org/licenses/MIT.
  */
 
-import { ConsumerConfig } from 'kafkajs';
-import { BaseConfig } from '../../Common';
-export interface Config extends BaseConfig {
-  /** Kafka consumer configuration options */
-  consumer: ConsumerConfig;
-}
+export * from './BasePort';
+export * from './config';
+export * from './types';

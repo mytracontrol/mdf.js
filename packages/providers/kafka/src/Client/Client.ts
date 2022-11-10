@@ -29,10 +29,14 @@ const DEFAULT_CHECK_INTERVAL = 30000;
 export type SystemStatus = { topics: ITopicMetadata[]; groups: GroupDescription[] };
 
 export declare interface Client {
-  /** Emitted if admin client cloud not get metadata from brokers */
+  /** Emitted when admin client can collect the desired information */
+  on(event: 'healthy', listener: () => void): this;
+  /** Emitted when admin client can not collect the desired information */
   on(event: 'unhealthy', listener: (crash: Crash) => void): this;
   /** Emitted every time that admin client get metadata from brokers */
-  on(event: 'healthy', listener: (status: SystemStatus) => void): this;
+  on(event: 'status', listener: (status?: SystemStatus) => void): this;
+  /** Emitted when admin client has some problem getting the metadata from brokers */
+  on(event: 'error', listener: (crash: Crash) => void): this;
 }
 
 /**
@@ -50,31 +54,33 @@ export abstract class Client extends EventEmitter {
   /** Kafka Broker configuration options */
   readonly options: KafkaConfig;
   /** Kafka Client */
-  protected readonly client: Kafka;
+  protected readonly instance: Kafka;
   /** Kafka admin instance */
-  private _adminClient?: Admin;
-  /** Period of check interval */
-  private readonly interval: number;
+  private readonly admin: Admin;
   /** Check interval */
   private timeInterval?: NodeJS.Timeout;
   /** System status */
-  private status: SystemStatus = { topics: [], groups: [] };
+  private status: SystemStatus | undefined = undefined;
   /** Connection state flag */
-  connected: boolean;
+  protected connected: boolean;
   /** Healthy flag, resumed state of brokers system */
-  private healthy: boolean;
+  protected healthy: boolean;
+  /** First check flag */
+  private isFirstCheck = true;
   /**
    * Create an instance of a Kafka client configuration options
    * @param options - Kafka client configuration options
+   * @param interval - Period of health check interval
    */
-  constructor(options: KafkaConfig) {
+  constructor(options: KafkaConfig, private readonly interval = DEFAULT_CHECK_INTERVAL) {
     super();
     this.logger = SetContext(new DebugLogger('client:kafka'), 'kafka', this.componentId);
     // Stryker disable next-line all
     this.logger.debug(`New instance of Kafka Client created: ${this.componentId}`);
     this.options = { ...options, logCreator: options.logCreator ?? this.defaultLogCreator };
-    this.interval = Math.floor((this.options.requestTimeout || DEFAULT_CHECK_INTERVAL) * 1.1);
-    this.client = new Kafka(this.options);
+    this.interval = Math.floor((this.options.requestTimeout || interval) * 1.1);
+    this.instance = new Kafka(this.options);
+    this.admin = this.instance.admin();
     this.connected = false;
     this.healthy = false;
   }
@@ -100,26 +106,26 @@ export abstract class Client extends EventEmitter {
     if (this.connected) {
       return;
     }
-    if (!this._adminClient) {
-      this._adminClient = this.createAdmin();
-    }
     try {
-      await this._adminClient.connect();
+      await this.admin.connect();
+      for (const event of Object.values(this.admin.events)) {
+        this.admin.on(event, this.eventLogging);
+      }
       this.connected = true;
       if (!this.timeInterval) {
         this.timeInterval = setInterval(this.checkHealth, this.interval);
-        this.checkHealth();
+        await this.checkHealth();
       }
     } catch (error) {
       const cause = Crash.from(error, this.componentId);
-      throw new Crash(`Error in initial connection process: ${cause.message}`, this.componentId, {
+      throw new Crash(`Error setting the monitoring client: ${cause.message}`, this.componentId, {
         cause,
       });
     }
   }
   /** Perform the disconnection of the instance from the system */
   protected async stop(): Promise<void> {
-    if (!this._adminClient || !this.connected) {
+    if (!this.connected) {
       return;
     }
     try {
@@ -127,49 +133,33 @@ export abstract class Client extends EventEmitter {
         clearInterval(this.timeInterval);
         this.timeInterval = undefined;
       }
-      await this._adminClient.disconnect();
+      await this.admin.disconnect();
       this.connected = false;
     } catch (error) {
       const cause = Crash.from(error, this.componentId);
-      throw new Crash(`Error in disconnection process: ${cause.message}`, this.componentId, {
-        cause,
-      });
+      throw new Crash(
+        `Error in disconnection process of monitor client: ${cause.message}`,
+        this.componentId,
+        { cause }
+      );
     }
-  }
-  /**
-   * Create an admin client over the underlayer Kafka client and perform the instrumentation of the
-   * events
-   */
-  private createAdmin(): Admin {
-    const admin = this.client.admin();
-    for (const event of Object.values(admin.events)) {
-      admin.on(event, this.eventLogging);
-    }
-    return admin;
   }
   /** Check the state of the topics over the brokers */
-  private readonly checkHealth = (): void => {
+  private readonly checkHealth = async (): Promise<void> => {
     // Stryker disable next-line all
     this.logger.debug(`Checking the state of the topics...`);
-    if (!this._adminClient) {
-      this.status = { topics: [], groups: [] };
-      this.emit('unhealthy', new Crash('Admin client not initialized', this.componentId));
-      return;
-    }
-    this._adminClient
-      .fetchTopicMetadata()
-      .then(result => {
-        this.status.topics = result.topics.filter(entry => !entry.name.startsWith('__'));
-      })
-      .then(() => this._adminClient?.listGroups())
-      .then(result => {
-        return !result || result.groups.length === 0
-          ? undefined
-          : this._adminClient?.describeGroups(result.groups.map(entry => entry.groupId));
-      })
-      .then(result => {
-        if (result) {
-          this.status.groups = result.groups.map(group => {
+    this.status = { topics: [], groups: [] };
+    try {
+      const fetchedTopics = await this.admin.fetchTopicMetadata();
+      this.status.topics = fetchedTopics.topics.filter(entry => !entry.name.startsWith('__'));
+      this.status.groups = [];
+      const fetchedGroups = await this.admin.listGroups();
+      if (fetchedGroups && fetchedGroups.groups.length) {
+        const descriptions = await this.admin.describeGroups(
+          fetchedGroups.groups.map(entry => entry.groupId)
+        );
+        if (descriptions) {
+          this.status.groups = descriptions.groups.map(group => {
             //@ts-ignore Buffer kind information not give us any real understanding
             group.members = group.members.map(member => {
               return {
@@ -181,18 +171,36 @@ export abstract class Client extends EventEmitter {
             return group;
           });
         }
-        this.logger.silly(`STATUS: ${JSON.stringify(this.status, null, 2)}`);
-        this.emit('healthy', this.status);
-      })
-      .catch(cause => {
-        const crash = new Crash(`Error checking the system: ${cause.message}`, this.componentId, {
-          cause,
-        });
-        this.logger.error(crash.message);
-        this.healthy = false;
-        this.status = { topics: [], groups: [] };
-        this.emit('unhealthy', crash);
+      }
+      this.emit('status', this.status);
+      if (!this.isFirstCheck && !this.healthy) {
+        this.emit('healthy');
+        this.healthy = true;
+      }
+      this.isFirstCheck = false;
+    } catch (error) {
+      this.status = undefined;
+      this.emit('status', this.status);
+      const cause = Crash.from(error, this.componentId);
+      const crash = new Crash(`Error checking the system: ${cause.message}`, this.componentId, {
+        cause,
       });
+      this.logger.error(crash.message);
+      if (this.isFirstCheck) {
+        this.emit('error', crash);
+        // The first time we want only transmit the error, not the healthy event, but the next
+        // times we want to transmit the healthy event if the system is not healthy
+        this.healthy = true;
+      } else if (this.healthy) {
+        this.emit('unhealthy', crash);
+        this.healthy = false;
+      }
+      this.isFirstCheck = false;
+    } finally {
+      // Stryker disable next-line all
+      this.logger.silly(`STATUS: ${JSON.stringify(this.status, null, 2)}`);
+      this.isFirstCheck = false;
+    }
   };
   /**
    * Log an event using the DEBUG logger for troubleshooting

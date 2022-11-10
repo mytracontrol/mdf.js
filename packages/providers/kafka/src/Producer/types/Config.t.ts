@@ -10,5 +10,7 @@ export interface Config {
   /** Kafka client configuration options */
   client: KafkaConfig;
   /** Kafka producer configuration options */
-  producer: ProducerConfig;
+  producer?: ProducerConfig;
+  /** Period of health check interval */
+  interval?: number;
 }

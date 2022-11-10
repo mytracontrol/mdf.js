@@ -6,14 +6,14 @@
  */
 // *************************************************************************************************
 // #region Arrange
-import { defaultConfig } from './default';
 import {
   CONFIG_PROVIDER_BASE_NAME,
   defaultLogCreator,
   logger,
   logLevel,
   selectLogLevel,
-} from './utils';
+} from '../../Common/config/utils';
+import { defaultConfig } from './default';
 
 // #endregion
 // *************************************************************************************************

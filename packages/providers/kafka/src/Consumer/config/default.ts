@@ -6,8 +6,8 @@
  */
 
 import { hostname } from 'os';
+import { CONFIG_KAFKA_CLIENT__LOG_LEVEL, defaultLogCreator } from '../../Common';
 import { Config as ConsumerConfig } from '../types';
-import { CONFIG_KAFKA_CLIENT__LOG_LEVEL, defaultLogCreator } from './utils';
 
 // *************************************************************************************************
 // #region Default values
