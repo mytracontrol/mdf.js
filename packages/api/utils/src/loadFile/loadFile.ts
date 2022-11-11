@@ -6,9 +6,11 @@
  */
 
 import { Crash } from '@mdf.js/crash';
-import { LoggerInstance } from '@mdf.js/logger';
 import fs from 'fs';
 
+type LoggerInstance = {
+  debug: (message: string) => void;
+};
 /**
  * Load the file from the path if this exist
  * @param path - path to file

@@ -212,7 +212,7 @@ module.exports = {
     /* pattern specifying which files to include (regular expression)
        dependency-cruiser will skip everything not matching this pattern
     */
-    // includeOnly : '',
+    includeOnly: 'src/',
 
     /* dependency-cruiser will include modules matching against the focus
        regular expression in its output, as well as their neighbours (direct
@@ -255,9 +255,9 @@ module.exports = {
        dependency-cruiser's current working directory). When not provided
        defaults to './tsconfig.json'.
      */
-    tsConfig: {
-      fileName: 'tsconfig.base.json'
-    },
+    /*tsConfig: {
+      fileName: 'tsconfig.json'
+    },*/
 
     /* Webpack configuration to use to get resolve options from.
 
