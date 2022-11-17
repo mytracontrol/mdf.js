@@ -26,7 +26,7 @@ export abstract class Registry {
    */
   constructor(service: ServiceMetadata) {
     // Stryker disable next-line all
-    this.logger = new DebugLogger(`health`);
+    this.logger = new DebugLogger(`mdf:health`);
     this.metadata = service;
     this.baseHealth = {
       version: this.metadata.version,

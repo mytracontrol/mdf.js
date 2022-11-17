@@ -8,9 +8,9 @@
 import { Headers } from './Headers.i';
 import { Status } from './Status.t';
 
-export interface JobObject<Type extends string = string, Data = any> {
+export interface JobObject<Type = string, Data = any> {
   /** Job type identification, used to identify specific job handlers to be applied */
-  type?: Type;
+  type: Type;
   /** Job identification */
   jobId: string;
   /** Job payload */

@@ -54,7 +54,7 @@ export class Engine<Type extends string = string, Data = any>
     super(merge(DEFAULT_TRANSFORM_OPTIONS, options));
     // Stryker disable next-line all
     this.logger = SetContext(
-      options?.logger || new DebugLogger(`stream:engine:${name}`),
+      options?.logger || new DebugLogger(`mdf:stream:engine:${name}`),
       'Engine',
       this.componentId
     );

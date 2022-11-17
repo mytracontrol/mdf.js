@@ -1097,7 +1097,7 @@ describe('#Provider #API', () => {
       expect(provider.client).toBeInstanceOf(MyPortInstance);
     }, 300);
     it(`Should be possible to use all the logger functions`, () => {
-      const logger = new DebugLogger('myLogger');
+      const logger = new DebugLogger('mdf:myLogger');
       const uuid = v4();
       const context = 'myContext';
       const meta = {

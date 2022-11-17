@@ -74,7 +74,7 @@ export abstract class Client extends EventEmitter {
    */
   constructor(options: KafkaConfig, private readonly interval = DEFAULT_CHECK_INTERVAL) {
     super();
-    this.logger = SetContext(new DebugLogger('client:kafka'), 'kafka', this.componentId);
+    this.logger = SetContext(new DebugLogger('mdf:client:kafka'), 'kafka', this.componentId);
     // Stryker disable next-line all
     this.logger.debug(`New instance of Kafka Client created: ${this.componentId}`);
     this.options = { ...options, logCreator: options.logCreator ?? this.defaultLogCreator };

@@ -17,7 +17,7 @@ export class DebugLogger implements LoggerInstance {
    * @param name - Name of the provider
    */
   constructor(private readonly name: string) {
-    this.logger = Debug(`mdf:${this.name}`);
+    this.logger = Debug(this.name);
   }
   /**
    * Log events in the SILLY level: all the information in a very detailed way.

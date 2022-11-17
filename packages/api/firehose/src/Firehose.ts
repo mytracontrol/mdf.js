@@ -66,7 +66,7 @@ export class Firehose<Type extends string = string, Data = any>
     super();
     // Stryker disable next-line all
     this.logger = SetContext(
-      options?.logger || new DebugLogger(`firehose:${this.name}`),
+      options?.logger || new DebugLogger(`mdf:firehose:${this.name}`),
       this.name,
       this.componentId
     );

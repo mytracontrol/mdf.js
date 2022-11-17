@@ -22,7 +22,7 @@ export declare interface JobHandler<Type, Data> {
   ): this;
 }
 
-export class JobHandler<Type extends string = string, Data = any>
+export class JobHandler<Type = string, Data = any>
   extends EventEmitter
   implements Jobs.JobObject<Type, Data>
 {

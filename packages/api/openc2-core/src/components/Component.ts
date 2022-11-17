@@ -45,7 +45,7 @@ export abstract class Component<T extends ComponentAdapter, K extends ComponentO
   constructor(protected readonly adapter: T, protected options: K) {
     super();
     this.logger = SetContext(
-      this.options.logger ?? new DebugLogger(`oc2:component:${this.name}`),
+      this.options.logger ?? new DebugLogger(`mdf:oc2:component:${this.name}`),
       this.constructor.name,
       this.componentId
     );

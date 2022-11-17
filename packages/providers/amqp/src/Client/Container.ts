@@ -34,7 +34,7 @@ export class Container extends EventEmitter {
   constructor(protected readonly options: ConnectionOptions) {
     super();
     this.connection = new Connection(this.options);
-    this.logger = SetContext(new DebugLogger('client:amqp'), 'amqp', this.componentId);
+    this.logger = SetContext(new DebugLogger('mdf:client:amqp'), 'amqp', this.componentId);
     // Stryker disable next-line all
     this.logger.debug(`New instance of AMQP port created: ${this.componentId}`);
   }

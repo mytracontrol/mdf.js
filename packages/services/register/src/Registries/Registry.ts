@@ -23,7 +23,7 @@ export abstract class Registry {
    */
   constructor(protected readonly maxSize: number = CONFIG_REGISTER_MAX_LIST_SIZE) {
     // Stryker disable next-line all
-    this.logger = new DebugLogger(`register`);
+    this.logger = new DebugLogger(`mdf:register`);
     if (maxSize < 1) {
       this.maxSize = CONFIG_REGISTER_MAX_LIST_SIZE;
     }

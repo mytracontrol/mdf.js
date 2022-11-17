@@ -66,7 +66,7 @@ export abstract class Base<T extends Plugs.Sink.Any> extends Writable implements
     super(merge(DEFAULT_WRITABLE_OPTIONS, options?.writableOptions));
     // Stryker disable next-line all
     this.logger = SetContext(
-      options?.logger || new DebugLogger(`stream:sink:${this.plug.name}`),
+      options?.logger || new DebugLogger(`mdf:stream:sink:${this.plug.name}`),
       'Sink',
       this.plug.componentId
     );

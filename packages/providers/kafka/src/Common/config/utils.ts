@@ -10,7 +10,7 @@ import { v4 } from 'uuid';
 export const CONFIG_PROVIDER_BASE_NAME = 'kafka';
 export const CONFIG_ARTIFACT_ID =
   process.env['CONFIG_ARTIFACT_ID'] || `mdf-${CONFIG_PROVIDER_BASE_NAME}`;
-export const logger = new DebugLogger(`${CONFIG_PROVIDER_BASE_NAME}:config`);
+export const logger = new DebugLogger(`mdf:${CONFIG_PROVIDER_BASE_NAME}:config`);
 
 // *************************************************************************************************
 // #region Logger configuration

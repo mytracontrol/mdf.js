@@ -33,7 +33,7 @@ export declare interface Base<T extends Plugs.Source.Any> {
   /** Emitted on every state change */
   on(event: 'status', listener: (status: Health.API.Status) => void): this;
   /** Emitted when a job is created */
-  on(event: 'job', listener: (job: JobHandler<any>) => void): this;
+  on(event: 'job', listener: (job: JobHandler) => void): this;
   /** Emitted when a job has ended */
   on(event: 'done', listener: (uuid: string, result: Jobs.Result, error?: Crash) => void): this;
 }
@@ -66,7 +66,7 @@ export abstract class Base<T extends Plugs.Source.Any>
     this.qos = options?.qos ?? this.qos;
     // Stryker disable next-line all
     this.logger = SetContext(
-      options?.logger || new DebugLogger(`stream:source:${this.plug.name}`),
+      options?.logger || new DebugLogger(`mdf:stream:source:${this.plug.name}`),
       'Source',
       this.plug.componentId
     );

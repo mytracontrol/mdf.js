@@ -75,7 +75,7 @@ export class Gateway extends EventEmitter implements Health.Component, Health.Se
   ) {
     super();
     this.logger = SetContext(
-      this.options.logger ?? new DebugLogger(`oc2:gateway:${this.name}`),
+      this.options.logger ?? new DebugLogger(`mdf:oc2:gateway:${this.name}`),
       this.constructor.name,
       this.componentId
     );

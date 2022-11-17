@@ -20,7 +20,7 @@ describe('#DebugLogger #logger', () => {
   describe('#Happy path', () => {
     it(`Should create a new instance of DebugLogger`, () => {
       const stderr = jest.spyOn(process.stderr, 'write');
-      const logger = new DebugLogger('myLogger');
+      const logger = new DebugLogger('mdf:myLogger');
       expect(logger).toBeDefined();
       logger.silly('Hello World', uuid, 'debug', { foo: 'bar' });
       logger.debug('Hello World', uuid, 'debug', { foo: 'bar' });
