@@ -17,7 +17,7 @@ describe(`#Config #${CONFIG_PROVIDER_BASE_NAME.toLocaleUpperCase()} #Consumer`, 
       expect(defaultConfig).toMatchObject({
         client: {
           brokers: ['127.0.0.1:9092'],
-          clientId: 'devCenter',
+          clientId: defaultConfig.client.clientId,
           connectionTimeout: 1000,
           enforceRequestTimeout: false,
           logCreator: defaultLogCreator,

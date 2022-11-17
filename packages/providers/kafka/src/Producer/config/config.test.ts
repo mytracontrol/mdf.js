@@ -17,7 +17,7 @@ describe(`#Config #${CONFIG_PROVIDER_BASE_NAME.toLocaleUpperCase()} #Producer`, 
     it(`Should has a default config`, () => {
       expect(defaultConfig).toMatchObject({
         client: {
-          clientId: 'devCenter',
+          clientId: defaultConfig.client.clientId,
           connectionTimeout: 1000,
           enforceRequestTimeout: false,
           logCreator: defaultLogCreator,
