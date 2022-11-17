@@ -11,7 +11,7 @@ import { DebugLogger, LoggerInstance } from '@mdf.js/logger';
 import EventEmitter from 'events';
 import Joi from 'joi';
 import { v4 } from 'uuid';
-import { Factory } from './Factory';
+import Factory from './Factory';
 import { Manager } from './Manager';
 import { Port } from './Port';
 // #endregion
