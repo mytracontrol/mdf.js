@@ -1,0 +1,52 @@
+{
+  "[typescript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.formatOnSave": true
+  },
+  "files.eol": "\r\n",
+  "editor.codeActionsOnSave": {
+    "source.organizeImports": true,
+    "source.fixAll.eslint": true
+  },
+  "eslint.validate": [
+    "typescript",
+    "javascript",
+  ],
+  "eslint.workingDirectories": [{"pattern": "packages/**/*/"}],
+  "cSpell.words": [
+    "Artermis",
+    "binded",
+    "firehoses",
+    "jolokia",
+    "Jolokia",
+    "middlewares",
+    "Middlewares",
+    "openc2",
+    "OpenC2",
+    "OPENC2"
+  ],
+  "sonarlint.connectedMode.project": {
+    "projectKey": "Mytra-Development-Framework-NDF-TypeScript"
+  },
+  "typescript.tsdk": "node_modules/typescript/lib",
+  "terminal.integrated.shell.windows": "C:\\Program Files\\Git\\bin\\bash.exe",
+  "plantuml.diagramsRoot": ".models",
+  "plantuml.exportOutDir": "assets/models",
+  "jestrunner.runOptions": [
+    "--runInBand",
+    "--detectOpenHandles",
+    "--coverage=false",
+    "--no-cache",
+    "--forceExit"
+  ],
+  "jestrunner.debugOptions": {
+    "args": [
+      "--runInBand",
+      "--detectOpenHandles",
+      "--coverage=false",
+      "--no-cache",
+      "--forceExit"
+    ],
+  },
+
+}

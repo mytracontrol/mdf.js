@@ -1,0 +1,11 @@
+{
+  "name": "@mdf.js/repo-config",
+  "version": "0.0.1",
+  "private": true,
+  "description": "MMS - Repo Config",
+  "author": "Mytra Control S.L.",
+  "main": "src/index.js",
+  "files": [
+    "src/**/*"
+  ]
+}

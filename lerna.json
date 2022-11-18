@@ -1,0 +1,26 @@
+{
+  "$schema": "node_modules/lerna/schemas/lerna-schema.json",
+  "packages": [
+    "packages/**/*"
+  ],
+  "version": "0.0.1",
+  "npmClient": "yarn",
+  "useWorkspaces": true,
+  "command": {
+    "publish": {
+      "registry": "https://registry.npmjs.org/"
+    },
+    "version": {
+      "allowBranch": [
+        "master",
+        "develop",
+        "hotfix/*",
+        "release/*",
+        "feature/*"
+      ],
+      "conventionalCommits": true,
+      "forcePublish": true,
+      "exact": true
+    }
+  }
+}

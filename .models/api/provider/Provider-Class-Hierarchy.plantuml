@@ -1,0 +1,41 @@
+@startuml Provider-Class-Hierarchy
+
+!define DARKGREEN
+!include ./styles/style.puml
+
+class Client {}
+
+class MyWrappedClient< extends Port > {
+    + client: Client
+}
+
+abstract class Port <extends EventEmitter> {
+    # addCheck(measure: string, check: Health.API.Check): boolean
+    + checks: Record<string, Health.API.Check[]>
+    + {abstract} client: Client
+    + {abstract} state: boolean
+    + {abstract} start(): Promise<void>
+    + {abstract} stop(): Promise<void>
+    + {abstract} close(): Promise<void>
+    ..events..
+    ~ on(event: "error", listener: (error: Crash) => void): this
+    ~ on(event: "healthy", listener: () => void): this
+    ~ on(event: "unhealthy", listener: (error: Crash) => void): this
+    ~ on(event: "closed", listener: (error?: Crash) => void): this
+}
+class Manager <implements Health.API.Component> {
+    - port: Port
+    + state: Health.API.State
+    + actualStateDate: string
+    + error: Crash
+    + client: Client
+    + checks: Health.API.Checks
+    + start(): Promise<void>
+    + stop(): Promise<void>
+    + fail(error: Crash): Promise<void>
+}
+
+Client --> MyWrappedClient::client : wrap
+MyWrappedClient --> Port : extends
+Manager --> MyWrappedClient: create
+@enduml

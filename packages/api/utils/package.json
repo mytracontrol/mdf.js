@@ -1,0 +1,52 @@
+{
+  "name": "@mdf.js/utils",
+  "version": "0.0.1",
+  "description": "MMS - API Core - Common utils tools",
+  "keywords": [
+    "NodeJS",
+    "MMS",
+    "API",
+    "coerce",
+    "escape",
+    "retry",
+    "validateError"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mytracontrol/mdf.js.git",
+    "directory": "packages/api/utils"
+  },
+  "license": "MIT",
+  "author": "Mytra Control S.L.",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist/**/*"
+  ],
+  "scripts": {
+    "build": "yarn clean && tsc -p tsconfig.build.json",
+    "check-dependencies": "npm-check",
+    "clean": "rimraf \"{tsconfig.build.tsbuildinfo,dist}\"",
+    "licenses": "license-checker --start ./ --production --csv --out ../../../licenses/api/utils/licenses.csv --customPath ../../../.config/customFormat.json",
+    "mutants": "stryker run stryker.conf.js",
+    "test": "jest --config ./jest.config.js"
+  },
+  "dependencies": {
+    "@mdf.js/core": "*",
+    "@mdf.js/crash": "*",
+    "lodash": "^4.17.21",
+    "tslib": "^2.4.1",
+    "uuid": "^9.0.0"
+  },
+  "devDependencies": {
+    "@mdf.js/repo-config": "*",
+    "@types/lodash": "^4.14.189",
+    "@types/uuid": "^8.3.4"
+  },
+  "engines": {
+    "node": ">=16.14.2"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

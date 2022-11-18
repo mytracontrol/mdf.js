@@ -1,0 +1,26 @@
+version: '2.4'
+services:
+    netin-ds-server-broker:
+        container_name: netin-ds-server-broker
+        restart: unless-stopped
+        image: 'netinsystems/netin-ds-server-broker:2.20.0-spider-1.0'
+        cpu_count: 2
+        cpu_percent: 50
+        mem_limit: 1024m
+        ports:
+            - '8161:8161'
+            - '61616:61616'
+            - '5672:5672'
+            - '61613:61613'
+            - '61614:61614'
+        expose: 
+            - 8161/tcp
+            - 61616/tcp
+            - 5672/tcp
+            - 61613/tcp
+            - 61614/tcp
+        networks:
+            - internal    
+networks: 
+    internal:
+        driver: bridge

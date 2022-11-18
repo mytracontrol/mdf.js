@@ -1,0 +1,47 @@
+@startuml C2-Consumer
+
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+
+skinparam linetype ortho
+skinparam nodesep 100
+skinparam ranksep 100
+
+AddElementTag("main", $bgColor="#0070C0", $fontColor="#FFFFFF", $legendText="Main component")
+AddElementTag("reused", $bgColor="#7030A0", $fontColor="#FFFFFF", $legendText="Interface componet, used in more schemas")
+AddElementTag("health", $borderColor="#FF0000", $legendText="Implement Health Component interface")
+
+AddRelTag("DottedLine", $lineStyle = DottedLine(), $legendText="Async event")
+
+'###################################################################################################
+'External components and systems
+Component_Ext("JOBHANDLER", "JobHandler", "Job", "Job handler, emitted by the consumer and revolved by the upper layers")
+SystemQueue_Ext("TRANSPORT_SYSTEM", "Transport", "Transport system used to interconnect the nodes that participate in the system (MQTT, Redis, HTTP ...)", $tags=reused)
+System_Ext("UPPER_LAYER", "Upper layer", "Use the producer and consumer interface to stablish perform command and control operations", $tags=reused)
+Component_Ext("REGISTER", "Register", "Repository", "Store a historical list of messages, both command and responses, and the actual pending Jobs", $tags=health+reused)
+'###################################################################################################
+'CONSUMER
+Boundary(CONSUMER_INTERFACE, "Consumer interface") {
+    Container("CONSUMER", "Consumer", "Main", "Manage the incoming commands, emitting jobs that should be resolved by the upper layers", $tags=main+health)
+    Component("CONSUMER_ADAPTER", "ConsumerAdapter", "Adapter", "Adapt the transport system to the consumer, making the sync or async transport processes transparent")
+}
+
+Lay_D(REGISTER, TRANSPORT_SYSTEM)
+
+Rel_U(JOBHANDLER, UPPER_LAYER, "handler", "listened")
+Rel_D(UPPER_LAYER, JOBHANDLER, "done", "called" )
+
+Rel_U(CONSUMER, JOBHANDLER, "command", "emitted", $tags="DottedLine")
+Rel_D(JOBHANDLER, CONSUMER, "done", "emitted", $tags="DottedLine")
+
+Rel_U(CONSUMER_ADAPTER, CONSUMER, "handler", "called")
+Rel_D(CONSUMER, CONSUMER_ADAPTER, "response", "resolve")
+
+Rel_R(CONSUMER_ADAPTER, TRANSPORT_SYSTEM, "response", $tags="DottedLine")
+Rel_L(TRANSPORT_SYSTEM, CONSUMER_ADAPTER, "command", $tags="DottedLine")
+
+Rel_R(CONSUMER, REGISTER, "push", "message")
+Rel_R(CONSUMER, REGISTER, "push", "job")
+Rel_R(CONSUMER, REGISTER, "delete", "job")
+
+SHOW_LEGEND()
+@enduml

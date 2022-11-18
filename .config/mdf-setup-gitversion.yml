@@ -1,0 +1,22 @@
+steps:
+- task: Bash@3
+  displayName: 'Set git config email & name'
+  inputs:
+    targetType: 'inline'
+    script: |
+      git config --global user.email $BUILD_REQUESTEDFOREMAIL
+      git config --global user.name "$BUILD_REQUESTEDFOR"
+      echo $BUILD_REQUESTEDFOREMAIL
+      echo "$BUILD_REQUESTEDFOR"
+ 
+- task: gitversion/setup@0
+  displayName: 'Use GitVersion Setup'
+  inputs:
+    versionSpec: '5.x'
+
+- task: gitversion/execute@0
+  displayName: 'Use GitVersion Execute'
+  inputs:
+    useConfigFile: true
+    configFilePath: './.config/GitVersion.yml'
+    name: 'Version'

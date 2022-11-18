@@ -1,0 +1,119 @@
+@startuml sequences-gateway
+
+!pragma teoz true
+
+skinparam sequenceArrowThickness 2
+skinparam roundcorner 20
+skinparam maxmessagesize 200
+
+
+skinparam ParticipantPadding 30
+skinparam BoxPadding 30
+skinparam SequenceBoxBackgroundColor AliceBlue
+skinparam ActorBorderColor SaddleBrown
+skinparam sequenceMessageAlign left
+
+box Upstream
+participant "Producer" as UpstreamProducer << (C,#ADD1B2) >> order 0
+participant "Adapter" as UpstreamProducerAdapter << (C,#ADD1B2) >> order 1
+end box
+
+participant "Tansport" as UpstreamTransport << (S, LightBlue) >> order 2
+
+box "Gateway"
+participant "Adapter" as GatewayConsumerAdapter << (C,#ADD1B2) >> order 3
+participant "Consumer" as GatewayConsumer << (C,#ADD1B2) >> order 4
+box JobExecution #LightCyan
+participant GatewayJobHandler << (C,#ADD1B2) >> order 5
+end box
+participant "Gateway" as Gateway << (C,#ADD1B2) >> order 6
+participant "Producer" as GatewayProducer << (C,#ADD1B2) >> order 7
+participant "Adapter" as GatewayProducerAdapter << (C,#ADD1B2) >> order 8
+end box
+
+participant "Tansport" as DownstreamTransport << (S, LightBlue) >> order 9
+
+box Downstream
+participant "Adapter" as DownstreamConsumerAdapter << (C,#ADD1B2) >> order 10
+participant "Consumer" as DownstreamConsumer << (C,#ADD1B2) >> order 11
+end box
+
+box JobExecution #LightCyan
+participant DownstreamJobHandler << (C,#ADD1B2) >> order 12
+end box
+
+participant "Lower Layer" as Lower << (S, LightBlue) >> order 13
+
+
+activate UpstreamProducer
+UpstreamProducer -> UpstreamProducerAdapter : publish(command)
+activate UpstreamProducerAdapter
+UpstreamProducerAdapter -> UpstreamTransport : publish(command)
+UpstreamTransport -> GatewayConsumerAdapter: execute(command)
+UpstreamTransport -> UpstreamProducerAdapter : resolves()
+activate GatewayConsumerAdapter
+& GatewayConsumerAdapter -> GatewayConsumer : handler(command, done)
+activate GatewayConsumer
+create GatewayJobHandler
+GatewayConsumer --> GatewayJobHandler : subscribe("done")
+activate GatewayJobHandler
+& UpstreamProducerAdapter -> UpstreamProducer : resolves()
+GatewayConsumer --> Gateway : emit("command", GatewayJobHandler)
+activate Gateway
+& {UpstreamStart} UpstreamProducer -> UpstreamProducerAdapter : subscribe(handler)
+UpstreamProducerAdapter -> UpstreamTransport : subscribe("response")
+& Gateway -> GatewayProducer : publish(command)
+activate GatewayProducer
+GatewayProducer -> GatewayProducerAdapter : publish(command)
+activate GatewayProducerAdapter
+GatewayProducerAdapter -> DownstreamTransport : publish(command)
+DownstreamTransport -> DownstreamConsumerAdapter: execute(command)
+DownstreamTransport -> GatewayProducerAdapter : resolves()
+activate DownstreamConsumerAdapter
+& DownstreamConsumerAdapter -> DownstreamConsumer : handler(command, done)
+activate DownstreamConsumer
+create DownstreamJobHandler
+DownstreamConsumer --> DownstreamJobHandler : subscribe("done")
+activate DownstreamJobHandler
+& GatewayProducerAdapter -> GatewayProducer : resolves()
+DownstreamConsumer --> Lower : emit("command", GatewayJobHandler)
+activate Lower
+& {GatewayStart} GatewayProducer -> GatewayProducerAdapter : subscribe(handler)
+GatewayProducerAdapter -> DownstreamTransport : subscribe("response")
+Lower -> DownstreamJobHandler : done()
+deactivate Lower
+DownstreamJobHandler --> DownstreamConsumer : emit("done")
+deactivate DownstreamJobHandler
+destroy DownstreamJobHandler
+DownstreamConsumer -> DownstreamConsumerAdapter : done(response)
+deactivate DownstreamConsumer
+DownstreamConsumerAdapter -> DownstreamTransport : done(response)
+deactivate DownstreamConsumerAdapter
+DownstreamTransport --> GatewayProducerAdapter : emit("response", response)
+GatewayProducerAdapter -> GatewayProducer : handler("response")
+{GatewayEnd} GatewayProducer --> GatewayProducer : onTimeOut(getDelay())
+GatewayProducer -> GatewayProducerAdapter : unsubscribe()
+deactivate GatewayProducerAdapter
+GatewayProducer -> Gateway : resolve(responses)
+{GatewayStart} <-> {GatewayEnd} : getDelay(command)
+deactivate GatewayProducer
+Gateway -> GatewayJobHandler : done()
+deactivate Gateway
+GatewayJobHandler --> GatewayConsumer : emit("done")
+deactivate GatewayJobHandler
+destroy GatewayJobHandler
+GatewayConsumer -> GatewayConsumerAdapter : done(response)
+deactivate GatewayConsumer
+GatewayConsumerAdapter -> UpstreamTransport : done(response)
+deactivate GatewayConsumerAdapter
+UpstreamTransport --> UpstreamProducerAdapter : emit("response", response)
+UpstreamProducerAdapter -> UpstreamProducer : handler("response")
+UpstreamTransport --> UpstreamProducerAdapter : emit("response", response)
+UpstreamProducerAdapter -> UpstreamProducer : handler("response")
+{UpstreamEnd} UpstreamProducer --> UpstreamProducer : onTimeOut(getDelay())
+UpstreamProducer -> UpstreamProducerAdapter : unsubscribe()
+deactivate UpstreamProducerAdapter
+{UpstreamStart} <-> {UpstreamEnd} : getDelay(command)
+deactivate UpstreamProducer
+
+@enduml

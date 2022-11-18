@@ -1,0 +1,58 @@
+@startuml sequences-producer-sync-async
+
+!pragma teoz true
+skinparam sequenceArrowThickness 2
+skinparam roundcorner 20
+skinparam maxmessagesize 200
+
+
+skinparam ParticipantPadding 30
+skinparam BoxPadding 30
+skinparam SequenceBoxBackgroundColor AliceBlue
+skinparam ActorBorderColor SaddleBrown
+skinparam sequenceMessageAlign left
+
+participant "Upper Layer" as Upper << (S, LightBlue) >> order 0
+box "Producer"
+participant "Producer" as Producer << (C,#ADD1B2) >> order 1
+participant "Producer Adapter" as Adapter << (C,#ADD1B2) >> order 2
+end box
+participant "Tansport Layer" as Transport << (S, LightBlue) >> order 4
+
+group Sync command process
+    Upper -> Producer : command(command)
+    activate Producer
+    Producer -> Adapter : publish(command)
+    activate Adapter
+    Adapter -> Transport : publish(command)
+    activate Transport
+    Transport -> Adapter : resolve(responses)
+    deactivate Transport
+    Adapter -> Producer : resolve(responses)
+    deactivate Adapter
+    Producer -> Upper : resolve(responses)
+    deactivate Producer
+end
+
+group Async command process
+    Upper -> Producer : command(command)
+    activate Producer
+    Producer -> Adapter : publish(command)
+    Adapter -> Transport : publish(command)
+    Transport -> Adapter : resolves()
+    Adapter -> Producer : resolves()
+    {start} Producer -> Adapter : subscribe(handler)
+    Adapter -> Transport : subscribe("response")
+    Transport --> Adapter : emit("response", response)
+    Adapter -> Producer : handler("response")
+    ...
+    Transport --> Adapter : emit("response", response)
+    Adapter -> Producer : handler("response")
+    {end} Producer --> Producer : onTimeOut(getDelay())
+    Producer -> Adapter : unsubscribe()
+    Producer -> Upper : resolve(responses)
+    {start} <-> {end} : getDelay(command)
+    deactivate Producer
+end
+
+@enduml

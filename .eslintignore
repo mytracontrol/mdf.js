@@ -1,0 +1,6 @@
+.config/
+.eslintrc.js
+.prettierrc.js
+node_modules/
+.vscode/
+libs/**/*.js

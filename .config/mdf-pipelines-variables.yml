@@ -1,0 +1,44 @@
+variables:
+  - group: NPM-Secrets
+  #- group: Netin-Signing
+  #- group: Netin-Release
+  - name: isMaster
+    value: ${{ eq(variables['Build.SourceBranch'], 'refs/heads/master') }}
+  - name: isDevelop
+    value: ${{ eq(variables['Build.SourceBranch'], 'refs/heads/develop') }}
+  - name: isRelease
+    value: ${{ startsWith(variables['Build.SourceBranch'], 'refs/heads/release/') }}
+  - name: isHotfix
+    value: ${{ startsWith(variables['Build.SourceBranch'], 'refs/heads/hotfix/') }}
+  - name: isFeature
+    value: ${{ startsWith(variables['Build.SourceBranch'], 'refs/heads/feature/') }}
+  - name: isPR
+    value: ${{ eq(variables['Build.Reason'], 'PullRequest') }}
+  - name: isManual
+    value: ${{ eq(variables['Build.Reason'], 'Manual') }}
+  - name: isBuildable
+    value: ${{ or(eq(variables['Build.SourceBranch'], 'refs/heads/master'), eq(variables['Build.SourceBranch'], 'refs/heads/develop'), startsWith(variables['Build.SourceBranch'], 'refs/heads/release/'), startsWith(variables['Build.SourceBranch'], 'refs/heads/hotfix/'), eq(variables['Build.Reason'], 'PullRequest')) }}
+  - name: imageTag
+    ${{ if eq(variables.isFeature, true) }}:
+      value: 'nighty'
+    ${{ if or(eq(variables.isRelease, true), eq(variables.isHotfix, true)) }}:
+      value: 'beta'
+    ${{ if eq(variables.isDevelop, true) }}:
+      value: 'alpha'
+    ${{ if eq(variables.isMaster, true) }}:
+      value: 'latest'
+    ${{ if eq(variables.isPR, true) }}:
+      value: 'test'
+  - name: dockerTag
+    ${{ if eq(variables.isFeature, true) }}:
+      value: $(Build.SourceBranchName)
+    ${{ if eq(variables.isPR, true) }}:
+      value: $(Build.SourceBranchName)
+    ${{ if or(eq(variables.isRelease, true), eq(variables.isHotfix, true)) }}:
+      value: 'beta'
+    ${{ if eq(variables.isDevelop, true) }}:
+      value: 'alpha'
+    ${{ if eq(variables.isMaster, true) }}:
+      value: 'latest'
+  - name: disable.coverage.autogenerate
+    value: 'true'
