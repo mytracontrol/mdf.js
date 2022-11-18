@@ -5,11 +5,15 @@
  * or at https://opensource.org/licenses/MIT.
  */
 
-import { Health, JobHandler } from '@mdf.js/core';
+import { Health, Jobs } from '@mdf.js/core';
 import { Plugs, SourceOptions } from '../types';
 import { Base } from './core';
 
-export class Sequence extends Base<Plugs.Source.Sequence> {
+export class Sequence<Type extends string = string, Data = any> extends Base<
+  Plugs.Source.Sequence<Type, Data>,
+  Type,
+  Data
+> {
   /** Indication of pending data request flag */
   private pendingRequest = false;
   /** Actual window size */
@@ -21,7 +25,7 @@ export class Sequence extends Base<Plugs.Source.Sequence> {
    * @param plug - Sequence source plug
    * @param options - source options
    */
-  constructor(plug: Plugs.Source.Sequence, options?: SourceOptions) {
+  constructor(plug: Plugs.Source.Sequence<Type, Data>, options?: SourceOptions) {
     super(plug, options);
   }
   /** Perform the read of data from the source */
@@ -83,7 +87,10 @@ export class Sequence extends Base<Plugs.Source.Sequence> {
     for (const job of arrayOfJobs) {
       this.push(
         this.subscribeJob(
-          new JobHandler(job.data, job.jobId, job.type, { headers: job.headers, qos: this.qos })
+          new Jobs.JobHandler(job.data, job.jobId, job.type, {
+            headers: job.headers,
+            qos: this.qos,
+          })
         )
       );
     }
@@ -101,7 +108,10 @@ export class Sequence extends Base<Plugs.Source.Sequence> {
     if (
       !this.push(
         this.subscribeJob(
-          new JobHandler(job.data, job.jobId, job.type, { headers: job.headers, qos: this.qos })
+          new Jobs.JobHandler(job.data, job.jobId, job.type, {
+            headers: job.headers,
+            qos: this.qos,
+          })
         )
       )
     ) {

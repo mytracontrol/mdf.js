@@ -5,7 +5,7 @@
  * or at https://opensource.org/licenses/MIT.
  */
 
-import { Health, JobHandler, Jobs } from '@mdf.js/core';
+import { Health, Jobs } from '@mdf.js/core';
 import { Crash, Multi } from '@mdf.js/crash';
 import { DebugLogger, LoggerInstance, SetContext } from '@mdf.js/logger';
 import { overallStatus } from '@mdf.js/utils';
@@ -15,7 +15,11 @@ import { Plugs, SourceOptions } from '../../types';
 import { DEFAULT_READABLE_OPTIONS } from './const';
 import { PlugWrapper } from './PlugWrapper';
 
-export declare interface Base<T extends Plugs.Source.Any> {
+export declare interface Base<
+  T extends Plugs.Source.Any<Type, Data>,
+  Type extends string = string,
+  Data = any
+> {
   /** Emitted when stream.resume() is called and readableFlowing is not true*/
   on(event: 'resume', listener: () => void): this;
   /** Emitted when there is data available to be read from the stream */
@@ -33,13 +37,17 @@ export declare interface Base<T extends Plugs.Source.Any> {
   /** Emitted on every state change */
   on(event: 'status', listener: (status: Health.API.Status) => void): this;
   /** Emitted when a job is created */
-  on(event: 'job', listener: (job: JobHandler) => void): this;
+  on(event: 'job', listener: (job: Jobs.JobHandler<Type, Data>) => void): this;
   /** Emitted when a job has ended */
   on(event: 'done', listener: (uuid: string, result: Jobs.Result, error?: Crash) => void): this;
 }
 
 /** Firehose source (Readable) plug class */
-export abstract class Base<T extends Plugs.Source.Any>
+export abstract class Base<
+    T extends Plugs.Source.Any<Type, Data>,
+    Type extends string = string,
+    Data = any
+  >
   extends Readable
   implements Health.Component
 {
@@ -203,7 +211,7 @@ export abstract class Base<T extends Plugs.Source.Any>
    * Manage the events of the jobs
    * @param job - job object
    */
-  protected subscribeJob(job: JobHandler<any>): JobHandler<any> {
+  protected subscribeJob(job: Jobs.JobHandler<any>): Jobs.JobHandler<any> {
     job.once('done', this.onJobDone);
     this.emit('job', job);
     return job;

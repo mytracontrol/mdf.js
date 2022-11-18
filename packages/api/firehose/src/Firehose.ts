@@ -5,7 +5,7 @@
  * or at https://opensource.org/licenses/MIT.
  */
 
-import { Health, JobHandler, Jobs } from '@mdf.js/core';
+import { Health, Jobs } from '@mdf.js/core';
 import { Crash } from '@mdf.js/crash';
 import { DebugLogger, LoggerInstance, SetContext } from '@mdf.js/logger';
 import { Service as RegisterService } from '@mdf.js/register-service';
@@ -26,7 +26,7 @@ import {
   WrappableSourcePlug,
 } from './types';
 
-export declare interface Firehose<Type, Data> {
+export declare interface Firehose<Type extends string = string, Data = any> {
   /** Due to the implementation of consumer classes, this event will never emitted */
   on(event: 'error', listener: (error: Error | Crash) => void): this;
   /** Emitted on every state change */
@@ -46,11 +46,11 @@ export class Firehose<Type extends string = string, Data = any>
   /** Provider unique identifier for trace purposes */
   readonly componentId: string = v4();
   /** Engine stream */
-  private readonly engine: Engine;
+  private readonly engine: Engine<Type, Data>;
   /** Sink streams */
-  private readonly sinks: Sinks[];
+  private readonly sinks: Sinks<Type, Data>[];
   /** Source streams */
-  private readonly sources: Sources[];
+  private readonly sources: Sources<Type, Data>[];
   /** Metrics handler */
   private readonly metricsHandler?: MetricsHandler;
   /** Error registry handler */
@@ -62,7 +62,7 @@ export class Firehose<Type extends string = string, Data = any>
    * @param name - Firehose name
    * @param options - Firehose options
    */
-  constructor(public readonly name: string, private readonly options: FirehoseOptions) {
+  constructor(public readonly name: string, private readonly options: FirehoseOptions<Type, Data>) {
     super();
     // Stryker disable next-line all
     this.logger = SetContext(
@@ -81,7 +81,7 @@ export class Firehose<Type extends string = string, Data = any>
       this.options.sources,
       this.options.atLeastOne ? 1 : this.sinks.length
     );
-    this.engine = new Engine(this.name, {
+    this.engine = new Engine<Type, Data>(this.name, {
       strategies: this.options.strategies,
       transformOptions: { highWaterMark: this.options.bufferSize },
       logger: this.options.logger,
@@ -102,12 +102,15 @@ export class Firehose<Type extends string = string, Data = any>
    * sinks that must be successfully processed to consider the job as successfully processed
    * @returns
    */
-  private getSourceStreams(sources: Plugs.Source.Any[], qos = 1): Sources[] {
-    const sourceStreams: Sources[] = [];
+  private getSourceStreams(
+    sources: Plugs.Source.Any<Type, Data>[],
+    qos = 1
+  ): Sources<Type, Data>[] {
+    const sourceStreams: Sources<Type, Data>[] = [];
     for (const source of sources) {
       if (this.isFlowSource(source)) {
         sourceStreams.push(
-          new Source.Flow(source, {
+          new Source.Flow<Type, Data>(source, {
             retryOptions: this.options.retryOptions,
             qos,
             readableOptions: { highWaterMark: this.options.bufferSize },
@@ -117,7 +120,7 @@ export class Firehose<Type extends string = string, Data = any>
         );
       } else if (this.isSequenceSource(source)) {
         sourceStreams.push(
-          new Source.Sequence(source, {
+          new Source.Sequence<Type, Data>(source, {
             retryOptions: this.options.retryOptions,
             qos,
             readableOptions: { highWaterMark: this.options.bufferSize },
@@ -206,7 +209,7 @@ export class Firehose<Type extends string = string, Data = any>
     this.emit('status', this.overallStatus);
   };
   /** Source job create event handler */
-  private readonly onJobEvent = (job: JobHandler<Type, Data>) => {
+  private readonly onJobEvent = (job: Jobs.JobHandler<Type, Data>) => {
     this.emit('job', job.toObject());
   };
   /** Source job done error event handler */

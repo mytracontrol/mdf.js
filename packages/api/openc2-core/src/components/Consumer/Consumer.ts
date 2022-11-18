@@ -4,7 +4,7 @@
  * Use of this source code is governed by an MIT-style license that can be found in the LICENSE file
  * or at https://opensource.org/licenses/MIT.
  */
-import { Health, JobHandler } from '@mdf.js/core';
+import { Health, Jobs } from '@mdf.js/core';
 import { Crash } from '@mdf.js/crash';
 import { Accessors, Checkers, Helpers } from '../../helpers';
 import {
@@ -169,7 +169,7 @@ export class Consumer extends Component<AdapterWrapper, ConsumerOptions> {
   private createJobFromCommand(message: Control.CommandMessage): CommandJobHandler {
     // Stryker disable next-line all
     this.logger.info(`Job - ${message.content.action}-${Object.keys(message.content.target)[0]}`);
-    return new JobHandler(message, message.request_id, 'command', {
+    return new Jobs.JobHandler(message, message.request_id, 'command', {
       headers: { duration: Accessors.getDelayFromCommandMessage(message) },
     });
   }

@@ -9,7 +9,7 @@
  * unless prior written permission is obtained from Netin System S.L.
  */
 
-import { JobHandler, Jobs } from '@mdf.js/core';
+import { Jobs } from '@mdf.js/core';
 import { Service } from '@mdf.js/metrics-service';
 import { Sources } from '../types';
 import { JOBS_METRICS_DEFINITIONS } from './MetricsDefinitions';
@@ -32,7 +32,7 @@ export class MetricsHandler {
    * Update the job processing metrics of a firehose
    * @param job - job to be managed
    */
-  private readonly onJobEventHandler = (job: JobHandler<any>): void => {
+  private readonly onJobEventHandler = (job: Jobs.JobHandler<any, any>): void => {
     this.metrics.api_all_job_in_processing_total.inc({ type: job.type });
     const onDoneHandler: (uuid: string, result: Jobs.Result) => void = (
       uuid: string,
@@ -53,7 +53,7 @@ export class MetricsHandler {
    * Register the metrics handler to a firehose source
    * @param source - Source to be managed
    */
-  public register(source: Sources): void {
+  public register(source: Sources<any, any>): void {
     source.on('job', this.onJobEventHandler);
   }
 }

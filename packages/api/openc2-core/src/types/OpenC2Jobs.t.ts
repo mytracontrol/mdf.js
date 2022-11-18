@@ -5,8 +5,8 @@
  * or at https://opensource.org/licenses/MIT.
  */
 
-import { JobHandler, Jobs } from '@mdf.js/core';
+import { Jobs } from '@mdf.js/core';
 import { Control } from '.';
 
-export type CommandJobHandler = JobHandler<'command', Control.CommandMessage>;
+export type CommandJobHandler = Jobs.JobHandler<'command', Control.CommandMessage>;
 export type CommandJobDone = Jobs.Result<'command'> & { command: Control.CommandMessage };

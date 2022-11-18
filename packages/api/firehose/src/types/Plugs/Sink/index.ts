@@ -11,4 +11,4 @@ export * from './Tap.i';
 import { Jet } from './Jet.i';
 import { Tap } from './Tap.i';
 
-export type Any = Jet | Tap;
+export type Any<Type extends string = string, Data = any> = Jet<Type, Data> | Tap<Type, Data>;

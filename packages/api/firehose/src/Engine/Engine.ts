@@ -4,7 +4,7 @@
  * Use of this source code is governed by an MIT-style license that can be found in the LICENSE file
  * or at https://opensource.org/licenses/MIT.
  */
-import { Health, JobHandler, Jobs } from '@mdf.js/core';
+import { Health, Jobs } from '@mdf.js/core';
 import { Crash, Multi } from '@mdf.js/crash';
 import { DebugLogger, LoggerInstance, SetContext } from '@mdf.js/logger';
 import { get, merge } from 'lodash';
@@ -51,7 +51,7 @@ export class Engine<Type extends string = string, Data = any>
    * @param options - engine options
    */
   constructor(public readonly name: string, private readonly options?: EngineOptions<Type, Data>) {
-    super(merge(DEFAULT_TRANSFORM_OPTIONS, options));
+    super(merge(DEFAULT_TRANSFORM_OPTIONS, options?.transformOptions));
     // Stryker disable next-line all
     this.logger = SetContext(
       options?.logger || new DebugLogger(`mdf:stream:engine:${name}`),
@@ -65,7 +65,7 @@ export class Engine<Type extends string = string, Data = any>
    * @param job - publication job object
    */
   override _transform(
-    job: JobHandler<Type, Data>,
+    job: Jobs.JobHandler<Type, Data>,
     encoding: string,
     callback: (error?: Crash, chunk?: any) => void
   ): void {
@@ -95,9 +95,9 @@ export class Engine<Type extends string = string, Data = any>
    * @returns
    */
   private executeStrategy(
-    job: JobHandler<any>,
+    job: Jobs.JobHandler<Type, Data>,
     strategy: Jobs.Strategy<Type, Data>
-  ): JobHandler<Type, Data> {
+  ): Jobs.JobHandler<Type, Data> {
     try {
       const result = strategy.do(job.toObject());
       if (!result || result.data === undefined || result.data === null) {

@@ -10,8 +10,8 @@ import { Crash, Multi } from '@mdf.js/crash';
 import { v5 } from 'uuid';
 import { Jobs } from '..';
 import { MDF_NAMESPACE_OID } from '../const';
-import { Status } from '../types/jobs';
 import { JobHandler } from './JobHandler';
+import { Status } from './types';
 
 // #endregion
 // *************************************************************************************************

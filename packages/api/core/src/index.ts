@@ -5,5 +5,5 @@
  * or at https://opensource.org/licenses/MIT.
  */
 
-export * from './JobHandler';
-export * from './types';
+export * as Health from './Health';
+export * as Jobs from './Jobs';

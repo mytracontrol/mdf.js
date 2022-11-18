@@ -876,18 +876,19 @@ describe('#Port #Kafka #Consumer', () => {
       const port = new Port(DEFAULT_CONFIG, new FakeLogger() as LoggerInstance);
       expect(port).toBeDefined();
       //@ts-ignore - Test environment
-      jest.spyOn(port.instance.admin, 'connect').mockResolvedValue();
-      //@ts-ignore - Test environment
-      jest.spyOn(port.instance.client, 'connect').mockRejectedValue(new Error('myError'));
+      jest.spyOn(port.instance.admin, 'connect').mockRejectedValue(new Error('myError'));
       try {
         await port.start();
         throw new Error('Should not be here');
       } catch (error: any) {
         expect(error.message).toEqual(
-          'Error in port initialization: Error in initial connection process: myError'
+          'Error in port initialization: Error in initial connection process: Error setting the monitoring client: myError'
         );
-        expect(error.cause.message).toEqual('Error in initial connection process: myError');
-        expect(error.cause.cause.message).toEqual('myError');
+        expect(error.cause.message).toEqual(
+          'Error in initial connection process: Error setting the monitoring client: myError'
+        );
+        expect(error.cause.cause.message).toEqual('Error setting the monitoring client: myError');
+        expect(error.cause.cause.cause.message).toEqual('myError');
       }
     }, 300);
     it(`Should reject to stop if admin rejects`, async () => {

@@ -5,7 +5,7 @@
  * or at https://opensource.org/licenses/MIT.
  */
 
-import { JobHandler } from '@mdf.js/core';
+import { Jobs } from '@mdf.js/core';
 import { Middleware } from '@mdf.js/middlewares';
 import express from 'express';
 import request from 'supertest';
@@ -36,7 +36,7 @@ const COMMAND: Control.CommandMessage = {
 const app = express();
 const myRegistry = new Registry('myRegistry');
 myRegistry.push(COMMAND);
-const job = new JobHandler(COMMAND, COMMAND.request_id, 'command', {
+const job = new Jobs.JobHandler(COMMAND, COMMAND.request_id, 'command', {
   headers: { duration: Accessors.getDelayFromCommandMessage(COMMAND) },
 });
 myRegistry.push(job);

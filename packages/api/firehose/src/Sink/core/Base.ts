@@ -16,7 +16,11 @@ import { PlugWrapper } from './PlugWrapper';
 import { DebugLogger, LoggerInstance, SetContext } from '@mdf.js/logger';
 import { DEFAULT_WRITABLE_OPTIONS } from './const';
 
-export declare interface Base<T extends Plugs.Sink.Any> {
+export declare interface Base<
+  T extends Plugs.Sink.Any<Type, Data>,
+  Type extends string = string,
+  Data = any
+> {
   /** Emitted when the stream have been closed */
   on(event: 'close', listener: () => void): this;
   /** Emitted when it is appropriate to resume writing data to the stream */
@@ -48,7 +52,14 @@ export declare interface Base<T extends Plugs.Sink.Any> {
 }
 
 /** Firehose sink (Writable) plug class */
-export abstract class Base<T extends Plugs.Sink.Any> extends Writable implements Health.Component {
+export abstract class Base<
+    T extends Plugs.Sink.Any<Type, Data>,
+    Type extends string = string,
+    Data = any
+  >
+  extends Writable
+  implements Health.Component
+{
   /** Debug logger for development and deep troubleshooting */
   protected readonly logger: LoggerInstance;
   /** Store the last error detected in the stream */
@@ -56,7 +67,7 @@ export abstract class Base<T extends Plugs.Sink.Any> extends Writable implements
   /** Flag to indicate that an unhealthy status has been emitted recently */
   private lastStatusEmitted?: Health.API.Status;
   /** Wrapped source plug */
-  private readonly plugWrapper: PlugWrapper;
+  private readonly plugWrapper: PlugWrapper<Type, Data>;
   /**
    * Create a new instance for a firehose sink
    * @param plug - sink plug instance
@@ -168,7 +179,7 @@ export abstract class Base<T extends Plugs.Sink.Any> extends Writable implements
     this.emitStatus();
   };
   /** Wrap super and plug events in the same to aggregate them in one component */
-  private wrappingEvents(plug: Plugs.Sink.Any): void {
+  private wrappingEvents(plug: Plugs.Sink.Any<Type, Data>): void {
     super.on('error', this.onErrorEvent);
     super.on('unpipe', this.onUnpipeEvent);
     super.on('pipe', this.onPipeEvent);

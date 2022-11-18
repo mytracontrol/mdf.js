@@ -11,4 +11,4 @@ export * from './Sequence.i';
 import { Flow } from './Flow.i';
 import { Sequence } from './Sequence.i';
 
-export type Any = Flow | Sequence;
+export type Any<Type extends string = string, Data = any> = Flow<Type, Data> | Sequence<Type, Data>;

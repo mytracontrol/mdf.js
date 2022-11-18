@@ -14,7 +14,7 @@ import { Plugs, PostConsumeOptions } from '.';
 
 export interface FirehoseOptions<Type extends string = string, Data = any> {
   /** Firehose sources */
-  sources: Plugs.Source.Any[];
+  sources: Plugs.Source.Any<Type, Data>[];
   /** Firehose sinks */
   sinks: Plugs.Sink.Any[];
   /** Firehose transformation strategies per job type */

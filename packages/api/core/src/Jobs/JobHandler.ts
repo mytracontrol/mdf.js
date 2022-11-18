@@ -8,7 +8,7 @@ import { Crash, Multi } from '@mdf.js/crash';
 import { EventEmitter } from 'events';
 import { v4, v5 } from 'uuid';
 import { MDF_NAMESPACE_OID } from '../const';
-import { Jobs } from '../types';
+import { Headers, JobObject, Options, Result, Status } from './types';
 
 /**
  * JobHandler events
@@ -16,26 +16,23 @@ import { Jobs } from '../types';
  */
 export declare interface JobHandler<Type, Data> {
   /** Emitted when a job has ended */
-  on(
-    event: 'done',
-    listener: (uuid: string, result: Jobs.Result<Type>, error?: Multi) => void
-  ): this;
+  on(event: 'done', listener: (uuid: string, result: Result<Type>, error?: Multi) => void): this;
 }
 
-export class JobHandler<Type = string, Data = any>
+export class JobHandler<Type extends string = string, Data = any>
   extends EventEmitter
-  implements Jobs.JobObject<Type, Data>
+  implements JobObject<Type, Data>
 {
   /** Job processing identification */
   public readonly uuid: string;
   /** Date object with the timestamp when the job was created */
   public readonly createdAt: Date;
   /** Job meta information, used to pass specific information for sinks and sources */
-  public readonly headers: Jobs.Headers;
+  public readonly headers: Headers;
   /** Date object with the timestamp when the job was resolved */
   private resolvedAt?: Date;
   /** Job processing status */
-  private _status: Jobs.Status = Jobs.Status.PENDING;
+  private _status: Status = Status.PENDING;
   /** Error raised during job processing */
   private _errors?: Multi;
   /** Job payload */
@@ -52,8 +49,8 @@ export class JobHandler<Type = string, Data = any>
   constructor(
     data: Data,
     public readonly jobId: string,
-    public readonly type: Type = 'default' as Type,
-    options?: Jobs.Options
+    public readonly type: Type,
+    options?: Options
   ) {
     super();
     if (typeof jobId !== 'string') {
@@ -114,7 +111,7 @@ export class JobHandler<Type = string, Data = any>
     }
   }
   /** Return the job processing status */
-  public get status(): Jobs.Status {
+  public get status(): Status {
     return this._status;
   }
   /**
@@ -144,15 +141,15 @@ export class JobHandler<Type = string, Data = any>
     if (this.pendingDone <= 0 && !this.resolvedAt) {
       this.resolvedAt = new Date();
       if (this.hasErrors) {
-        this._status = Jobs.Status.FAILED;
+        this._status = Status.FAILED;
       } else {
-        this._status = Jobs.Status.COMPLETED;
+        this._status = Status.COMPLETED;
       }
       this.emit('done', this.uuid, this.result(), this._errors);
     }
   }
   /** Return the result of the publication process */
-  public result(): Jobs.Result<Type> {
+  public result(): Result<Type> {
     return {
       id: this.uuid,
       createdAt: this.createdAt.toISOString(),
@@ -166,7 +163,7 @@ export class JobHandler<Type = string, Data = any>
     };
   }
   /** Return an object with the key information of the job, this information is used by the plugs */
-  public toObject(): Jobs.JobObject<Type, Data> {
+  public toObject(): JobObject<Type, Data> {
     return {
       data: this.data,
       type: this.type,
@@ -177,8 +174,8 @@ export class JobHandler<Type = string, Data = any>
   }
   /** Update the job status to processing if it is in pending state */
   private updateStatusToProcessing(): void {
-    if (this._status === Jobs.Status.PENDING) {
-      this._status = Jobs.Status.PROCESSING;
+    if (this._status === Status.PENDING) {
+      this._status = Status.PROCESSING;
     }
   }
 }

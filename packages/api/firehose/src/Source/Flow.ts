@@ -5,17 +5,21 @@
  * or at https://opensource.org/licenses/MIT.
  */
 
-import { JobHandler } from '@mdf.js/core';
+import { Jobs } from '@mdf.js/core';
 import { Plugs, SourceOptions } from '../types';
 import { Base } from './core';
 
-export class Flow extends Base<Plugs.Source.Flow> {
+export class Flow<Type extends string = string, Data = any> extends Base<
+  Plugs.Source.Flow<Type, Data>,
+  Type,
+  Data
+> {
   /**
    * Create a new instance for the firehose source
    * @param plug - Flow source plug
    * @param options - source options
    */
-  constructor(plug: Plugs.Source.Flow, options?: SourceOptions) {
+  constructor(plug: Plugs.Source.Flow<Type, Data>, options?: SourceOptions) {
     super(plug, options);
     this.plug.on('data', this._onJobReceived);
   }
@@ -27,13 +31,16 @@ export class Flow extends Base<Plugs.Source.Flow> {
    * Process the received jobs
    * @param job - job to be processed
    */
-  private readonly _onJobReceived = (job: Plugs.Source.JobObject) => {
+  private readonly _onJobReceived = (job: Plugs.Source.JobObject<Type, Data>) => {
     // Stryker disable next-line all
     this.logger.verbose(`New job from consumer: ${job.jobId}`);
     if (
       !this.push(
         this.subscribeJob(
-          new JobHandler(job.data, job.jobId, job.type, { headers: job.headers, qos: this.qos })
+          new Jobs.JobHandler<Type, Data>(job.data, job.jobId, job.type, {
+            headers: job.headers,
+            qos: this.qos,
+          })
         )
       )
     ) {

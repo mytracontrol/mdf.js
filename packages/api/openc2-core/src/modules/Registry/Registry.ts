@@ -5,7 +5,7 @@
  * or at https://opensource.org/licenses/MIT.
  */
 
-import { Health, JobHandler } from '@mdf.js/core';
+import { Health, Jobs } from '@mdf.js/core';
 import { Crash } from '@mdf.js/crash';
 import { EventEmitter } from 'stream';
 import { v4 } from 'uuid';
@@ -53,7 +53,7 @@ export class Registry extends EventEmitter implements Health.Component {
    */
   public push(message: Control.Message): void;
   public push(item: Control.Message | CommandJobHandler): void {
-    if (item instanceof JobHandler) {
+    if (item instanceof Jobs.JobHandler) {
       this.pendingJobs.set(item.uuid, item);
     } else {
       this.messages.push(item);

@@ -9,7 +9,7 @@ import { MultiObject } from '@mdf.js/crash';
 import { Status } from './Status.t';
 
 /** Job result interface */
-export interface Result<Type = string> {
+export interface Result<Type extends string = string> {
   /** Job type */
   type: Type;
   /** Publication process job identification */

@@ -5,23 +5,27 @@
  * or at https://opensource.org/licenses/MIT.
  */
 
-import { JobHandler } from '@mdf.js/core';
+import { Jobs } from '@mdf.js/core';
 import { Crash } from '@mdf.js/crash';
 import { Plugs, SinkOptions } from '../types';
 import { Base } from './core';
 
-export class Jet extends Base<Plugs.Sink.Jet> {
+export class Jet<Type extends string = string, Data = any> extends Base<
+  Plugs.Sink.Jet<Type, Data>,
+  Type,
+  Data
+> {
   /**
    * Create a new Jet instance
    * @param plug - Jet sink plug
    * @param options - sink options
    */
-  constructor(plug: Plugs.Sink.Jet, options?: SinkOptions) {
+  constructor(plug: Plugs.Sink.Jet<Type, Data>, options?: SinkOptions) {
     super(plug, options);
   }
   /** Perform the publication of the information on the sink destination */
   override _write(
-    data: JobHandler<any>,
+    data: Jobs.JobHandler<Type, Data>,
     encoding: string,
     callback: (error?: Crash | Error) => void
   ): void {
@@ -35,7 +39,7 @@ export class Jet extends Base<Plugs.Sink.Jet> {
   }
   /** Perform the publication of the information on the sink destination */
   override _writev?(
-    data: { chunk: JobHandler<any>; encoding: BufferEncoding }[],
+    data: { chunk: Jobs.JobHandler<Type, Data>; encoding: BufferEncoding }[],
     callback: (error?: Crash | Error) => void
   ): void {
     // Stryker disable next-line all

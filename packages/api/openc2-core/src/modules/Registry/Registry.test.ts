@@ -5,7 +5,7 @@
  * or at https://opensource.org/licenses/MIT.
  */
 
-import { JobHandler } from '@mdf.js/core';
+import { Jobs } from '@mdf.js/core';
 import { Registry } from '.';
 import { Accessors } from '../../helpers';
 import { Control } from '../../types';
@@ -73,7 +73,7 @@ describe('#Registry', () => {
     }, 300);
     it('Should manage jobs properly', () => {
       const registry = new Registry('test', 10, 100);
-      const job = new JobHandler(COMMAND, COMMAND.request_id, 'command', {
+      const job = new Jobs.JobHandler(COMMAND, COMMAND.request_id, 'command', {
         headers: { duration: Accessors.getDelayFromCommandMessage(COMMAND) },
       });
       expect(registry.pendingJobs.size).toEqual(0);
@@ -88,7 +88,7 @@ describe('#Registry', () => {
       //@ts-ignore - Test environment
       expect(registry.interval).toBeUndefined();
       expect(registry.delete(job.uuid)).toBeUndefined();
-      expect(completedJob).toBeInstanceOf(JobHandler);
+      expect(completedJob).toBeInstanceOf(Jobs.JobHandler);
       expect(registry.pendingJobs.size).toEqual(0);
       expect(registry.executedJobs.length).toEqual(1);
       for (let i = 0; i < 101; i++) {
@@ -107,7 +107,7 @@ describe('#Registry', () => {
       const registry = new Registry('test', 10, 100);
       //@ts-ignore - Test environment
       registry.timeInterval = 10;
-      const job = new JobHandler(COMMAND, COMMAND.request_id, 'command', {
+      const job = new Jobs.JobHandler(COMMAND, COMMAND.request_id, 'command', {
         headers: { duration: Accessors.getDelayFromCommandMessage(COMMAND) },
       });
       job.on('done', (job, result) => {
@@ -163,7 +163,7 @@ describe('#Registry', () => {
       });
       //@ts-ignore - Test environment
       registry.timeInterval = 10;
-      const job = new JobHandler(COMMAND, COMMAND.request_id, 'command', {
+      const job = new Jobs.JobHandler(COMMAND, COMMAND.request_id, 'command', {
         headers: { duration: Accessors.getDelayFromCommandMessage(COMMAND) },
       });
       // @ts-ignore - Test environment

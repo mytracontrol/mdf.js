@@ -5,23 +5,27 @@
  * or at https://opensource.org/licenses/MIT.
  */
 
-import { JobHandler } from '@mdf.js/core';
+import { Jobs } from '@mdf.js/core';
 import { Crash } from '@mdf.js/crash';
 import { Plugs, SinkOptions } from '../types';
 import { Base } from './core';
 
-export class Tap extends Base<Plugs.Sink.Tap> {
+export class Tap<Type extends string = string, Data = any> extends Base<
+  Plugs.Sink.Tap<Type, Data>,
+  Type,
+  Data
+> {
   /**
    * Create a new Tap instance
    * @param plug - Tap sink plug
    * @param options - sink options
    */
-  constructor(plug: Plugs.Sink.Tap, options?: SinkOptions) {
+  constructor(plug: Plugs.Sink.Tap<Type, Data>, options?: SinkOptions) {
     super(plug, options);
   }
   /** Perform the publication of the information on the sink destination */
   override _write(
-    data: JobHandler<any>,
+    data: Jobs.JobHandler<Type, Data>,
     encoding: string,
     callback: (error?: Crash | Error) => void
   ): void {

@@ -6,3 +6,4 @@
  */
 
 export * from './JobHandler';
+export * from './types';
