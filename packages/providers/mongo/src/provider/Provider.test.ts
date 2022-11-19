@@ -10,10 +10,22 @@ import { undoMocks } from '@mdf.js/utils';
 import { MongoClient } from 'mongodb';
 import { Factory } from './Factory';
 import { Port } from './Port';
-import { Config } from './types';
+import { Collections, Config } from './types';
 
 const DEFAULT_CONFIG: Config = {
   url: 'mongodb://localhost:27017',
+};
+
+const COLLECTIONS_OPTIONS: Collections = {
+  myCollection: {
+    options: { clusteredIndex: { key: { id: 1 }, unique: true, name: 'alarmIdIndex' } },
+    indexes: [
+      { key: { id: 1 }, name: 'alarmIdIndex', unique: true },
+      { key: { locationId: 1 }, name: 'locationIdIndex' },
+      { key: { deviceId: 1 }, name: 'deviceIdIndex' },
+      { key: { entity: 1 }, name: 'entityIdIndex' },
+    ],
+  },
 };
 class FakeLogger {
   public entry?: string;
@@ -140,6 +152,139 @@ describe('#Port #Mongo', () => {
       await provider.stop();
       //@ts-ignore - Test environment
       expect(provider.port.isConnected).toBeFalsy();
+    });
+    it('Should start/stop the instance properly, creating the collections if the collections not exist', async () => {
+      const provider = Factory.create({
+        useEnvironment: false,
+        name: 'mongo',
+        logger: new FakeLogger() as LoggerInstance,
+        config: {
+          collections: COLLECTIONS_OPTIONS,
+        },
+      });
+      const createIndexes = jest.fn().mockResolvedValue(undefined);
+      const toArray = jest.fn().mockResolvedValue([]);
+      const mockedDB = {
+        listCollections: jest.fn().mockReturnValue({
+          toArray,
+        }),
+        createCollection: jest.fn().mockResolvedValue(undefined),
+        collection: jest.fn().mockReturnValue({
+          createIndexes,
+        }),
+      };
+      //@ts-ignore - Test environment
+      jest.spyOn(provider.client, 'connect').mockResolvedValue();
+      //@ts-ignore - Test environment
+      jest.spyOn(provider.client, 'db').mockReturnValue(mockedDB);
+      //@ts-ignore - Test environment
+      jest.spyOn(provider.client, 'close').mockResolvedValue();
+      expect(provider.client.listenerCount('commandSucceeded')).toEqual(0);
+      expect(provider.client.listenerCount('commandFailed')).toEqual(0);
+      expect(provider.client.listenerCount('serverHeartbeatSucceeded')).toEqual(0);
+      expect(provider.client.listenerCount('serverHeartbeatFailed')).toEqual(0);
+      //@ts-ignore - Test environment
+      expect(provider.port.isConnected).toBeFalsy();
+      await provider.start();
+      //@ts-ignore - Test environment
+      expect(provider.port.isConnected).toBeTruthy();
+      expect(provider.client.listenerCount('commandSucceeded')).toEqual(2);
+      expect(provider.client.listenerCount('commandFailed')).toEqual(2);
+      expect(provider.client.listenerCount('serverHeartbeatSucceeded')).toEqual(2);
+      expect(provider.client.listenerCount('serverHeartbeatFailed')).toEqual(2);
+      await provider.start();
+      //@ts-ignore - Test environment
+      expect(provider.port.isConnected).toBeTruthy();
+      //@ts-ignore - Test environment
+      await provider.port.close();
+      //@ts-ignore - Test environment
+      expect(provider.port.isConnected).toBeFalsy();
+      expect(provider.client.listenerCount('commandSucceeded')).toEqual(0);
+      expect(provider.client.listenerCount('commandFailed')).toEqual(0);
+      expect(provider.client.listenerCount('serverHeartbeatSucceeded')).toEqual(0);
+      expect(provider.client.listenerCount('serverHeartbeatFailed')).toEqual(0);
+      await provider.stop();
+      //@ts-ignore - Test environment
+      expect(provider.port.isConnected).toBeFalsy();
+      await provider.stop();
+      //@ts-ignore - Test environment
+      expect(provider.port.isConnected).toBeFalsy();
+      expect(mockedDB.listCollections).toHaveBeenCalledTimes(1);
+      expect(toArray).toHaveBeenCalledTimes(1);
+      expect(mockedDB.listCollections.mock.calls[0][0]).toEqual({});
+      expect(mockedDB.listCollections.mock.calls[0][1]).toEqual({ nameOnly: true });
+      expect(mockedDB.createCollection).toHaveBeenCalledTimes(1);
+      expect(mockedDB.createCollection.mock.calls[0][0]).toEqual('myCollection');
+      expect(mockedDB.createCollection.mock.calls[0][1]).toEqual(
+        COLLECTIONS_OPTIONS['myCollection'].options
+      );
+      expect(mockedDB.collection).toHaveBeenCalledTimes(1);
+      expect(createIndexes).toHaveBeenCalledTimes(1);
+      expect(createIndexes.mock.calls[0][0]).toEqual(COLLECTIONS_OPTIONS['myCollection'].indexes);
+    });
+    it('Should start/stop the instance properly, and not creating the collections if the collection exist', async () => {
+      const provider = Factory.create({
+        useEnvironment: false,
+        name: 'mongo',
+        logger: new FakeLogger() as LoggerInstance,
+        config: {
+          collections: COLLECTIONS_OPTIONS,
+        },
+      });
+      const createIndexes = jest.fn().mockResolvedValue(undefined);
+      const toArray = jest.fn().mockResolvedValue([{ name: 'myCollection' }]);
+      const mockedDB = {
+        listCollections: jest.fn().mockReturnValue({
+          toArray,
+        }),
+        createCollection: jest.fn().mockResolvedValue(undefined),
+        collection: jest.fn().mockReturnValue({
+          createIndexes,
+        }),
+      };
+      //@ts-ignore - Test environment
+      jest.spyOn(provider.client, 'connect').mockResolvedValue();
+      //@ts-ignore - Test environment
+      jest.spyOn(provider.client, 'db').mockReturnValue(mockedDB);
+      //@ts-ignore - Test environment
+      jest.spyOn(provider.client, 'close').mockResolvedValue();
+      expect(provider.client.listenerCount('commandSucceeded')).toEqual(0);
+      expect(provider.client.listenerCount('commandFailed')).toEqual(0);
+      expect(provider.client.listenerCount('serverHeartbeatSucceeded')).toEqual(0);
+      expect(provider.client.listenerCount('serverHeartbeatFailed')).toEqual(0);
+      //@ts-ignore - Test environment
+      expect(provider.port.isConnected).toBeFalsy();
+      await provider.start();
+      //@ts-ignore - Test environment
+      expect(provider.port.isConnected).toBeTruthy();
+      expect(provider.client.listenerCount('commandSucceeded')).toEqual(2);
+      expect(provider.client.listenerCount('commandFailed')).toEqual(2);
+      expect(provider.client.listenerCount('serverHeartbeatSucceeded')).toEqual(2);
+      expect(provider.client.listenerCount('serverHeartbeatFailed')).toEqual(2);
+      await provider.start();
+      //@ts-ignore - Test environment
+      expect(provider.port.isConnected).toBeTruthy();
+      //@ts-ignore - Test environment
+      await provider.port.close();
+      //@ts-ignore - Test environment
+      expect(provider.port.isConnected).toBeFalsy();
+      expect(provider.client.listenerCount('commandSucceeded')).toEqual(0);
+      expect(provider.client.listenerCount('commandFailed')).toEqual(0);
+      expect(provider.client.listenerCount('serverHeartbeatSucceeded')).toEqual(0);
+      expect(provider.client.listenerCount('serverHeartbeatFailed')).toEqual(0);
+      await provider.stop();
+      //@ts-ignore - Test environment
+      expect(provider.port.isConnected).toBeFalsy();
+      await provider.stop();
+      //@ts-ignore - Test environment
+      expect(provider.port.isConnected).toBeFalsy();
+      expect(mockedDB.listCollections).toHaveBeenCalledTimes(1);
+      expect(toArray).toHaveBeenCalledTimes(1);
+      expect(mockedDB.listCollections.mock.calls[0][0]).toEqual({});
+      expect(mockedDB.listCollections.mock.calls[0][1]).toEqual({ nameOnly: true });
+      expect(mockedDB.createCollection).toHaveBeenCalledTimes(0);
+      expect(mockedDB.collection).toHaveBeenCalledTimes(0);
+      expect(createIndexes).toHaveBeenCalledTimes(0);
     });
     it('Should log events as silly', async () => {
       const logger = new FakeLogger();

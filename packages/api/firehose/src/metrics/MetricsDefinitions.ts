@@ -42,4 +42,12 @@ export const JOBS_METRICS_DEFINITIONS: Record<string, MetricConfig> = {
     buckets: [5, 10, 25, 50, 100, 250, 500, 1000, 2500, 5000, 10000],
     labelNames: ['type'],
   },
+  /** Firehose throughput in bytes */
+  api_publishing_job_throughput: {
+    type: 'Histogram',
+    name: 'api_publishing_throughput',
+    help: 'Firehose throughput in bytes',
+    buckets: [5, 10, 25, 50, 100, 250, 500, 1000, 2500, 5000, 10000],
+    labelNames: ['type'],
+  },
 };

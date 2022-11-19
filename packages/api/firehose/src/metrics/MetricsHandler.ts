@@ -34,6 +34,7 @@ export class MetricsHandler {
    */
   private readonly onJobEventHandler = (job: Jobs.JobHandler<any, any>): void => {
     this.metrics.api_all_job_in_processing_total.inc({ type: job.type });
+    const size = Buffer.from(JSON.stringify(job.data), 'utf-8').byteLength;
     const onDoneHandler: (uuid: string, result: Jobs.Result) => void = (
       uuid: string,
       result: Jobs.Result
@@ -46,6 +47,7 @@ export class MetricsHandler {
       }
       const duration = job.processTime;
       this.metrics.api_publishing_job_duration_milliseconds.observe({ type: job.type }, duration);
+      this.metrics.api_publishing_job_throughput.observe({ type: job.type }, size);
     };
     job.once('done', onDoneHandler);
   };

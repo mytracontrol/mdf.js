@@ -800,6 +800,7 @@ describe('#Firehose', () => {
         expect(metrics).toBeDefined();
         expect(metrics.metrics).toBeDefined();
         expect(metrics.metrics).toContain(`api_all_errors_job_processing_total{type="myType"} 200`);
+        expect(metrics.metrics).toContain(`api_publishing_throughput_sum{type="myType"} 492`);
         firehose.close();
         service.stop().then(done);
       }, 200);

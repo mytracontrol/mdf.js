@@ -12,7 +12,7 @@ describe(`#Config #${CONFIG_PROVIDER_BASE_NAME.toLocaleUpperCase()}`, () => {
   describe('#Happy path', () => {
     it(`Should has a default config`, () => {
       expect(defaultConfig).toMatchObject({
-        url: 'mongodb://127.0.0.1:27017',
+        url: 'mongodb://127.0.0.1:27017/mdf',
         appName: CONFIG_ARTIFACT_ID,
         serverSelectionTimeoutMS: 10000,
         keepAlive: true,

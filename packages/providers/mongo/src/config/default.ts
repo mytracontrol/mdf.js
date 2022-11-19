@@ -10,7 +10,7 @@ import { CONFIG_ARTIFACT_ID } from './utils';
 
 // *************************************************************************************************
 // #region Default values
-const CONFIG_MONGO_URL = 'mongodb://127.0.0.1:27017';
+const CONFIG_MONGO_URL = 'mongodb://127.0.0.1:27017/mdf';
 const CONFIG_MONGO_SERVER_SELECTION_TIMEOUT_M_S = 10000;
 const CONFIG_MONGO_MIN_POOL_SIZE = 4;
 const CONFIG_MONGO_KEEP_ALIVE = true;

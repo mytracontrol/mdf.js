@@ -15,7 +15,7 @@ import {
 } from 'mongodb';
 import { inspect } from 'util';
 import { CONFIG_PROVIDER_BASE_NAME } from '../config';
-import { Client, Config, MONGO_CLIENT_EVENTS } from './types';
+import { Client, Collections, Config, MONGO_CLIENT_EVENTS } from './types';
 
 export class Port extends Provider.Port<Client, Config> {
   /** Mongo connection handler */
@@ -33,7 +33,7 @@ export class Port extends Provider.Port<Client, Config> {
    */
   constructor(config: Config, logger: LoggerInstance) {
     super(config, logger, config.appName || CONFIG_PROVIDER_BASE_NAME);
-    const cleanedOptions = { ...this.config, url: undefined } as Config;
+    const cleanedOptions = { ...this.config, url: undefined, collections: undefined } as Config;
     this.instance = new MongoClient(config.url as string, cleanedOptions);
     // Stryker disable next-line all
     this.logger.debug(`New instance of Mongo port created: ${this.uuid}`, this.uuid, this.name);
@@ -59,6 +59,9 @@ export class Port extends Provider.Port<Client, Config> {
       await this.instance.connect();
       this.instance = this.eventsWrapping(this.instance);
       this.isConnected = true;
+      if (this.config.collections) {
+        await this.createCollections(this.config.collections);
+      }
     } catch (rawError) {
       const error = Crash.from(rawError);
       throw new Crash(`Error starting Mongo port: ${error.message}`, this.uuid, { cause: error });
@@ -210,5 +213,30 @@ export class Port extends Provider.Port<Client, Config> {
       instance.removeAllListeners(event);
     }
     return instance;
+  }
+  /**
+   * Check and create the collections indicated in the config
+   * @param collections - collections to be created
+   */
+  private async createCollections(collections: Collections): Promise<void> {
+    const actualCollections = (
+      await this.client.db().listCollections({}, { nameOnly: true }).toArray()
+    ).map(collection => collection.name);
+    this.logger.debug(`Collections present in the database: [${actualCollections}]`);
+    for (const collection of Object.keys(collections)) {
+      if (!actualCollections.includes(collection)) {
+        this.logger.debug(`Creating collection: ${collection}`);
+        await this.client.db().createCollection(collection, collections[collection].options);
+        if (collections[collection].indexes && collections[collection].indexes.length > 0) {
+          this.logger.debug(`Creating indexes: ${inspect(collections[collection].indexes)}`);
+          await this.client
+            .db()
+            .collection(collection)
+            .createIndexes(collections[collection].indexes);
+        }
+      } else {
+        this.logger.debug(`Collection already exists: ${collection}`);
+      }
+    }
   }
 }
