@@ -15,26 +15,26 @@ const PREFIX_PATH = '/registers';
 
 /** Router class */
 export class Router {
-  readonly #router: express.Router;
+  private readonly _router: express.Router;
   /** Persistence used by this model */
-  readonly #persistence: Registry;
+  private readonly persistence: Registry;
   /** Model class instance */
-  readonly #model: Model;
+  private readonly model: Model;
   /** Service class instance */
-  readonly #service: Service;
+  private readonly service: Service;
   /** Controller class instance */
-  readonly #controller: Controller;
+  private readonly controller: Controller;
   /**
    * Create a new instance of the Router class
    * @param persistence - persistence instance
    * @param path - prefix path for all the routes
    */
   constructor(persistence: Registry, path = PREFIX_PATH) {
-    this.#persistence = persistence;
-    this.#model = new Model(this.#persistence);
-    this.#service = new Service(this.#model);
-    this.#controller = new Controller(this.#service);
-    this.#router = this.buildRoutes(path);
+    this.persistence = persistence;
+    this.model = new Model(this.persistence);
+    this.service = new Service(this.model);
+    this.controller = new Controller(this.service);
+    this._router = this.buildRoutes(path);
   }
   /**
    * Perform the instantiation of the routes in an express router
@@ -42,11 +42,11 @@ export class Router {
    */
   private buildRoutes(registersPath: string): express.Router {
     const router = express.Router();
-    router.route(registersPath).get(this.#controller.errors.bind(this.#controller));
+    router.route(registersPath).get(this.controller.errors.bind(this.controller));
     return router;
   }
   /** Express router for health REST API component*/
   get router(): express.Router {
-    return this.#router;
+    return this._router;
   }
 }

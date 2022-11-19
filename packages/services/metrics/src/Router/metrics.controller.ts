@@ -17,17 +17,17 @@ const JSON_CONTENT_TYPE = 'application/json';
 /** Controller class */
 export class Controller {
   /** Services used by this controller */
-  readonly #service: Service;
+  private readonly service: Service;
   /** Cluster mode flag */
-  readonly #clusterMode: boolean;
+  private readonly clusterMode: boolean;
   /**
    * Create an instance of Controller class
    * @param service - service instance
    * @param isCluster - indicates that the instance of this metrics service is running in a cluster
    */
   constructor(service: Service, clusterMode: boolean) {
-    this.#service = service;
-    this.#clusterMode = clusterMode;
+    this.service = service;
+    this.clusterMode = clusterMode;
   }
   /**
    * Return all the actual metrics of this artifact
@@ -51,7 +51,7 @@ export class Controller {
         )
       );
     } else {
-      this.#service
+      this.service
         .metrics(requestCheck.jsonFormat)
         .then(result => {
           response.set('Content-type', result.contentType);
@@ -67,7 +67,7 @@ export class Controller {
   private isAcceptable(request: Request): { acceptable: boolean; jsonFormat: boolean } {
     let jsonFormat: boolean = coerce(request.query['json'] as string, false);
     let acceptable = true;
-    if (this.#clusterMode && cluster.isPrimary) {
+    if (this.clusterMode && cluster.isPrimary) {
       jsonFormat = false;
       if (!request.accepts(TEXT_CONTENT_TYPE)) {
         acceptable = false;

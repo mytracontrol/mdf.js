@@ -11,16 +11,16 @@ import { Registry } from '../Registries';
 /** Model class */
 export class Model {
   /** Registry used by this model */
-  readonly #registry: Registry;
+  private readonly registry: Registry;
   /**
    * Create an instance of model class
    * @param registry - registry instance
    */
   constructor(registry: Registry) {
-    this.#registry = registry;
+    this.registry = registry;
   }
   /** Return the state of all the providers */
   public health(uuid: string): Promise<Health.API.Health> {
-    return Promise.resolve(this.#registry.health(uuid));
+    return Promise.resolve(this.registry.health(uuid));
   }
 }

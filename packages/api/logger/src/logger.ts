@@ -32,27 +32,27 @@ export const LoggerSchema = Joi.object<LoggerConfig>({
 /** Class Logger, manage the event and log register process for netin artifacts */
 export class Logger implements LoggerInstance {
   /** Debug logger for development and deep troubleshooting */
-  #debug: Debugger;
+  private readonly _debug: Debugger;
   /** Default config */
-  readonly #defaultConfig: LoggerConfig = LoggerSchema.validate({}).value as LoggerConfig;
+  private readonly defaultConfig: LoggerConfig = LoggerSchema.validate({}).value as LoggerConfig;
   /** Actual logger configuration */
-  #config: LoggerConfig;
+  private _config: LoggerConfig;
   /** Logger de context dentro de Winston */
-  #logger: winston.Logger;
+  private readonly logger: winston.Logger;
   /** Transports */
-  #transports: winston.transport[] = [];
+  private transports: winston.transport[] = [];
   /** Number of actual configured transports */
-  #numberOfTransports = 0;
+  private numberOfTransports = 0;
   /** Actual process id */
-  readonly #pid = process.pid.toString();
+  private readonly pid = process.pid.toString();
   /** Logger configuration was wrong flag */
-  #errorInConfig = false;
+  private errorInConfig = false;
   /** Error in the configuration */
-  #configError: Multi | undefined;
+  private _configError: Multi | undefined;
   /** Logger instance UUID */
-  #uuid = v4();
+  private readonly uuid = v4();
   /** Flag that indicate if the component is running in a docker instance */
-  #isDocker: boolean | undefined;
+  private _isDocker: boolean | undefined;
   /** Create a netin logger instance with default values */
   constructor();
   /**
@@ -68,19 +68,19 @@ export class Logger implements LoggerInstance {
   constructor(label: string, configuration: LoggerConfig);
   constructor(private label = 'mdf-app', configuration?: LoggerConfig) {
     // Stryker disable all
-    this.#debug = Debug('mdf:logger');
-    this.#debug(`${process.pid} - New instance of logger for ${label}`);
-    this.#debug(`${process.pid} - Configuration in the constructor %O`, configuration);
+    this._debug = Debug('mdf:logger');
+    this._debug(`${process.pid} - New instance of logger for ${label}`);
+    this._debug(`${process.pid} - Configuration in the constructor %O`, configuration);
     // Stryker enable all
-    this.#config = this.initialize(label, configuration);
-    this.#numberOfTransports = this.#transports.length;
+    this._config = this.initialize(label, configuration);
+    this.numberOfTransports = this.transports.length;
     // Stryker disable next-line all
-    this.#debug(`${process.pid} - Number of transports configured ${this.#numberOfTransports}`);
-    this.#logger = winston.createLogger({
-      transports: [...this.#transports],
+    this._debug(`${process.pid} - Number of transports configured ${this.numberOfTransports}`);
+    this.logger = winston.createLogger({
+      transports: [...this.transports],
     });
-    if (this.#errorInConfig && this.#configError) {
-      this.error(this.#configError.message, this.#uuid, 'logger', this.#configError);
+    if (this.errorInConfig && this._configError) {
+      this.error(this._configError.message, this.uuid, 'logger', this._configError);
     }
   }
   /**
@@ -92,32 +92,32 @@ export class Logger implements LoggerInstance {
     const validation = LoggerSchema.validate(configuration);
     if (validation.error) {
       // Stryker disable next-line all
-      this.#debug(`${process.pid} - Error in the configuration, default will be applied`);
-      this.#configError = new Multi(`Logger configuration Error`, this.#uuid);
-      this.#configError.Multify(validation.error);
-      this.#errorInConfig = true;
+      this._debug(`${process.pid} - Error in the configuration, default will be applied`);
+      this._configError = new Multi(`Logger configuration Error`, this.uuid);
+      this._configError.Multify(validation.error);
+      this.errorInConfig = true;
       // Stryker disable next-line all
-      this.#debug(`${process.pid} - Error: %O`, this.#configError.toJSON());
-      this.#config = this.#defaultConfig;
+      this._debug(`${process.pid} - Error: %O`, this._configError.toJSON());
+      this._config = this.defaultConfig;
     } else {
       // Stryker disable next-line all
-      this.#debug(`${process.pid} - The configuration is valid`);
+      this._debug(`${process.pid} - The configuration is valid`);
       this.label = label;
-      this.#config = validation.value;
+      this._config = validation.value;
     }
-    this.atLeastOne(this.#config, configuration);
+    this.atLeastOne(this._config, configuration);
     // Stryker disable next-line all
-    this.#debug(`${process.pid} - Final configuration %O`, this.#config);
-    if (this.#config.file) {
-      this.setFileTransport(label, this.#config.file);
+    this._debug(`${process.pid} - Final configuration %O`, this._config);
+    if (this._config.file) {
+      this.setFileTransport(label, this._config.file);
     }
-    if (this.#config.console) {
-      this.setConsoleTransport(label, this.#config.console);
+    if (this._config.console) {
+      this.setConsoleTransport(label, this._config.console);
     }
-    if (this.#config.fluentd) {
-      this.setFluentdTransport(label, this.#config.fluentd);
+    if (this._config.fluentd) {
+      this.setFluentdTransport(label, this._config.fluentd);
     }
-    return this.#config;
+    return this._config;
   }
   /**
    * Establish the logger configuration
@@ -126,20 +126,20 @@ export class Logger implements LoggerInstance {
    */
   public setConfig(label: string, configuration: LoggerConfig): void {
     // Stryker disable next-line all
-    this.#debug(`${process.pid} - Setting the configuration by the process`);
-    if (this.#numberOfTransports > 0) {
+    this._debug(`${process.pid} - Setting the configuration by the process`);
+    if (this.numberOfTransports > 0) {
       // Stryker disable next-line all
-      this.#debug(`${process.pid} - The are ${this.#numberOfTransports} transport to remove`);
-      this.#logger.transports.forEach(transport => {
-        this.#logger.remove(transport);
+      this._debug(`${process.pid} - The are ${this.numberOfTransports} transport to remove`);
+      this.logger.transports.forEach(transport => {
+        this.logger.remove(transport);
       });
-      this.#transports = [];
+      this.transports = [];
     }
-    this.#config = this.initialize(label, configuration);
-    this.#numberOfTransports = this.#transports.length;
+    this._config = this.initialize(label, configuration);
+    this.numberOfTransports = this.transports.length;
     // Stryker disable next-line all
-    this.#debug(`${process.pid} - Number of transports configured ${this.#numberOfTransports}`);
-    this.#transports.forEach(transport => this.#logger.add(transport));
+    this._debug(`${process.pid} - Number of transports configured ${this.numberOfTransports}`);
+    this.transports.forEach(transport => this.logger.add(transport));
   }
   /**
    * Establish the file transport configuration
@@ -148,9 +148,9 @@ export class Logger implements LoggerInstance {
    */
   private setFileTransport(label: string, config: FileTransportConfig): void {
     if (config.enabled) {
-      const _file = new FileTransport(label, this.#uuid, config);
+      const _file = new FileTransport(label, this.uuid, config);
       if (_file.transport) {
-        this.#transports.push(_file.transport);
+        this.transports.push(_file.transport);
       }
     }
   }
@@ -161,9 +161,9 @@ export class Logger implements LoggerInstance {
    */
   private setConsoleTransport(label: string, config: ConsoleTransportConfig): void {
     if (config.enabled) {
-      const _console = new ConsoleTransport(label, this.#uuid, config);
+      const _console = new ConsoleTransport(label, this.uuid, config);
       if (_console.transport) {
-        this.#transports.push(_console.transport);
+        this.transports.push(_console.transport);
       }
     }
   }
@@ -174,9 +174,9 @@ export class Logger implements LoggerInstance {
    */
   private setFluentdTransport(label: string, config: FluentdTransportConfig): void {
     if (config.enabled) {
-      const _fluentd = new FluentdTransport(label, this, this.#uuid, config);
+      const _fluentd = new FluentdTransport(label, this, this.uuid, config);
       if (_fluentd.transport) {
-        this.#transports.push(_fluentd.transport);
+        this.transports.push(_fluentd.transport);
       }
     }
   }
@@ -190,10 +190,10 @@ export class Logger implements LoggerInstance {
    * @param meta - extra information
    */
   silly(message: string, uuid?: string, context?: string, ...meta: any[]): void {
-    if (this.#numberOfTransports > 0) {
-      this.#logger.silly(message, {
+    if (this.numberOfTransports > 0) {
+      this.logger.silly(message, {
         timestamp: new Date().toISOString(),
-        pid: this.#pid,
+        pid: this.pid,
         uuid,
         context,
         meta,
@@ -210,10 +210,10 @@ export class Logger implements LoggerInstance {
    * @param meta - extra information
    */
   debug(message: string, uuid?: string, context?: string, ...meta: any[]): void {
-    if (this.#numberOfTransports > 0) {
-      this.#logger.debug(message, {
+    if (this.numberOfTransports > 0) {
+      this.logger.debug(message, {
         timestamp: new Date().toISOString(),
-        pid: this.#pid,
+        pid: this.pid,
         uuid,
         context,
         meta,
@@ -230,10 +230,10 @@ export class Logger implements LoggerInstance {
    * @param meta - extra information
    */
   verbose(message: string, uuid?: string, context?: string, ...meta: any[]): void {
-    if (this.#numberOfTransports > 0) {
-      this.#logger.verbose(message, {
+    if (this.numberOfTransports > 0) {
+      this.logger.verbose(message, {
         timestamp: new Date().toISOString(),
-        pid: this.#pid,
+        pid: this.pid,
         uuid,
         context,
         meta,
@@ -249,10 +249,10 @@ export class Logger implements LoggerInstance {
    * @param meta - extra information
    */
   info(message: string, uuid?: string, context?: string, ...meta: any[]): void {
-    if (this.#numberOfTransports > 0) {
-      this.#logger.info(message, {
+    if (this.numberOfTransports > 0) {
+      this.logger.info(message, {
         timestamp: new Date().toISOString(),
-        pid: this.#pid,
+        pid: this.pid,
         uuid,
         context,
         meta,
@@ -267,10 +267,10 @@ export class Logger implements LoggerInstance {
    * @param meta - extra information
    */
   warn(message: string, uuid?: string, context?: string, ...meta: any[]): void {
-    if (this.#numberOfTransports > 0) {
-      this.#logger.warn(message, {
+    if (this.numberOfTransports > 0) {
+      this.logger.warn(message, {
         timestamp: new Date().toISOString(),
-        pid: this.#pid,
+        pid: this.pid,
         uuid,
         context,
         meta,
@@ -285,10 +285,10 @@ export class Logger implements LoggerInstance {
    * @param meta - extra information
    */
   error(message: string, uuid?: string, context?: string, ...meta: any[]): void {
-    if (this.#numberOfTransports > 0) {
-      this.#logger.error(message, {
+    if (this.numberOfTransports > 0) {
+      this.logger.error(message, {
         timestamp: new Date().toISOString(),
-        pid: this.#pid,
+        pid: this.pid,
         uuid,
         context,
         meta,
@@ -302,10 +302,10 @@ export class Logger implements LoggerInstance {
    * @param context - context (class/function) where this logger is logging
    */
   crash(error: Crash | Boom | Multi, context?: string): void {
-    if (this.#numberOfTransports > 0) {
-      this.#logger.error(error.message, {
+    if (this.numberOfTransports > 0) {
+      this.logger.error(error.message, {
         timestamp: new Date().toISOString(),
-        pid: this.#pid,
+        pid: this.pid,
         uuid: error.uuid,
         context,
         cause: error.toJSON(),
@@ -315,9 +315,9 @@ export class Logger implements LoggerInstance {
   }
   /** Stream de escritura del propio logger */
   get stream(): { write: (str: string) => void } {
-    const _pid = this.#pid;
+    const _pid = this.pid;
     const _label = this.label;
-    const _logger = this.#logger;
+    const _logger = this.logger;
     return {
       write: function (message: string): void {
         const jsonObject = JSON.parse(message);
@@ -329,19 +329,19 @@ export class Logger implements LoggerInstance {
   }
   /** Logger config */
   get config(): LoggerConfig {
-    return this.#config;
+    return this._config;
   }
   /** Logger configuration error flag */
   get hasError(): boolean {
-    return this.#errorInConfig;
+    return this.errorInConfig;
   }
   /** Logger configuration errors, if exist */
   get configError(): Multi | undefined {
-    return this.#configError;
+    return this._configError;
   }
   /** Determine if the component is running in a docker instance or not */
   private isDocker(): boolean {
-    if (this.#isDocker === undefined) {
+    if (this._isDocker === undefined) {
       let hasDockerEnv = true;
       let hasDockerCGroup = true;
       try {
@@ -354,9 +354,9 @@ export class Logger implements LoggerInstance {
       } catch (error) {
         hasDockerCGroup = false;
       }
-      this.#isDocker = hasDockerEnv || hasDockerCGroup;
+      this._isDocker = hasDockerEnv || hasDockerCGroup;
     }
-    return this.#isDocker;
+    return this._isDocker;
   }
   /**
    * Set at least one transport to true if no transport is set but a configuration has been
@@ -370,14 +370,14 @@ export class Logger implements LoggerInstance {
     }
     if (configuration !== undefined) {
       // Stryker disable next-line all
-      this.#debug(`Configuration error with not empty configuration: %O`, configuration);
+      this._debug(`Configuration error with not empty configuration: %O`, configuration);
       if (this.isDocker()) {
         // Stryker disable next-line all
-        this.#debug(`Running in docker instance, console will be enabled`);
+        this._debug(`Running in docker instance, console will be enabled`);
         finalConfig.console = { enabled: true };
       } else {
         // Stryker disable next-line all
-        this.#debug(`Running in a NOT docker instance, file will be enabled`);
+        this._debug(`Running in a NOT docker instance, file will be enabled`);
         finalConfig.file = { enabled: true };
       }
     }

@@ -11,16 +11,16 @@ import { ErrorRecord } from '../types';
 /** Model class */
 export class Model {
   /** Registry used by this model */
-  readonly #registry: Registry;
+  private readonly registry: Registry;
   /**
    * Create an instance of model class
    * @param registry - registry instance
    */
   constructor(registry: Registry) {
-    this.#registry = registry;
+    this.registry = registry;
   }
   /** Get all the error in the registry */
   errors(): ErrorRecord[] {
-    return this.#registry.errors;
+    return this.registry.errors;
   }
 }

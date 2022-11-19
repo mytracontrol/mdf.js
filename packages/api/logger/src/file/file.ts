@@ -54,14 +54,14 @@ export const FileTransportSchema = Joi.object<FileTransportConfig>({
 /** File transport management class */
 export class FileTransport {
   /** Debug logger for development and deep troubleshooting */
-  #debug: Debugger;
+  private readonly debug: Debugger;
   /** Default transport config */
-  readonly #defaultConfig: FileTransportConfig = FileTransportSchema.validate({})
+  private readonly defaultConfig: FileTransportConfig = FileTransportSchema.validate({})
     .value as FileTransportConfig;
   /** Transport configuration */
-  readonly #config: FileTransportConfig;
+  private readonly _config: FileTransportConfig;
   /** Transport instance */
-  readonly #instance: FileTransportInterface;
+  private readonly instance: FileTransportInterface;
   /**
    * Create a file transport instance
    * @param label - Logger label
@@ -70,36 +70,36 @@ export class FileTransport {
    */
   constructor(label: string, uuid: string, configuration?: FileTransportConfig) {
     // Stryker disable all
-    this.#debug = Debug('mms:logger:file');
-    this.#debug(`${process.pid} - Configuration in the constructor %O`, configuration);
+    this.debug = Debug('mms:logger:file');
+    this.debug(`${process.pid} - Configuration in the constructor %O`, configuration);
     // Stryker enable all
     const validation = FileTransportSchema.validate(configuration);
     if (validation.error) {
       // Stryker disable next-line all
-      this.#debug(`${process.pid} - Error in the configuration, default will be applied`);
-      this.#config = this.#defaultConfig;
+      this.debug(`${process.pid} - Error in the configuration, default will be applied`);
+      this._config = this.defaultConfig;
     } else {
-      this.#config = validation.value;
+      this._config = validation.value;
     }
     // Stryker disable next-line all
-    this.#debug(`${process.pid} - Final configuration %O`, this.#config);
-    const fileFormat = this.#config.json ? jsonFormat(label) : stringFormat(label);
-    this.#instance = new File({
+    this.debug(`${process.pid} - Final configuration %O`, this._config);
+    const fileFormat = this._config.json ? jsonFormat(label) : stringFormat(label);
+    this.instance = new File({
       format: fileFormat,
-      silent: !this.#config.enabled,
-      level: this.#config.level,
-      filename: this.#config.filename,
-      maxsize: this.#config.maxsize,
-      maxFiles: this.#config.maxFiles,
-      zippedArchive: this.#config.zippedArchive,
+      silent: !this._config.enabled,
+      level: this._config.level,
+      filename: this._config.filename,
+      maxsize: this._config.maxsize,
+      maxFiles: this._config.maxFiles,
+      zippedArchive: this._config.zippedArchive,
     });
   }
   /** Transport configuration */
   get config(): FileTransportConfig {
-    return this.#config;
+    return this._config;
   }
   /** File mode transport instance */
   get transport(): FileTransportInterface {
-    return this.#instance;
+    return this.instance;
   }
 }

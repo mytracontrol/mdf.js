@@ -34,14 +34,14 @@ export const ConsoleTransportSchema = Joi.object<ConsoleTransportConfig>({
 /** Console transport management class */
 export class ConsoleTransport {
   /** Debug logger for development and deep troubleshooting */
-  #debug: Debugger;
+  private readonly debug: Debugger;
   /** Default transport config */
-  readonly #defaultConfig: ConsoleTransportConfig = ConsoleTransportSchema.validate({})
+  private readonly defaultConfig: ConsoleTransportConfig = ConsoleTransportSchema.validate({})
     .value as ConsoleTransportConfig;
   /** Transport configuration */
-  readonly #config: ConsoleTransportConfig;
+  private readonly _config: ConsoleTransportConfig;
   /** Transport instance */
-  readonly #instance: ConsoleTransportInterface;
+  private readonly instance: ConsoleTransportInterface;
   /**
    * Create a console transport instance
    * @param label - Logger label
@@ -50,33 +50,33 @@ export class ConsoleTransport {
    */
   constructor(label: string, uuid: string, configuration?: ConsoleTransportConfig) {
     // Stryker disable all
-    this.#debug = Debug('mms:logger:console');
-    this.#debug(`${process.pid} - Configuration in the constructor %O`, configuration);
+    this.debug = Debug('mms:logger:console');
+    this.debug(`${process.pid} - Configuration in the constructor %O`, configuration);
     // Stryker enable all
     const validation = ConsoleTransportSchema.validate(configuration);
     if (validation.error) {
       // Stryker disable next-line all
-      this.#debug(`${process.pid} - Error in the configuration, default will be applied`);
-      this.#config = this.#defaultConfig;
+      this.debug(`${process.pid} - Error in the configuration, default will be applied`);
+      this._config = this.defaultConfig;
     } else {
-      this.#config = validation.value;
+      this._config = validation.value;
     }
     // Stryker disable next-line all
-    this.#debug(`${process.pid} - Final configuration %O`, this.#config);
-    this.#instance = new Console({
+    this.debug(`${process.pid} - Final configuration %O`, this._config);
+    this.instance = new Console({
       format: stringFormat(label),
-      silent: !this.#config.enabled,
-      level: this.#config.level,
+      silent: !this._config.enabled,
+      level: this._config.level,
       //consoleWarnLevels: ['error', 'warn'],
       stderrLevels: ['error', 'warn'],
     });
   }
   /** Transport configuration */
   get config(): ConsoleTransportConfig {
-    return this.#config;
+    return this._config;
   }
   /** Console mode transport instance */
   get transport(): ConsoleTransportInterface {
-    return this.#instance;
+    return this.instance;
   }
 }

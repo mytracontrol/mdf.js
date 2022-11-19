@@ -71,9 +71,9 @@ const CONFIG_API_MAX_HEADERS = coerce(
  */
 export class Multer {
   /** Allowed mime types allowed for this multer instance */
-  #allowedMimeTypes: string[] = [];
+  private readonly allowedMimeTypes: string[] = [];
   /** Instance of multer */
-  #instance: multer.Multer;
+  private readonly instance: multer.Multer;
   /**
    * Return a new instance of the multipart/form-data middleware
    * @param storage - storage engine used for this middleware
@@ -164,10 +164,10 @@ export class Multer {
     allowedMineTypes: string | string[] = []
   ) {
     if (typeof allowedMineTypes === 'string' || Array.isArray(allowedMineTypes)) {
-      this.#allowedMimeTypes =
+      this.allowedMimeTypes =
         typeof allowedMineTypes === 'string' ? [allowedMineTypes] : allowedMineTypes;
     }
-    this.#instance = multer({
+    this.instance = multer({
       storage,
       limits: {
         fieldNameSize: CONFIG_API_MAX_FORM_FIELD_SIZE,
@@ -193,14 +193,12 @@ export class Multer {
     file: Express.Multer.File,
     callback: FileFilterCallback
   ): void => {
-    if (this.#allowedMimeTypes.length === 0 || this.#allowedMimeTypes.includes(file.mimetype)) {
+    if (this.allowedMimeTypes.length === 0 || this.allowedMimeTypes.includes(file.mimetype)) {
       callback(null, true);
     } else {
       callback(
         BoomHelpers.unsupportedMediaType(
-          `Unsupported media type: [${file.mimetype}]. Supported types: [${
-            this.#allowedMimeTypes
-          }]`,
+          `Unsupported media type: [${file.mimetype}]. Supported types: [${this.allowedMimeTypes}]`,
           request.uuid,
           {
             source: {
@@ -217,7 +215,7 @@ export class Multer {
    * @param fieldName - name of the file
    */
   public single(fieldName: string): RequestHandler {
-    return this.multerWrap(this.#instance.single(fieldName));
+    return this.multerWrap(this.instance.single(fieldName));
   }
   /**
    * Accept an array of files, all with the name fieldName. Optionally error out if more than
@@ -226,7 +224,7 @@ export class Multer {
    * @param maxCount - maximum number of files
    */
   public array(fieldName: string, maxCount?: number): RequestHandler {
-    return this.multerWrap(this.#instance.array(fieldName, maxCount));
+    return this.multerWrap(this.instance.array(fieldName, maxCount));
   }
   /**
    * Accept a mix of files, specified by fields. An object with arrays of files will be stored in
@@ -240,20 +238,20 @@ export class Multer {
    * ```
    */
   public fields(fields: readonly multer.Field[]): RequestHandler {
-    return this.multerWrap(this.#instance.fields(fields));
+    return this.multerWrap(this.instance.fields(fields));
   }
   /**
    * Accept only text fields. If any file upload is made, error with code "Unexpected field" will
    * be issued.
    */
   public none(): RequestHandler {
-    return this.multerWrap(this.#instance.none());
+    return this.multerWrap(this.instance.none());
   }
   /**
    * Accepts all files that comes over the wire. An array of files will be stored in req.files.
    */
   public any(): RequestHandler {
-    return this.multerWrap(this.#instance.any());
+    return this.multerWrap(this.instance.any());
   }
   /**
    * Wrap the multer middleware functions for error management

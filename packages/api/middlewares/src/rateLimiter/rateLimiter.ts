@@ -17,13 +17,13 @@ const MINUTE = 60000;
 /** RateLimiter class manages the API requests rate limits */
 export class RateLimiter {
   /** Rate limiters configuration */
-  readonly #config: RateLimitConfig;
+  private readonly config: RateLimitConfig;
   /** Flag that indicates that the rates limiters are enabled */
-  readonly #enable: boolean;
+  private readonly enable: boolean;
   /** Rate limiters map */
-  readonly #RateLimiterMap: Map<string, RequestHandler> = new Map();
+  private readonly RateLimiterMap: Map<string, RequestHandler> = new Map();
   /** Empty rate limiter */
-  readonly #emptyMiddleware: RequestHandler = (req, res, next) => {
+  private readonly emptyMiddleware: RequestHandler = (req, res, next) => {
     next();
   };
   /**
@@ -31,16 +31,16 @@ export class RateLimiter {
    * @param configuration - Rate limiters configuration
    */
   constructor(configuration: RateLimitConfig) {
-    this.#config = configuration;
-    this.#enable = this.#config.enabled;
-    if (this.#config.rates && this.#config.rates.length) {
-      this.#config.rates.forEach((rate: any) => {
+    this.config = configuration;
+    this.enable = this.config.enabled;
+    if (this.config.rates && this.config.rates.length) {
+      this.config.rates.forEach((rate: any) => {
         const label = Object.keys(rate)[0];
         const handler = this.requestHandler(rate[label].maxRequests, rate[label].timeWindow);
-        this.#RateLimiterMap.set(label, handler);
+        this.RateLimiterMap.set(label, handler);
       });
     } else {
-      this.#enable = false;
+      this.enable = false;
     }
   }
   /** Create a request handler for a rate limiter */
@@ -65,11 +65,11 @@ export class RateLimiter {
   }
   /** Get the request handler */
   public get(label: string): RequestHandler {
-    const result = this.#RateLimiterMap.get(label);
-    if (result && this.#enable) {
+    const result = this.RateLimiterMap.get(label);
+    if (result && this.enable) {
       return result;
     } else {
-      return this.#emptyMiddleware;
+      return this.emptyMiddleware;
     }
   }
 }

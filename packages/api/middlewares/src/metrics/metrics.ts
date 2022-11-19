@@ -105,9 +105,9 @@ const CONTENT_LENGTH_HEADER = 'content-length';
 /** MetricsExpressMiddleware middleware */
 export class Metrics {
   /** Metrics service */
-  #service: Service;
+  private readonly service: Service;
   /** Core and API metrics */
-  #metrics: MetricInstances;
+  private readonly metrics: MetricInstances;
   /**
    * Return a metrics middleware instance
    * @param service - Metrics service interface
@@ -120,25 +120,25 @@ export class Metrics {
    * @param service - Metrics service interface
    */
   private constructor(service: Service) {
-    this.#service = service;
-    this.#metrics = this.#service.setMetrics<MetricInstances>(METRICS_DEFINITIONS);
+    this.service = service;
+    this.metrics = this.service.setMetrics<MetricInstances>(METRICS_DEFINITIONS);
   }
   /** Return response status code class */
   private increaseCounterMetricByCode(code: number): void {
-    if (!this.#service || !this.#metrics) {
+    if (!this.service || !this.metrics) {
       return;
     } else if (code < 200) {
-      this.#metrics['api_all_info_total'].inc();
+      this.metrics['api_all_info_total'].inc();
     } else if (code < 300) {
-      this.#metrics['api_all_success_total'].inc();
+      this.metrics['api_all_success_total'].inc();
     } else if (code < 400) {
-      this.#metrics['api_all_redirect_total'].inc();
+      this.metrics['api_all_redirect_total'].inc();
     } else if (code < 500) {
-      this.#metrics['api_all_errors_total'].inc();
-      this.#metrics['api_all_client_error_total'].inc();
+      this.metrics['api_all_errors_total'].inc();
+      this.metrics['api_all_client_error_total'].inc();
     } else {
-      this.#metrics['api_all_errors_total'].inc();
-      this.#metrics['api_all_server_error_total'].inc();
+      this.metrics['api_all_errors_total'].inc();
+      this.metrics['api_all_server_error_total'].inc();
     }
   }
   /**
@@ -173,11 +173,11 @@ export class Metrics {
    */
   private get handler(): RequestHandler {
     return (request: Request, response: Response, next: NextFunction): void => {
-      this.#metrics['api_all_request_total'].inc();
-      this.#metrics['api_all_request_in_processing_total'].inc();
+      this.metrics['api_all_request_total'].inc();
+      this.metrics['api_all_request_in_processing_total'].inc();
       const startDate = new Date().getTime();
       response.on('finish', () => {
-        if (!this.#service || !this.#metrics) {
+        if (!this.service || !this.metrics) {
           return;
         }
         const labels = {
@@ -188,12 +188,12 @@ export class Metrics {
         const endDate = new Date().getTime();
         const duration = endDate - startDate;
         const contentLength = this.getContentLength(request, response);
-        this.#metrics['api_all_request_in_processing_total'].dec();
+        this.metrics['api_all_request_in_processing_total'].dec();
         this.increaseCounterMetricByCode(response.statusCode);
-        this.#metrics['api_request_total'].inc(labels);
-        this.#metrics['api_request_duration_milliseconds'].observe(labels, duration);
-        this.#metrics['api_request_size_bytes'].observe(labels, contentLength.request);
-        this.#metrics['api_response_size_bytes'].observe(labels, contentLength.response);
+        this.metrics['api_request_total'].inc(labels);
+        this.metrics['api_request_duration_milliseconds'].observe(labels, duration);
+        this.metrics['api_request_size_bytes'].observe(labels, contentLength.request);
+        this.metrics['api_response_size_bytes'].observe(labels, contentLength.response);
       });
       next();
     };

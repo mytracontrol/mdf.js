@@ -14,7 +14,7 @@ export abstract class Registry {
   /** Array of errors registered in this registry */
   protected _errors: ErrorRecord[] = [];
   /** Last update date */
-  #lastUpdate: string = new Date().toISOString();
+  private _lastUpdate: string = new Date().toISOString();
   /** Debugger logger */
   protected readonly logger: LoggerInstance;
   /**
@@ -47,11 +47,11 @@ export abstract class Registry {
     if (this._errors.length > this.maxSize) {
       this._errors.shift();
     }
-    this.#lastUpdate = new Date().toISOString();
+    this._lastUpdate = new Date().toISOString();
   }
   /** Get last update date */
   get lastUpdate(): string {
-    return this.#lastUpdate;
+    return this._lastUpdate;
   }
   /** Get all the error in the registry */
   public abstract get errors(): ErrorRecord[];

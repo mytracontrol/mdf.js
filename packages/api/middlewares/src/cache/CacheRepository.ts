@@ -27,15 +27,15 @@ const CONFIG_CACHE_EXPIRATION = coerce(
 /** CacheRepository, cache repository management interface */
 export class CacheRepository {
   /** Repository class name */
-  readonly #context: string = this.constructor.name;
+  private readonly context: string = this.constructor.name;
   /** Cache client */
-  readonly #redis: Redis.Client;
+  private readonly redis: Redis.Client;
   /**
    * Create an instance of CacheRepository
    * @param client - Redis client instance
    */
   constructor(client: Redis.Client) {
-    this.#redis = client;
+    this.redis = client;
   }
   /**
    * Return the value of the previous response for the requested path if is present in the cache
@@ -44,12 +44,12 @@ export class CacheRepository {
    */
   getPath(path: string, uuid: string): Promise<CacheEntry | null> {
     // Stryker disable next-line all
-    logger.debug(`New request for path ${path}`, uuid, this.#context);
-    if (this.#redis.status !== 'ready') {
+    logger.debug(`New request for path ${path}`, uuid, this.context);
+    if (this.redis.status !== 'ready') {
       return Promise.resolve(null);
     }
     return new Promise((resolve, reject) => {
-      this.#redis
+      this.redis
         .get(path)
         .then((result: string | null) => {
           if (typeof result !== 'string') {
@@ -71,14 +71,14 @@ export class CacheRepository {
    */
   setPath(path: string, response: CacheEntry, uuid: string): Promise<void> {
     // Stryker disable next-line all
-    logger.debug(`New request for path ${path}`, uuid, this.#context);
+    logger.debug(`New request for path ${path}`, uuid, this.context);
     // Stryker disable next-line all
-    logger.silly(`${response}`, uuid, this.#context);
-    if (this.#redis.status !== 'ready') {
+    logger.silly(`${response}`, uuid, this.context);
+    if (this.redis.status !== 'ready') {
       return Promise.resolve();
     }
     return new Promise((resolve, reject) => {
-      this.#redis
+      this.redis
         .setex(path, response.duration || CONFIG_CACHE_EXPIRATION, JSON.stringify(response))
         .then((result: 'OK') => {
           // Stryker disable all
@@ -87,7 +87,7 @@ export class CacheRepository {
               response.duration || CONFIG_CACHE_EXPIRATION
             } seconds`,
             uuid,
-            this.#context
+            this.context
           );
           // Stryker enable all
           resolve();

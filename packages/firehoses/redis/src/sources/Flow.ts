@@ -33,9 +33,9 @@ export declare interface Flow {
 
 export class Flow extends Base implements Plugs.Source.Flow {
   /** Ready flag */
-  #readiness: boolean;
+  private readiness: boolean;
   /** Ingestion state */
-  #init: boolean;
+  private _init: boolean;
   /**
    * Create a new instance of this class
    * @param provider - Redis provider used by this source plug
@@ -43,19 +43,19 @@ export class Flow extends Base implements Plugs.Source.Flow {
    */
   constructor(provider: Redis.Provider, streamId: string) {
     super(provider, streamId);
-    this.#init = false;
-    this.#readiness = false;
+    this._init = false;
+    this.readiness = false;
     this.checkRedisReadiness();
     this.checkDataListeners();
   }
   /** Enable consuming process */
   public init(): void {
     this.logger.extend('verbose')(`Init request received`);
-    if (this.#init) {
+    if (this._init) {
       this.logger.extend('verbose')(`The source was already initialized`);
     } else {
       this.logger.extend('verbose')(`The source has been initialized`);
-      this.#init = true;
+      this._init = true;
       if (this.checkIngestReadiness()) {
         this.logger(`Starting the ingestion`);
         this.ingestData();
@@ -65,11 +65,11 @@ export class Flow extends Base implements Plugs.Source.Flow {
   /** Stop consuming process */
   public pause(): void {
     this.logger(`Pause request received`);
-    this.#init = false;
+    this._init = false;
   }
   /** Check all the conditions for data ingestion */
   private checkIngestReadiness(): boolean {
-    const ready = this.listenerCount('data') > 0 && this.#init && this.#readiness;
+    const ready = this.listenerCount('data') > 0 && this._init && this.readiness;
     this.logger.extend('verbose')(`Checking if the ingestion is ready: ${ready}`);
     return ready;
   }
@@ -92,7 +92,7 @@ export class Flow extends Base implements Plugs.Source.Flow {
   private checkRedisReadiness(): void {
     if (this.provider.state === 'running') {
       this.logger(`Redis is running`);
-      this.#readiness = true;
+      this.readiness = true;
       this.emit('ready');
     } else {
       this.logger(`Redis is NOT running`);
@@ -101,9 +101,9 @@ export class Flow extends Base implements Plugs.Source.Flow {
       this.logger(`New Redis event`);
       if (status !== 'pass') {
         this.logger(`Redis is not running`);
-        this.#readiness = false;
+        this.readiness = false;
       } else {
-        this.#readiness = true;
+        this.readiness = true;
         this.logger(`Redis is running`);
         this.emit('ready');
       }

@@ -63,14 +63,14 @@ export const FluentdTransportSchema = Joi.object<FluentdTransportConfig>({
 /** Fluentd transport management class */
 export class FluentdTransport {
   /** Debug logger for development and deep troubleshooting */
-  #debug: Debugger;
+  private readonly debug: Debugger;
   /** Default transport config */
-  readonly #defaultConfig: FluentdTransportConfig = FluentdTransportSchema.validate({})
+  private readonly defaultConfig: FluentdTransportConfig = FluentdTransportSchema.validate({})
     .value as FluentdTransportConfig;
   /** Transport configuration */
-  readonly #config: FluentdTransportConfig;
+  private readonly _config: FluentdTransportConfig;
   /** Transport instance */
-  readonly #instance: FluentTransportInterface;
+  private readonly instance: FluentTransportInterface;
   /**
    * Create a fluentd transport instance
    * @param label - Logger label
@@ -80,21 +80,21 @@ export class FluentdTransport {
    */
   constructor(label: string, logger: Logger, uuid: string, configuration?: FluentdTransportConfig) {
     // Stryker disable all
-    this.#debug = Debug('mms:logger:fluentd');
-    this.#debug(`${process.pid} - Configuration in the constructor %O`, configuration);
+    this.debug = Debug('mms:logger:fluentd');
+    this.debug(`${process.pid} - Configuration in the constructor %O`, configuration);
     // Stryker enable all
     const validation = FluentdTransportSchema.validate(configuration);
     if (validation.error) {
       // Stryker disable next-line all
-      this.#debug(`${process.pid} - Error in the configuration, default will be applied`);
-      this.#config = this.#defaultConfig;
+      this.debug(`${process.pid} - Error in the configuration, default will be applied`);
+      this._config = this.defaultConfig;
     } else {
-      this.#config = validation.value;
+      this._config = validation.value;
     }
     // Stryker disable next-line all
-    this.#debug(`${process.pid} - Final configuration %O`, this.#config);
-    this.#instance = new (winstonTransport())(`${DEFAULT_TAG_PATH}${label}`, {
-      ...this.#config,
+    this.debug(`${process.pid} - Final configuration %O`, this._config);
+    this.instance = new (winstonTransport())(`${DEFAULT_TAG_PATH}${label}`, {
+      ...this._config,
       format: jsonFormat(label),
       internalLogger: {
         info: (message: string, data?: any, ...extra: any[]) => {
@@ -108,10 +108,10 @@ export class FluentdTransport {
   }
   /** Transport configuration */
   get config(): FluentdTransportConfig {
-    return this.#config;
+    return this._config;
   }
   /** Mongodb mode transport instance */
   get transport(): FluentTransportInterface {
-    return this.#instance;
+    return this.instance;
   }
 }

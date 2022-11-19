@@ -18,7 +18,7 @@ export class PlugWrapper<Type extends string = string, Data = any> extends Event
   /** Date of the last operation performed */
   private lastOperationDate?: Date;
   /** Operation retry options */
-  #retryOptions: RetryOptions;
+  private readonly retryOptions: RetryOptions;
   /** Plug single operation original */
   private readonly singleOriginal: (job: Plugs.Sink.JobObject<Type, Data>) => Promise<void>;
   /** Plug multi operation original */
@@ -30,7 +30,7 @@ export class PlugWrapper<Type extends string = string, Data = any> extends Event
    */
   constructor(private readonly plug: WrappableSinkPlug<Type, Data>, retryOptions?: RetryOptions) {
     super();
-    this.#retryOptions = merge({ logger: this.onOperationError }, retryOptions);
+    this.retryOptions = merge({ logger: this.onOperationError }, retryOptions);
     if (!this.plug) {
       throw new Crash('PlugWrapper requires a plug instance');
     } else if (!this.plug.single) {
@@ -71,7 +71,7 @@ export class PlugWrapper<Type extends string = string, Data = any> extends Event
     task: (...args: any[]) => Promise<T>,
     funcArgs: any[]
   ): Promise<T> {
-    const result = await retryBind(task, this.plug, funcArgs, this.#retryOptions);
+    const result = await retryBind(task, this.plug, funcArgs, this.retryOptions);
     this.onOperationSuccess();
     return result;
   }
