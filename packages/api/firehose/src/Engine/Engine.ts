@@ -35,7 +35,11 @@ export declare interface Engine {
   on(event: 'status', listener: (providerState: Health.API.Status) => void): this;
 }
 
-export class Engine<Type extends string = string, Data = any>
+export class Engine<
+    Type extends string = string,
+    Data = any,
+    CustomHeaders extends Record<string, unknown> = Record<string, unknown>
+  >
   extends Transform
   implements Health.Component
 {
@@ -50,7 +54,10 @@ export class Engine<Type extends string = string, Data = any>
    * @param name - name of the transform
    * @param options - engine options
    */
-  constructor(public readonly name: string, private readonly options?: EngineOptions<Type, Data>) {
+  constructor(
+    public readonly name: string,
+    private readonly options?: EngineOptions<Type, Data, CustomHeaders>
+  ) {
     super(merge(DEFAULT_TRANSFORM_OPTIONS, options?.transformOptions));
     // Stryker disable next-line all
     this.logger = SetContext(
@@ -65,7 +72,7 @@ export class Engine<Type extends string = string, Data = any>
    * @param job - publication job object
    */
   override _transform(
-    job: Jobs.JobHandler<Type, Data>,
+    job: Jobs.JobHandler<Type, Data, CustomHeaders>,
     encoding: string,
     callback: (error?: Crash, chunk?: any) => void
   ): void {
@@ -95,9 +102,9 @@ export class Engine<Type extends string = string, Data = any>
    * @returns
    */
   private executeStrategy(
-    job: Jobs.JobHandler<Type, Data>,
-    strategy: Jobs.Strategy<Type, Data>
-  ): Jobs.JobHandler<Type, Data> {
+    job: Jobs.JobHandler<Type, Data, CustomHeaders>,
+    strategy: Jobs.Strategy<Type, Data, CustomHeaders>
+  ): Jobs.JobHandler<Type, Data, CustomHeaders> {
     try {
       const result = strategy.do(job.toObject());
       if (!result || result.data === undefined || result.data === null) {

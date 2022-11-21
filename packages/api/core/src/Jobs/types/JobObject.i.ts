@@ -8,7 +8,11 @@
 import { Headers } from './Headers.i';
 import { Status } from './Status.t';
 
-export interface JobObject<Type extends string = string, Data = any> {
+export interface JobObject<
+  Type extends string = string,
+  Data = any,
+  CustomHeaders extends Record<string, unknown> = Record<string, unknown>
+> {
   /** Job type identification, used to identify specific job handlers to be applied */
   type: Type;
   /** Job identification */
@@ -16,7 +20,7 @@ export interface JobObject<Type extends string = string, Data = any> {
   /** Job payload */
   data: Data;
   /** Job meta information, used to pass specific information for sinks and sources */
-  headers?: Headers;
+  headers?: Headers<CustomHeaders>;
   /** Job status */
   status: Status;
 }

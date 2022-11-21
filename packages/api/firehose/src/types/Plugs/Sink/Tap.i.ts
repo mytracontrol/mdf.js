@@ -8,10 +8,14 @@
 import { Health } from '@mdf.js/core';
 import { JobObject } from './JobObject.t';
 
-export interface Tap<Type extends string = string, Data = any> extends Health.Component {
+export interface Tap<
+  Type extends string = string,
+  Data = any,
+  CustomHeaders extends Record<string, unknown> = Record<string, unknown>
+> extends Health.Component {
   /**
    * Perform the processing of a single Job
    * @param job - job to be processed
    */
-  single: (job: JobObject<Type, Data>) => Promise<void>;
+  single: (job: JobObject<Type, Data, CustomHeaders>) => Promise<void>;
 }

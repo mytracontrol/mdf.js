@@ -17,9 +17,13 @@ export * from './WrappableSourcePlug.i';
 import * as Sink from '../Sink';
 import * as Source from '../Source';
 
-export type Sinks<Type extends string = string, Data = any> =
-  | Sink.Jet<Type, Data>
-  | Sink.Tap<Type, Data>;
-export type Sources<Type extends string = string, Data = any> =
-  | Source.Flow<Type, Data>
-  | Source.Sequence<Type, Data>;
+export type Sinks<
+  Type extends string = string,
+  Data = any,
+  CustomHeaders extends Record<string, unknown> = Record<string, unknown>
+> = Sink.Jet<Type, Data, CustomHeaders> | Sink.Tap<Type, Data, CustomHeaders>;
+export type Sources<
+  Type extends string = string,
+  Data = any,
+  CustomHeaders extends Record<string, unknown> = Record<string, unknown>
+> = Source.Flow<Type, Data, CustomHeaders> | Source.Sequence<Type, Data, CustomHeaders>;

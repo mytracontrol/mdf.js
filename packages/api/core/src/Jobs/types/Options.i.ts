@@ -7,9 +7,9 @@
 
 import { Headers } from './Headers.i';
 
-export interface Options {
+export interface Options<CustomHeaders extends Record<string, unknown> = Record<string, unknown>> {
   /** Job meta information, used to pass specific information for sinks and sources */
-  headers?: Headers;
+  headers?: Headers<CustomHeaders>;
   /**
    * Indicates the quality of service for the job, indeed this indicate the number of sinks that
    * must be successfully processed to consider the job as successfully processed

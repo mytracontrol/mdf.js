@@ -10,13 +10,17 @@ import { Crash, Multi } from '@mdf.js/crash';
 import { overallStatus, retryBind, RetryOptions } from '@mdf.js/utils';
 import EventEmitter from 'events';
 import { merge } from 'lodash';
-import { PostConsumeOptions, WrappableSourcePlug } from '../../types';
+import { Plugs, PostConsumeOptions, WrappableSourcePlug } from '../../types';
 import {
   CONFIG_SOURCE_PLUG_CHECK_UNCLEANED_INTERVAL,
   CONFIG_SOURCE_PLUG_MAX_UNKNOWN_JOBS,
 } from './const';
 
-export class PlugWrapper extends EventEmitter {
+export class PlugWrapper<
+  Type extends string = string,
+  Data = any,
+  CustomHeaders extends Record<string, unknown> = Record<string, unknown>
+> extends EventEmitter {
   /** Jobs uncleaned after job finish due to problems in the post consume command */
   private readonly uncleanedEntries: string[] = [];
   /** Jobs uncleaned after job finish due to the plugs has declare that not exist */
@@ -36,7 +40,12 @@ export class PlugWrapper extends EventEmitter {
   /** Plug post consume operation original */
   private readonly postConsumeOriginal: (jobId: string) => Promise<string | undefined>;
   /** Plug ingest data operation */
-  private readonly ingestDataOriginal?: (size: number) => Promise<any>;
+  private readonly ingestDataOriginal?: (
+    size: number
+  ) => Promise<
+    | Plugs.Source.JobObject<Type, Data, CustomHeaders>
+    | Plugs.Source.JobObject<Type, Data, CustomHeaders>[]
+  >;
   /**
    * Create a new instance of PlugWrapper
    * @param plug - source plug instance
@@ -44,7 +53,7 @@ export class PlugWrapper extends EventEmitter {
    * @param postConsumeOptions - options for post consume operations
    */
   constructor(
-    private readonly plug: WrappableSourcePlug,
+    private readonly plug: WrappableSourcePlug<Type, Data, CustomHeaders>,
     retryOptions?: RetryOptions,
     postConsumeOptions?: PostConsumeOptions
   ) {

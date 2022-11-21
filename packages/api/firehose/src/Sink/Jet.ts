@@ -10,22 +10,22 @@ import { Crash } from '@mdf.js/crash';
 import { Plugs, SinkOptions } from '../types';
 import { Base } from './core';
 
-export class Jet<Type extends string = string, Data = any> extends Base<
-  Plugs.Sink.Jet<Type, Data>,
-  Type,
-  Data
-> {
+export class Jet<
+  Type extends string = string,
+  Data = any,
+  CustomHeaders extends Record<string, unknown> = Record<string, unknown>
+> extends Base<Plugs.Sink.Jet<Type, Data, CustomHeaders>, Type, Data, CustomHeaders> {
   /**
    * Create a new Jet instance
    * @param plug - Jet sink plug
    * @param options - sink options
    */
-  constructor(plug: Plugs.Sink.Jet<Type, Data>, options?: SinkOptions) {
+  constructor(plug: Plugs.Sink.Jet<Type, Data, CustomHeaders>, options?: SinkOptions) {
     super(plug, options);
   }
   /** Perform the publication of the information on the sink destination */
   override _write(
-    data: Jobs.JobHandler<Type, Data>,
+    data: Jobs.JobHandler<Type, Data, CustomHeaders>,
     encoding: string,
     callback: (error?: Crash | Error) => void
   ): void {
@@ -39,7 +39,7 @@ export class Jet<Type extends string = string, Data = any> extends Base<
   }
   /** Perform the publication of the information on the sink destination */
   override _writev?(
-    data: { chunk: Jobs.JobHandler<Type, Data>; encoding: BufferEncoding }[],
+    data: { chunk: Jobs.JobHandler<Type, Data, CustomHeaders>; encoding: BufferEncoding }[],
     callback: (error?: Crash | Error) => void
   ): void {
     // Stryker disable next-line all

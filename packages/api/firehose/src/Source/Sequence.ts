@@ -9,11 +9,11 @@ import { Health, Jobs } from '@mdf.js/core';
 import { Plugs, SourceOptions } from '../types';
 import { Base } from './core';
 
-export class Sequence<Type extends string = string, Data = any> extends Base<
-  Plugs.Source.Sequence<Type, Data>,
-  Type,
-  Data
-> {
+export class Sequence<
+  Type extends string = string,
+  Data = any,
+  CustomHeaders extends Record<string, unknown> = Record<string, unknown>
+> extends Base<Plugs.Source.Sequence<Type, Data, CustomHeaders>, Type, Data, CustomHeaders> {
   /** Indication of pending data request flag */
   private pendingRequest = false;
   /** Actual window size */
@@ -25,7 +25,7 @@ export class Sequence<Type extends string = string, Data = any> extends Base<
    * @param plug - Sequence source plug
    * @param options - source options
    */
-  constructor(plug: Plugs.Source.Sequence<Type, Data>, options?: SourceOptions) {
+  constructor(plug: Plugs.Source.Sequence<Type, Data, CustomHeaders>, options?: SourceOptions) {
     super(plug, options);
   }
   /** Perform the read of data from the source */
@@ -81,13 +81,17 @@ export class Sequence<Type extends string = string, Data = any> extends Base<
    * Push the received jobs to the stream
    * @param jobs - jobs to be pushed to the stream
    */
-  private processJobs(jobs: Plugs.Source.JobObject | Plugs.Source.JobObject[]): void {
+  private processJobs(
+    jobs:
+      | Plugs.Source.JobObject<Type, Data, CustomHeaders>
+      | Plugs.Source.JobObject<Type, Data, CustomHeaders>[]
+  ): void {
     const arrayOfJobs = Array.isArray(jobs) ? jobs : [jobs];
     this.actualWindowSize += arrayOfJobs.length;
     for (const job of arrayOfJobs) {
       this.push(
         this.subscribeJob(
-          new Jobs.JobHandler(job.data, job.jobId, job.type, {
+          new Jobs.JobHandler<Type, Data, CustomHeaders>(job.data, job.jobId, job.type, {
             headers: job.headers,
             qos: this.qos,
           })
@@ -101,7 +105,7 @@ export class Sequence<Type extends string = string, Data = any> extends Base<
    * Process the received jobs
    * @param job - job to be processed
    */
-  private readonly _onJobReceived = (job: Plugs.Source.JobObject) => {
+  private readonly _onJobReceived = (job: Plugs.Source.JobObject<Type, Data, CustomHeaders>) => {
     this.actualWindowSize++;
     // Stryker disable next-line all
     this.logger.verbose(`New job from consumer: ${job.jobId}`);

@@ -11,4 +11,8 @@ export * from './Sequence.i';
 import { Flow } from './Flow.i';
 import { Sequence } from './Sequence.i';
 
-export type Any<Type extends string = string, Data = any> = Flow<Type, Data> | Sequence<Type, Data>;
+export type Any<
+  Type extends string = string,
+  Data = any,
+  CustomHeaders extends Record<string, unknown> = Record<string, unknown>
+> = Flow<Type, Data, CustomHeaders> | Sequence<Type, Data, CustomHeaders>;

@@ -9,10 +9,14 @@ import { Jobs } from '@mdf.js/core';
 import { LoggerInstance } from '@mdf.js/logger';
 import { TransformOptions } from 'stream';
 
-export interface EngineOptions<Type extends string = string, Data = any> {
+export interface EngineOptions<
+  Type extends string = string,
+  Data = any,
+  CustomHeaders extends Record<string, unknown> = Record<string, unknown>
+> {
   /** Strategies to be applied over the jobs */
   strategies?: {
-    [type: string]: Jobs.Strategy<Type, Data>[];
+    [type: string]: Jobs.Strategy<Type, Data, CustomHeaders>[];
   };
   /** Transform streams options */
   transformOptions?: TransformOptions;

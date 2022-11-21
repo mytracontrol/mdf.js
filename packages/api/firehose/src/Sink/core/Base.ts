@@ -17,9 +17,10 @@ import { DebugLogger, LoggerInstance, SetContext } from '@mdf.js/logger';
 import { DEFAULT_WRITABLE_OPTIONS } from './const';
 
 export declare interface Base<
-  T extends Plugs.Sink.Any<Type, Data>,
+  T extends Plugs.Sink.Any<Type, Data, CustomHeaders>,
   Type extends string = string,
-  Data = any
+  Data = any,
+  CustomHeaders extends Record<string, unknown> = Record<string, unknown>
 > {
   /** Emitted when the stream have been closed */
   on(event: 'close', listener: () => void): this;
@@ -53,9 +54,10 @@ export declare interface Base<
 
 /** Firehose sink (Writable) plug class */
 export abstract class Base<
-    T extends Plugs.Sink.Any<Type, Data>,
+    T extends Plugs.Sink.Any<Type, Data, CustomHeaders>,
     Type extends string = string,
-    Data = any
+    Data = any,
+    CustomHeaders extends Record<string, unknown> = Record<string, unknown>
   >
   extends Writable
   implements Health.Component
@@ -67,7 +69,7 @@ export abstract class Base<
   /** Flag to indicate that an unhealthy status has been emitted recently */
   private lastStatusEmitted?: Health.API.Status;
   /** Wrapped source plug */
-  private readonly plugWrapper: PlugWrapper<Type, Data>;
+  private readonly plugWrapper: PlugWrapper<Type, Data, CustomHeaders>;
   /**
    * Create a new instance for a firehose sink
    * @param plug - sink plug instance
@@ -178,8 +180,11 @@ export abstract class Base<
     this.logger.info(`Sink stream ${this.plug.name} has been closed`);
     this.emitStatus();
   };
-  /** Wrap super and plug events in the same to aggregate them in one component */
-  private wrappingEvents(plug: Plugs.Sink.Any<Type, Data>): void {
+  /**
+   * Wrap super and plug events in the same to aggregate them in one component
+   * @param plug - sink plug instance
+   */
+  private wrappingEvents(plug: Plugs.Sink.Any<Type, Data, CustomHeaders>): void {
     super.on('error', this.onErrorEvent);
     super.on('unpipe', this.onUnpipeEvent);
     super.on('pipe', this.onPipeEvent);

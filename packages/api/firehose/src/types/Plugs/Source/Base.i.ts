@@ -10,15 +10,18 @@ import { Crash } from '@mdf.js/crash';
 import EventEmitter from 'events';
 import { JobObject } from './JobObject.t';
 
-export interface Base<Type extends string = string, Data = any>
-  extends EventEmitter,
+export interface Base<
+  Type extends string = string,
+  Data = any,
+  CustomHeaders extends Record<string, unknown> = Record<string, unknown>
+> extends EventEmitter,
     Health.Component {
   /** Emitted when the component throw an error*/
   on(event: 'error', listener: (error: Crash | Error) => void): this;
   /** Emitted on every status change */
   on(event: 'status', listener: (status: Health.API.Status) => void): this;
   /** Emitted when there is a new job to be managed */
-  on(event: 'data', listener: (job: JobObject<Type, Data>) => void): this;
+  on(event: 'data', listener: (job: JobObject<Type, Data, CustomHeaders>) => void): this;
   /**
    * Perform the task to clean the job registers after the job has been resolved
    * @param jobId - Job entry identification

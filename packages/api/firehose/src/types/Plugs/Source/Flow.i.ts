@@ -7,7 +7,11 @@
 
 import { Base } from './Base.i';
 
-export interface Flow<Type extends string = string, Data = any> extends Base<Type, Data> {
+export interface Flow<
+  Type extends string = string,
+  Data = any,
+  CustomHeaders extends Record<string, unknown> = Record<string, unknown>
+> extends Base<Type, Data, CustomHeaders> {
   /** Enable consuming process */
   init(): void;
   /** Stop consuming process */

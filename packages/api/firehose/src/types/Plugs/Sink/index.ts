@@ -11,4 +11,8 @@ export * from './Tap.i';
 import { Jet } from './Jet.i';
 import { Tap } from './Tap.i';
 
-export type Any<Type extends string = string, Data = any> = Jet<Type, Data> | Tap<Type, Data>;
+export type Any<
+  Type extends string = string,
+  Data = any,
+  CustomHeaders extends Record<string, unknown> = Record<string, unknown>
+> = Jet<Type, Data, CustomHeaders> | Tap<Type, Data, CustomHeaders>;

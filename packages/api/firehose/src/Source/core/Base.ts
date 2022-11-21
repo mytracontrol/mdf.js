@@ -16,9 +16,10 @@ import { DEFAULT_READABLE_OPTIONS } from './const';
 import { PlugWrapper } from './PlugWrapper';
 
 export declare interface Base<
-  T extends Plugs.Source.Any<Type, Data>,
+  T extends Plugs.Source.Any<Type, Data, CustomHeaders>,
   Type extends string = string,
-  Data = any
+  Data = any,
+  CustomHeaders extends Record<string, unknown> = Record<string, unknown>
 > {
   /** Emitted when stream.resume() is called and readableFlowing is not true*/
   on(event: 'resume', listener: () => void): this;
@@ -37,16 +38,20 @@ export declare interface Base<
   /** Emitted on every state change */
   on(event: 'status', listener: (status: Health.API.Status) => void): this;
   /** Emitted when a job is created */
-  on(event: 'job', listener: (job: Jobs.JobHandler<Type, Data>) => void): this;
+  on(event: 'job', listener: (job: Jobs.JobHandler<Type, Data, CustomHeaders>) => void): this;
   /** Emitted when a job has ended */
-  on(event: 'done', listener: (uuid: string, result: Jobs.Result, error?: Crash) => void): this;
+  on(
+    event: 'done',
+    listener: (uuid: string, result: Jobs.Result<Type>, error?: Crash) => void
+  ): this;
 }
 
 /** Firehose source (Readable) plug class */
 export abstract class Base<
-    T extends Plugs.Source.Any<Type, Data>,
+    T extends Plugs.Source.Any<Type, Data, CustomHeaders>,
     Type extends string = string,
-    Data = any
+    Data = any,
+    CustomHeaders extends Record<string, unknown> = Record<string, unknown>
   >
   extends Readable
   implements Health.Component
@@ -58,7 +63,7 @@ export abstract class Base<
   /** Flag to indicate that an unhealthy status has been emitted recently */
   private lastStatusEmitted?: Health.API.Status;
   /** Wrapped source plug */
-  private readonly plugWrapper: PlugWrapper;
+  private readonly plugWrapper: PlugWrapper<Type, Data, CustomHeaders>;
   /**
    * Indicates the quality of service for the job, indeed this indicate the number of sinks that
    * must be successfully processed to consider the job as successfully processed
@@ -211,7 +216,7 @@ export abstract class Base<
    * Manage the events of the jobs
    * @param job - job object
    */
-  protected subscribeJob(job: Jobs.JobHandler<any>): Jobs.JobHandler<any> {
+  protected subscribeJob(job: Jobs.JobHandler<Type, Data, CustomHeaders>): Jobs.JobHandler<any> {
     job.once('done', this.onJobDone);
     this.emit('job', job);
     return job;

@@ -10,11 +10,11 @@ import { Crash } from '@mdf.js/crash';
 import { Plugs, SinkOptions } from '../types';
 import { Base } from './core';
 
-export class Tap<Type extends string = string, Data = any> extends Base<
-  Plugs.Sink.Tap<Type, Data>,
-  Type,
-  Data
-> {
+export class Tap<
+  Type extends string = string,
+  Data = any,
+  CustomHeaders extends Record<string, unknown> = Record<string, unknown>
+> extends Base<Plugs.Sink.Tap<Type, Data, CustomHeaders>, Type, Data, CustomHeaders> {
   /**
    * Create a new Tap instance
    * @param plug - Tap sink plug
@@ -25,7 +25,7 @@ export class Tap<Type extends string = string, Data = any> extends Base<
   }
   /** Perform the publication of the information on the sink destination */
   override _write(
-    data: Jobs.JobHandler<Type, Data>,
+    data: Jobs.JobHandler<Type, Data, CustomHeaders>,
     encoding: string,
     callback: (error?: Crash | Error) => void
   ): void {

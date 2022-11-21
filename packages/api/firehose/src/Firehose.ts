@@ -26,18 +26,26 @@ import {
   WrappableSourcePlug,
 } from './types';
 
-export declare interface Firehose<Type extends string = string, Data = any> {
+export declare interface Firehose<
+  Type extends string = string,
+  Data = any,
+  CustomHeaders extends Record<string, unknown> = Record<string, unknown>
+> {
   /** Due to the implementation of consumer classes, this event will never emitted */
   on(event: 'error', listener: (error: Error | Crash) => void): this;
   /** Emitted on every state change */
   on(event: 'status', listener: (status: Health.API.Status) => void): this;
   /** Emitted when a job is created */
-  on(event: 'job', listener: (job: Jobs.JobObject<Type, Data>) => void): this;
+  on(event: 'job', listener: (job: Jobs.JobObject<Type, Data, CustomHeaders>) => void): this;
   /** Emitted when a job has ended */
   on(event: 'done', listener: (uuid: string, result: Jobs.Result, error?: Crash) => void): this;
 }
 
-export class Firehose<Type extends string = string, Data = any>
+export class Firehose<
+    Type extends string = string,
+    Data = any,
+    CustomHeaders extends Record<string, unknown> = Record<string, unknown>
+  >
   extends EventEmitter
   implements Health.Component
 {
@@ -46,11 +54,11 @@ export class Firehose<Type extends string = string, Data = any>
   /** Provider unique identifier for trace purposes */
   readonly componentId: string = v4();
   /** Engine stream */
-  private readonly engine: Engine<Type, Data>;
+  private readonly engine: Engine<Type, Data, CustomHeaders>;
   /** Sink streams */
-  private readonly sinks: Sinks<Type, Data>[];
+  private readonly sinks: Sinks<Type, Data, CustomHeaders>[];
   /** Source streams */
-  private readonly sources: Sources<Type, Data>[];
+  private readonly sources: Sources<Type, Data, CustomHeaders>[];
   /** Metrics handler */
   private readonly metricsHandler?: MetricsHandler;
   /** Error registry handler */
@@ -62,7 +70,10 @@ export class Firehose<Type extends string = string, Data = any>
    * @param name - Firehose name
    * @param options - Firehose options
    */
-  constructor(public readonly name: string, private readonly options: FirehoseOptions<Type, Data>) {
+  constructor(
+    public readonly name: string,
+    private readonly options: FirehoseOptions<Type, Data, CustomHeaders>
+  ) {
     super();
     // Stryker disable next-line all
     this.logger = SetContext(
@@ -81,7 +92,7 @@ export class Firehose<Type extends string = string, Data = any>
       this.options.sources,
       this.options.atLeastOne ? 1 : this.sinks.length
     );
-    this.engine = new Engine<Type, Data>(this.name, {
+    this.engine = new Engine<Type, Data, CustomHeaders>(this.name, {
       strategies: this.options.strategies,
       transformOptions: { highWaterMark: this.options.bufferSize },
       logger: this.options.logger,
@@ -103,14 +114,14 @@ export class Firehose<Type extends string = string, Data = any>
    * @returns
    */
   private getSourceStreams(
-    sources: Plugs.Source.Any<Type, Data>[],
+    sources: Plugs.Source.Any<Type, Data, CustomHeaders>[],
     qos = 1
-  ): Sources<Type, Data>[] {
-    const sourceStreams: Sources<Type, Data>[] = [];
+  ): Sources<Type, Data, CustomHeaders>[] {
+    const sourceStreams: Sources<Type, Data, CustomHeaders>[] = [];
     for (const source of sources) {
       if (this.isFlowSource(source)) {
         sourceStreams.push(
-          new Source.Flow<Type, Data>(source, {
+          new Source.Flow<Type, Data, CustomHeaders>(source, {
             retryOptions: this.options.retryOptions,
             qos,
             readableOptions: { highWaterMark: this.options.bufferSize },
@@ -120,7 +131,7 @@ export class Firehose<Type extends string = string, Data = any>
         );
       } else if (this.isSequenceSource(source)) {
         sourceStreams.push(
-          new Source.Sequence<Type, Data>(source, {
+          new Source.Sequence<Type, Data, CustomHeaders>(source, {
             retryOptions: this.options.retryOptions,
             qos,
             readableOptions: { highWaterMark: this.options.bufferSize },

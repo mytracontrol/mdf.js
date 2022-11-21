@@ -12,7 +12,11 @@ import EventEmitter from 'events';
 import { merge } from 'lodash';
 import { Plugs, WrappableSinkPlug } from '../../types';
 
-export class PlugWrapper<Type extends string = string, Data = any> extends EventEmitter {
+export class PlugWrapper<
+  Type extends string = string,
+  Data = any,
+  CustomHeaders extends Record<string, unknown> = Record<string, unknown>
+> extends EventEmitter {
   /** Indicate if the last operation was finished with error */
   private lastOperationError?: Crash | Multi;
   /** Date of the last operation performed */
@@ -20,15 +24,22 @@ export class PlugWrapper<Type extends string = string, Data = any> extends Event
   /** Operation retry options */
   private readonly retryOptions: RetryOptions;
   /** Plug single operation original */
-  private readonly singleOriginal: (job: Plugs.Sink.JobObject<Type, Data>) => Promise<void>;
+  private readonly singleOriginal: (
+    job: Plugs.Sink.JobObject<Type, Data, CustomHeaders>
+  ) => Promise<void>;
   /** Plug multi operation original */
-  private readonly multiOriginal?: (jobs: Plugs.Sink.JobObject<Type, Data>[]) => Promise<void>;
+  private readonly multiOriginal?: (
+    jobs: Plugs.Sink.JobObject<Type, Data, CustomHeaders>[]
+  ) => Promise<void>;
   /**
    * Create a new instance of PlugWrapper
    * @param plug - sink plug instance
    * @param retryOptions - options for job retry operations
    */
-  constructor(private readonly plug: WrappableSinkPlug<Type, Data>, retryOptions?: RetryOptions) {
+  constructor(
+    private readonly plug: WrappableSinkPlug<Type, Data, CustomHeaders>,
+    retryOptions?: RetryOptions
+  ) {
     super();
     this.retryOptions = merge({ logger: this.onOperationError }, retryOptions);
     if (!this.plug) {
@@ -79,14 +90,18 @@ export class PlugWrapper<Type extends string = string, Data = any> extends Event
    * Perform the processing of a single Job
    * @param job - job to be processed
    */
-  private readonly single = async (job: Plugs.Sink.JobObject<Type, Data>): Promise<void> => {
+  private readonly single = async (
+    job: Plugs.Sink.JobObject<Type, Data, CustomHeaders>
+  ): Promise<void> => {
     await this.wrappedOperation(this.singleOriginal, [job]);
   };
   /**
    * Perform the processing of several Jobs
    * @param jobs - jobs to be processed
    */
-  private readonly multi = async (jobs: Plugs.Sink.JobObject<Type, Data>[]): Promise<void> => {
+  private readonly multi = async (
+    jobs: Plugs.Sink.JobObject<Type, Data, CustomHeaders>[]
+  ): Promise<void> => {
     if (!this.multiOriginal) {
       throw new Crash(`Plug ${this.plug.name} does not implement the multi method`);
     }

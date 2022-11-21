@@ -9,8 +9,11 @@ import { Health } from '@mdf.js/core';
 import { EventEmitter } from 'events';
 import { Source } from './Plugs';
 
-export interface WrappableSourcePlug<Type extends string = string, Data = any>
-  extends EventEmitter,
+export interface WrappableSourcePlug<
+  Type extends string = string,
+  Data = any,
+  CustomHeaders extends Record<string, unknown> = Record<string, unknown>
+> extends EventEmitter,
     Health.Component {
   on(event: 'error' | 'data' | 'status', listener: (...args: any[]) => void): this;
   /**
@@ -26,5 +29,7 @@ export interface WrappableSourcePlug<Type extends string = string, Data = any>
    */
   ingestData?: (
     size: number
-  ) => Promise<Source.JobObject<Type, Data> | Source.JobObject<Type, Data>[]>;
+  ) => Promise<
+    Source.JobObject<Type, Data, CustomHeaders> | Source.JobObject<Type, Data, CustomHeaders>[]
+  >;
 }

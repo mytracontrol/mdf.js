@@ -19,16 +19,20 @@ export declare interface JobHandler<Type, Data> {
   on(event: 'done', listener: (uuid: string, result: Result<Type>, error?: Multi) => void): this;
 }
 
-export class JobHandler<Type extends string = string, Data = any>
+export class JobHandler<
+    Type extends string = string,
+    Data = any,
+    CustomHeaders extends Record<string, unknown> = Record<string, unknown>
+  >
   extends EventEmitter
-  implements JobObject<Type, Data>
+  implements JobObject<Type, Data, CustomHeaders>
 {
   /** Job processing identification */
   public readonly uuid: string;
   /** Date object with the timestamp when the job was created */
   public readonly createdAt: Date;
   /** Job meta information, used to pass specific information for sinks and sources */
-  public readonly headers: Headers;
+  public readonly headers: Headers<CustomHeaders>;
   /** Date object with the timestamp when the job was resolved */
   private resolvedAt?: Date;
   /** Job processing status */
@@ -50,7 +54,7 @@ export class JobHandler<Type extends string = string, Data = any>
     data: Data,
     public readonly jobId: string,
     public readonly type: Type,
-    options?: Options
+    options?: Options<CustomHeaders>
   ) {
     super();
     if (typeof jobId !== 'string') {
@@ -79,7 +83,7 @@ export class JobHandler<Type extends string = string, Data = any>
     }
     this.createdAt = new Date();
     this.pendingDone = options?.qos || 1;
-    this.headers = options?.headers || {};
+    this.headers = options?.headers || ({} as Headers<CustomHeaders>);
   }
   /** Job payload */
   public get data(): Data {
@@ -163,7 +167,7 @@ export class JobHandler<Type extends string = string, Data = any>
     };
   }
   /** Return an object with the key information of the job, this information is used by the plugs */
-  public toObject(): JobObject<Type, Data> {
+  public toObject(): JobObject<Type, Data, CustomHeaders> {
     return {
       data: this.data,
       type: this.type,

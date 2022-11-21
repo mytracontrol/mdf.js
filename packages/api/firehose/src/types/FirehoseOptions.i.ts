@@ -12,13 +12,17 @@ import { Service as RegisterService } from '@mdf.js/register-service';
 import { RetryOptions } from '@mdf.js/utils';
 import { Plugs, PostConsumeOptions } from '.';
 
-export interface FirehoseOptions<Type extends string = string, Data = any> {
+export interface FirehoseOptions<
+  Type extends string = string,
+  Data = any,
+  CustomHeaders extends Record<string, unknown> = Record<string, unknown>
+> {
   /** Firehose sources */
-  sources: Plugs.Source.Any<Type, Data>[];
+  sources: Plugs.Source.Any<Type, Data, CustomHeaders>[];
   /** Firehose sinks */
   sinks: Plugs.Sink.Any[];
   /** Firehose transformation strategies per job type */
-  strategies?: { [type: string]: Jobs.Strategy<Type, Data>[] };
+  strategies?: { [type: string]: Jobs.Strategy<Type, Data, CustomHeaders>[] };
   /** Retry options for sink/source operations */
   retryOptions?: RetryOptions;
   /** Post consume operation options */
