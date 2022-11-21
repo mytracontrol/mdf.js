@@ -19,7 +19,7 @@ import {
 export class PlugWrapper<
   Type extends string = string,
   Data = any,
-  CustomHeaders extends Record<string, unknown> = Record<string, unknown>
+  CustomHeaders extends Record<string, any> = Record<string, any>
 > extends EventEmitter {
   /** Jobs uncleaned after job finish due to problems in the post consume command */
   private readonly uncleanedEntries: string[] = [];

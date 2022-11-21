@@ -20,7 +20,7 @@ export declare interface Base<
   T extends Plugs.Sink.Any<Type, Data, CustomHeaders>,
   Type extends string = string,
   Data = any,
-  CustomHeaders extends Record<string, unknown> = Record<string, unknown>
+  CustomHeaders extends Record<string, any> = Record<string, any>
 > {
   /** Emitted when the stream have been closed */
   on(event: 'close', listener: () => void): this;
@@ -57,7 +57,7 @@ export abstract class Base<
     T extends Plugs.Sink.Any<Type, Data, CustomHeaders>,
     Type extends string = string,
     Data = any,
-    CustomHeaders extends Record<string, unknown> = Record<string, unknown>
+    CustomHeaders extends Record<string, any> = Record<string, any>
   >
   extends Writable
   implements Health.Component

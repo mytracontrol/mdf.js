@@ -19,7 +19,7 @@ export declare interface Base<
   T extends Plugs.Source.Any<Type, Data, CustomHeaders>,
   Type extends string = string,
   Data = any,
-  CustomHeaders extends Record<string, unknown> = Record<string, unknown>
+  CustomHeaders extends Record<string, any> = Record<string, any>
 > {
   /** Emitted when stream.resume() is called and readableFlowing is not true*/
   on(event: 'resume', listener: () => void): this;
@@ -51,7 +51,7 @@ export abstract class Base<
     T extends Plugs.Source.Any<Type, Data, CustomHeaders>,
     Type extends string = string,
     Data = any,
-    CustomHeaders extends Record<string, unknown> = Record<string, unknown>
+    CustomHeaders extends Record<string, any> = Record<string, any>
   >
   extends Readable
   implements Health.Component

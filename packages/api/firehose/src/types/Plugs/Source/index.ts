@@ -14,5 +14,5 @@ import { Sequence } from './Sequence.i';
 export type Any<
   Type extends string = string,
   Data = any,
-  CustomHeaders extends Record<string, unknown> = Record<string, unknown>
+  CustomHeaders extends Record<string, any> = Record<string, any>
 > = Flow<Type, Data, CustomHeaders> | Sequence<Type, Data, CustomHeaders>;

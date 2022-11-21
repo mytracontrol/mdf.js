@@ -10,5 +10,5 @@ import { Jobs } from '@mdf.js/core';
 export type JobObject<
   Type extends string = string,
   Data = any,
-  CustomHeaders extends Record<string, unknown> = Record<string, unknown>
+  CustomHeaders extends Record<string, any> = Record<string, any>
 > = Omit<Jobs.JobObject<Type, Data, CustomHeaders>, 'status'>;

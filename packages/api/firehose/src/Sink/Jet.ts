@@ -13,7 +13,7 @@ import { Base } from './core';
 export class Jet<
   Type extends string = string,
   Data = any,
-  CustomHeaders extends Record<string, unknown> = Record<string, unknown>
+  CustomHeaders extends Record<string, any> = Record<string, any>
 > extends Base<Plugs.Sink.Jet<Type, Data, CustomHeaders>, Type, Data, CustomHeaders> {
   /**
    * Create a new Jet instance

@@ -11,7 +11,7 @@ import { Status } from './Status.t';
 export interface JobObject<
   Type extends string = string,
   Data = any,
-  CustomHeaders extends Record<string, unknown> = Record<string, unknown>
+  CustomHeaders extends Record<string, any> = Record<string, any>
 > {
   /** Job type identification, used to identify specific job handlers to be applied */
   type: Type;

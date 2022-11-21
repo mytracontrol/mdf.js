@@ -12,7 +12,7 @@ import { TransformOptions } from 'stream';
 export interface EngineOptions<
   Type extends string = string,
   Data = any,
-  CustomHeaders extends Record<string, unknown> = Record<string, unknown>
+  CustomHeaders extends Record<string, any> = Record<string, any>
 > {
   /** Strategies to be applied over the jobs */
   strategies?: {

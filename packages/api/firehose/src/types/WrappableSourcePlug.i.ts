@@ -12,7 +12,7 @@ import { Source } from './Plugs';
 export interface WrappableSourcePlug<
   Type extends string = string,
   Data = any,
-  CustomHeaders extends Record<string, unknown> = Record<string, unknown>
+  CustomHeaders extends Record<string, any> = Record<string, any>
 > extends EventEmitter,
     Health.Component {
   on(event: 'error' | 'data' | 'status', listener: (...args: any[]) => void): this;

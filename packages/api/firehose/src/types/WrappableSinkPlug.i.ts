@@ -11,7 +11,7 @@ import { Sink } from './Plugs';
 export interface WrappableSinkPlug<
   Type extends string = string,
   Data = any,
-  CustomHeaders extends Record<string, unknown> = Record<string, unknown>
+  CustomHeaders extends Record<string, any> = Record<string, any>
 > extends Health.Component {
   /**
    * Perform the processing of a single Job

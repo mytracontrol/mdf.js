@@ -12,7 +12,7 @@ import { Base } from './core';
 export class Flow<
   Type extends string = string,
   Data = any,
-  CustomHeaders extends Record<string, unknown> = Record<string, unknown>
+  CustomHeaders extends Record<string, any> = Record<string, any>
 > extends Base<Plugs.Source.Flow<Type, Data, CustomHeaders>, Type, Data, CustomHeaders> {
   /**
    * Create a new instance for the firehose source

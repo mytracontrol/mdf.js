@@ -13,7 +13,7 @@ import { JobObject } from './JobObject.t';
 export interface Base<
   Type extends string = string,
   Data = any,
-  CustomHeaders extends Record<string, unknown> = Record<string, unknown>
+  CustomHeaders extends Record<string, any> = Record<string, any>
 > extends EventEmitter,
     Health.Component {
   /** Emitted when the component throw an error*/

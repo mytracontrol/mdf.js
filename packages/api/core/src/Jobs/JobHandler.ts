@@ -22,7 +22,7 @@ export declare interface JobHandler<Type, Data> {
 export class JobHandler<
     Type extends string = string,
     Data = any,
-    CustomHeaders extends Record<string, unknown> = Record<string, unknown>
+    CustomHeaders extends Record<string, any> = Record<string, any>
   >
   extends EventEmitter
   implements JobObject<Type, Data, CustomHeaders>

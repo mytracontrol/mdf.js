@@ -15,7 +15,7 @@ import { Plugs, PostConsumeOptions } from '.';
 export interface FirehoseOptions<
   Type extends string = string,
   Data = any,
-  CustomHeaders extends Record<string, unknown> = Record<string, unknown>
+  CustomHeaders extends Record<string, any> = Record<string, any>
 > {
   /** Firehose sources */
   sources: Plugs.Source.Any<Type, Data, CustomHeaders>[];

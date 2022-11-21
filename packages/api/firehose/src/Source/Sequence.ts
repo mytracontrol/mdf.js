@@ -12,7 +12,7 @@ import { Base } from './core';
 export class Sequence<
   Type extends string = string,
   Data = any,
-  CustomHeaders extends Record<string, unknown> = Record<string, unknown>
+  CustomHeaders extends Record<string, any> = Record<string, any>
 > extends Base<Plugs.Source.Sequence<Type, Data, CustomHeaders>, Type, Data, CustomHeaders> {
   /** Indication of pending data request flag */
   private pendingRequest = false;

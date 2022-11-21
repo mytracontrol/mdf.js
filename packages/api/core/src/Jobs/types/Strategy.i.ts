@@ -11,7 +11,7 @@ import { JobObject } from './JobObject.i';
 export interface Strategy<
   Type extends string = string,
   Data = any,
-  CustomHeaders extends Record<string, unknown> = Record<string, unknown>
+  CustomHeaders extends Record<string, any> = Record<string, any>
 > {
   /** Strategy name */
   readonly name: string;

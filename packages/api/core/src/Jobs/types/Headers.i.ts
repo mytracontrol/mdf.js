@@ -16,4 +16,4 @@ export interface AnyHeaders {
   [header: string]: unknown;
 }
 
-export type Headers<T extends Record<string, unknown> = AnyHeaders> = DefaultHeaders & T;
+export type Headers<T extends Record<string, any> = AnyHeaders> = DefaultHeaders & T;

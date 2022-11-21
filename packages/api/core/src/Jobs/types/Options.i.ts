@@ -7,7 +7,7 @@
 
 import { Headers } from './Headers.i';
 
-export interface Options<CustomHeaders extends Record<string, unknown> = Record<string, unknown>> {
+export interface Options<CustomHeaders extends Record<string, any> = Record<string, any>> {
   /** Job meta information, used to pass specific information for sinks and sources */
   headers?: Headers<CustomHeaders>;
   /**
