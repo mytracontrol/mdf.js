@@ -6,7 +6,7 @@
  */
 
 import { LoggerInstance } from '@mdf.js/logger';
-import { FactoryOptions, PortConfigValidationStruct } from '../types';
+import { Factory, FactoryOptions, PortConfigValidationStruct } from '../types';
 import { Manager } from './Manager';
 import { Port } from './Port';
 
@@ -23,8 +23,8 @@ export default function <PortClient, PortConfig, T extends Port<PortClient, Port
   validation: PortConfigValidationStruct<PortConfig>,
   defaultName: string,
   type: string
-) {
-  return class Factory {
+): Factory<PortClient, PortConfig, T> {
+  return class MixinFactory {
     /** Provider */
     private readonly provider: Manager<PortClient, PortConfig, T>;
     /**
@@ -34,7 +34,7 @@ export default function <PortClient, PortConfig, T extends Port<PortClient, Port
     public static create<P extends PortConfig>(
       options?: FactoryOptions<P>
     ): Manager<PortClient, PortConfig, T> {
-      return new Factory(options).provider;
+      return new MixinFactory(options).provider;
     }
     /**
      * Private constructor for provider factory

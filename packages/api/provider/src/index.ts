@@ -8,6 +8,8 @@
 export { LoggerInstance } from '@mdf.js/logger';
 export * as Provider from './api';
 export {
+  Factory,
+  FactoryOptions,
   PortConfigValidationStruct,
   ProviderOptions,
   ProviderState,
