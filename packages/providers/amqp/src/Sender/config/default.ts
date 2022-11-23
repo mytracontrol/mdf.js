@@ -23,6 +23,7 @@ const CONFIG_AMQP_REQUEST_CERT = false;
 const CONFIG_AMQP_REJECT_UNAUTHORIZED = false;
 const CONFIG_AMQP_SENDER_SETTLE_MODE = 2;
 const CONFIG_AMQP_SENDER_AUTO_SETTLE = true;
+const CONFIG_AMQP_SENDER_TARGET = {};
 
 export const defaultConfig: Config = {
   username: CONFIG_AMQP_USER_NAME,
@@ -40,6 +41,7 @@ export const defaultConfig: Config = {
     name: CONFIG_ARTIFACT_ID,
     snd_settle_mode: CONFIG_AMQP_SENDER_SETTLE_MODE,
     autosettle: CONFIG_AMQP_SENDER_AUTO_SETTLE,
+    target: CONFIG_AMQP_SENDER_TARGET,
   },
 };
 // #endregion

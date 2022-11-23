@@ -51,7 +51,7 @@ class FakeLogger {
     this.entry = value;
   }
 }
-class FakeSession extends EventEmitter {
+class FakeContainer extends EventEmitter {
   open = true;
   credit = 10;
   sender?: FakeSender;
@@ -149,14 +149,14 @@ describe('#Port #AMQP #Sender', () => {
     }, 300);
     it(`Should start and stop the port properly, with credits`, () => {
       const port = new Port(DEFAULT_CONFIG, new FakeLogger() as LoggerInstance);
-      const mySession = new FakeSession();
+      const myContainer = new FakeContainer();
       expect(port).toBeDefined();
       //@ts-ignore - Test environment
       jest.spyOn(port.instance.connection, 'open').mockResolvedValue();
       //@ts-ignore - Test environment
       jest.spyOn(port.instance.connection, 'close').mockResolvedValue();
       //@ts-ignore - Test environment
-      jest.spyOn(port.instance.connection, 'createSession').mockResolvedValue(mySession);
+      jest.spyOn(port.instance.connection, 'createSession').mockResolvedValue(myContainer);
       return port
         .start()
         .then(() => port.start())
@@ -183,15 +183,15 @@ describe('#Port #AMQP #Sender', () => {
     }, 300);
     it(`Should start and stop the port properly, without credits`, () => {
       const port = new Port(DEFAULT_CONFIG, new FakeLogger() as LoggerInstance);
-      const mySession = new FakeSession();
-      mySession.credit = 0;
+      const myContainer = new FakeContainer();
+      myContainer.credit = 0;
       expect(port).toBeDefined();
       //@ts-ignore - Test environment
       jest.spyOn(port.instance.connection, 'open').mockResolvedValue();
       //@ts-ignore - Test environment
       jest.spyOn(port.instance.connection, 'close').mockResolvedValue();
       //@ts-ignore - Test environment
-      jest.spyOn(port.instance.connection, 'createSession').mockResolvedValue(mySession);
+      jest.spyOn(port.instance.connection, 'createSession').mockResolvedValue(myContainer);
       return port
         .start()
         .then(() => {
@@ -215,14 +215,14 @@ describe('#Port #AMQP #Sender', () => {
     }, 300);
     it(`Should start and stop the port properly, attaching/detaching the listeners to the instance`, () => {
       const port = new Port(DEFAULT_CONFIG, new FakeLogger() as LoggerInstance);
-      const mySession = new FakeSession();
+      const myContainer = new FakeContainer();
       expect(port).toBeDefined();
       //@ts-ignore - Test environment
       jest.spyOn(port.instance.connection, 'open').mockResolvedValue();
       //@ts-ignore - Test environment
       jest.spyOn(port.instance.connection, 'close').mockResolvedValue();
       //@ts-ignore - Test environment
-      jest.spyOn(port.instance.connection, 'createSession').mockResolvedValue(mySession);
+      jest.spyOn(port.instance.connection, 'createSession').mockResolvedValue(myContainer);
       let events = 0;
       port.on('error', error => {
         expect(error.message).toEqual('myError');
@@ -289,14 +289,14 @@ describe('#Port #AMQP #Sender', () => {
     }, 300);
     it(`Should start and stop the port properly, attaching/detaching the listeners to the underlayer sender`, () => {
       const port = new Port(DEFAULT_CONFIG, new FakeLogger() as LoggerInstance);
-      const mySession = new FakeSession();
+      const myContainer = new FakeContainer();
       expect(port).toBeDefined();
       //@ts-ignore - Test environment
       jest.spyOn(port.instance.connection, 'open').mockResolvedValue();
       //@ts-ignore - Test environment
       jest.spyOn(port.instance.connection, 'close').mockResolvedValue();
       //@ts-ignore - Test environment
-      jest.spyOn(port.instance.connection, 'createSession').mockResolvedValue(mySession);
+      jest.spyOn(port.instance.connection, 'createSession').mockResolvedValue(myContainer);
       let events = 0;
       let numOfError = 0;
       port.on('error', error => {
@@ -412,15 +412,15 @@ describe('#Port #AMQP #Sender', () => {
     });
     it(`Should reject to start if session.createReceiver rejects`, () => {
       const port = new Port(DEFAULT_CONFIG, new FakeLogger() as LoggerInstance);
-      const mySession = new FakeSession();
-      mySession.shouldFailCreate = true;
+      const myContainer = new FakeContainer();
+      myContainer.shouldFailCreate = true;
       expect(port).toBeDefined();
       //@ts-ignore - Test environment
       jest.spyOn(port.instance.connection, 'open').mockResolvedValue();
       //@ts-ignore - Test environment
       jest.spyOn(port.instance.connection, 'close').mockResolvedValue();
       //@ts-ignore - Test environment
-      jest.spyOn(port.instance.connection, 'createSession').mockResolvedValue(mySession);
+      jest.spyOn(port.instance.connection, 'createSession').mockResolvedValue(myContainer);
       return port.start().catch(error => {
         expect(error.message).toEqual('Error creating the AMQP Sender: Error creating sender');
         expect(error.cause.message).toEqual('Error creating sender');
@@ -428,19 +428,19 @@ describe('#Port #AMQP #Sender', () => {
     }, 300);
     it(`Should reject to stop if receiver.close rejects`, async () => {
       const port = new Port(DEFAULT_CONFIG, new FakeLogger() as LoggerInstance);
-      const mySession = new FakeSession();
+      const myContainer = new FakeContainer();
       expect(port).toBeDefined();
       //@ts-ignore - Test environment
       jest.spyOn(port.instance.connection, 'open').mockResolvedValue();
       //@ts-ignore - Test environment
       jest.spyOn(port.instance.connection, 'close').mockResolvedValue();
       //@ts-ignore - Test environment
-      jest.spyOn(port.instance.connection, 'createSession').mockResolvedValue(mySession);
+      jest.spyOn(port.instance.connection, 'createSession').mockResolvedValue(myContainer);
       await port.start();
       //@ts-ignore - Test environment
       jest.spyOn(port.instance.connection, 'isOpen').mockReturnValue(true);
       //@ts-ignore - Test environment
-      mySession.sender?.shouldFailClose = true;
+      myContainer.sender?.shouldFailClose = true;
       try {
         await port.close();
         throw new Error('Should not be here');

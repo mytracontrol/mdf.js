@@ -15,11 +15,13 @@ import {
   SenderEvents,
 } from 'rhea-promise';
 import { inspect } from 'util';
-import { SessionClient } from './Session';
+import { Container } from './Container';
 
-export class Sender extends SessionClient {
+export class Sender extends Container {
   /** AMQP Sender */
   private sender?: RheaSender;
+  /** Flag for wrapped events */
+  private senderEventsWrapped = false;
   /**
    * Creates an instance of AMQP Sender
    * @param options - Connection options
@@ -161,12 +163,8 @@ export class Sender extends SessionClient {
     }
     try {
       await super.start();
-      if (this.session) {
-        this.sender = await this.session.createAwaitableSender();
-        this.senderEventsWrapping(this.sender);
-      } else {
-        throw new Crash('Session is not initialized');
-      }
+      this.sender = await this.connection.createAwaitableSender();
+      this.senderEventsWrapping(this.sender);
     } catch (rawError) {
       const error = Crash.from(rawError, this.componentId);
       throw new Crash(`Error creating the AMQP Sender: ${error.message}`, this.componentId, {
@@ -199,6 +197,9 @@ export class Sender extends SessionClient {
    * @param sender - AMQP message sender
    */
   private senderEventsWrapping(sender: RheaSender): RheaSender {
+    if (this.senderEventsWrapped) {
+      return sender;
+    }
     sender.on(SenderEvents.sendable, this.onSendableEvent);
     sender.on(SenderEvents.senderOpen, this.onSenderOpenEvent);
     sender.on(SenderEvents.senderDraining, this.onSenderDrainingEvent);
@@ -210,6 +211,7 @@ export class Sender extends SessionClient {
     sender.on(SenderEvents.rejected, this.onSenderRejectedEvent);
     sender.on(SenderEvents.modified, this.onSenderModifiedEvent);
     sender.on(SenderEvents.settled, this.onSenderSettledEvent);
+    this.senderEventsWrapped = true;
     return sender;
   }
   /**
@@ -217,6 +219,9 @@ export class Sender extends SessionClient {
    * @param sender - AMQP message sender
    */
   private senderEventsUnwrapping(sender: RheaSender): RheaSender {
+    if (!this.senderEventsWrapped) {
+      return sender;
+    }
     sender.off(SenderEvents.sendable, this.onSendableEvent);
     sender.off(SenderEvents.senderOpen, this.onSenderOpenEvent);
     sender.off(SenderEvents.senderDraining, this.onSenderDrainingEvent);
@@ -228,6 +233,7 @@ export class Sender extends SessionClient {
     sender.off(SenderEvents.rejected, this.onSenderRejectedEvent);
     sender.off(SenderEvents.modified, this.onSenderModifiedEvent);
     sender.off(SenderEvents.settled, this.onSenderSettledEvent);
+    this.senderEventsWrapped = false;
     return sender;
   }
 }

@@ -15,11 +15,13 @@ import {
   ReceiverEvents,
 } from 'rhea-promise';
 import { inspect } from 'util';
-import { SessionClient } from './Session';
+import { Container } from './Container';
 
-export class Receiver extends SessionClient {
+export class Receiver extends Container {
   /** AMQP Receiver */
   private receiver?: RheaReceiver;
+  /** Flag for wrapped events */
+  private receiverEventsWrapped = false;
   /**
    * Creates an instance of AMQP Container
    * @param options - Connection options
@@ -121,12 +123,8 @@ export class Receiver extends SessionClient {
     }
     try {
       await super.start();
-      if (this.session) {
-        this.receiver = await this.session.createReceiver();
-        this.receiverEventsWrapping(this.receiver);
-      } else {
-        throw new Crash('Session is not initialized', this.componentId);
-      }
+      this.receiver = await this.connection.createReceiver();
+      this.receiverEventsWrapping(this.receiver);
     } catch (rawError) {
       const error = Crash.from(rawError, this.componentId);
       throw new Crash(`Error creating the AMQP Receiver: ${error.message}`, this.componentId, {
@@ -159,6 +157,9 @@ export class Receiver extends SessionClient {
    * @param received - AMQP message received
    */
   private receiverEventsWrapping(receiver: RheaReceiver): RheaReceiver {
+    if (this.receiverEventsWrapped) {
+      return receiver;
+    }
     receiver.on(ReceiverEvents.message, this.onMessageEvent);
     receiver.on(ReceiverEvents.receiverOpen, this.onReceiverOpenEvent);
     receiver.on(ReceiverEvents.receiverDrained, this.onReceiverDrainedEvent);
@@ -166,6 +167,7 @@ export class Receiver extends SessionClient {
     receiver.on(ReceiverEvents.receiverError, this.onReceiverErrorEvent);
     receiver.on(ReceiverEvents.receiverClose, this.onReceiverCloseEvent);
     receiver.on(ReceiverEvents.settled, this.onReceivedSettledEvent);
+    this.receiverEventsWrapped = true;
     return receiver;
   }
   /**
@@ -173,6 +175,9 @@ export class Receiver extends SessionClient {
    * @param received - AMQP message received
    */
   private receiverEventsUnwrapping(receiver: RheaReceiver): RheaReceiver {
+    if (!this.receiverEventsWrapped) {
+      return receiver;
+    }
     receiver.off(ReceiverEvents.message, this.onMessageEvent);
     receiver.off(ReceiverEvents.receiverOpen, this.onReceiverOpenEvent);
     receiver.off(ReceiverEvents.receiverDrained, this.onReceiverDrainedEvent);
@@ -180,6 +185,7 @@ export class Receiver extends SessionClient {
     receiver.off(ReceiverEvents.receiverError, this.onReceiverErrorEvent);
     receiver.off(ReceiverEvents.receiverClose, this.onReceiverCloseEvent);
     receiver.off(ReceiverEvents.settled, this.onReceivedSettledEvent);
+    this.receiverEventsWrapped = false;
     return receiver;
   }
 }

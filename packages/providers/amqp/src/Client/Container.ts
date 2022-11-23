@@ -27,6 +27,8 @@ export class Container extends EventEmitter {
   protected readonly connection: Connection;
   /** Debug logger for development and deep troubleshooting */
   protected readonly logger: LoggerInstance;
+  /** Flag for wrapped events */
+  private containerEventsWrapped = false;
   /**
    * Creates an instance of AMQP Container
    * @param options - Connection options
@@ -174,6 +176,9 @@ export class Container extends EventEmitter {
    * @param connection - AMQP Connection instance
    */
   private eventsWrapping(connection: Connection): Connection {
+    if (this.containerEventsWrapped) {
+      return connection;
+    }
     connection.on(ConnectionEvents.connectionOpen, this.onConnectionOpen);
     connection.on(ConnectionEvents.connectionClose, this.onConnectionCloseEvent);
     connection.on(ConnectionEvents.connectionError, this.onConnectionErrorEvent);
@@ -181,6 +186,7 @@ export class Container extends EventEmitter {
     connection.on(ConnectionEvents.error, this.onErrorEvent);
     connection.on(ConnectionEvents.disconnected, this.onDisconnectedEvent);
     connection.on(ConnectionEvents.settled, this.onSettledEvent);
+    this.containerEventsWrapped = true;
     return connection;
   }
   /**
@@ -188,6 +194,9 @@ export class Container extends EventEmitter {
    * @param connection - AMQP Connection instance
    */
   private eventsUnwrapping(connection: Connection): Connection {
+    if (!this.containerEventsWrapped) {
+      return connection;
+    }
     connection.off(ConnectionEvents.connectionOpen, this.onConnectionOpen);
     connection.off(ConnectionEvents.connectionClose, this.onConnectionCloseEvent);
     connection.off(ConnectionEvents.connectionError, this.onConnectionErrorEvent);
@@ -195,6 +204,7 @@ export class Container extends EventEmitter {
     connection.off(ConnectionEvents.error, this.onErrorEvent);
     connection.off(ConnectionEvents.disconnected, this.onDisconnectedEvent);
     connection.off(ConnectionEvents.settled, this.onSettledEvent);
+    this.containerEventsWrapped = false;
     return connection;
   }
 }

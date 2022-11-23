@@ -55,7 +55,7 @@ class FakeLogger {
     this.entry = value;
   }
 }
-class FakeSession extends EventEmitter {
+class FakeContainer extends EventEmitter {
   open = true;
   credit = 10;
   receiver?: FakeReceiver;
@@ -70,7 +70,7 @@ class FakeSession extends EventEmitter {
   }
   async close(): Promise<void> {
     if (this.shouldFailClose) {
-      throw new Error('Failed to close session');
+      throw new Error('Failed to close container');
     }
     this.open = false;
   }
@@ -169,14 +169,14 @@ describe('#Port #AMQP #Receiver', () => {
     }, 300);
     it(`Should start and stop the port properly and fullfil the checks`, () => {
       const port = new Port(DEFAULT_CONFIG, new FakeLogger() as LoggerInstance);
-      const mySession = new FakeSession();
+      const myContainer = new FakeContainer();
       expect(port).toBeDefined();
       //@ts-ignore - Test environment
       jest.spyOn(port.instance.connection, 'open').mockResolvedValue();
       //@ts-ignore - Test environment
       jest.spyOn(port.instance.connection, 'close').mockResolvedValue();
       //@ts-ignore - Test environment
-      jest.spyOn(port.instance.connection, 'createSession').mockResolvedValue(mySession);
+      jest.spyOn(port.instance.connection, 'createSession').mockResolvedValue(myContainer);
       return port
         .start()
         .then(() => port.start())
@@ -202,14 +202,14 @@ describe('#Port #AMQP #Receiver', () => {
     }, 300);
     it(`Should start and stop the port properly, attaching/detaching the listeners to the instance`, () => {
       const port = new Port(DEFAULT_CONFIG, new FakeLogger() as LoggerInstance);
-      const mySession = new FakeSession();
+      const myContainer = new FakeContainer();
       expect(port).toBeDefined();
       //@ts-ignore - Test environment
       jest.spyOn(port.instance.connection, 'open').mockResolvedValue();
       //@ts-ignore - Test environment
       jest.spyOn(port.instance.connection, 'close').mockResolvedValue();
       //@ts-ignore - Test environment
-      jest.spyOn(port.instance.connection, 'createSession').mockResolvedValue(mySession);
+      jest.spyOn(port.instance.connection, 'createSession').mockResolvedValue(myContainer);
       let events = 0;
       port.on('error', error => {
         expect(error.message).toEqual('myError');
@@ -276,14 +276,14 @@ describe('#Port #AMQP #Receiver', () => {
     }, 300);
     it(`Should start and stop the port properly, attaching/detaching the listeners to the underlayer receiver`, () => {
       const port = new Port(DEFAULT_CONFIG, new FakeLogger() as LoggerInstance);
-      const mySession = new FakeSession();
+      const myContainer = new FakeContainer();
       expect(port).toBeDefined();
       //@ts-ignore - Test environment
       jest.spyOn(port.instance.connection, 'open').mockResolvedValue();
       //@ts-ignore - Test environment
       jest.spyOn(port.instance.connection, 'close').mockResolvedValue();
       //@ts-ignore - Test environment
-      jest.spyOn(port.instance.connection, 'createSession').mockResolvedValue(mySession);
+      jest.spyOn(port.instance.connection, 'createSession').mockResolvedValue(myContainer);
       let events = 0;
       let numOfError = 0;
       port.on('error', error => {
@@ -370,93 +370,16 @@ describe('#Port #AMQP #Receiver', () => {
           expect(port.instance.receiver.listeners('settle').length).toEqual(0);
         });
     }, 300);
-    it(`Should start and stop the port properly, attaching/detaching the listeners to the underlayer session`, () => {
-      const port = new Port(DEFAULT_CONFIG, new FakeLogger() as LoggerInstance);
-      const mySession = new FakeSession();
-      expect(port).toBeDefined();
-      //@ts-ignore - Test environment
-      jest.spyOn(port.instance.connection, 'open').mockResolvedValue();
-      //@ts-ignore - Test environment
-      jest.spyOn(port.instance.connection, 'close').mockResolvedValue();
-      //@ts-ignore - Test environment
-      jest.spyOn(port.instance.connection, 'createSession').mockResolvedValue(mySession);
-      let events = 0;
-      let numOfError = 0;
-      port.on('error', error => {
-        if (numOfError === 0) {
-          expect(error?.message).toEqual('Session error: myError - myDescription');
-          expect(error.info).toBeDefined();
-          numOfError++;
-        } else {
-          expect(error?.message).toEqual('Session error: Unknown error');
-          expect(error.info).toBeDefined();
-        }
-        events++;
-      });
-      port.on('closed', error => {
-        expect(error).toBeUndefined();
-        events++;
-      });
-      port.on('healthy', () => {
-        events++;
-      });
-      port.on('unhealthy', error => {
-        events++;
-      });
-      return port
-        .start()
-        .then(() => {
-          expect(port.state).toBeTruthy();
-          //@ts-ignore - Test environment
-          jest.spyOn(port.instance.connection, 'isOpen').mockReturnValue(true);
-          //@ts-ignore - Test environment
-          expect(port.instance.session.listeners('session_open').length).toEqual(1);
-          //@ts-ignore - Test environment
-          expect(port.instance.session.listeners('session_error').length).toEqual(1);
-          //@ts-ignore - Test environment
-          expect(port.instance.session.listeners('session_close').length).toEqual(1);
-          //@ts-ignore - Test environment
-          expect(port.instance.session.listeners('settled').length).toEqual(1);
-          //@ts-ignore - Test environment
-          port.instance.session.emit('session_open', { message: { to: 'myAddress' } });
-          //@ts-ignore - Test environment
-          port.instance.session.emit('session_error', {
-            session: {
-              error: { condition: 'myError', description: 'myDescription' },
-            },
-          });
-          //@ts-ignore - Test environment
-          port.instance.session.emit('session_error', {
-            session: {},
-          });
-          //@ts-ignore - Test environment
-          port.instance.session.emit('session_close', { message: { to: 'myAddress' } });
-          //@ts-ignore - Test environment
-          port.instance.session.emit('settled', { message: { to: 'myAddress' } });
-          expect(events).toEqual(2);
-        })
-        .then(() => port.close())
-        .then(() => {
-          //@ts-ignore - Test environment
-          expect(port.instance.session.listeners('session_open').length).toEqual(0);
-          //@ts-ignore - Test environment
-          expect(port.instance.session.listeners('session_error').length).toEqual(0);
-          //@ts-ignore - Test environment
-          expect(port.instance.session.listeners('session_close').length).toEqual(0);
-          //@ts-ignore - Test environment
-          expect(port.instance.session.listeners('settled').length).toEqual(0);
-        });
-    }, 300);
     it(`Should start and stop the port properly, attaching/detaching the listeners to the underlayer container`, () => {
       const port = new Port(DEFAULT_CONFIG, new FakeLogger() as LoggerInstance);
-      const mySession = new FakeSession();
+      const myContainer = new FakeContainer();
       expect(port).toBeDefined();
       //@ts-ignore - Test environment
       jest.spyOn(port.instance.connection, 'open').mockResolvedValue();
       //@ts-ignore - Test environment
       jest.spyOn(port.instance.connection, 'close').mockResolvedValue();
       //@ts-ignore - Test environment
-      jest.spyOn(port.instance.connection, 'createSession').mockResolvedValue(mySession);
+      jest.spyOn(port.instance.connection, 'createSession').mockResolvedValue(myContainer);
       let events = 0;
       let numOfError = 0;
       port.on('error', error => {
@@ -554,42 +477,20 @@ describe('#Port #AMQP #Receiver', () => {
     }, 300);
     it(`Should reject to start if session.createReceiver rejects`, () => {
       const port = new Port(DEFAULT_CONFIG, new FakeLogger() as LoggerInstance);
-      const mySession = new FakeSession();
-      mySession.shouldFailCreate = true;
+      const myContainer = new FakeContainer();
+      myContainer.shouldFailCreate = true;
       expect(port).toBeDefined();
       //@ts-ignore - Test environment
       jest.spyOn(port.instance.connection, 'open').mockResolvedValue();
       //@ts-ignore - Test environment
       jest.spyOn(port.instance.connection, 'close').mockResolvedValue();
       //@ts-ignore - Test environment
-      jest.spyOn(port.instance.connection, 'createSession').mockResolvedValue(mySession);
+      jest.spyOn(port.instance.connection, 'createSession').mockResolvedValue(myContainer);
       return port.start().catch(error => {
         expect(error.message).toEqual(
           'Error creating the AMQP Receiver: Failed to create receiver'
         );
         expect(error.cause.message).toEqual('Failed to create receiver');
-      });
-    }, 300);
-    it(`Should reject to start if container.createSessionRejects rejects`, () => {
-      const port = new Port(DEFAULT_CONFIG, new FakeLogger() as LoggerInstance);
-      const mySession = new FakeSession();
-      expect(port).toBeDefined();
-      //@ts-ignore - Test environment
-      jest.spyOn(port.instance.connection, 'open').mockResolvedValue();
-      //@ts-ignore - Test environment
-      jest.spyOn(port.instance.connection, 'close').mockResolvedValue();
-      jest
-        //@ts-ignore - Test environment
-        .spyOn(port.instance.connection, 'createSession')
-        .mockRejectedValue(new Error('Failed to create session'));
-      return port.start().catch(error => {
-        expect(error.message).toEqual(
-          'Error creating the AMQP Receiver: Error creating the AMQP Session: Failed to create session'
-        );
-        expect(error.cause.message).toEqual(
-          'Error creating the AMQP Session: Failed to create session'
-        );
-        expect(error.cause.cause.message).toEqual('Failed to create session');
       });
     }, 300);
     it(`Should reject to start if connection.open rejects`, () => {
@@ -601,32 +502,29 @@ describe('#Port #AMQP #Receiver', () => {
         .mockRejectedValue(new Error('Failed to open connection'));
       return port.start().catch(error => {
         expect(error.message).toEqual(
-          'Error creating the AMQP Receiver: Error creating the AMQP Session: Error opening the AMQP connection: Failed to open connection'
+          'Error creating the AMQP Receiver: Error opening the AMQP connection: Failed to open connection'
         );
         expect(error.cause.message).toEqual(
-          'Error creating the AMQP Session: Error opening the AMQP connection: Failed to open connection'
-        );
-        expect(error.cause.cause.message).toEqual(
           'Error opening the AMQP connection: Failed to open connection'
         );
-        expect(error.cause.cause.cause.message).toEqual('Failed to open connection');
+        expect(error.cause.cause.message).toEqual('Failed to open connection');
       });
     }, 300);
     it(`Should reject to stop if receiver.close rejects`, async () => {
       const port = new Port(DEFAULT_CONFIG, new FakeLogger() as LoggerInstance);
-      const mySession = new FakeSession();
+      const myContainer = new FakeContainer();
       expect(port).toBeDefined();
       //@ts-ignore - Test environment
       jest.spyOn(port.instance.connection, 'open').mockResolvedValue();
       //@ts-ignore - Test environment
       jest.spyOn(port.instance.connection, 'close').mockResolvedValue();
       //@ts-ignore - Test environment
-      jest.spyOn(port.instance.connection, 'createSession').mockResolvedValue(mySession);
+      jest.spyOn(port.instance.connection, 'createSession').mockResolvedValue(myContainer);
       await port.start();
       //@ts-ignore - Test environment
       jest.spyOn(port.instance.connection, 'isOpen').mockReturnValue(true);
       //@ts-ignore - Test environment
-      mySession.receiver?.shouldFailClose = true;
+      myContainer.receiver?.shouldFailClose = true;
       try {
         await port.close();
         throw new Error('Should have failed');
@@ -635,39 +533,9 @@ describe('#Port #AMQP #Receiver', () => {
         expect(error.cause.message).toEqual('Failed to close receiver');
       }
     }, 300);
-    it(`Should reject to stop if session.close rejects`, async () => {
-      const port = new Port(DEFAULT_CONFIG, new FakeLogger() as LoggerInstance);
-      const mySession = new FakeSession();
-      expect(port).toBeDefined();
-      //@ts-ignore - Test environment
-      jest.spyOn(port.instance.connection, 'open').mockResolvedValue();
-      //@ts-ignore - Test environment
-      jest.spyOn(port.instance.connection, 'close').mockResolvedValue();
-      //@ts-ignore - Test environment
-      jest.spyOn(port.instance.connection, 'createSession').mockResolvedValue(mySession);
-      port.on('error', error => {
-        expect(error.message).toEqual('myError');
-      });
-      await port.start();
-      //@ts-ignore - Test environment
-      jest.spyOn(port.instance.connection, 'isOpen').mockReturnValue(true);
-      mySession.shouldFailClose = true;
-      try {
-        await port.close();
-        throw new Error('Should have failed');
-      } catch (error: any) {
-        expect(error.message).toEqual(
-          'Error closing the AMQP Receiver: Error closing the AMQP Session: Failed to close session'
-        );
-        expect(error.cause.message).toEqual(
-          'Error closing the AMQP Session: Failed to close session'
-        );
-        expect(error.cause.cause.message).toEqual('Failed to close session');
-      }
-    }, 300);
     it(`Should reject to stop if connection.close rejects`, async () => {
       const port = new Port(DEFAULT_CONFIG, new FakeLogger() as LoggerInstance);
-      const mySession = new FakeSession();
+      const myContainer = new FakeContainer();
       expect(port).toBeDefined();
       //@ts-ignore - Test environment
       jest.spyOn(port.instance.connection, 'open').mockResolvedValue();
@@ -676,7 +544,7 @@ describe('#Port #AMQP #Receiver', () => {
         .spyOn(port.instance.connection, 'close')
         .mockRejectedValue(new Error('Failed to close connection'));
       //@ts-ignore - Test environment
-      jest.spyOn(port.instance.connection, 'createSession').mockResolvedValue(mySession);
+      jest.spyOn(port.instance.connection, 'createSession').mockResolvedValue(myContainer);
       await port.start();
       //@ts-ignore - Test environment
       jest.spyOn(port.instance.connection, 'isOpen').mockReturnValue(true);
@@ -685,15 +553,12 @@ describe('#Port #AMQP #Receiver', () => {
         throw new Error('Should not reach here');
       } catch (error: any) {
         expect(error.message).toEqual(
-          'Error closing the AMQP Receiver: Error closing the AMQP Session: Error closing the AMQP connection: Failed to close connection'
+          'Error closing the AMQP Receiver: Error closing the AMQP connection: Failed to close connection'
         );
         expect(error.cause.message).toEqual(
-          'Error closing the AMQP Session: Error closing the AMQP connection: Failed to close connection'
-        );
-        expect(error.cause.cause.message).toEqual(
           'Error closing the AMQP connection: Failed to close connection'
         );
-        expect(error.cause.cause.cause.message).toEqual('Failed to close connection');
+        expect(error.cause.cause.message).toEqual('Failed to close connection');
       }
     }, 300);
   });
