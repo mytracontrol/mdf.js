@@ -13,6 +13,8 @@ export interface JobObject<
   Data = any,
   CustomHeaders extends Record<string, any> = Record<string, any>
 > extends JobRequest<Type, Data, CustomHeaders> {
+  /** Job type identification, used to identify specific job handlers to be applied */
+  type: Type;
   /** Unique job processing identification */
   uuid: string;
   /**
