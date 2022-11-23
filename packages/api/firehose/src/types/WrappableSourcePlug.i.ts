@@ -32,4 +32,8 @@ export interface WrappableSourcePlug<
   ) => Promise<
     Source.JobObject<Type, Data, CustomHeaders> | Source.JobObject<Type, Data, CustomHeaders>[]
   >;
+  /** Start the Plug and the underlayer resources, making it available */
+  start(): Promise<void>;
+  /** Stop the Plug and the underlayer resources, making it unavailable */
+  stop(): Promise<void>;
 }

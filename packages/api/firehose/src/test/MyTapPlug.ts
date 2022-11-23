@@ -42,4 +42,10 @@ export class MyTapPlug extends EventEmitter implements Plugs.Sink.Tap {
       }
     });
   }
+  public start(): Promise<void> {
+    return Promise.resolve();
+  }
+  public stop(): Promise<void> {
+    return Promise.resolve();
+  }
 }

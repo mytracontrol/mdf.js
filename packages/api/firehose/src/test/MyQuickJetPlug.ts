@@ -50,4 +50,10 @@ export class MyQuickJetPlug extends EventEmitter implements Plugs.Sink.Jet {
       }
     });
   }
+  public start(): Promise<void> {
+    return Promise.resolve();
+  }
+  public stop(): Promise<void> {
+    return Promise.resolve();
+  }
 }

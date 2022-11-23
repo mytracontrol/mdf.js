@@ -5,6 +5,5 @@
  * or at https://opensource.org/licenses/MIT.
  */
 
-export { Config } from '../types';
 export { Factory } from './Factory';
-export { ProviderInstance as Provider, Receiver } from './types';
+export { Config, ProviderInstance as Provider, Receiver } from './types';

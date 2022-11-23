@@ -5,6 +5,6 @@
  * or at https://opensource.org/licenses/MIT.
  */
 
-export { Collection, CreateCollectionOptions, DropIndexesOptions } from 'mongodb';
+export { Collection, CreateCollectionOptions, IndexDescription } from 'mongodb';
 export { Factory } from './Factory';
 export { Client, Collections, Config, ProviderInstance as Provider } from './types';

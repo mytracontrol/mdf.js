@@ -33,7 +33,6 @@
     "@mdf.js/logger": "*",
     "@mdf.js/provider": "*",
     "@mdf.js/utils": "*",
-    "axios": "^1.1.3",
     "debug": "^4.3.4",
     "joi": "^17.6.3",
     "lodash": "^4.17.21",

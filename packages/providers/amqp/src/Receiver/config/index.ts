@@ -6,14 +6,14 @@
  */
 
 import { PortConfigValidationStruct } from '@mdf.js/provider';
-import { Config } from '../Receiver';
+import { schema } from '../../Common';
+import { Config } from '../types';
 import { defaultConfig } from './default';
 import { envBasedConfig } from './env';
-import { schema } from './schema';
 
 export const configEntry: PortConfigValidationStruct<Config> = {
   envBasedConfig,
   defaultConfig,
   schema,
 };
-export { CONFIG_PROVIDER_BASE_NAME } from './utils';
+export { CONFIG_PROVIDER_BASE_NAME } from '../../Common';

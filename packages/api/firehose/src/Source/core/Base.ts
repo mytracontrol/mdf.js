@@ -223,4 +223,12 @@ export abstract class Base<
   }
   /** Perform the read of data from the source */
   abstract override _read(size: number): void;
+  /** Start the Plug and the underlayer resources, making it available */
+  public async start(): Promise<void> {
+    await this.plug.start();
+  }
+  /** Stop the Plug and the underlayer resources, making it unavailable */
+  public async stop(): Promise<void> {
+    await this.plug.stop();
+  }
 }

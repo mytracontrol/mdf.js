@@ -50,4 +50,10 @@ export class MyQuickSequencePlug extends EventEmitter implements Plugs.Source.Se
       return Promise.resolve(this.founded ? jobId : undefined);
     }
   }
+  public start(): Promise<void> {
+    return Promise.resolve();
+  }
+  public stop(): Promise<void> {
+    return Promise.resolve();
+  }
 }

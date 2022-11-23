@@ -6,12 +6,12 @@
  */
 // *************************************************************************************************
 // #region Arrange
+import { CONFIG_PROVIDER_BASE_NAME } from '.';
 import { defaultConfig } from './default';
-import { CONFIG_PROVIDER_BASE_NAME } from './utils';
 // #endregion
 // *************************************************************************************************
 // #region Redis config
-describe(`#Config #${CONFIG_PROVIDER_BASE_NAME.toLocaleUpperCase()}`, () => {
+describe(`#Config #${CONFIG_PROVIDER_BASE_NAME.toLocaleUpperCase()} Sender`, () => {
   describe('#Happy path', () => {
     it(`Should has a default config`, () => {
       expect(defaultConfig).toMatchObject({
@@ -19,26 +19,18 @@ describe(`#Config #${CONFIG_PROVIDER_BASE_NAME.toLocaleUpperCase()}`, () => {
         host: '127.0.0.1',
         initial_reconnect_delay: 30000,
         max_reconnect_delay: 10000,
-        monitor: {
-          brokerName: '*',
-          interval: 10000,
-          routingType: '*',
-          timeout: 1000,
-          url: 'http://127.0.0.1:8161/console/jolokia',
-        },
         non_fatal_errors: ['amqp:connection:forced'],
         port: 5672,
-        receiver_options: {
-          autoaccept: false,
+        sender_options: {
+          name: 'mdf-amqp',
+          snd_settle_mode: 2,
           autosettle: true,
-          credit_window: 0,
-          rcv_settle_mode: 0,
         },
         reconnect: 5000,
         rejectUnauthorized: false,
         requestCert: false,
         transport: 'tcp',
-        username: 'consumer',
+        username: 'producer',
       });
     }, 300);
   });

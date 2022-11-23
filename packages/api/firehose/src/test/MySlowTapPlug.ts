@@ -31,4 +31,10 @@ export class MySlowTapPlug extends EventEmitter implements Plugs.Sink.Tap {
       }, 1000);
     });
   }
+  public start(): Promise<void> {
+    return Promise.resolve();
+  }
+  public stop(): Promise<void> {
+    return Promise.resolve();
+  }
 }

@@ -10,7 +10,7 @@ import { PlugWrapper } from './PlugWrapper';
 
 describe('#Sink #PlugWrapper', () => {
   describe('#Happy path', () => {
-    it('Should wrap a single/multi operation', async () => {
+    it('Should wrap a single/multi start/stop operation', async () => {
       //@ts-ignore - Test environment
       const wrapper = new PlugWrapper({
         //@ts-ignore - Test environment
@@ -21,11 +21,21 @@ describe('#Sink #PlugWrapper', () => {
         multi: () => {
           return Promise.resolve();
         },
+        start: () => {
+          return Promise.resolve();
+        },
+        stop: () => {
+          return Promise.resolve();
+        },
       });
       //@ts-ignore - Test environment
       expect(wrapper.single('hi')).resolves.toEqual(undefined);
       //@ts-ignore - Test environment
       expect(wrapper.multi([['hi']])).resolves.toEqual(undefined);
+      //@ts-ignore - Test environment
+      expect(wrapper.start()).resolves.toEqual(undefined);
+      //@ts-ignore - Test environment
+      expect(wrapper.stop()).resolves.toEqual(undefined);
     });
   });
   describe('#Sad path', () => {
@@ -75,9 +85,54 @@ describe('#Sink #PlugWrapper', () => {
         );
       }
     });
+    it('Should throw an error if the plug does not implement the start method properly', () => {
+      try {
+        new PlugWrapper({
+          name: 'myPlug',
+          single: () => Promise.resolve(),
+          //@ts-ignore - Test environment
+          start: 3,
+          stop: () => {
+            return Promise.resolve();
+          },
+        });
+        throw new Error(`Should throw an error`);
+      } catch (error) {
+        expect(error).toBeInstanceOf(Crash);
+        expect((error as Crash).message).toBe(
+          'Plug myPlug not implement the start method properly'
+        );
+      }
+    });
+    it('Should throw an error if the plug does not implement the stop method properly', () => {
+      try {
+        new PlugWrapper({
+          name: 'myPlug',
+          single: () => Promise.resolve(),
+          //@ts-ignore - Test environment
+          stop: 3,
+          start: () => {
+            return Promise.resolve();
+          },
+        });
+        throw new Error(`Should throw an error`);
+      } catch (error) {
+        expect(error).toBeInstanceOf(Crash);
+        expect((error as Crash).message).toBe('Plug myPlug not implement the stop method properly');
+      }
+    });
     it('Should throw an error if try to call multi method and this not exist', async () => {
       //@ts-ignore - Test environment
-      const wrapper = new PlugWrapper({ name: 'myPlug', single: () => Promise.resolve() });
+      const wrapper = new PlugWrapper({
+        name: 'myPlug',
+        single: () => Promise.resolve(),
+        start: () => {
+          return Promise.resolve();
+        },
+        stop: () => {
+          return Promise.resolve();
+        },
+      });
       //@ts-ignore - Test environment
       await expect(wrapper.multi()).rejects.toThrow(
         'Plug myPlug does not implement the multi method'

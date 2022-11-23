@@ -8,22 +8,15 @@ import { Crash } from '@mdf.js/crash';
 import { LoggerInstance, Provider } from '@mdf.js/provider';
 import { undoMocks } from '@mdf.js/utils';
 import { EventEmitter } from 'events';
-import { Config } from '../types';
 import { Factory } from './Factory';
 import { Port } from './Port';
+import { Config } from './types';
 
 const DEFAULT_CONFIG: Config = {
   container_id: 'mdf-amqp',
   host: '127.0.0.1',
   initial_reconnect_delay: 30000,
   max_reconnect_delay: 10000,
-  monitor: {
-    brokerName: '*',
-    interval: 10000,
-    routingType: '*',
-    timeout: 1000,
-    url: 'http://127.0.0.1:8161/console/jolokia',
-  },
   non_fatal_errors: ['amqp:connection:forced'],
   port: 5672,
   receiver_options: {
@@ -41,785 +34,6 @@ const DEFAULT_CONFIG: Config = {
   transport: 'tcp',
   username: 'consumer',
 };
-const VALUE_FROM_ARTEMIS_SIMPLE = {
-  ConfigurationManaged: true,
-  MaxConsumers: -1,
-  Address: 'stream.alarms',
-  Exclusive: false,
-  DurableDeliveringSize: 0,
-  PersistentSize: 9652,
-  GroupBuckets: -1,
-  MessagesKilled: 0,
-  Name: 'alarms.realtime',
-  DelayBeforeDispatch: -1,
-  DurableMessageCount: 0,
-  PreparedTransactionMessageCount: 0,
-  ID: 3,
-  DeadLetterAddress: null,
-  RetroactiveResource: false,
-  MessagesAcknowledged: 574,
-  MessagesExpired: 0,
-  DeliveringSize: 0,
-  LastValue: false,
-  LastValueKey: null,
-  DurableScheduledSize: 0,
-  GroupRebalance: false,
-  GroupFirstKey: null,
-  User: null,
-  GroupCount: 0,
-  PurgeOnNoConsumers: false,
-  ScheduledCount: 0,
-  DurableScheduledCount: 0,
-  ConsumersBeforeDispatch: 0,
-  ExpiryAddress: null,
-  FirstMessageAsJSON:
-    '[{"durable":false,"address":"stream.alarms::alarms.realtime","messageID":21768,"expiration":0,"to":"stream.alarms::alarms.realtime","priority":4,"userID":"ID:26","timestamp":0}]',
-  GroupRebalancePauseDispatch: false,
-  RoutingType: 'MULTICAST',
-  Paused: false,
-  DurableDeliveringCount: 0,
-  FirstMessageAge: 1667941433396,
-  DurablePersistentSize: 0,
-  MessagesAdded: 716,
-  ConsumerCount: 0,
-  RingSize: -1,
-  DeliveringCount: 0,
-  Enabled: true,
-  AcknowledgeAttempts: 10631,
-  Temporary: false,
-  FirstMessageTimestamp: 0,
-  Filter: 'severity > 200',
-  ScheduledSize: 0,
-  Durable: true,
-  MessageCount: 142,
-};
-const VALUE_FROM_ARTEMIS = {
-  'org.apache.activemq.artemis:address="stream.alarms",broker="NetinAMQ",component=addresses,queue="alarms.timeseries",routing-type="multicast",subcomponent=queues':
-    {
-      ConfigurationManaged: true,
-      MaxConsumers: -1,
-      Address: 'stream.alarms',
-      Exclusive: false,
-      DurableDeliveringSize: 0,
-      PersistentSize: 0,
-      GroupBuckets: -1,
-      MessagesKilled: 0,
-      Name: 'alarms.timeseries',
-      DelayBeforeDispatch: -1,
-      DurableMessageCount: 0,
-      PreparedTransactionMessageCount: 0,
-      ID: 1,
-      DeadLetterAddress: null,
-      RetroactiveResource: false,
-      MessagesAcknowledged: 0,
-      MessagesExpired: 0,
-      DeliveringSize: 0,
-      LastValue: false,
-      LastValueKey: null,
-      DurableScheduledSize: 0,
-      GroupRebalance: false,
-      GroupFirstKey: null,
-      User: null,
-      GroupCount: 0,
-      PurgeOnNoConsumers: false,
-      ScheduledCount: 0,
-      DurableScheduledCount: 0,
-      ConsumersBeforeDispatch: 0,
-      ExpiryAddress: null,
-      FirstMessageAsJSON: '[{}]',
-      GroupRebalancePauseDispatch: false,
-      RoutingType: 'MULTICAST',
-      Paused: false,
-      DurableDeliveringCount: 0,
-      FirstMessageAge: null,
-      DurablePersistentSize: 0,
-      MessagesAdded: 0,
-      ConsumerCount: 0,
-      RingSize: -1,
-      DeliveringCount: 0,
-      Enabled: true,
-      AcknowledgeAttempts: 0,
-      Temporary: false,
-      FirstMessageTimestamp: null,
-      Filter: null,
-      ScheduledSize: 0,
-      Durable: true,
-      MessageCount: 0,
-    },
-  'org.apache.activemq.artemis:address="stream.alarms",broker="NetinAMQ",component=addresses,queue="alarms.realtime",routing-type="multicast",subcomponent=queues':
-    {
-      ConfigurationManaged: true,
-      MaxConsumers: -1,
-      Address: 'stream.alarms',
-      Exclusive: false,
-      DurableDeliveringSize: 0,
-      PersistentSize: 13866,
-      GroupBuckets: -1,
-      MessagesKilled: 0,
-      Name: 'alarms.realtime',
-      DelayBeforeDispatch: -1,
-      DurableMessageCount: 0,
-      PreparedTransactionMessageCount: 0,
-      ID: 3,
-      DeadLetterAddress: null,
-      RetroactiveResource: false,
-      MessagesAcknowledged: 602,
-      MessagesExpired: 0,
-      DeliveringSize: 0,
-      LastValue: false,
-      LastValueKey: null,
-      DurableScheduledSize: 0,
-      GroupRebalance: false,
-      GroupFirstKey: null,
-      User: null,
-      GroupCount: 0,
-      PurgeOnNoConsumers: false,
-      ScheduledCount: 0,
-      DurableScheduledCount: 0,
-      ConsumersBeforeDispatch: 0,
-      ExpiryAddress: null,
-      FirstMessageAsJSON:
-        '[{"durable":false,"address":"stream.alarms::alarms.realtime","messageID":21808,"expiration":0,"to":"stream.alarms::alarms.realtime","priority":4,"userID":"ID:27","timestamp":0}]',
-      GroupRebalancePauseDispatch: false,
-      RoutingType: 'MULTICAST',
-      Paused: false,
-      DurableDeliveringCount: 0,
-      FirstMessageAge: 1667946190297,
-      DurablePersistentSize: 0,
-      MessagesAdded: 806,
-      ConsumerCount: 1,
-      RingSize: -1,
-      DeliveringCount: 0,
-      Enabled: true,
-      AcknowledgeAttempts: 10659,
-      Temporary: false,
-      FirstMessageTimestamp: 0,
-      Filter: 'severity > 200',
-      ScheduledSize: 0,
-      Durable: true,
-      MessageCount: 204,
-    },
-  'org.apache.activemq.artemis:address="stream.devices",broker="NetinAMQ",component=addresses,queue="devices.realtime",routing-type="multicast",subcomponent=queues':
-    {
-      ConfigurationManaged: true,
-      MaxConsumers: -1,
-      Address: 'stream.devices',
-      Exclusive: false,
-      DurableDeliveringSize: 0,
-      PersistentSize: 0,
-      GroupBuckets: -1,
-      MessagesKilled: 0,
-      Name: 'devices.realtime',
-      DelayBeforeDispatch: -1,
-      DurableMessageCount: 0,
-      PreparedTransactionMessageCount: 0,
-      ID: 9,
-      DeadLetterAddress: null,
-      RetroactiveResource: false,
-      MessagesAcknowledged: 0,
-      MessagesExpired: 0,
-      DeliveringSize: 0,
-      LastValue: false,
-      LastValueKey: null,
-      DurableScheduledSize: 0,
-      GroupRebalance: false,
-      GroupFirstKey: null,
-      User: null,
-      GroupCount: 0,
-      PurgeOnNoConsumers: false,
-      ScheduledCount: 0,
-      DurableScheduledCount: 0,
-      ConsumersBeforeDispatch: 0,
-      ExpiryAddress: null,
-      FirstMessageAsJSON: '[{}]',
-      GroupRebalancePauseDispatch: false,
-      RoutingType: 'MULTICAST',
-      Paused: false,
-      DurableDeliveringCount: 0,
-      FirstMessageAge: null,
-      DurablePersistentSize: 0,
-      MessagesAdded: 0,
-      ConsumerCount: 0,
-      RingSize: -1,
-      DeliveringCount: 0,
-      Enabled: true,
-      AcknowledgeAttempts: 0,
-      Temporary: false,
-      FirstMessageTimestamp: null,
-      Filter: null,
-      ScheduledSize: 0,
-      Durable: true,
-      MessageCount: 0,
-    },
-  'org.apache.activemq.artemis:address="stream.timepoints",broker="NetinAMQ",component=addresses,queue="timepoints.timeseries",routing-type="multicast",subcomponent=queues':
-    {
-      ConfigurationManaged: true,
-      MaxConsumers: -1,
-      Address: 'stream.timepoints',
-      Exclusive: false,
-      DurableDeliveringSize: 0,
-      PersistentSize: 0,
-      GroupBuckets: -1,
-      MessagesKilled: 0,
-      Name: 'timepoints.timeseries',
-      DelayBeforeDispatch: -1,
-      DurableMessageCount: 0,
-      PreparedTransactionMessageCount: 0,
-      ID: 6,
-      DeadLetterAddress: null,
-      RetroactiveResource: false,
-      MessagesAcknowledged: 0,
-      MessagesExpired: 0,
-      DeliveringSize: 0,
-      LastValue: false,
-      LastValueKey: null,
-      DurableScheduledSize: 0,
-      GroupRebalance: false,
-      GroupFirstKey: null,
-      User: null,
-      GroupCount: 0,
-      PurgeOnNoConsumers: false,
-      ScheduledCount: 0,
-      DurableScheduledCount: 0,
-      ConsumersBeforeDispatch: 0,
-      ExpiryAddress: null,
-      FirstMessageAsJSON: '[{}]',
-      GroupRebalancePauseDispatch: false,
-      RoutingType: 'MULTICAST',
-      Paused: false,
-      DurableDeliveringCount: 0,
-      FirstMessageAge: null,
-      DurablePersistentSize: 0,
-      MessagesAdded: 0,
-      ConsumerCount: 0,
-      RingSize: -1,
-      DeliveringCount: 0,
-      Enabled: true,
-      AcknowledgeAttempts: 0,
-      Temporary: false,
-      FirstMessageTimestamp: null,
-      Filter: null,
-      ScheduledSize: 0,
-      Durable: true,
-      MessageCount: 0,
-    },
-  'org.apache.activemq.artemis:address="events.discovery",broker="NetinAMQ",component=addresses,queue="datablob.devices",routing-type="anycast",subcomponent=queues':
-    {
-      ConfigurationManaged: true,
-      MaxConsumers: -1,
-      Address: 'events.discovery',
-      Exclusive: false,
-      DurableDeliveringSize: 0,
-      PersistentSize: 0,
-      GroupBuckets: -1,
-      MessagesKilled: 0,
-      Name: 'datablob.devices',
-      DelayBeforeDispatch: -1,
-      DurableMessageCount: 0,
-      PreparedTransactionMessageCount: 0,
-      ID: 12,
-      DeadLetterAddress: 'DLQ',
-      RetroactiveResource: false,
-      MessagesAcknowledged: 0,
-      MessagesExpired: 0,
-      DeliveringSize: 0,
-      LastValue: false,
-      LastValueKey: null,
-      DurableScheduledSize: 0,
-      GroupRebalance: false,
-      GroupFirstKey: null,
-      User: null,
-      GroupCount: 0,
-      PurgeOnNoConsumers: false,
-      ScheduledCount: 0,
-      DurableScheduledCount: 0,
-      ConsumersBeforeDispatch: 0,
-      ExpiryAddress: 'ExpiryQueue',
-      FirstMessageAsJSON: '[{}]',
-      GroupRebalancePauseDispatch: false,
-      RoutingType: 'ANYCAST',
-      Paused: false,
-      DurableDeliveringCount: 0,
-      FirstMessageAge: null,
-      DurablePersistentSize: 0,
-      MessagesAdded: 0,
-      ConsumerCount: 0,
-      RingSize: -1,
-      DeliveringCount: 0,
-      Enabled: true,
-      AcknowledgeAttempts: 0,
-      Temporary: false,
-      FirstMessageTimestamp: null,
-      Filter: null,
-      ScheduledSize: 0,
-      Durable: true,
-      MessageCount: 0,
-    },
-  'org.apache.activemq.artemis:address="DLQ",broker="NetinAMQ",component=addresses,queue="DLQ",routing-type="anycast",subcomponent=queues':
-    {
-      ConfigurationManaged: true,
-      MaxConsumers: -1,
-      Address: 'DLQ',
-      Exclusive: false,
-      DurableDeliveringSize: 0,
-      PersistentSize: 0,
-      GroupBuckets: -1,
-      MessagesKilled: 0,
-      Name: 'DLQ',
-      DelayBeforeDispatch: -1,
-      DurableMessageCount: 0,
-      PreparedTransactionMessageCount: 0,
-      ID: 15,
-      DeadLetterAddress: null,
-      RetroactiveResource: false,
-      MessagesAcknowledged: 0,
-      MessagesExpired: 0,
-      DeliveringSize: 0,
-      LastValue: false,
-      LastValueKey: null,
-      DurableScheduledSize: 0,
-      GroupRebalance: false,
-      GroupFirstKey: null,
-      User: null,
-      GroupCount: 0,
-      PurgeOnNoConsumers: false,
-      ScheduledCount: 0,
-      DurableScheduledCount: 0,
-      ConsumersBeforeDispatch: 0,
-      ExpiryAddress: null,
-      FirstMessageAsJSON: '[{}]',
-      GroupRebalancePauseDispatch: false,
-      RoutingType: 'ANYCAST',
-      Paused: false,
-      DurableDeliveringCount: 0,
-      FirstMessageAge: null,
-      DurablePersistentSize: 0,
-      MessagesAdded: 0,
-      ConsumerCount: 0,
-      RingSize: -1,
-      DeliveringCount: 0,
-      Enabled: true,
-      AcknowledgeAttempts: 0,
-      Temporary: false,
-      FirstMessageTimestamp: null,
-      Filter: null,
-      ScheduledSize: 0,
-      Durable: true,
-      MessageCount: 0,
-    },
-  'org.apache.activemq.artemis:address="ExpiryQueue",broker="NetinAMQ",component=addresses,queue="ExpiryQueue",routing-type="anycast",subcomponent=queues':
-    {
-      ConfigurationManaged: true,
-      MaxConsumers: -1,
-      Address: 'ExpiryQueue',
-      Exclusive: false,
-      DurableDeliveringSize: 0,
-      PersistentSize: 0,
-      GroupBuckets: -1,
-      MessagesKilled: 0,
-      Name: 'ExpiryQueue',
-      DelayBeforeDispatch: -1,
-      DurableMessageCount: 0,
-      PreparedTransactionMessageCount: 0,
-      ID: 18,
-      DeadLetterAddress: null,
-      RetroactiveResource: false,
-      MessagesAcknowledged: 0,
-      MessagesExpired: 0,
-      DeliveringSize: 0,
-      LastValue: false,
-      LastValueKey: null,
-      DurableScheduledSize: 0,
-      GroupRebalance: false,
-      GroupFirstKey: null,
-      User: null,
-      GroupCount: 0,
-      PurgeOnNoConsumers: false,
-      ScheduledCount: 0,
-      DurableScheduledCount: 0,
-      ConsumersBeforeDispatch: 0,
-      ExpiryAddress: null,
-      FirstMessageAsJSON: '[{}]',
-      GroupRebalancePauseDispatch: false,
-      RoutingType: 'ANYCAST',
-      Paused: false,
-      DurableDeliveringCount: 0,
-      FirstMessageAge: null,
-      DurablePersistentSize: 0,
-      MessagesAdded: 0,
-      ConsumerCount: 0,
-      RingSize: -1,
-      DeliveringCount: 0,
-      Enabled: true,
-      AcknowledgeAttempts: 0,
-      Temporary: false,
-      FirstMessageTimestamp: null,
-      Filter: null,
-      ScheduledSize: 0,
-      Durable: true,
-      MessageCount: 0,
-    },
-};
-const VALUE_FROM_ARTEMIS_RESULT = [
-  {
-    ConfigurationManaged: true,
-    MaxConsumers: -1,
-    Address: 'stream.alarms',
-    Exclusive: false,
-    DurableDeliveringSize: 0,
-    PersistentSize: 0,
-    GroupBuckets: -1,
-    MessagesKilled: 0,
-    Name: 'alarms.timeseries',
-    DelayBeforeDispatch: -1,
-    DurableMessageCount: 0,
-    PreparedTransactionMessageCount: 0,
-    ID: 1,
-    DeadLetterAddress: null,
-    RetroactiveResource: false,
-    MessagesAcknowledged: 0,
-    MessagesExpired: 0,
-    DeliveringSize: 0,
-    LastValue: false,
-    LastValueKey: null,
-    DurableScheduledSize: 0,
-    GroupRebalance: false,
-    GroupFirstKey: null,
-    User: null,
-    GroupCount: 0,
-    PurgeOnNoConsumers: false,
-    ScheduledCount: 0,
-    DurableScheduledCount: 0,
-    ConsumersBeforeDispatch: 0,
-    ExpiryAddress: null,
-    FirstMessageAsJSON: '[{}]',
-    GroupRebalancePauseDispatch: false,
-    RoutingType: 'MULTICAST',
-    Paused: false,
-    DurableDeliveringCount: 0,
-    FirstMessageAge: null,
-    DurablePersistentSize: 0,
-    MessagesAdded: 0,
-    ConsumerCount: 0,
-    RingSize: -1,
-    DeliveringCount: 0,
-    Enabled: true,
-    AcknowledgeAttempts: 0,
-    Temporary: false,
-    FirstMessageTimestamp: null,
-    Filter: null,
-    ScheduledSize: 0,
-    Durable: true,
-    MessageCount: 0,
-  },
-  {
-    ConfigurationManaged: true,
-    MaxConsumers: -1,
-    Address: 'stream.alarms',
-    Exclusive: false,
-    DurableDeliveringSize: 0,
-    PersistentSize: 13866,
-    GroupBuckets: -1,
-    MessagesKilled: 0,
-    Name: 'alarms.realtime',
-    DelayBeforeDispatch: -1,
-    DurableMessageCount: 0,
-    PreparedTransactionMessageCount: 0,
-    ID: 3,
-    DeadLetterAddress: null,
-    RetroactiveResource: false,
-    MessagesAcknowledged: 602,
-    MessagesExpired: 0,
-    DeliveringSize: 0,
-    LastValue: false,
-    LastValueKey: null,
-    DurableScheduledSize: 0,
-    GroupRebalance: false,
-    GroupFirstKey: null,
-    User: null,
-    GroupCount: 0,
-    PurgeOnNoConsumers: false,
-    ScheduledCount: 0,
-    DurableScheduledCount: 0,
-    ConsumersBeforeDispatch: 0,
-    ExpiryAddress: null,
-    FirstMessageAsJSON:
-      '[{"durable":false,"address":"stream.alarms::alarms.realtime","messageID":21808,"expiration":0,"to":"stream.alarms::alarms.realtime","priority":4,"userID":"ID:27","timestamp":0}]',
-    GroupRebalancePauseDispatch: false,
-    RoutingType: 'MULTICAST',
-    Paused: false,
-    DurableDeliveringCount: 0,
-    FirstMessageAge: 1667946190297,
-    DurablePersistentSize: 0,
-    MessagesAdded: 806,
-    ConsumerCount: 1,
-    RingSize: -1,
-    DeliveringCount: 0,
-    Enabled: true,
-    AcknowledgeAttempts: 10659,
-    Temporary: false,
-    FirstMessageTimestamp: 0,
-    Filter: 'severity > 200',
-    ScheduledSize: 0,
-    Durable: true,
-    MessageCount: 204,
-  },
-  {
-    ConfigurationManaged: true,
-    MaxConsumers: -1,
-    Address: 'stream.devices',
-    Exclusive: false,
-    DurableDeliveringSize: 0,
-    PersistentSize: 0,
-    GroupBuckets: -1,
-    MessagesKilled: 0,
-    Name: 'devices.realtime',
-    DelayBeforeDispatch: -1,
-    DurableMessageCount: 0,
-    PreparedTransactionMessageCount: 0,
-    ID: 9,
-    DeadLetterAddress: null,
-    RetroactiveResource: false,
-    MessagesAcknowledged: 0,
-    MessagesExpired: 0,
-    DeliveringSize: 0,
-    LastValue: false,
-    LastValueKey: null,
-    DurableScheduledSize: 0,
-    GroupRebalance: false,
-    GroupFirstKey: null,
-    User: null,
-    GroupCount: 0,
-    PurgeOnNoConsumers: false,
-    ScheduledCount: 0,
-    DurableScheduledCount: 0,
-    ConsumersBeforeDispatch: 0,
-    ExpiryAddress: null,
-    FirstMessageAsJSON: '[{}]',
-    GroupRebalancePauseDispatch: false,
-    RoutingType: 'MULTICAST',
-    Paused: false,
-    DurableDeliveringCount: 0,
-    FirstMessageAge: null,
-    DurablePersistentSize: 0,
-    MessagesAdded: 0,
-    ConsumerCount: 0,
-    RingSize: -1,
-    DeliveringCount: 0,
-    Enabled: true,
-    AcknowledgeAttempts: 0,
-    Temporary: false,
-    FirstMessageTimestamp: null,
-    Filter: null,
-    ScheduledSize: 0,
-    Durable: true,
-    MessageCount: 0,
-  },
-  {
-    ConfigurationManaged: true,
-    MaxConsumers: -1,
-    Address: 'stream.timepoints',
-    Exclusive: false,
-    DurableDeliveringSize: 0,
-    PersistentSize: 0,
-    GroupBuckets: -1,
-    MessagesKilled: 0,
-    Name: 'timepoints.timeseries',
-    DelayBeforeDispatch: -1,
-    DurableMessageCount: 0,
-    PreparedTransactionMessageCount: 0,
-    ID: 6,
-    DeadLetterAddress: null,
-    RetroactiveResource: false,
-    MessagesAcknowledged: 0,
-    MessagesExpired: 0,
-    DeliveringSize: 0,
-    LastValue: false,
-    LastValueKey: null,
-    DurableScheduledSize: 0,
-    GroupRebalance: false,
-    GroupFirstKey: null,
-    User: null,
-    GroupCount: 0,
-    PurgeOnNoConsumers: false,
-    ScheduledCount: 0,
-    DurableScheduledCount: 0,
-    ConsumersBeforeDispatch: 0,
-    ExpiryAddress: null,
-    FirstMessageAsJSON: '[{}]',
-    GroupRebalancePauseDispatch: false,
-    RoutingType: 'MULTICAST',
-    Paused: false,
-    DurableDeliveringCount: 0,
-    FirstMessageAge: null,
-    DurablePersistentSize: 0,
-    MessagesAdded: 0,
-    ConsumerCount: 0,
-    RingSize: -1,
-    DeliveringCount: 0,
-    Enabled: true,
-    AcknowledgeAttempts: 0,
-    Temporary: false,
-    FirstMessageTimestamp: null,
-    Filter: null,
-    ScheduledSize: 0,
-    Durable: true,
-    MessageCount: 0,
-  },
-  {
-    ConfigurationManaged: true,
-    MaxConsumers: -1,
-    Address: 'events.discovery',
-    Exclusive: false,
-    DurableDeliveringSize: 0,
-    PersistentSize: 0,
-    GroupBuckets: -1,
-    MessagesKilled: 0,
-    Name: 'datablob.devices',
-    DelayBeforeDispatch: -1,
-    DurableMessageCount: 0,
-    PreparedTransactionMessageCount: 0,
-    ID: 12,
-    DeadLetterAddress: 'DLQ',
-    RetroactiveResource: false,
-    MessagesAcknowledged: 0,
-    MessagesExpired: 0,
-    DeliveringSize: 0,
-    LastValue: false,
-    LastValueKey: null,
-    DurableScheduledSize: 0,
-    GroupRebalance: false,
-    GroupFirstKey: null,
-    User: null,
-    GroupCount: 0,
-    PurgeOnNoConsumers: false,
-    ScheduledCount: 0,
-    DurableScheduledCount: 0,
-    ConsumersBeforeDispatch: 0,
-    ExpiryAddress: 'ExpiryQueue',
-    FirstMessageAsJSON: '[{}]',
-    GroupRebalancePauseDispatch: false,
-    RoutingType: 'ANYCAST',
-    Paused: false,
-    DurableDeliveringCount: 0,
-    FirstMessageAge: null,
-    DurablePersistentSize: 0,
-    MessagesAdded: 0,
-    ConsumerCount: 0,
-    RingSize: -1,
-    DeliveringCount: 0,
-    Enabled: true,
-    AcknowledgeAttempts: 0,
-    Temporary: false,
-    FirstMessageTimestamp: null,
-    Filter: null,
-    ScheduledSize: 0,
-    Durable: true,
-    MessageCount: 0,
-  },
-  {
-    ConfigurationManaged: true,
-    MaxConsumers: -1,
-    Address: 'DLQ',
-    Exclusive: false,
-    DurableDeliveringSize: 0,
-    PersistentSize: 0,
-    GroupBuckets: -1,
-    MessagesKilled: 0,
-    Name: 'DLQ',
-    DelayBeforeDispatch: -1,
-    DurableMessageCount: 0,
-    PreparedTransactionMessageCount: 0,
-    ID: 15,
-    DeadLetterAddress: null,
-    RetroactiveResource: false,
-    MessagesAcknowledged: 0,
-    MessagesExpired: 0,
-    DeliveringSize: 0,
-    LastValue: false,
-    LastValueKey: null,
-    DurableScheduledSize: 0,
-    GroupRebalance: false,
-    GroupFirstKey: null,
-    User: null,
-    GroupCount: 0,
-    PurgeOnNoConsumers: false,
-    ScheduledCount: 0,
-    DurableScheduledCount: 0,
-    ConsumersBeforeDispatch: 0,
-    ExpiryAddress: null,
-    FirstMessageAsJSON: '[{}]',
-    GroupRebalancePauseDispatch: false,
-    RoutingType: 'ANYCAST',
-    Paused: false,
-    DurableDeliveringCount: 0,
-    FirstMessageAge: null,
-    DurablePersistentSize: 0,
-    MessagesAdded: 0,
-    ConsumerCount: 0,
-    RingSize: -1,
-    DeliveringCount: 0,
-    Enabled: true,
-    AcknowledgeAttempts: 0,
-    Temporary: false,
-    FirstMessageTimestamp: null,
-    Filter: null,
-    ScheduledSize: 0,
-    Durable: true,
-    MessageCount: 0,
-  },
-  {
-    ConfigurationManaged: true,
-    MaxConsumers: -1,
-    Address: 'ExpiryQueue',
-    Exclusive: false,
-    DurableDeliveringSize: 0,
-    PersistentSize: 0,
-    GroupBuckets: -1,
-    MessagesKilled: 0,
-    Name: 'ExpiryQueue',
-    DelayBeforeDispatch: -1,
-    DurableMessageCount: 0,
-    PreparedTransactionMessageCount: 0,
-    ID: 18,
-    DeadLetterAddress: null,
-    RetroactiveResource: false,
-    MessagesAcknowledged: 0,
-    MessagesExpired: 0,
-    DeliveringSize: 0,
-    LastValue: false,
-    LastValueKey: null,
-    DurableScheduledSize: 0,
-    GroupRebalance: false,
-    GroupFirstKey: null,
-    User: null,
-    GroupCount: 0,
-    PurgeOnNoConsumers: false,
-    ScheduledCount: 0,
-    DurableScheduledCount: 0,
-    ConsumersBeforeDispatch: 0,
-    ExpiryAddress: null,
-    FirstMessageAsJSON: '[{}]',
-    GroupRebalancePauseDispatch: false,
-    RoutingType: 'ANYCAST',
-    Paused: false,
-    DurableDeliveringCount: 0,
-    FirstMessageAge: null,
-    DurablePersistentSize: 0,
-    MessagesAdded: 0,
-    ConsumerCount: 0,
-    RingSize: -1,
-    DeliveringCount: 0,
-    Enabled: true,
-    AcknowledgeAttempts: 0,
-    Temporary: false,
-    FirstMessageTimestamp: null,
-    Filter: null,
-    ScheduledSize: 0,
-    Durable: true,
-    MessageCount: 0,
-  },
-];
 class FakeLogger {
   public entry?: string;
   public debug(value: string): void {
@@ -908,28 +122,13 @@ describe('#Port #AMQP #Receiver', () => {
           },
         ],
       });
-      //@ts-ignore - Test environment
-      expect(provider.port.monitorBodyRequest).toEqual({
-        type: 'read',
-        mbean:
-          'org.apache.activemq.artemis:broker="*",component=addresses,address="*",subcomponent=queues,routing-type="*",queue="*"',
-      });
     }, 300);
     it('Should create provider using the factory instance with a configuration', () => {
       const provider = Factory.create({
         useEnvironment: false,
         name: 'amqp',
         logger: new FakeLogger() as LoggerInstance,
-        config: {
-          monitor: {
-            brokerName: 'broker',
-            username: 'user',
-            password: 'pass',
-            address: 'address',
-            queueName: 'queue',
-            routingType: 'routingType',
-          },
-        },
+        config: {},
       });
       expect(provider).toBeDefined();
       expect(provider).toBeInstanceOf(Provider.Manager);
@@ -949,12 +148,6 @@ describe('#Port #AMQP #Receiver', () => {
           },
         ],
       });
-      //@ts-ignore - Test environment
-      expect(provider.port.monitorBodyRequest).toEqual({
-        type: 'read',
-        mbean:
-          'org.apache.activemq.artemis:broker="broker",component=addresses,address="address",subcomponent=queues,routing-type="routingType",queue="queue"',
-      });
     }, 300);
     it(`Should create a valid instance`, () => {
       const port = new Port(
@@ -973,14 +166,8 @@ describe('#Port #AMQP #Receiver', () => {
       expect(port).toBeDefined();
       expect(port.state).toBeFalsy();
       expect(port.checks).toEqual({});
-      //@ts-ignore - Test environment
-      expect(port.monitorBodyRequest).toEqual({
-        type: 'read',
-        mbean:
-          'org.apache.activemq.artemis:broker="*",component=addresses,address="amqp",subcomponent=queues,routing-type="*",queue="receiver"',
-      });
     }, 300);
-    it(`Should start and stop the port properly and fullfil the checks with simple responses from artemis`, () => {
+    it(`Should start and stop the port properly and fullfil the checks`, () => {
       const port = new Port(DEFAULT_CONFIG, new FakeLogger() as LoggerInstance);
       const mySession = new FakeSession();
       expect(port).toBeDefined();
@@ -990,10 +177,6 @@ describe('#Port #AMQP #Receiver', () => {
       jest.spyOn(port.instance.connection, 'close').mockResolvedValue();
       //@ts-ignore - Test environment
       jest.spyOn(port.instance.connection, 'createSession').mockResolvedValue(mySession);
-      //@ts-ignore - Test environment
-      jest.spyOn(port.artemisClient, 'post').mockResolvedValue({
-        data: { value: VALUE_FROM_ARTEMIS_SIMPLE },
-      });
       return port
         .start()
         .then(() => port.start())
@@ -1012,111 +195,9 @@ describe('#Port #AMQP #Receiver', () => {
                 time: checks['credits'][0].time,
               },
             ],
-            artemis: [
-              {
-                componentId: checks['artemis'][0].componentId,
-                observedUnit: 'queue',
-                observedValue: VALUE_FROM_ARTEMIS_SIMPLE,
-                output: undefined,
-                status: 'pass',
-                time: checks['artemis'][0].time,
-              },
-            ],
           });
         })
         .then(() => port.close())
-        .then(() => port.close());
-    }, 300);
-    it(`Should start and stop the port properly and fullfil the checks with empty response from artemis`, () => {
-      const port = new Port(DEFAULT_CONFIG, new FakeLogger() as LoggerInstance);
-      const mySession = new FakeSession();
-      mySession.credit = 0;
-      expect(port).toBeDefined();
-      //@ts-ignore - Test environment
-      jest.spyOn(port.instance.connection, 'open').mockResolvedValue();
-      //@ts-ignore - Test environment
-      jest.spyOn(port.instance.connection, 'close').mockResolvedValue();
-      //@ts-ignore - Test environment
-      jest.spyOn(port.instance.connection, 'createSession').mockResolvedValue(mySession);
-      //@ts-ignore - Test environment
-      jest.spyOn(port.artemisClient, 'post').mockResolvedValue({
-        data: { value: undefined },
-      });
-      return port
-        .start()
-        .then(() => {
-          //@ts-ignore - Test environment
-          jest.spyOn(port.instance.connection, 'isOpen').mockReturnValue(true);
-          const checks = port.checks;
-          expect(checks).toEqual({
-            credits: [
-              {
-                componentId: checks['credits'][0].componentId,
-                observedUnit: 'credits',
-                observedValue: 0,
-                output: 'No credits available',
-                status: 'warn',
-                time: checks['credits'][0].time,
-              },
-            ],
-            artemis: [
-              {
-                componentId: checks['artemis'][0].componentId,
-                observedUnit: 'queue',
-                observedValue: {},
-                output: undefined,
-                status: 'pass',
-                time: checks['artemis'][0].time,
-              },
-            ],
-          });
-        })
-        .then(() => port.close());
-    }, 300);
-    it(`Should start and stop the port properly and fullfil the checks with a complex response from artemis`, () => {
-      const port = new Port(DEFAULT_CONFIG, new FakeLogger() as LoggerInstance);
-      const mySession = new FakeSession();
-      mySession.credit = 0;
-      expect(port).toBeDefined();
-      //@ts-ignore - Test environment
-      jest.spyOn(port.instance.connection, 'open').mockResolvedValue();
-      //@ts-ignore - Test environment
-      jest.spyOn(port.instance.connection, 'close').mockResolvedValue();
-      //@ts-ignore - Test environment
-      jest.spyOn(port.instance.connection, 'createSession').mockResolvedValue(mySession);
-      //@ts-ignore - Test environment
-      jest.spyOn(port.artemisClient, 'post').mockResolvedValue({
-        data: { value: VALUE_FROM_ARTEMIS },
-      });
-      return port
-        .start()
-        .then(() => {
-          //@ts-ignore - Test environment
-          jest.spyOn(port.instance.connection, 'isOpen').mockReturnValue(true);
-          const checks = port.checks;
-          expect(checks).toEqual({
-            credits: [
-              {
-                componentId: checks['credits'][0].componentId,
-                observedUnit: 'credits',
-                observedValue: 0,
-                output: 'No credits available',
-                status: 'warn',
-                time: checks['credits'][0].time,
-              },
-            ],
-            artemis: [
-              {
-                componentId: checks['artemis'][0].componentId,
-                observedUnit: 'queue',
-                observedValue: VALUE_FROM_ARTEMIS_RESULT,
-                output: undefined,
-                status: 'pass',
-                time: checks['artemis'][0].time,
-              },
-            ],
-          });
-        })
         .then(() => port.close());
     }, 300);
     it(`Should start and stop the port properly, attaching/detaching the listeners to the instance`, () => {
@@ -1129,10 +210,6 @@ describe('#Port #AMQP #Receiver', () => {
       jest.spyOn(port.instance.connection, 'close').mockResolvedValue();
       //@ts-ignore - Test environment
       jest.spyOn(port.instance.connection, 'createSession').mockResolvedValue(mySession);
-      //@ts-ignore - Test environment
-      jest.spyOn(port.artemisClient, 'post').mockResolvedValue({
-        data: { value: VALUE_FROM_ARTEMIS_SIMPLE },
-      });
       let events = 0;
       port.on('error', error => {
         expect(error.message).toEqual('myError');
@@ -1164,16 +241,6 @@ describe('#Port #AMQP #Receiver', () => {
                 output: undefined,
                 status: 'pass',
                 time: checks['credits'][0].time,
-              },
-            ],
-            artemis: [
-              {
-                componentId: checks['artemis'][0].componentId,
-                observedUnit: 'queue',
-                observedValue: VALUE_FROM_ARTEMIS_SIMPLE,
-                output: undefined,
-                status: 'pass',
-                time: checks['artemis'][0].time,
               },
             ],
           });
@@ -1217,10 +284,6 @@ describe('#Port #AMQP #Receiver', () => {
       jest.spyOn(port.instance.connection, 'close').mockResolvedValue();
       //@ts-ignore - Test environment
       jest.spyOn(port.instance.connection, 'createSession').mockResolvedValue(mySession);
-      //@ts-ignore - Test environment
-      jest.spyOn(port.artemisClient, 'post').mockResolvedValue({
-        data: { value: VALUE_FROM_ARTEMIS_SIMPLE },
-      });
       let events = 0;
       let numOfError = 0;
       port.on('error', error => {
@@ -1317,10 +380,6 @@ describe('#Port #AMQP #Receiver', () => {
       jest.spyOn(port.instance.connection, 'close').mockResolvedValue();
       //@ts-ignore - Test environment
       jest.spyOn(port.instance.connection, 'createSession').mockResolvedValue(mySession);
-      //@ts-ignore - Test environment
-      jest.spyOn(port.artemisClient, 'post').mockResolvedValue({
-        data: { value: VALUE_FROM_ARTEMIS_SIMPLE },
-      });
       let events = 0;
       let numOfError = 0;
       port.on('error', error => {
@@ -1398,10 +457,6 @@ describe('#Port #AMQP #Receiver', () => {
       jest.spyOn(port.instance.connection, 'close').mockResolvedValue();
       //@ts-ignore - Test environment
       jest.spyOn(port.instance.connection, 'createSession').mockResolvedValue(mySession);
-      //@ts-ignore - Test environment
-      jest.spyOn(port.artemisClient, 'post').mockResolvedValue({
-        data: { value: VALUE_FROM_ARTEMIS_SIMPLE },
-      });
       let events = 0;
       let numOfError = 0;
       port.on('error', error => {
@@ -1497,52 +552,6 @@ describe('#Port #AMQP #Receiver', () => {
       const provider = Factory.create();
       expect(() => provider.client).toThrowError('Receiver is not initialized');
     }, 300);
-    it(`Should start and stop the port properly and fullfil the checks with error if artemis check fails`, () => {
-      const port = new Port(DEFAULT_CONFIG, new FakeLogger() as LoggerInstance);
-      const mySession = new FakeSession();
-      expect(port).toBeDefined();
-      //@ts-ignore - Test environment
-      jest.spyOn(port.instance.connection, 'open').mockResolvedValue();
-      //@ts-ignore - Test environment
-      jest.spyOn(port.instance.connection, 'close').mockResolvedValue();
-      //@ts-ignore - Test environment
-      jest.spyOn(port.instance.connection, 'createSession').mockResolvedValue(mySession);
-      //@ts-ignore - Test environment
-      jest.spyOn(port.artemisClient, 'post').mockRejectedValue(new Error('myError'));
-      port.on('error', error => {
-        expect(error.message).toEqual('myError');
-      });
-      return port
-        .start()
-        .then(() => {
-          //@ts-ignore - Test environment
-          jest.spyOn(port.instance.connection, 'isOpen').mockReturnValue(true);
-          const checks = port.checks;
-          expect(checks).toEqual({
-            credits: [
-              {
-                componentId: checks['credits'][0].componentId,
-                observedUnit: 'credits',
-                observedValue: 10,
-                output: undefined,
-                status: 'pass',
-                time: checks['credits'][0].time,
-              },
-            ],
-            artemis: [
-              {
-                componentId: checks['artemis'][0].componentId,
-                observedUnit: 'queue',
-                observedValue: {},
-                output: 'myError',
-                status: 'fail',
-                time: checks['artemis'][0].time,
-              },
-            ],
-          });
-        })
-        .then(() => port.close());
-    }, 300);
     it(`Should reject to start if session.createReceiver rejects`, () => {
       const port = new Port(DEFAULT_CONFIG, new FakeLogger() as LoggerInstance);
       const mySession = new FakeSession();
@@ -1613,11 +622,6 @@ describe('#Port #AMQP #Receiver', () => {
       jest.spyOn(port.instance.connection, 'close').mockResolvedValue();
       //@ts-ignore - Test environment
       jest.spyOn(port.instance.connection, 'createSession').mockResolvedValue(mySession);
-      //@ts-ignore - Test environment
-      jest.spyOn(port.artemisClient, 'post').mockRejectedValue(new Error('myError'));
-      port.on('error', error => {
-        expect(error.message).toEqual('myError');
-      });
       await port.start();
       //@ts-ignore - Test environment
       jest.spyOn(port.instance.connection, 'isOpen').mockReturnValue(true);
@@ -1641,8 +645,6 @@ describe('#Port #AMQP #Receiver', () => {
       jest.spyOn(port.instance.connection, 'close').mockResolvedValue();
       //@ts-ignore - Test environment
       jest.spyOn(port.instance.connection, 'createSession').mockResolvedValue(mySession);
-      //@ts-ignore - Test environment
-      jest.spyOn(port.artemisClient, 'post').mockRejectedValue(new Error('myError'));
       port.on('error', error => {
         expect(error.message).toEqual('myError');
       });
@@ -1675,11 +677,6 @@ describe('#Port #AMQP #Receiver', () => {
         .mockRejectedValue(new Error('Failed to close connection'));
       //@ts-ignore - Test environment
       jest.spyOn(port.instance.connection, 'createSession').mockResolvedValue(mySession);
-      //@ts-ignore - Test environment
-      jest.spyOn(port.artemisClient, 'post').mockRejectedValue(new Error('myError'));
-      port.on('error', error => {
-        expect(error.message).toEqual('myError');
-      });
       await port.start();
       //@ts-ignore - Test environment
       jest.spyOn(port.instance.connection, 'isOpen').mockReturnValue(true);

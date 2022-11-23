@@ -46,6 +46,10 @@ export class PlugWrapper<
     | Plugs.Source.JobObject<Type, Data, CustomHeaders>
     | Plugs.Source.JobObject<Type, Data, CustomHeaders>[]
   >;
+  /** Plug start operation original */
+  private readonly startOriginal: () => Promise<void>;
+  /** Plug stop operation original */
+  private readonly stopOriginal: () => Promise<void>;
   /**
    * Create a new instance of PlugWrapper
    * @param plug - source plug instance
@@ -83,6 +87,18 @@ export class PlugWrapper<
         this.ingestDataOriginal = this.plug.ingestData;
         this.plug.ingestData = this.ingestData;
       }
+    }
+    if (typeof this.plug.start !== 'function') {
+      throw new Crash(`Plug ${this.plug.name} not implement the start method properly`);
+    } else {
+      this.startOriginal = this.plug.start;
+      this.plug.start = this.start;
+    }
+    if (typeof this.plug.stop !== 'function') {
+      throw new Crash(`Plug ${this.plug.name} not implement the stop method properly`);
+    } else {
+      this.stopOriginal = this.plug.stop;
+      this.plug.stop = this.stop;
     }
   }
   /**
@@ -222,6 +238,14 @@ export class PlugWrapper<
     // Ingest data operation is retried infinitely using the default values, in other way the normal
     // ingestion process will be blocked
     return this.wrappedOperation(this.ingestDataOriginal, [size]);
+  };
+  /** Start the Plug and the underlayer resources, making it available */
+  private readonly start = async (): Promise<void> => {
+    await this.wrappedOperation(this.startOriginal, []);
+  };
+  /** Stop the Plug and the underlayer resources, making it unavailable */
+  private readonly stop = async (): Promise<void> => {
+    await this.wrappedOperation(this.stopOriginal, []);
   };
   /**
    * Return the status of the stream in a standard format

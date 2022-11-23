@@ -193,4 +193,12 @@ export abstract class Base<
     plug.on('error', this.onErrorEvent);
     plug.on('status', this.onStatusEvent);
   }
+  /** Start the Plug and the underlayer resources, making it available */
+  public async start(): Promise<void> {
+    await this.plug.start();
+  }
+  /** Stop the Plug and the underlayer resources, making it unavailable */
+  public async stop(): Promise<void> {
+    await this.plug.stop();
+  }
 }

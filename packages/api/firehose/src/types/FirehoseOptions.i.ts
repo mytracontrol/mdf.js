@@ -20,7 +20,7 @@ export interface FirehoseOptions<
   /** Firehose sources */
   sources: Plugs.Source.Any<Type, Data, CustomHeaders>[];
   /** Firehose sinks */
-  sinks: Plugs.Sink.Any[];
+  sinks: Plugs.Sink.Any<Type, Data, CustomHeaders>[];
   /** Firehose transformation strategies per job type */
   strategies?: { [type: string]: Jobs.Strategy<Type, Data, CustomHeaders>[] };
   /** Retry options for sink/source operations */

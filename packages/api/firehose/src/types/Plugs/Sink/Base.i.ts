@@ -6,9 +6,9 @@
  */
 
 import { Health } from '@mdf.js/core';
-import { Sink } from './Plugs';
+import { JobObject } from './JobObject.t';
 
-export interface WrappableSinkPlug<
+export interface Base<
   Type extends string = string,
   Data = any,
   CustomHeaders extends Record<string, any> = Record<string, any>
@@ -17,12 +17,7 @@ export interface WrappableSinkPlug<
    * Perform the processing of a single Job
    * @param job - job to be processed
    */
-  single: (job: Sink.JobObject<Type, Data, CustomHeaders>) => Promise<void>;
-  /**
-   * Perform the processing of several Jobs
-   * @param jobs - jobs to be processed
-   */
-  multi?: (jobs: Sink.JobObject<Type, Data, CustomHeaders>[]) => Promise<void>;
+  single: (job: JobObject<Type, Data, CustomHeaders>) => Promise<void>;
   /** Start the Plug and the underlayer resources, making it available */
   start(): Promise<void>;
   /** Stop the Plug and the underlayer resources, making it unavailable */

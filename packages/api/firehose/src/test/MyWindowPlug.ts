@@ -60,4 +60,10 @@ export class MyWindowPlug extends EventEmitter implements Plugs.Source.Sequence 
   public postConsume(jobId: string): Promise<string | undefined> {
     return Promise.resolve(this.founded ? jobId : undefined);
   }
+  public start(): Promise<void> {
+    return Promise.resolve();
+  }
+  public stop(): Promise<void> {
+    return Promise.resolve();
+  }
 }

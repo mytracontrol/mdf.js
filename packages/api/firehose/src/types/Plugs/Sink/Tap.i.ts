@@ -5,17 +5,10 @@
  * or at https://opensource.org/licenses/MIT.
  */
 
-import { Health } from '@mdf.js/core';
-import { JobObject } from './JobObject.t';
+import { Base } from './Base.i';
 
-export interface Tap<
+export type Tap<
   Type extends string = string,
   Data = any,
   CustomHeaders extends Record<string, any> = Record<string, any>
-> extends Health.Component {
-  /**
-   * Perform the processing of a single Job
-   * @param job - job to be processed
-   */
-  single: (job: JobObject<Type, Data, CustomHeaders>) => Promise<void>;
-}
+> = Base<Type, Data, CustomHeaders>;

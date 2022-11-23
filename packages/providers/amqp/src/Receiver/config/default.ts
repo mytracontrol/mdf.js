@@ -5,8 +5,8 @@
  * or at https://opensource.org/licenses/MIT.
  */
 
-import { Config } from '../Receiver';
-import { CONFIG_ARTIFACT_ID } from './utils';
+import { CONFIG_ARTIFACT_ID } from '../../Common';
+import { Config } from '../types';
 
 // *************************************************************************************************
 // #region Default values
@@ -25,11 +25,6 @@ const CONFIG_AMQP_RECEIVER_SETTLE_MODE = 0;
 const CONFIG_AMQP_RECEIVER_CREDIT_WINDOW = 0;
 const CONFIG_AMQP_RECEIVER_AUTO_ACCEPT = false;
 const CONFIG_AMQP_RECEIVER_AUTO_SETTLE = true;
-const CONFIG_AMQP_MONITOR__INTERVAL = 10000;
-const CONFIG_AMQP_MONITOR__URL = 'http://127.0.0.1:8161/console/jolokia';
-const CONFIG_AMQP_MONITOR__BROKER_NAME = '*';
-const CONFIG_AMQP_MONITOR__ROUTING_TYPE = '*';
-const CONFIG_AMQP_MONITOR__TIMEOUT = 1000;
 
 export const defaultConfig: Config = {
   username: CONFIG_AMQP_USER_NAME,
@@ -44,17 +39,11 @@ export const defaultConfig: Config = {
   requestCert: CONFIG_AMQP_REQUEST_CERT,
   rejectUnauthorized: CONFIG_AMQP_REJECT_UNAUTHORIZED,
   receiver_options: {
+    name: CONFIG_ARTIFACT_ID,
     rcv_settle_mode: CONFIG_AMQP_RECEIVER_SETTLE_MODE,
     credit_window: CONFIG_AMQP_RECEIVER_CREDIT_WINDOW,
     autoaccept: CONFIG_AMQP_RECEIVER_AUTO_ACCEPT,
     autosettle: CONFIG_AMQP_RECEIVER_AUTO_SETTLE,
-  },
-  monitor: {
-    interval: CONFIG_AMQP_MONITOR__INTERVAL,
-    url: CONFIG_AMQP_MONITOR__URL,
-    brokerName: CONFIG_AMQP_MONITOR__BROKER_NAME,
-    routingType: CONFIG_AMQP_MONITOR__ROUTING_TYPE,
-    timeout: CONFIG_AMQP_MONITOR__TIMEOUT,
   },
 };
 // #endregion

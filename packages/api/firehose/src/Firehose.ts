@@ -150,8 +150,10 @@ export class Firehose<
    * @param sinks - Sinks plugs to be processed
    * @returns
    */
-  private getSinkStreams(sinks: Plugs.Sink.Any[]): Sinks[] {
-    const sinkStreams: Sinks[] = [];
+  private getSinkStreams(
+    sinks: Plugs.Sink.Any<Type, Data, CustomHeaders>[]
+  ): Sinks<Type, Data, CustomHeaders>[] {
+    const sinkStreams: Sinks<Type, Data, CustomHeaders>[] = [];
     for (const sink of sinks) {
       if (this.isJetSink(sink)) {
         sinkStreams.push(
@@ -180,7 +182,9 @@ export class Firehose<
    * @param source - source to be checked
    * @returns
    */
-  private isFlowSource(source: WrappableSourcePlug): source is Plugs.Source.Flow {
+  private isFlowSource(
+    source: WrappableSourcePlug<Type, Data, CustomHeaders>
+  ): source is Plugs.Source.Flow<Type, Data, CustomHeaders> {
     return typeof source.postConsume === 'function' && typeof source.ingestData === 'undefined';
   }
   /**
@@ -188,7 +192,9 @@ export class Firehose<
    * @param source - source to be checked
    * @returns
    */
-  private isSequenceSource(source: WrappableSourcePlug): source is Plugs.Source.Sequence {
+  private isSequenceSource(
+    source: WrappableSourcePlug<Type, Data, CustomHeaders>
+  ): source is Plugs.Source.Sequence<Type, Data, CustomHeaders> {
     return typeof source.postConsume === 'function' && typeof source.ingestData === 'function';
   }
   /**
@@ -196,7 +202,9 @@ export class Firehose<
    * @param sink - sink to be checked
    * @returns
    */
-  private isTapSink(sink: WrappableSinkPlug): sink is Plugs.Sink.Tap {
+  private isTapSink(
+    sink: WrappableSinkPlug<Type, Data, CustomHeaders>
+  ): sink is Plugs.Sink.Tap<Type, Data, CustomHeaders> {
     return typeof sink.single === 'function' && typeof sink.multi === 'undefined';
   }
   /**
@@ -204,7 +212,9 @@ export class Firehose<
    * @param sink - sink to be checked
    * @returns
    */
-  private isJetSink(sink: WrappableSinkPlug): sink is Plugs.Sink.Jet {
+  private isJetSink(
+    sink: WrappableSinkPlug<Type, Data, CustomHeaders>
+  ): sink is Plugs.Sink.Jet<Type, Data, CustomHeaders> {
     return typeof sink.multi === 'function' && typeof sink.single === 'function';
   }
   /** Sink/Source/Engine error event handler */
@@ -293,24 +303,28 @@ export class Firehose<
     return { ...this.engine.checks, ...overallChecks };
   }
   /** Perform the piping of all the streams */
-  public start(): void {
+  public async start(): Promise<void> {
     this.wrappingEvents();
     for (const sink of this.sinks) {
       this.engine.pipe(sink);
+      await sink.start();
     }
     for (const source of this.sources) {
       source.pipe(this.engine);
+      await source.start();
     }
   }
   /** Perform the unpipe of all the streams */
-  public stop(): void {
+  public async stop(): Promise<void> {
     this.stopping = true;
     this.unWrappingEvents();
     for (const sink of this.sinks) {
       this.engine.unpipe(sink);
+      await sink.stop();
     }
     for (const source of this.sources) {
       source.unpipe(this.engine);
+      await source.stop();
     }
   }
   /** Stop and close all the streams */

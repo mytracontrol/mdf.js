@@ -6,10 +6,9 @@
  */
 
 import { Provider } from '@mdf.js/provider';
-import { configEntry, CONFIG_PROVIDER_BASE_NAME } from '../config';
-import { Config } from '../types';
+import { configEntry, CONFIG_PROVIDER_BASE_NAME } from './config';
 import { Port } from './Port';
-import { Receiver } from './types';
+import { Config, Receiver } from './types';
 
 export const Factory = Provider.Factory<Receiver, Config, Port>(
   Port,

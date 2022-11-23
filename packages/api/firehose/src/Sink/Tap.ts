@@ -20,7 +20,7 @@ export class Tap<
    * @param plug - Tap sink plug
    * @param options - sink options
    */
-  constructor(plug: Plugs.Sink.Tap<Type, Data>, options?: SinkOptions) {
+  constructor(plug: Plugs.Sink.Tap<Type, Data, CustomHeaders>, options?: SinkOptions) {
     super(plug, options);
   }
   /** Perform the publication of the information on the sink destination */

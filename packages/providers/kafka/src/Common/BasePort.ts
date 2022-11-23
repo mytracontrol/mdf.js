@@ -112,7 +112,7 @@ export abstract class BasePort<Client, Config extends BaseConfig> extends Provid
   };
   /**
    * Attach all the events and log for debugging
-   * @param instance - AMQP Receiver client instance
+   * @param instance - Kafka Consumer/Producer client instance
    */
   private eventsWrapping(instance: Consumer | Producer): Consumer | Producer {
     instance.on('healthy', this.onHealthyEvent);
@@ -121,7 +121,7 @@ export abstract class BasePort<Client, Config extends BaseConfig> extends Provid
   }
   /**
    * Attach all the events and log for debugging
-   * @param instance - AMQP Receiver client instance
+   * @param instance - Kafka Consumer/Producer client instance
    */
   private eventsUnWrapping(instance: Consumer | Producer): Consumer | Producer {
     instance.off('healthy', this.onHealthyEvent);

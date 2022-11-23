@@ -31,6 +31,10 @@ export class PlugWrapper<
   private readonly multiOriginal?: (
     jobs: Plugs.Sink.JobObject<Type, Data, CustomHeaders>[]
   ) => Promise<void>;
+  /** Plug start operation original */
+  private readonly startOriginal: () => Promise<void>;
+  /** Plug stop operation original */
+  private readonly stopOriginal: () => Promise<void>;
   /**
    * Create a new instance of PlugWrapper
    * @param plug - sink plug instance
@@ -59,6 +63,18 @@ export class PlugWrapper<
         this.multiOriginal = this.plug.multi;
         this.plug.multi = this.multi;
       }
+    }
+    if (typeof this.plug.start !== 'function') {
+      throw new Crash(`Plug ${this.plug.name} not implement the start method properly`);
+    } else {
+      this.startOriginal = this.plug.start;
+      this.plug.start = this.start;
+    }
+    if (typeof this.plug.stop !== 'function') {
+      throw new Crash(`Plug ${this.plug.name} not implement the stop method properly`);
+    } else {
+      this.stopOriginal = this.plug.stop;
+      this.plug.stop = this.stop;
     }
   }
   /** Register an error in the plug operation */
@@ -106,6 +122,14 @@ export class PlugWrapper<
       throw new Crash(`Plug ${this.plug.name} does not implement the multi method`);
     }
     await this.wrappedOperation(this.multiOriginal, [jobs]);
+  };
+  /** Start the Plug and the underlayer resources, making it available */
+  private readonly start = async (): Promise<void> => {
+    await this.wrappedOperation(this.startOriginal, []);
+  };
+  /** Stop the Plug and the underlayer resources, making it unavailable */
+  private readonly stop = async (): Promise<void> => {
+    await this.wrappedOperation(this.stopOriginal, []);
   };
   /**
    * Return the status of the stream in a standard format

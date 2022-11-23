@@ -6,8 +6,8 @@
  */
 
 import { coerce, loadFile } from '@mdf.js/utils';
-import { Config } from '../Receiver';
-import { logger } from './utils';
+import { logger } from '../../Common';
+import { Config } from '../types';
 
 // *************************************************************************************************
 // #region Environment variables
@@ -42,19 +42,12 @@ const CONFIG_AMQP_REJECT_UNAUTHORIZED = coerce<boolean>(
   process.env['CONFIG_AMQP_REJECT_UNAUTHORIZED']
 );
 
-const CONFIG_AMQP_RECEIVER_NAME = process.env['CONFIG_AMQP_RECEIVER_NAME'];
-const CONFIG_AMQP_RECEIVER_SETTLE_MODE = coerce<number>(
-  process.env['CONFIG_AMQP_RECEIVER_SETTLE_MODE']
+const CONFIG_AMQP_SENDER_NAME = process.env['CONFIG_AMQP_SENDER_NAME'];
+const CONFIG_AMQP_SENDER_SETTLE_MODE = coerce<0 | 1 | 2>(
+  process.env['CONFIG_AMQP_SENDER_SETTLE_MODE']
 );
-
-const CONFIG_AMQP_RECEIVER_CREDIT_WINDOW = coerce<number>(
-  process.env['CONFIG_AMQP_RECEIVER_CREDIT_WINDOW']
-);
-const CONFIG_AMQP_RECEIVER_AUTO_ACCEPT = coerce<boolean>(
-  process.env['CONFIG_AMQP_RECEIVER_AUTO_ACCEPT']
-);
-const CONFIG_AMQP_RECEIVER_AUTO_SETTLE = coerce<boolean>(
-  process.env['CONFIG_AMQP_RECEIVER_AUTO_SETTLE']
+const CONFIG_AMQP_SENDER_AUTO_SETTLE = coerce<boolean>(
+  process.env['CONFIG_AMQP_SENDER_AUTO_SETTLE']
 );
 
 export const envBasedConfig: Config = {
@@ -77,12 +70,10 @@ export const envBasedConfig: Config = {
   ca: CONFIG_AMQP_CA_CERT?.toString(),
   requestCert: CONFIG_AMQP_REQUEST_CERT,
   rejectUnauthorized: CONFIG_AMQP_REJECT_UNAUTHORIZED,
-  receiver_options: {
-    name: CONFIG_AMQP_RECEIVER_NAME,
-    rcv_settle_mode: CONFIG_AMQP_RECEIVER_SETTLE_MODE as 0 | 1 | undefined,
-    credit_window: CONFIG_AMQP_RECEIVER_CREDIT_WINDOW,
-    autoaccept: CONFIG_AMQP_RECEIVER_AUTO_ACCEPT,
-    autosettle: CONFIG_AMQP_RECEIVER_AUTO_SETTLE,
+  sender_options: {
+    name: CONFIG_AMQP_SENDER_NAME,
+    snd_settle_mode: CONFIG_AMQP_SENDER_SETTLE_MODE,
+    autosettle: CONFIG_AMQP_SENDER_AUTO_SETTLE,
   },
 };
 // #endregion

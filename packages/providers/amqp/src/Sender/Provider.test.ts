@@ -8,32 +8,21 @@ import { Crash } from '@mdf.js/crash';
 import { LoggerInstance, Provider } from '@mdf.js/provider';
 import { undoMocks } from '@mdf.js/utils';
 import { EventEmitter } from 'events';
-import { Config } from '../types';
 import { Factory } from './Factory';
 import { Port } from './Port';
+import { Config } from './types';
 
 const DEFAULT_CONFIG: Config = {
   container_id: 'mdf-amqp',
   host: '127.0.0.1',
   initial_reconnect_delay: 30000,
   max_reconnect_delay: 10000,
-  monitor: {
-    brokerName: '*',
-    interval: 10000,
-    routingType: '*',
-    timeout: 1000,
-    url: 'http://127.0.0.1:8161/console/jolokia',
-  },
   non_fatal_errors: ['amqp:connection:forced'],
   port: 5672,
-  receiver_options: {
-    autoaccept: false,
+  sender_options: {
+    name: 'mdf-sender',
+    snd_settle_mode: 1,
     autosettle: true,
-    credit_window: 0,
-    rcv_settle_mode: 0,
-    source: {
-      address: 'amqp::receiver',
-    },
   },
   reconnect: 5000,
   rejectUnauthorized: false,

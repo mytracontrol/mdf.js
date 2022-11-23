@@ -48,4 +48,10 @@ export class MyFlowPlug extends EventEmitter implements Plugs.Source.Flow {
   public get checks(): Health.API.Checks {
     return {};
   }
+  public start(): Promise<void> {
+    return Promise.resolve();
+  }
+  public stop(): Promise<void> {
+    return Promise.resolve();
+  }
 }

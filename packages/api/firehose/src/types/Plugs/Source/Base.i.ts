@@ -29,4 +29,8 @@ export interface Base<
    * was not found
    */
   postConsume: (jobId: string) => Promise<string | undefined>;
+  /** Start the Plug and the underlayer resources, making it available */
+  start(): Promise<void>;
+  /** Stop the Plug and the underlayer resources, making it unavailable */
+  stop(): Promise<void>;
 }

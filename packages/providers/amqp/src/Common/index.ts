@@ -5,5 +5,6 @@
  * or at https://opensource.org/licenses/MIT.
  */
 
-export { Factory } from './Factory';
-export { AwaitableSender, Config, ProviderInstance as Provider } from './types';
+export * from './BasePort';
+export * from './config';
+export * from './types';

@@ -6,10 +6,9 @@
  */
 
 import { Provider } from '@mdf.js/provider';
-import { configEntry, CONFIG_PROVIDER_BASE_NAME } from '../config';
-import { Config } from '../types';
+import { configEntry, CONFIG_PROVIDER_BASE_NAME } from './config';
 import { Port } from './Port';
-import { AwaitableSender } from './types';
+import { AwaitableSender, Config } from './types';
 
 export const Factory = Provider.Factory<AwaitableSender, Config, Port>(
   Port,

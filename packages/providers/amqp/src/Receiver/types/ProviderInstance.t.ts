@@ -6,8 +6,8 @@
  */
 
 import { Provider } from '@mdf.js/provider';
-import { Config } from '../../types';
 import { Port } from '../Port';
 import { Receiver } from './Client.t';
+import { Config } from './Config.t';
 
 export type ProviderInstance = Provider.Manager<Receiver, Config, Port>;

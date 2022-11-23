@@ -6,4 +6,5 @@
  */
 
 export * from './Client.t';
+export * from './Config.t';
 export * from './ProviderInstance.t';
