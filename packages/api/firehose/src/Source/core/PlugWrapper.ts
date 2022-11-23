@@ -5,12 +5,12 @@
  * or at https://opensource.org/licenses/MIT.
  */
 
-import { Health } from '@mdf.js/core';
+import { Health, Jobs } from '@mdf.js/core';
 import { Crash, Multi } from '@mdf.js/crash';
 import { overallStatus, retryBind, RetryOptions } from '@mdf.js/utils';
 import EventEmitter from 'events';
 import { merge } from 'lodash';
-import { Plugs, PostConsumeOptions, WrappableSourcePlug } from '../../types';
+import { PostConsumeOptions, WrappableSourcePlug } from '../../types';
 import {
   CONFIG_SOURCE_PLUG_CHECK_UNCLEANED_INTERVAL,
   CONFIG_SOURCE_PLUG_MAX_UNKNOWN_JOBS,
@@ -43,8 +43,7 @@ export class PlugWrapper<
   private readonly ingestDataOriginal?: (
     size: number
   ) => Promise<
-    | Plugs.Source.JobObject<Type, Data, CustomHeaders>
-    | Plugs.Source.JobObject<Type, Data, CustomHeaders>[]
+    Jobs.JobRequest<Type, Data, CustomHeaders> | Jobs.JobRequest<Type, Data, CustomHeaders>[]
   >;
   /** Plug start operation original */
   private readonly startOriginal: () => Promise<void>;

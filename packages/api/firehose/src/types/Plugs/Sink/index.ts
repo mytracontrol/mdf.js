@@ -5,7 +5,6 @@
  * or at https://opensource.org/licenses/MIT.
  */
 export * from './Jet.i';
-export * from './JobObject.t';
 export * from './Tap.i';
 
 import { Jet } from './Jet.i';

@@ -5,8 +5,7 @@
  * or at https://opensource.org/licenses/MIT.
  */
 
-import { Health } from '@mdf.js/core';
-import { Sink } from './Plugs';
+import { Health, Jobs } from '@mdf.js/core';
 
 export interface WrappableSinkPlug<
   Type extends string = string,
@@ -17,12 +16,12 @@ export interface WrappableSinkPlug<
    * Perform the processing of a single Job
    * @param job - job to be processed
    */
-  single: (job: Sink.JobObject<Type, Data, CustomHeaders>) => Promise<void>;
+  single: (job: Jobs.JobObject<Type, Data, CustomHeaders>) => Promise<void>;
   /**
    * Perform the processing of several Jobs
    * @param jobs - jobs to be processed
    */
-  multi?: (jobs: Sink.JobObject<Type, Data, CustomHeaders>[]) => Promise<void>;
+  multi?: (jobs: Jobs.JobObject<Type, Data, CustomHeaders>[]) => Promise<void>;
   /** Start the Plug and the underlayer resources, making it available */
   start(): Promise<void>;
   /** Stop the Plug and the underlayer resources, making it unavailable */

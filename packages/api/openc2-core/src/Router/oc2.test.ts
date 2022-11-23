@@ -36,7 +36,7 @@ const COMMAND: Control.CommandMessage = {
 const app = express();
 const myRegistry = new Registry('myRegistry');
 myRegistry.push(COMMAND);
-const job = new Jobs.JobHandler(COMMAND, COMMAND.request_id, 'command', {
+const job = new Jobs.JobHandler(COMMAND.request_id, COMMAND, 'command', {
   headers: { duration: Accessors.getDelayFromCommandMessage(COMMAND) },
 });
 myRegistry.push(job);

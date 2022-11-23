@@ -9,6 +9,7 @@ import { Crash } from '@mdf.js/crash';
 import { Accessors, Checkers, Helpers } from '../../helpers';
 import {
   CommandJobHandler,
+  CommandJobRequest,
   ConsumerAdapter,
   ConsumerOptions,
   Control,
@@ -144,7 +145,7 @@ export class Consumer extends Component<AdapterWrapper, ConsumerOptions> {
           );
         } else if (commandJob.hasErrors) {
           // Stryker disable next-line all
-          this.logger.error(`Job ${commandJob.jobId} was finished with errors`);
+          this.logger.error(`Job ${commandJob.jobUserId} was finished with errors`);
           response = Helpers.internalError(
             commandJob.data,
             this.options.id,
@@ -152,7 +153,7 @@ export class Consumer extends Component<AdapterWrapper, ConsumerOptions> {
           );
         } else {
           // Stryker disable next-line all
-          this.logger.info(`Job ${commandJob.jobId} was finished successfully`);
+          this.logger.info(`Job ${commandJob.jobUserId} was finished successfully`);
           response = Helpers.ok(commandJob.data, this.options.id);
         }
         resolve(response);
@@ -169,8 +170,14 @@ export class Consumer extends Component<AdapterWrapper, ConsumerOptions> {
   private createJobFromCommand(message: Control.CommandMessage): CommandJobHandler {
     // Stryker disable next-line all
     this.logger.info(`Job - ${message.content.action}-${Object.keys(message.content.target)[0]}`);
-    return new Jobs.JobHandler(message, message.request_id, 'command', {
-      headers: { duration: Accessors.getDelayFromCommandMessage(message) },
-    });
+    const jobRequest: CommandJobRequest = {
+      jobUserId: message.request_id,
+      data: message,
+      type: 'command',
+      options: {
+        headers: { duration: Accessors.getDelayFromCommandMessage(message) },
+      },
+    };
+    return new Jobs.JobHandler(jobRequest);
   }
 }

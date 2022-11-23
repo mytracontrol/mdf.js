@@ -5,10 +5,9 @@
  * or at https://opensource.org/licenses/MIT.
  */
 
-import { Health } from '@mdf.js/core';
+import { Health, Jobs } from '@mdf.js/core';
 import { Crash } from '@mdf.js/crash';
 import EventEmitter from 'events';
-import { JobObject } from './JobObject.t';
 
 export interface Base<
   Type extends string = string,
@@ -21,7 +20,7 @@ export interface Base<
   /** Emitted on every status change */
   on(event: 'status', listener: (status: Health.API.Status) => void): this;
   /** Emitted when there is a new job to be managed */
-  on(event: 'data', listener: (job: JobObject<Type, Data, CustomHeaders>) => void): this;
+  on(event: 'data', listener: (job: Jobs.JobRequest<Type, Data, CustomHeaders>) => void): this;
   /**
    * Perform the task to clean the job registers after the job has been resolved
    * @param jobId - Job entry identification

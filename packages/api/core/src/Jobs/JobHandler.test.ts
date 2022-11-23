@@ -18,44 +18,140 @@ import { Status } from './types';
 // #region Our tests
 describe('#JobHandler', () => {
   describe('#Happy path', () => {
-    it(`Should create an instance of a job handler properly`, () => {
-      const job = new JobHandler<string>('myData', 'myId', 'myType', {
-        headers: { routing: { topic: 'myTopic' } },
+    it(`Should create an instance of a job handler properly used the JobRequest`, () => {
+      const job = new JobHandler({
+        data: 'myData',
+        jobUserId: 'myId',
+        type: 'myType',
+        options: {
+          headers: { routing: { topic: 'myTopic' } },
+        },
       });
       expect(job.status).toEqual(Status.PENDING);
       expect(job.data).toEqual('myData');
       expect(job.status).toEqual(Status.PROCESSING);
       expect(job.type).toEqual('myType');
-      expect(job.jobId).toEqual('myId');
-      expect(job.uuid).toEqual(v5('myId', MDF_NAMESPACE_OID));
+      expect(job.jobUserId).toEqual('myId');
+      expect(job.jobUserUUID).toEqual(v5('myId', MDF_NAMESPACE_OID));
+      expect(job.uuid).toEqual(job.uuid);
       expect(job.createdAt).toBeInstanceOf(Date);
       expect(job.errors).toBeUndefined();
       expect(job.hasErrors).toBeFalsy();
       expect(job.processTime).toEqual(-1);
       expect(job.result()).toEqual({
-        id: v5('myId', MDF_NAMESPACE_OID),
+        uuid: job.result().uuid,
+        jobUserId: 'myId',
+        jobUserUUID: v5('myId', MDF_NAMESPACE_OID),
         createdAt: job.createdAt.toISOString(),
         resolvedAt: '',
         quantity: 1,
         hasErrors: false,
         errors: undefined,
-        jobId: 'myId',
         type: 'myType',
         status: Status.PROCESSING,
       });
     });
-    it(`Should be possible to add errors to the job handler`, () => {
-      const job = new JobHandler<string>('myData', 'myId', 'myType');
+    it(`Should create an instance of a job handler properly used the JobRequest with default value`, () => {
+      const job = new JobHandler({
+        data: ['myData'],
+        jobUserId: 'myId',
+        options: {
+          headers: { routing: { topic: 'myTopic' } },
+        },
+      });
+      expect(job.status).toEqual(Status.PENDING);
+      expect(job.data).toEqual(['myData']);
+      expect(job.status).toEqual(Status.PROCESSING);
+      expect(job.type).toEqual('default');
+      expect(job.jobUserId).toEqual('myId');
+      expect(job.jobUserUUID).toEqual(v5('myId', MDF_NAMESPACE_OID));
+      expect(job.uuid).toEqual(job.uuid);
+      expect(job.createdAt).toBeInstanceOf(Date);
       expect(job.errors).toBeUndefined();
       expect(job.hasErrors).toBeFalsy();
+      expect(job.processTime).toEqual(-1);
       expect(job.result()).toEqual({
-        id: v5('myId', MDF_NAMESPACE_OID),
+        uuid: job.result().uuid,
+        jobUserId: 'myId',
+        jobUserUUID: v5('myId', MDF_NAMESPACE_OID),
         createdAt: job.createdAt.toISOString(),
         resolvedAt: '',
         quantity: 1,
         hasErrors: false,
         errors: undefined,
-        jobId: 'myId',
+        type: 'default',
+        status: Status.PROCESSING,
+      });
+    });
+    it(`Should create an instance of a job handler properly`, () => {
+      const job = new JobHandler<string>('myId', 'myData', 'myType', {
+        headers: { routing: { topic: 'myTopic' } },
+      });
+      expect(job.status).toEqual(Status.PENDING);
+      job.data = 'myOtherData';
+      expect(job.data).toEqual('myOtherData');
+      expect(job.status).toEqual(Status.PROCESSING);
+      expect(job.type).toEqual('myType');
+      expect(job.uuid).toEqual(job.uuid);
+      expect(job.jobUserId).toEqual('myId');
+      expect(job.jobUserUUID).toEqual(v5('myId', MDF_NAMESPACE_OID));
+      expect(job.createdAt).toBeInstanceOf(Date);
+      expect(job.errors).toBeUndefined();
+      expect(job.hasErrors).toBeFalsy();
+      expect(job.processTime).toEqual(-1);
+      expect(job.result()).toEqual({
+        uuid: job.uuid,
+        jobUserUUID: v5('myId', MDF_NAMESPACE_OID),
+        createdAt: job.createdAt.toISOString(),
+        resolvedAt: '',
+        quantity: 1,
+        hasErrors: false,
+        errors: undefined,
+        jobUserId: 'myId',
+        type: 'myType',
+        status: Status.PROCESSING,
+      });
+    });
+    it(`Should create an instance of a job handler properly with default value`, () => {
+      const job = new JobHandler<string>('myId', 'myData');
+      expect(job.status).toEqual(Status.PENDING);
+      job.data = 'myOtherData';
+      expect(job.data).toEqual('myOtherData');
+      expect(job.status).toEqual(Status.PROCESSING);
+      expect(job.type).toEqual('default');
+      expect(job.uuid).toEqual(job.uuid);
+      expect(job.jobUserId).toEqual('myId');
+      expect(job.jobUserUUID).toEqual(v5('myId', MDF_NAMESPACE_OID));
+      expect(job.createdAt).toBeInstanceOf(Date);
+      expect(job.errors).toBeUndefined();
+      expect(job.hasErrors).toBeFalsy();
+      expect(job.processTime).toEqual(-1);
+      expect(job.result()).toEqual({
+        uuid: job.uuid,
+        jobUserUUID: v5('myId', MDF_NAMESPACE_OID),
+        createdAt: job.createdAt.toISOString(),
+        resolvedAt: '',
+        quantity: 1,
+        hasErrors: false,
+        errors: undefined,
+        jobUserId: 'myId',
+        type: 'default',
+        status: Status.PROCESSING,
+      });
+    });
+    it(`Should be possible to add errors to the job handler`, () => {
+      const job = new JobHandler<string>('myId', 'myData', 'myType');
+      expect(job.errors).toBeUndefined();
+      expect(job.hasErrors).toBeFalsy();
+      expect(job.result()).toEqual({
+        createdAt: job.createdAt.toISOString(),
+        resolvedAt: '',
+        quantity: 1,
+        hasErrors: false,
+        errors: undefined,
+        uuid: job.uuid,
+        jobUserUUID: v5('myId', MDF_NAMESPACE_OID),
+        jobUserId: 'myId',
         type: 'myType',
         status: Status.PENDING,
       });
@@ -65,7 +161,7 @@ describe('#JobHandler', () => {
       expect(job.errors).toBeDefined();
       expect(job.hasErrors).toBeTruthy();
       expect(job.result()).toEqual({
-        id: v5('myId', MDF_NAMESPACE_OID),
+        uuid: job.uuid,
         createdAt: job.createdAt.toISOString(),
         resolvedAt: '',
         quantity: 1,
@@ -77,25 +173,27 @@ describe('#JobHandler', () => {
           subject: 'common',
           timestamp: job.errors?.date.toISOString(),
           trace: ['CrashError: myError', 'CrashError: myError'],
-          uuid: v5('myId', MDF_NAMESPACE_OID),
+          uuid: job.errors?.uuid,
         },
-        jobId: 'myId',
+        jobUserUUID: v5('myId', MDF_NAMESPACE_OID),
+        jobUserId: 'myId',
         type: 'myType',
         status: Status.PROCESSING,
       });
     });
     it(`Should be possible to finnish the job without errors`, done => {
-      const job = new JobHandler<string>('myData', 'myId', 'myType');
+      const job = new JobHandler<string>('myId', 'myData', 'myType');
       job.on('done', (uuid: string, result: Jobs.Result<string>, error?: Multi) => {
-        expect(uuid).toEqual(v5('myId', MDF_NAMESPACE_OID));
+        expect(uuid).toEqual(job.uuid);
         expect(result).toEqual({
-          id: v5('myId', MDF_NAMESPACE_OID),
+          uuid: job.uuid,
+          jobUserUUID: v5('myId', MDF_NAMESPACE_OID),
           createdAt: job.createdAt.toISOString(),
           resolvedAt: result.resolvedAt,
           quantity: 1,
           hasErrors: false,
           errors: undefined,
-          jobId: 'myId',
+          jobUserId: 'myId',
           type: 'myType',
           status: Status.COMPLETED,
         });
@@ -106,12 +204,12 @@ describe('#JobHandler', () => {
       job.done();
     });
     it(`Should be possible to finnish the job with errors`, done => {
-      const job = new JobHandler<string>('myData', 'myId', 'myType');
+      const job = new JobHandler<string>('myId', 'myData', 'myType');
       const myError = new Crash('myError');
       job.on('done', (uuid: string, result: Jobs.Result<string>, error?: Multi) => {
-        expect(uuid).toEqual(v5('myId', MDF_NAMESPACE_OID));
+        expect(uuid).toEqual(job.uuid);
         expect(result).toEqual({
-          id: v5('myId', MDF_NAMESPACE_OID),
+          uuid: result.uuid,
           createdAt: job.createdAt.toISOString(),
           resolvedAt: result.resolvedAt,
           quantity: 1,
@@ -123,9 +221,10 @@ describe('#JobHandler', () => {
             subject: 'common',
             timestamp: job.errors?.date.toISOString(),
             trace: ['CrashError: myError'],
-            uuid: v5('myId', MDF_NAMESPACE_OID),
+            uuid: result.errors?.uuid,
           },
-          jobId: 'myId',
+          jobUserId: 'myId',
+          jobUserUUID: v5('myId', MDF_NAMESPACE_OID),
           type: 'myType',
           status: Status.FAILED,
         });
@@ -138,12 +237,14 @@ describe('#JobHandler', () => {
       job.done(myError);
     });
     it(`Should return an object with the key data of the Job`, () => {
-      const job = new JobHandler<string>('myData', 'myId', 'myType');
+      const job = new JobHandler<string>('myId', 'myData', 'myType');
       expect(job.toObject()).toEqual({
+        uuid: job.uuid,
+        jobUserUUID: v5('myId', MDF_NAMESPACE_OID),
+        jobUserId: 'myId',
         data: 'myData',
         type: 'myType',
-        jobId: 'myId',
-        headers: {},
+        options: undefined,
         status: Status.PROCESSING,
       });
     });
@@ -152,11 +253,11 @@ describe('#JobHandler', () => {
     it(`Should throw an error if try to create a job without jobId`, done => {
       try {
         //@ts-ignore - Test environment
-        new JobHandler('myData', undefined, 'myType');
+        new JobHandler(undefined, 'myData', 'myType');
       } catch (error) {
         expect(error).toBeInstanceOf(Crash);
         expect((error as Crash).message).toEqual(
-          'Error creating a valid JobHandler, JobId is mandatory and must be a string'
+          'Error creating a valid JobHandler, the first parameter must be a jobUserId or a JobRequest object'
         );
         expect((error as Crash).name).toEqual('ValidationError');
         done();
@@ -165,7 +266,7 @@ describe('#JobHandler', () => {
     it(`Should throw an error if try to create a job with invalid type`, done => {
       try {
         //@ts-ignore - Test environment
-        new JobHandler('myData', 'myId', 4);
+        new JobHandler('myId', 'myData', 4);
       } catch (error) {
         expect(error).toBeInstanceOf(Crash);
         expect((error as Crash).message).toEqual(
@@ -178,7 +279,7 @@ describe('#JobHandler', () => {
     it(`Should throw an error if try to create a job without data = undefined`, done => {
       try {
         //@ts-ignore - Test environment
-        new JobHandler(undefined, 'myId', 'myType');
+        new JobHandler('myId', undefined, 'myType');
       } catch (error) {
         expect(error).toBeInstanceOf(Crash);
         expect((error as Crash).message).toEqual(
@@ -191,7 +292,7 @@ describe('#JobHandler', () => {
     it(`Should throw an error if try to create a job without data = null`, done => {
       try {
         //@ts-ignore - Test environment
-        new JobHandler(null, 'myId', 'myType');
+        new JobHandler('myId', null, 'myType');
       } catch (error) {
         expect(error).toBeInstanceOf(Crash);
         expect((error as Crash).message).toEqual(
@@ -204,7 +305,7 @@ describe('#JobHandler', () => {
     it(`Should throw an error if try to create a job with invalid options`, done => {
       try {
         //@ts-ignore - Test environment
-        new JobHandler(3, 'myId', 'myType', 'myBadOptions');
+        new JobHandler('myId', 3, 'myType', 'myBadOptions');
       } catch (error) {
         expect(error).toBeInstanceOf(Crash);
         expect((error as Crash).message).toEqual(

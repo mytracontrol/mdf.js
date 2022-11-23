@@ -8,11 +8,11 @@
 import { Headers } from './Headers.i';
 
 export interface Options<CustomHeaders extends Record<string, any> = Record<string, any>> {
-  /** Job meta information, used to pass specific information for sinks and sources */
+  /** Job meta information, used to pass specific information for jobs handlers */
   headers?: Headers<CustomHeaders>;
   /**
-   * Indicates the quality of service for the job, indeed this indicate the number of sinks that
-   * must be successfully processed to consider the job as successfully processed
+   * Indicates the number of handlers that must be successfully processed to consider the job as
+   * successfully processed
    */
-  qos?: number;
+  numberOfHandlers?: number;
 }

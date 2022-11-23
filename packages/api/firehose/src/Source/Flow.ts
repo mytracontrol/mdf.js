@@ -31,15 +31,20 @@ export class Flow<
    * Process the received jobs
    * @param job - job to be processed
    */
-  private readonly _onJobReceived = (job: Plugs.Source.JobObject<Type, Data, CustomHeaders>) => {
+  private readonly _onJobReceived = (job: Jobs.JobRequest<Type, Data, CustomHeaders>) => {
     // Stryker disable next-line all
-    this.logger.verbose(`New job from consumer: ${job.jobId}`);
+    this.logger.verbose(`New job from consumer: ${job.jobUserId}`);
     if (
       !this.push(
         this.subscribeJob(
-          new Jobs.JobHandler<Type, Data, CustomHeaders>(job.data, job.jobId, job.type, {
-            headers: job.headers,
-            qos: this.qos,
+          new Jobs.JobHandler<Type, Data, CustomHeaders>({
+            data: job.data,
+            type: job.type,
+            jobUserId: job.jobUserId,
+            options: {
+              headers: job.options?.headers,
+              numberOfHandlers: this.numberOfHandlers,
+            },
           })
         )
       )

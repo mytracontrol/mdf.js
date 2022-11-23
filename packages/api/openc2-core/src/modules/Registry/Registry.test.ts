@@ -73,7 +73,7 @@ describe('#Registry', () => {
     }, 300);
     it('Should manage jobs properly', () => {
       const registry = new Registry('test', 10, 100);
-      const job = new Jobs.JobHandler(COMMAND, COMMAND.request_id, 'command', {
+      const job = new Jobs.JobHandler(COMMAND.request_id, COMMAND, 'command', {
         headers: { duration: Accessors.getDelayFromCommandMessage(COMMAND) },
       });
       expect(registry.pendingJobs.size).toEqual(0);
@@ -96,8 +96,8 @@ describe('#Registry', () => {
         registry.delete(job.uuid);
       }
       expect(registry.executedJobs.length).toEqual(100);
-      expect(registry.executedJobs[0].id).toEqual(job.uuid);
-      expect(registry.executedJobs[99].id).toEqual(job.uuid);
+      expect(registry.executedJobs[0].uuid).toEqual(job.uuid);
+      expect(registry.executedJobs[99].uuid).toEqual(job.uuid);
       registry.clear();
       //@ts-ignore - Test environment
       expect(registry.interval).toBeUndefined();
@@ -107,7 +107,7 @@ describe('#Registry', () => {
       const registry = new Registry('test', 10, 100);
       //@ts-ignore - Test environment
       registry.timeInterval = 10;
-      const job = new Jobs.JobHandler(COMMAND, COMMAND.request_id, 'command', {
+      const job = new Jobs.JobHandler(COMMAND.request_id, COMMAND, 'command', {
         headers: { duration: Accessors.getDelayFromCommandMessage(COMMAND) },
       });
       job.on('done', (job, result) => {
@@ -123,8 +123,9 @@ describe('#Registry', () => {
             uuid: result.errors?.uuid,
           },
           hasErrors: true,
-          id: result.id,
-          jobId: result.jobId,
+          uuid: result.uuid,
+          jobUserId: result.jobUserId,
+          jobUserUUID: result.jobUserUUID,
           quantity: 1,
           resolvedAt: result.resolvedAt,
           status: 'failed',
@@ -163,7 +164,7 @@ describe('#Registry', () => {
       });
       //@ts-ignore - Test environment
       registry.timeInterval = 10;
-      const job = new Jobs.JobHandler(COMMAND, COMMAND.request_id, 'command', {
+      const job = new Jobs.JobHandler(COMMAND.request_id, COMMAND, 'command', {
         headers: { duration: Accessors.getDelayFromCommandMessage(COMMAND) },
       });
       // @ts-ignore - Test environment

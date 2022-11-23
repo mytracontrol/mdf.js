@@ -4,7 +4,7 @@
  * Use of this source code is governed by an MIT-style license that can be found in the LICENSE file
  * or at https://opensource.org/licenses/MIT.
  */
-import { Health } from '@mdf.js/core';
+import { Health, Jobs } from '@mdf.js/core';
 import EventEmitter from 'events';
 import { v4 } from 'uuid';
 import {} from '../Engine';
@@ -20,7 +20,7 @@ export class MySlowTapPlug extends EventEmitter implements Plugs.Sink.Tap {
   public get checks(): Health.API.Checks {
     return {};
   }
-  public single(job: Plugs.Sink.JobObject): Promise<void> {
+  public single(job: Jobs.JobObject): Promise<void> {
     return new Promise<void>((resolve, reject) => {
       setTimeout(() => {
         if (this.shouldReject) {

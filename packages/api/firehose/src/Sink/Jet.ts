@@ -30,7 +30,7 @@ export class Jet<
     callback: (error?: Crash | Error) => void
   ): void {
     // Stryker disable next-line all
-    this.logger.verbose(`Publishing job ${data.jobId} on single operation from Jet Sink`);
+    this.logger.verbose(`Publishing job ${data.jobUserId} on single operation from Jet Sink`);
     this.plug
       .single(data.toObject())
       .then(() => data.done())
@@ -49,7 +49,7 @@ export class Jet<
       .then(() => {
         for (const entry of data) {
           // Stryker disable next-line all
-          this.logger.verbose(`Job ${entry.chunk.jobId} finished`);
+          this.logger.verbose(`Job ${entry.chunk.jobUserId} finished`);
           entry.chunk.done();
         }
       })

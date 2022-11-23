@@ -5,12 +5,12 @@
  * or at https://opensource.org/licenses/MIT.
  */
 
-import { Health } from '@mdf.js/core';
+import { Health, Jobs } from '@mdf.js/core';
 import { Crash, Multi } from '@mdf.js/crash';
 import { retryBind, RetryOptions } from '@mdf.js/utils';
 import EventEmitter from 'events';
 import { merge } from 'lodash';
-import { Plugs, WrappableSinkPlug } from '../../types';
+import { WrappableSinkPlug } from '../../types';
 
 export class PlugWrapper<
   Type extends string = string,
@@ -25,11 +25,11 @@ export class PlugWrapper<
   private readonly retryOptions: RetryOptions;
   /** Plug single operation original */
   private readonly singleOriginal: (
-    job: Plugs.Sink.JobObject<Type, Data, CustomHeaders>
+    job: Jobs.JobObject<Type, Data, CustomHeaders>
   ) => Promise<void>;
   /** Plug multi operation original */
   private readonly multiOriginal?: (
-    jobs: Plugs.Sink.JobObject<Type, Data, CustomHeaders>[]
+    jobs: Jobs.JobObject<Type, Data, CustomHeaders>[]
   ) => Promise<void>;
   /** Plug start operation original */
   private readonly startOriginal: () => Promise<void>;
@@ -107,7 +107,7 @@ export class PlugWrapper<
    * @param job - job to be processed
    */
   private readonly single = async (
-    job: Plugs.Sink.JobObject<Type, Data, CustomHeaders>
+    job: Jobs.JobObject<Type, Data, CustomHeaders>
   ): Promise<void> => {
     await this.wrappedOperation(this.singleOriginal, [job]);
   };
@@ -116,7 +116,7 @@ export class PlugWrapper<
    * @param jobs - jobs to be processed
    */
   private readonly multi = async (
-    jobs: Plugs.Sink.JobObject<Type, Data, CustomHeaders>[]
+    jobs: Jobs.JobObject<Type, Data, CustomHeaders>[]
   ): Promise<void> => {
     if (!this.multiOriginal) {
       throw new Crash(`Plug ${this.plug.name} does not implement the multi method`);

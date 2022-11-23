@@ -65,10 +65,10 @@ export abstract class Base<
   /** Wrapped source plug */
   private readonly plugWrapper: PlugWrapper<Type, Data, CustomHeaders>;
   /**
-   * Indicates the quality of service for the job, indeed this indicate the number of sinks that
-   * must be successfully processed to consider the job as successfully processed
+   * Indicates the number of handlers that must be successfully processed to consider the job as
+   * successfully processed
    */
-  protected readonly qos: number = 1;
+  protected readonly numberOfHandlers: number = 1;
   /**
    * Create a new instance for the firehose source
    * @param plug - source plug instance
@@ -76,7 +76,7 @@ export abstract class Base<
    */
   constructor(protected readonly plug: T, options?: SourceOptions) {
     super(merge(DEFAULT_READABLE_OPTIONS, options?.readableOptions));
-    this.qos = options?.qos ?? this.qos;
+    this.numberOfHandlers = options?.qos ?? this.numberOfHandlers;
     // Stryker disable next-line all
     this.logger = SetContext(
       options?.logger || new DebugLogger(`mdf:stream:source:${this.plug.name}`),
@@ -191,23 +191,23 @@ export abstract class Base<
   private readonly onJobDone = (uuid: string, jobResult: Jobs.Result, error?: Crash) => {
     if (error) {
       // Stryker disable next-line all
-      this.logger.debug(`Job ${jobResult.id} was finished with error: ${error.message}`);
+      this.logger.debug(`Job ${jobResult.uuid} was finished with error: ${error.message}`);
     }
     this.plug
-      .postConsume(jobResult.jobId)
+      .postConsume(jobResult.jobUserId)
       .then(postConsumeResult => {
         if (postConsumeResult) {
           // Stryker disable next-line all
-          this.logger.silly(`Job [${jobResult.jobId}] resolved properly`);
+          this.logger.silly(`Job [${jobResult.jobUserId}] resolved properly`);
         } else {
           // Stryker disable next-line all
-          this.logger.silly(`Job [${jobResult.jobId}] resolved with no result`);
+          this.logger.silly(`Job [${jobResult.jobUserId}] resolved with no result`);
         }
       })
       .catch(plugError => {
         // Stryker disable next-line all
         this.logger.error(
-          `Job [${jobResult.jobId}] was not cleaned due to error: ${plugError.message}`
+          `Job [${jobResult.jobUserId}] was not cleaned due to error: ${plugError.message}`
         );
       })
       .finally(() => this.emit('done', uuid, jobResult, error));

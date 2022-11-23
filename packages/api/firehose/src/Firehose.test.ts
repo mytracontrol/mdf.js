@@ -50,20 +50,20 @@ describe('#Firehose', () => {
       expect(firehose.name).toEqual('MyFirehose');
       expect(firehose.componentId).toBeDefined();
       service.health.register(firehose);
-      firehose.start();
       let jobEmitted = false;
       firehose.on('job', job => {
         expect(job).toBeDefined();
         expect(job.data).toBeDefined();
         expect(job.type).toBeDefined();
         expect(job.type).toEqual('myType');
-        expect(job.jobId).toBeDefined();
-        expect(job.headers).toBeDefined();
-        expect(job.headers).toEqual({ 'x-my-header': 'my-header-value' });
+        expect(job.jobUserId).toBeDefined();
+        expect(job.options).toBeDefined();
+        expect(job.options?.headers).toBeDefined();
+        expect(job.options?.headers).toEqual({ 'x-my-header': 'my-header-value' });
         jobEmitted = true;
       });
       firehose.on('done', async (uuid: string, result: Jobs.Result, error?: Crash) => {
-        if (result.jobId === '4') {
+        if (result.jobUserId === '4') {
           const metrics = await service.metrics.metrics();
           expect(metrics).toBeDefined();
           expect(metrics.metrics).toBeDefined();
@@ -96,6 +96,7 @@ describe('#Firehose', () => {
           });
         }
       });
+      firehose.start().then();
     }, 1000);
     it('Should repiping the streams if there is a unexpected unpipe, and it should still work', done => {
       const mySinkPlug = new MyTapPlug();
@@ -105,7 +106,6 @@ describe('#Firehose', () => {
         sinks: [mySinkPlug],
         bufferSize: 2,
       });
-      firehose.start();
       let unpipe = false;
       firehose.on('done', async (uuid: string, result: Jobs.Result, error?: Crash) => {
         if (unpipe) {
@@ -125,12 +125,13 @@ describe('#Firehose', () => {
           expect(firehose.sources[0].destroyed).toEqual(true);
           done();
         }
-        if (result.jobId === '4') {
+        if (result.jobUserId === '4') {
           //@ts-ignore - Test environment
           firehose.engine.unpipe(firehose.sinks[0]);
           unpipe = true;
         }
       });
+      firehose.start().then();
     }, 1000);
     it('Should create a new Firehose with a Window Source and a Tap Sink, start it and check is working', done => {
       const service = new Observability(config);
@@ -148,7 +149,7 @@ describe('#Firehose', () => {
       expect(firehose.componentId).toBeDefined();
       service.health.register(firehose);
       firehose.on('done', async (uuid: string, result: Jobs.Result, error?: Crash) => {
-        if (result.jobId === '10') {
+        if (result.jobUserId === '10') {
           const metrics = await service.metrics.metrics();
           expect(metrics).toBeDefined();
           expect(metrics.metrics).toBeDefined();
@@ -161,12 +162,12 @@ describe('#Firehose', () => {
           firehose.close();
           service.stop().then(done);
         }
-        if (result.jobId === '11') {
+        if (result.jobUserId === '11') {
           firehose.close();
           service.stop().then(() => done(new Error('Job should not be emitted')));
         }
       });
-      firehose.start();
+      firehose.start().then();
     }, 1000);
     it('Should create a new Firehose with a Flow Source and a Tap Sink, start it and check is working', done => {
       const service = new Observability(config);
@@ -188,12 +189,13 @@ describe('#Firehose', () => {
         expect(job.data).toBeDefined();
         expect(job.type).toBeDefined();
         expect(job.type).toEqual('myType');
-        expect(job.jobId).toBeDefined();
-        expect(job.headers).toBeDefined();
-        expect(job.headers).toEqual({ 'x-my-header': 'my-header-value' });
+        expect(job.jobUserId).toBeDefined();
+        expect(job.options).toBeDefined();
+        expect(job.options?.headers).toBeDefined();
+        expect(job.options?.headers).toEqual({ 'x-my-header': 'my-header-value' });
       });
       firehose.on('done', async (uuid: string, result: Jobs.Result, error?: Crash) => {
-        if (result.jobId === '10') {
+        if (result.jobUserId === '10') {
           const metrics = await service.metrics.metrics();
           expect(metrics).toBeDefined();
           expect(metrics.metrics).toBeDefined();
@@ -221,7 +223,7 @@ describe('#Firehose', () => {
       expect(firehose.componentId).toBeDefined();
       service.health.register(firehose);
       firehose.on('done', async (uuid: string, result: Jobs.Result, error?: Crash) => {
-        if (result.jobId === '10') {
+        if (result.jobUserId === '10') {
           const metrics = await service.metrics.metrics();
           expect(metrics).toBeDefined();
           expect(metrics.metrics).toBeDefined();
@@ -249,7 +251,7 @@ describe('#Firehose', () => {
       expect(firehose.componentId).toBeDefined();
       service.health.register(firehose);
       firehose.on('done', async (uuid: string, result: Jobs.Result, error?: Crash) => {
-        if (result.jobId === '10') {
+        if (result.jobUserId === '10') {
           const metrics = await service.metrics.metrics();
           expect(metrics).toBeDefined();
           expect(metrics.metrics).toBeDefined();
@@ -258,7 +260,7 @@ describe('#Firehose', () => {
           firehose.close();
           service.stop().then(done);
         }
-        if (result.jobId === '11') {
+        if (result.jobUserId === '11') {
           firehose.close();
           service.stop().then(() => done(new Error('Job should not be emitted')));
         }
@@ -281,7 +283,7 @@ describe('#Firehose', () => {
       expect(firehose.componentId).toBeDefined();
       service.health.register(firehose);
       firehose.on('done', async (uuid: string, result: Jobs.Result, error?: Crash) => {
-        if (result.jobId === '10') {
+        if (result.jobUserId === '10') {
           const metrics = await service.metrics.metrics();
           expect(metrics).toBeDefined();
           expect(metrics.metrics).toBeDefined();
@@ -310,7 +312,7 @@ describe('#Firehose', () => {
       expect(firehose.componentId).toBeDefined();
       service.health.register(firehose);
       firehose.on('done', async (uuid: string, result: Jobs.Result, error?: Crash) => {
-        if (result.jobId === '4') {
+        if (result.jobUserId === '4') {
           const metrics = await service.metrics.metrics();
           expect(metrics).toBeDefined();
           expect(metrics.metrics).toBeDefined();
@@ -330,7 +332,7 @@ describe('#Firehose', () => {
       const firehose = new Firehose('MyFirehose', {
         sources: [mySourcePlug],
         sinks: [mySinkPlug, mySinkPlug, myOtherSinkPlug, myOtherSinkPlug],
-        bufferSize: 4,
+        bufferSize: 2,
         metricsService: service.metrics,
         registerService: service.registry,
       });
@@ -339,7 +341,7 @@ describe('#Firehose', () => {
       expect(firehose.componentId).toBeDefined();
       service.health.register(firehose);
       firehose.on('done', async (uuid: string, result: Jobs.Result, error?: Crash) => {
-        if (result.jobId === '10') {
+        if (result.jobUserId === '10') {
           const metrics = await service.metrics.metrics();
           expect(metrics).toBeDefined();
           expect(metrics.metrics).toBeDefined();
@@ -357,9 +359,9 @@ describe('#Firehose', () => {
       jest.spyOn(mySinkPlug, 'single').mockImplementation(async (job: Jobs.JobObject<any>) => {
         return new Promise<void>((resolve, reject) => {
           expect(job).toBeDefined();
-          expect(job.jobId).toBeDefined();
+          expect(job.jobUserId).toBeDefined();
           expect(job.data).toBeDefined();
-          expect(job.data).toEqual(parseInt(job.jobId) + 3);
+          expect(job.data).toEqual(parseInt(job.jobUserId) + 3);
           process.nextTick(() => {
             resolve();
           });
@@ -382,7 +384,7 @@ describe('#Firehose', () => {
       expect(firehose.componentId).toBeDefined();
       service.health.register(firehose);
       firehose.on('done', async (uuid: string, result: Jobs.Result, error?: Crash) => {
-        if (result.jobId === '10') {
+        if (result.jobUserId === '10') {
           firehose.close();
           service.stop().then(done);
         }
@@ -395,9 +397,9 @@ describe('#Firehose', () => {
       jest.spyOn(mySinkPlug, 'single').mockImplementation(async (job: Jobs.JobObject<any>) => {
         return new Promise<void>((resolve, reject) => {
           expect(job).toBeDefined();
-          expect(job.jobId).toBeDefined();
+          expect(job.jobUserId).toBeDefined();
           expect(job.data).toBeDefined();
-          expect(job.data).toEqual(parseInt(job.jobId) + 1);
+          expect(job.data).toEqual(parseInt(job.jobUserId) + 1);
           process.nextTick(() => {
             resolve();
           });
@@ -419,7 +421,7 @@ describe('#Firehose', () => {
       expect(firehose.componentId).toBeDefined();
       service.health.register(firehose);
       firehose.on('done', async (uuid: string, result: Jobs.Result, error?: Crash) => {
-        if (result.jobId === '4') {
+        if (result.jobUserId === '4') {
           expect(service.registry.size).toEqual(4);
           expect(service.registry.errors[0].trace[0]).toContain(
             'CrashError: Job finished with errors'
@@ -442,9 +444,9 @@ describe('#Firehose', () => {
       jest.spyOn(mySinkPlug, 'single').mockImplementation(async (job: Jobs.JobObject<any>) => {
         return new Promise<void>((resolve, reject) => {
           expect(job).toBeDefined();
-          expect(job.jobId).toBeDefined();
+          expect(job.jobUserId).toBeDefined();
           expect(job.data).toBeDefined();
-          expect(job.data).toEqual(parseInt(job.jobId) + 1);
+          expect(job.data).toEqual(parseInt(job.jobUserId) + 1);
           process.nextTick(() => {
             resolve();
           });
@@ -467,7 +469,7 @@ describe('#Firehose', () => {
       expect(firehose.componentId).toBeDefined();
       service.health.register(firehose);
       firehose.on('done', async (uuid: string, result: Jobs.Result, error?: Crash) => {
-        if (result.jobId === '4') {
+        if (result.jobUserId === '4') {
           expect(service.registry.size).toEqual(4);
           expect(service.registry.errors[0].subject).toEqual('firehose');
           expect(service.registry.errors[0].trace[0]).toContain(
@@ -520,7 +522,7 @@ describe('#Firehose', () => {
           sinks: [new MyTapPlug(), {}],
         });
       }).toThrowError('Sink type not supported');
-    });
+    }, 1000);
     it(`Should emit an error if any of the streams emit an error`, done => {
       const myFirehose = new Firehose('MyFirehose', {
         sources: [new MyFlowPlug()],
@@ -564,12 +566,12 @@ describe('#Firehose', () => {
       service.health.register(firehose);
       firehose.start();
       firehose.on('done', async (uuid: string, result: Jobs.Result, error?: Crash) => {
-        if (result.jobId === '101') {
+        if (result.jobUserId === '101') {
           const checks = service.health.health.checks as Health.API.Checks;
           expect(checks['MySequencePlug:unknownJobsInPostConsume'][0].output?.length).toEqual(100);
           expect(checks['MySequencePlug:unknownJobsInPostConsume'][0].status).toEqual('fail');
         }
-        if (result.jobId === '200') {
+        if (result.jobUserId === '200') {
           const checks = service.health.health.checks as Health.API.Checks;
           expect(checks['MySequencePlug:stream'][0].observedUnit).toEqual('jobs');
           expect(checks['MySequencePlug:stream'][0].componentType).toEqual('stream');
@@ -616,7 +618,7 @@ describe('#Firehose', () => {
       });
       service.health.register(firehose);
       firehose.on('job', job => {
-        if (job.jobId === '8') {
+        if (job.jobUserId === '8') {
           const checks = service.health.health.checks as Health.API.Checks;
           expect(checks['MyWindowPlug:window'][0].observedUnit).toEqual('pending windows jobs');
           expect(checks['MyWindowPlug:window'][0].componentType).toEqual('stream');
@@ -656,7 +658,7 @@ describe('#Firehose', () => {
         statusCounter++;
       });
       firehose.on('done', async (uuid: string, result: Jobs.Result, error?: Crash) => {
-        if (result.jobId === '10') {
+        if (result.jobUserId === '10') {
           let checks = service.health.health.checks as Health.API.Checks;
           expect(checks['MySequencePlug:unknownJobsInPostConsume'][0].output).toBeUndefined();
           expect(checks['MySequencePlug:unknownJobsInPostConsume'][0].status).toEqual('pass');

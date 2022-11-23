@@ -4,7 +4,7 @@
  * Use of this source code is governed by an MIT-style license that can be found in the LICENSE file
  * or at https://opensource.org/licenses/MIT.
  */
-import { Health } from '@mdf.js/core';
+import { Health, Jobs } from '@mdf.js/core';
 import EventEmitter from 'events';
 import { v4 } from 'uuid';
 import {} from '../Engine';
@@ -23,7 +23,7 @@ export class MyWindowPlug extends EventEmitter implements Plugs.Source.Sequence 
   public get checks(): Health.API.Checks {
     return {};
   }
-  public ingestData(size: number): Promise<Plugs.Source.JobObject> {
+  public ingestData(size: number): Promise<Jobs.JobRequest> {
     let count = 0;
     return new Promise((resolve, reject) => {
       if (this.shouldReject) {
@@ -38,7 +38,7 @@ export class MyWindowPlug extends EventEmitter implements Plugs.Source.Sequence 
             this.emit('data', {
               data: this.counter,
               type: 'myType',
-              jobId: this.counter.toString(),
+              jobUserId: this.counter.toString(),
               headers: {
                 'x-my-header': 'my-header-value',
               },
@@ -47,9 +47,11 @@ export class MyWindowPlug extends EventEmitter implements Plugs.Source.Sequence 
             resolve({
               data: this.counter,
               type: 'myType',
-              jobId: this.counter.toString(),
-              headers: {
-                'x-my-header': 'my-header-value',
+              jobUserId: this.counter.toString(),
+              options: {
+                headers: {
+                  'x-my-header': 'my-header-value',
+                },
               },
             });
           }

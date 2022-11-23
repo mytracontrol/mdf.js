@@ -4,7 +4,7 @@
  * Use of this source code is governed by an MIT-style license that can be found in the LICENSE file
  * or at https://opensource.org/licenses/MIT.
  */
-import { Health } from '@mdf.js/core';
+import { Health, Jobs } from '@mdf.js/core';
 import { Crash } from '@mdf.js/crash';
 import EventEmitter from 'events';
 import { v4 } from 'uuid';
@@ -22,7 +22,7 @@ export class MyTapPlug extends EventEmitter implements Plugs.Sink.Tap {
   public get checks(): Health.API.Checks {
     return {};
   }
-  public single(job: Plugs.Sink.JobObject): Promise<void> {
+  public single(job: Jobs.JobObject): Promise<void> {
     return new Promise<void>((resolve, reject) => {
       if (!job) {
         reject(new Crash('Job is required'));

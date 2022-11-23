@@ -82,18 +82,21 @@ export class Sequence<
    * @param jobs - jobs to be pushed to the stream
    */
   private processJobs(
-    jobs:
-      | Plugs.Source.JobObject<Type, Data, CustomHeaders>
-      | Plugs.Source.JobObject<Type, Data, CustomHeaders>[]
+    jobs: Jobs.JobRequest<Type, Data, CustomHeaders> | Jobs.JobRequest<Type, Data, CustomHeaders>[]
   ): void {
     const arrayOfJobs = Array.isArray(jobs) ? jobs : [jobs];
     this.actualWindowSize += arrayOfJobs.length;
     for (const job of arrayOfJobs) {
       this.push(
         this.subscribeJob(
-          new Jobs.JobHandler<Type, Data, CustomHeaders>(job.data, job.jobId, job.type, {
-            headers: job.headers,
-            qos: this.qos,
+          new Jobs.JobHandler<Type, Data, CustomHeaders>({
+            data: job.data,
+            type: job.type,
+            jobUserId: job.jobUserId,
+            options: {
+              headers: job.options?.headers,
+              numberOfHandlers: this.numberOfHandlers,
+            },
           })
         )
       );
@@ -105,16 +108,21 @@ export class Sequence<
    * Process the received jobs
    * @param job - job to be processed
    */
-  private readonly _onJobReceived = (job: Plugs.Source.JobObject<Type, Data, CustomHeaders>) => {
+  private readonly _onJobReceived = (job: Jobs.JobRequest<Type, Data, CustomHeaders>) => {
     this.actualWindowSize++;
     // Stryker disable next-line all
-    this.logger.verbose(`New job from consumer: ${job.jobId}`);
+    this.logger.verbose(`New job from consumer: ${job.jobUserId}`);
     if (
       !this.push(
         this.subscribeJob(
-          new Jobs.JobHandler(job.data, job.jobId, job.type, {
-            headers: job.headers,
-            qos: this.qos,
+          new Jobs.JobHandler<Type, Data, CustomHeaders>({
+            data: job.data,
+            type: job.type,
+            jobUserId: job.jobUserId,
+            options: {
+              headers: job.options?.headers,
+              numberOfHandlers: this.numberOfHandlers,
+            },
           })
         )
       )

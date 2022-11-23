@@ -5,9 +5,8 @@
  * or at https://opensource.org/licenses/MIT.
  */
 
-import { Health } from '@mdf.js/core';
+import { Health, Jobs } from '@mdf.js/core';
 import { EventEmitter } from 'events';
-import { Source } from './Plugs';
 
 export interface WrappableSourcePlug<
   Type extends string = string,
@@ -30,7 +29,7 @@ export interface WrappableSourcePlug<
   ingestData?: (
     size: number
   ) => Promise<
-    Source.JobObject<Type, Data, CustomHeaders> | Source.JobObject<Type, Data, CustomHeaders>[]
+    Jobs.JobRequest<Type, Data, CustomHeaders> | Jobs.JobRequest<Type, Data, CustomHeaders>[]
   >;
   /** Start the Plug and the underlayer resources, making it available */
   start(): Promise<void>;

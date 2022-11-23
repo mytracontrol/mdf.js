@@ -5,8 +5,8 @@
  * or at https://opensource.org/licenses/MIT.
  */
 
+import { Jobs } from '@mdf.js/core';
 import { Base } from './Base.i';
-import { JobObject } from './JobObject.t';
 export interface Sequence<
   Type extends string = string,
   Data = any,
@@ -18,5 +18,7 @@ export interface Sequence<
    */
   ingestData(
     size: number
-  ): Promise<JobObject<Type, Data, CustomHeaders> | JobObject<Type, Data, CustomHeaders>[]>;
+  ): Promise<
+    Jobs.JobRequest<Type, Data, CustomHeaders> | Jobs.JobRequest<Type, Data, CustomHeaders>[]
+  >;
 }

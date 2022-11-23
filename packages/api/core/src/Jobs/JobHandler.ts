@@ -8,7 +8,7 @@ import { Crash, Multi } from '@mdf.js/crash';
 import { EventEmitter } from 'events';
 import { v4, v5 } from 'uuid';
 import { MDF_NAMESPACE_OID } from '../const';
-import { Headers, JobObject, Options, Result, Status } from './types';
+import { JobObject, JobRequest, Options, Result, Status } from './types';
 
 /**
  * JobHandler events
@@ -27,12 +27,18 @@ export class JobHandler<
   extends EventEmitter
   implements JobObject<Type, Data, CustomHeaders>
 {
-  /** Job processing identification */
+  /** Unique job processing identification */
   public readonly uuid: string;
+  /** User job request identifier, defined by the user */
+  public readonly jobUserId: string;
+  /** Unique user job request identification, based on jobUserId */
+  public readonly jobUserUUID: string;
   /** Date object with the timestamp when the job was created */
   public readonly createdAt: Date;
-  /** Job meta information, used to pass specific information for sinks and sources */
-  public readonly headers: Headers<CustomHeaders>;
+  /** Job type, used as selector for strategies in job processors */
+  public readonly type: Type;
+  /** Job meta information, used to pass specific information for job processors */
+  public readonly options?: Options<CustomHeaders>;
   /** Date object with the timestamp when the job was resolved */
   private resolvedAt?: Date;
   /** Job processing status */
@@ -45,45 +51,60 @@ export class JobHandler<
   private pendingDone: number;
   /**
    * Create a new instance of JobHandler
+   * @param jobRequest - job request object
+   */
+  constructor(jobRequest: JobRequest<Type, Data, CustomHeaders>);
+  /**
+   * Create a new instance of JobHandler
+   * @param jobUserId - User job request identifier, defined by the user
    * @param data - Job payload
-   * @param jobId - Job identifier, defined by the user
-   * @param type - Job type, used as selector for strategies
+   * @param type - Job type, used as selector for strategies in job processors
    * @param options - JobHandler options
    */
+  constructor(jobUserId: string, data: Data, type?: Type, options?: Options<CustomHeaders>);
   constructor(
-    data: Data,
-    public readonly jobId: string,
-    public readonly type: Type,
+    jobUserIdOrJobRequest: string | JobRequest<Type, Data, CustomHeaders>,
+    data?: Data,
+    type?: Type,
     options?: Options<CustomHeaders>
   ) {
     super();
-    if (typeof jobId !== 'string') {
+    this.uuid = v4();
+    if (typeof jobUserIdOrJobRequest === 'string') {
+      this.jobUserId = jobUserIdOrJobRequest;
+      this.type = type ?? ('default' as Type);
+      this.options = options;
+      this._data = data as Data;
+    } else if (typeof jobUserIdOrJobRequest === 'object') {
+      this.jobUserId = jobUserIdOrJobRequest.jobUserId;
+      this.type = jobUserIdOrJobRequest.type ?? ('default' as Type);
+      this.options = jobUserIdOrJobRequest.options;
+      this._data = jobUserIdOrJobRequest.data;
+    } else {
       throw new Crash(
-        'Error creating a valid JobHandler, JobId is mandatory and must be a string',
-        v4(),
+        `Error creating a valid JobHandler, the first parameter must be a jobUserId or a JobRequest object`,
+        this.uuid,
         { name: 'ValidationError' }
       );
     }
-    this.uuid = v5(this.jobId, MDF_NAMESPACE_OID);
-    if (data === undefined || data === null) {
+    if (this._data === undefined || this._data === null) {
       throw new Crash('Error creating a valid JobHandler, data is mandatory', this.uuid, {
         name: 'ValidationError',
       });
     }
-    this._data = data;
-    if (typeof type !== 'string') {
+    if (typeof this.type !== 'string') {
       throw new Crash('Error creating a valid JobHandler, type must be a string', this.uuid, {
         name: 'ValidationError',
       });
     }
-    if (options && typeof options !== 'object') {
+    if (this.options && typeof this.options !== 'object') {
       throw new Crash('Error creating a valid JobHandler, options should be a object', v4(), {
         name: 'ValidationError',
       });
     }
+    this.jobUserUUID = v5(this.jobUserId, MDF_NAMESPACE_OID);
     this.createdAt = new Date();
-    this.pendingDone = options?.qos || 1;
-    this.headers = options?.headers || ({} as Headers<CustomHeaders>);
+    this.pendingDone = options?.numberOfHandlers || 1;
   }
   /** Job payload */
   public get data(): Data {
@@ -155,13 +176,14 @@ export class JobHandler<
   /** Return the result of the publication process */
   public result(): Result<Type> {
     return {
-      id: this.uuid,
+      uuid: this.uuid,
       createdAt: this.createdAt.toISOString(),
       resolvedAt: this.resolvedAt?.toISOString() || '',
       quantity: Array.isArray(this._data) ? this._data.length : 1,
       hasErrors: this._errors ? this._errors.size > 0 : false,
       errors: this._errors ? this._errors.toJSON() : undefined,
-      jobId: this.jobId,
+      jobUserId: this.jobUserId,
+      jobUserUUID: this.jobUserUUID,
       type: this.type,
       status: this._status,
     };
@@ -169,11 +191,13 @@ export class JobHandler<
   /** Return an object with the key information of the job, this information is used by the plugs */
   public toObject(): JobObject<Type, Data, CustomHeaders> {
     return {
+      uuid: this.uuid,
       data: this.data,
       type: this.type,
-      jobId: this.jobId,
+      jobUserId: this.jobUserId,
+      jobUserUUID: this.jobUserUUID,
       status: this._status,
-      headers: this.headers,
+      options: this.options,
     };
   }
   /** Update the job status to processing if it is in pending state */

@@ -10,10 +10,10 @@ import { Status } from './Status.t';
 
 /** Job result interface */
 export interface Result<Type extends string = string> {
+  /** Unique job processing identification */
+  uuid: string;
   /** Job type */
   type: Type;
-  /** Publication process job identification */
-  id: string;
   /** Timestamp, in ISO format, of the job creation date */
   createdAt: string;
   /** Timestamp, in ISO format, of the job resolve date */
@@ -24,8 +24,10 @@ export interface Result<Type extends string = string> {
   hasErrors: boolean;
   /** Array of errors */
   errors?: MultiObject;
-  /** Job entry identification */
-  jobId: string;
+  /** User job request identifier, defined by the user */
+  jobUserId: string;
+  /** Unique user job request identification, based on jobUserId */
+  jobUserUUID: string;
   /** Job status */
   status: Status;
 }

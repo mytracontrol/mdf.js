@@ -4,8 +4,8 @@
  * Use of this source code is governed by an MIT-style license that can be found in the LICENSE file
  * or at https://opensource.org/licenses/MIT.
  */
+import { Jobs } from '@mdf.js/core';
 import { Base } from './Base.i';
-import { JobObject } from './JobObject.t';
 
 export interface Jet<
   Type extends string = string,
@@ -16,5 +16,5 @@ export interface Jet<
    * Perform the processing of several Jobs
    * @param jobs - jobs to be processed
    */
-  multi: (jobs: JobObject<Type, Data, CustomHeaders>[]) => Promise<void>;
+  multi: (jobs: Jobs.JobObject<Type, Data, CustomHeaders>[]) => Promise<void>;
 }

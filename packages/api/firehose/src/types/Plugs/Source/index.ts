@@ -5,7 +5,6 @@
  * or at https://opensource.org/licenses/MIT.
  */
 export * from './Flow.i';
-export * from './JobObject.t';
 export * from './Sequence.i';
 
 import { Flow } from './Flow.i';

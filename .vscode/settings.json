@@ -51,7 +51,8 @@
   "conventionalCommits.scopes": [
     "mongo-provider",
     "style",
-    "amqp-provider"
+    "amqp-provider",
+    "jobs"
   ],
 
 }

@@ -26,9 +26,11 @@ export class MyFlowPlug extends EventEmitter implements Plugs.Source.Flow {
           this.emit('data', {
             data: this.counter + 1,
             type: 'myType',
-            jobId: (this.counter + 1).toString(),
-            headers: {
-              'x-my-header': 'my-header-value',
+            jobUserId: (this.counter + 1).toString(),
+            options: {
+              headers: {
+                'x-my-header': 'my-header-value',
+              },
             },
           });
           this.counter = this.counter + 1;

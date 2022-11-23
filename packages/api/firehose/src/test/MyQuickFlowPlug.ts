@@ -25,7 +25,7 @@ export class MyQuickFlowPlug extends EventEmitter implements Plugs.Source.Flow {
       this.emit('data', {
         data: this.counter + 1,
         type: 'myType',
-        jobId: (this.counter + 1).toString(),
+        jobUserId: (this.counter + 1).toString(),
         headers: {
           'x-my-header': 'my-header-value',
         },
