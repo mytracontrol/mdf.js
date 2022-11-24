@@ -26,4 +26,7 @@ export type Sources<
   Type extends string = string,
   Data = any,
   CustomHeaders extends Record<string, any> = Record<string, any>
-> = Source.Flow<Type, Data, CustomHeaders> | Source.Sequence<Type, Data, CustomHeaders>;
+> =
+  | Source.Flow<Type, Data, CustomHeaders>
+  | Source.Sequence<Type, Data, CustomHeaders>
+  | Source.CreditsFlow<Type, Data, CustomHeaders>;

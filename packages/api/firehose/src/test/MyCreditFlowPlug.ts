@@ -10,19 +10,21 @@ import { v4 } from 'uuid';
 import {} from '../Engine';
 import { Plugs } from '../types';
 
-export class MyFlowPlug extends EventEmitter implements Plugs.Source.Flow {
+export class MyCreditsFlowPlug extends EventEmitter implements Plugs.Source.CreditsFlow {
   timeInterval?: NodeJS.Timeout;
   counter = 0;
-  name = 'MyFlowPlug';
+  credits = 0;
+  name = 'MyCreditsFlowPlug';
   componentId = v4();
   founded = true;
-  constructor(public max: number = -1) {
+  constructor() {
     super();
   }
-  public init(): void {
+  public addCredits(credits: number): void {
     if (!this.timeInterval) {
+      this.credits = credits;
       this.timeInterval = setInterval(() => {
-        if (this.max === -1 || this.counter < this.max) {
+        if (credits) {
           this.emit('data', {
             data: this.counter + 1,
             type: 'myType',
@@ -34,14 +36,9 @@ export class MyFlowPlug extends EventEmitter implements Plugs.Source.Flow {
             },
           });
           this.counter = this.counter + 1;
+          this.credits = this.credits - 1;
         }
       }, 20);
-    }
-  }
-  public pause(): void {
-    if (this.timeInterval) {
-      clearInterval(this.timeInterval);
-      this.timeInterval = undefined;
     }
   }
   public postConsume(jobId: string): Promise<string | undefined> {

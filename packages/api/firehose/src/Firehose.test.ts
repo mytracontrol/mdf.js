@@ -12,6 +12,7 @@ import { Observability, ObservabilityOptions } from '@mdf.js/observability';
 import { v4 } from 'uuid';
 import { Firehose, Plugs } from '.';
 import {
+  MyCreditsFlowPlug,
   MyFlowPlug,
   MyJetPlug,
   MyQuickFlowPlug,
@@ -86,6 +87,69 @@ describe('#Firehose', () => {
             'result of last operation'
           );
           expect(checks['MySequencePlug:lastOperation'][0].time).toBeDefined();
+          firehose.close();
+          service.stop().then(() => {
+            if (jobEmitted) {
+              done();
+            } else {
+              done(new Error('Job not emitted'));
+            }
+          });
+        }
+      });
+      firehose.start().then();
+    }, 1000);
+    it('Should create a new Firehose with a CreditFlow Source and a Tap Sink, start it and check is working', done => {
+      const service = new Observability(config);
+      const mySinkPlug = new MyTapPlug();
+      const mySourcePlug = new MyCreditsFlowPlug();
+      const firehose = new Firehose('MyFirehose', {
+        sources: [mySourcePlug],
+        sinks: [mySinkPlug],
+        bufferSize: 2,
+        metricsService: service.metrics,
+        registerService: service.registry,
+      });
+      expect(firehose).toBeDefined();
+      expect(firehose.name).toEqual('MyFirehose');
+      expect(firehose.componentId).toBeDefined();
+      service.health.register(firehose);
+      let jobEmitted = false;
+      firehose.on('job', job => {
+        expect(job).toBeDefined();
+        expect(job.data).toBeDefined();
+        expect(job.type).toBeDefined();
+        expect(job.type).toEqual('myType');
+        expect(job.jobUserId).toBeDefined();
+        expect(job.options).toBeDefined();
+        expect(job.options?.headers).toBeDefined();
+        expect(job.options?.headers).toEqual({ 'x-my-header': 'my-header-value' });
+        jobEmitted = true;
+      });
+      firehose.on('done', async (uuid: string, result: Jobs.Result, error?: Crash) => {
+        if (result.jobUserId === '4') {
+          const metrics = await service.metrics.metrics();
+          expect(metrics).toBeDefined();
+          expect(metrics.metrics).toBeDefined();
+          expect(metrics.metrics).toContain(`api_all_job_processed_total{type="myType"} 4`);
+          expect(metrics.metrics).toContain(`api_all_job_in_processing_total{type="myType"} 0`);
+          expect(service.registry.size).toEqual(0);
+          const checks = service.health.health.checks as Health.API.Checks;
+          expect(checks['MyTapPlug:lastOperation'][0].status).toEqual('pass');
+          expect(checks['MyTapPlug:lastOperation'][0].componentType).toEqual('plug');
+          expect(checks['MyTapPlug:lastOperation'][0].observedValue).toEqual('ok');
+          expect(checks['MyTapPlug:lastOperation'][0].observedUnit).toEqual(
+            'result of last operation'
+          );
+          expect(checks['MyTapPlug:lastOperation'][0].time).toBeDefined();
+
+          expect(checks['MyCreditsFlowPlug:lastOperation'][0].status).toEqual('pass');
+          expect(checks['MyCreditsFlowPlug:lastOperation'][0].componentType).toEqual('plug');
+          expect(checks['MyCreditsFlowPlug:lastOperation'][0].observedValue).toEqual('ok');
+          expect(checks['MyCreditsFlowPlug:lastOperation'][0].observedUnit).toEqual(
+            'result of last operation'
+          );
+          expect(checks['MyCreditsFlowPlug:lastOperation'][0].time).toBeDefined();
           firehose.close();
           service.stop().then(() => {
             if (jobEmitted) {
@@ -589,15 +653,15 @@ describe('#Firehose', () => {
           expect(checks['MyJetPlug:stream'][0].status).toEqual('pass');
           expect(checks['MyJetPlug:stream'][0].observedValue).toEqual('0/200');
 
-          expect(checks['MyFirehose:stream'][0].observedUnit).toEqual('writable jobs');
-          expect(checks['MyFirehose:stream'][0].componentType).toEqual('stream');
-          expect(checks['MyFirehose:stream'][0].status).toEqual('pass');
-          expect(checks['MyFirehose:stream'][0].observedValue).toEqual('0/200');
+          expect(checks['engine:stream'][0].observedUnit).toEqual('writable jobs');
+          expect(checks['engine:stream'][0].componentType).toEqual('stream');
+          expect(checks['engine:stream'][0].status).toEqual('pass');
+          expect(checks['engine:stream'][0].observedValue).toEqual('0/200');
 
-          expect(checks['MyFirehose:stream'][1].observedUnit).toEqual('readable jobs');
-          expect(checks['MyFirehose:stream'][1].componentType).toEqual('stream');
-          expect(checks['MyFirehose:stream'][1].status).toEqual('pass');
-          expect(checks['MyFirehose:stream'][1].observedValue).toEqual('0/200');
+          expect(checks['engine:stream'][1].observedUnit).toEqual('readable jobs');
+          expect(checks['engine:stream'][1].componentType).toEqual('stream');
+          expect(checks['engine:stream'][1].status).toEqual('pass');
+          expect(checks['engine:stream'][1].observedValue).toEqual('0/200');
           firehose.close();
           service.stop().then(done);
         }

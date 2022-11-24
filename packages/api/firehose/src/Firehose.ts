@@ -139,6 +139,16 @@ export class Firehose<
             logger: this.options.logger,
           })
         );
+      } else if (this.isCreditsFlowSource(source)) {
+        sourceStreams.push(
+          new Source.CreditsFlow<Type, Data, CustomHeaders>(source, {
+            retryOptions: this.options.retryOptions,
+            qos,
+            readableOptions: { highWaterMark: this.options.bufferSize },
+            postConsumeOptions: this.options.postConsumeOptions,
+            logger: this.options.logger,
+          })
+        );
       } else {
         throw new Crash(`Source type not supported`, this.componentId);
       }
@@ -185,7 +195,12 @@ export class Firehose<
   private isFlowSource(
     source: WrappableSourcePlug<Type, Data, CustomHeaders>
   ): source is Plugs.Source.Flow<Type, Data, CustomHeaders> {
-    return typeof source.postConsume === 'function' && typeof source.ingestData === 'undefined';
+    return (
+      typeof source.postConsume === 'function' &&
+      typeof source.ingestData === 'undefined' &&
+      typeof source.init === 'function' &&
+      typeof source.pause === 'function'
+    );
   }
   /**
    * Check if a source is a valid Sequence Source
@@ -196,6 +211,16 @@ export class Firehose<
     source: WrappableSourcePlug<Type, Data, CustomHeaders>
   ): source is Plugs.Source.Sequence<Type, Data, CustomHeaders> {
     return typeof source.postConsume === 'function' && typeof source.ingestData === 'function';
+  }
+  /**
+   * Check if a source is a valid Credit Flow Source
+   * @param source - source to be checked
+   * @returns
+   */
+  private isCreditsFlowSource(
+    source: WrappableSourcePlug<Type, Data, CustomHeaders>
+  ): source is Plugs.Source.CreditsFlow<Type, Data, CustomHeaders> {
+    return typeof source.postConsume === 'function' && typeof source.addCredits === 'function';
   }
   /**
    * Check if a sink is a valid Tap Sink

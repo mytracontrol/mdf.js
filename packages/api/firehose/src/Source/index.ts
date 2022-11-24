@@ -6,5 +6,6 @@
  */
 
 export { PlugWrapper } from './core';
+export * from './CreditsFlow';
 export * from './Flow';
 export * from './Sequence';

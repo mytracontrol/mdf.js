@@ -5,6 +5,7 @@
  * or at https://opensource.org/licenses/MIT.
  */
 
+export * from './MyCreditFlowPlug';
 export * from './MyFlowPlug';
 export * from './MyJetPlug';
 export * from './MyQuickFlowPlug';

@@ -136,7 +136,7 @@ export class Engine<
    */
   public get checks(): Health.API.Checks {
     return {
-      [`${this.name}:stream`]: [
+      [`engine:stream`]: [
         {
           status: this.ownStatus,
           componentId: this.componentId,

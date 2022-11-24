@@ -31,8 +31,17 @@ export interface WrappableSourcePlug<
   ) => Promise<
     Jobs.JobRequest<Type, Data, CustomHeaders> | Jobs.JobRequest<Type, Data, CustomHeaders>[]
   >;
+  /**
+   * Add new credits to the source
+   * @param credits - Credits to be added to the source
+   */
+  addCredits?: (credits: number) => void;
+  /** Enable consuming process */
+  init?: () => void;
+  /** Stop consuming process */
+  pause?: () => void;
   /** Start the Plug and the underlayer resources, making it available */
-  start(): Promise<void>;
+  start: () => Promise<void>;
   /** Stop the Plug and the underlayer resources, making it unavailable */
-  stop(): Promise<void>;
+  stop: () => Promise<void>;
 }
