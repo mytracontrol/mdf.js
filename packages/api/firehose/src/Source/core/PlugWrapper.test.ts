@@ -10,7 +10,7 @@ import { PlugWrapper } from './PlugWrapper';
 
 describe('#Source #PlugWrapper', () => {
   describe('#Happy path', () => {
-    it('Should wrap a postConsume/ingestData start/stop operation', async () => {
+    it('Should wrap a postConsume/ingestData/addCredits/start/stop operations', async () => {
       //@ts-ignore - Test environment
       const wrapper = new PlugWrapper({
         //@ts-ignore - Test environment
@@ -19,6 +19,9 @@ describe('#Source #PlugWrapper', () => {
         },
         //@ts-ignore - Test environment
         ingestData: () => {
+          return Promise.resolve();
+        },
+        addCredits: () => {
           return Promise.resolve();
         },
         start: () => {
@@ -32,6 +35,8 @@ describe('#Source #PlugWrapper', () => {
       expect(wrapper.postConsume()).resolves.toEqual(undefined);
       //@ts-ignore - Test environment
       expect(wrapper.ingestData()).resolves.toEqual(undefined);
+      //@ts-ignore - Test environment
+      expect(wrapper.addCredits()).resolves.toEqual(undefined);
       //@ts-ignore - Test environment
       expect(wrapper.start()).resolves.toEqual(undefined);
       //@ts-ignore - Test environment
@@ -76,12 +81,24 @@ describe('#Source #PlugWrapper', () => {
     it('Should throw an error if the plug does not implement the ingestData method properly', () => {
       try {
         //@ts-ignore - Test environment
-        new PlugWrapper({ postConsume: () => {}, ingestData: 3 });
+        new PlugWrapper({ postConsume: () => {}, start: () => {}, stop: () => {}, ingestData: 3 });
         throw new Error(`Should throw an error`);
       } catch (error) {
         expect(error).toBeInstanceOf(Crash);
         expect((error as Crash).message).toBe(
           'Plug undefined does not implement the ingestData method properly'
+        );
+      }
+    });
+    it('Should throw an error if the plug does not implement the addCredits method properly', () => {
+      try {
+        //@ts-ignore - Test environment
+        new PlugWrapper({ postConsume: () => {}, start: () => {}, stop: () => {}, addCredits: 3 });
+        throw new Error(`Should throw an error`);
+      } catch (error) {
+        expect(error).toBeInstanceOf(Crash);
+        expect((error as Crash).message).toBe(
+          'Plug undefined does not implement the addCredits method properly'
         );
       }
     });
@@ -107,7 +124,7 @@ describe('#Source #PlugWrapper', () => {
       } catch (error) {
         expect(error).toBeInstanceOf(Crash);
         expect((error as Crash).message).toBe(
-          'Plug myPlug not implement the start method properly'
+          'Plug myPlug does not implement the start method properly'
         );
       }
     });
@@ -132,7 +149,9 @@ describe('#Source #PlugWrapper', () => {
         throw new Error(`Should throw an error`);
       } catch (error) {
         expect(error).toBeInstanceOf(Crash);
-        expect((error as Crash).message).toBe('Plug myPlug not implement the stop method properly');
+        expect((error as Crash).message).toBe(
+          'Plug myPlug does not implement the stop method properly'
+        );
       }
     });
     it('Should throw an error if try to call ingestData method and this not exist', async () => {
@@ -146,6 +165,19 @@ describe('#Source #PlugWrapper', () => {
       //@ts-ignore - Test environment
       await expect(wrapper.ingestData()).rejects.toThrow(
         'Plug myPlug does not implement the ingestData method'
+      );
+    });
+    it('Should throw an error if try to call addCredits method and this not exist', async () => {
+      const wrapper = new PlugWrapper({
+        name: 'myPlug',
+        //@ts-ignore - Test environment
+        postConsume: () => Promise.resolve(),
+        start: () => Promise.resolve(),
+        stop: () => Promise.resolve(),
+      });
+      //@ts-ignore - Test environment
+      await expect(wrapper.addCredits()).rejects.toThrow(
+        'Plug myPlug does not implement the addCredits method'
       );
     });
   });

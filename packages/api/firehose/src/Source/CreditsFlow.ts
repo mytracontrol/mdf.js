@@ -25,7 +25,10 @@ export class CreditsFlow<
   }
   /** Perform the read of data from the source */
   _read(size: number): void {
-    this.plug.addCredits(size);
+    this.plug.addCredits(size).then(() => {
+      // Stryker disable next-line all
+      this.logger.verbose(`${size} credits has been added`);
+    });
   }
   /**
    * Process the received jobs

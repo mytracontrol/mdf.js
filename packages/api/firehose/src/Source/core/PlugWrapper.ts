@@ -40,11 +40,13 @@ export class PlugWrapper<
   /** Plug post consume operation original */
   private readonly postConsumeOriginal: (jobId: string) => Promise<string | undefined>;
   /** Plug ingest data operation */
-  private readonly ingestDataOriginal?: (
+  private ingestDataOriginal?: (
     size: number
   ) => Promise<
     Jobs.JobRequest<Type, Data, CustomHeaders> | Jobs.JobRequest<Type, Data, CustomHeaders>[]
   >;
+  /** Plug ingest addCredits operation */
+  private addCreditsOriginal?: (size: number) => Promise<void>;
   /** Plug start operation original */
   private readonly startOriginal: () => Promise<void>;
   /** Plug stop operation original */
@@ -79,6 +81,23 @@ export class PlugWrapper<
       this.postConsumeOriginal = this.plug.postConsume;
       this.plug.postConsume = this.postConsume;
     }
+
+    if (typeof this.plug.start !== 'function') {
+      throw new Crash(`Plug ${this.plug.name} does not implement the start method properly`);
+    } else {
+      this.startOriginal = this.plug.start;
+      this.plug.start = this.start;
+    }
+    if (typeof this.plug.stop !== 'function') {
+      throw new Crash(`Plug ${this.plug.name} does not implement the stop method properly`);
+    } else {
+      this.stopOriginal = this.plug.stop;
+      this.plug.stop = this.stop;
+    }
+    this.checkConditionalMethods();
+  }
+  /** Check conditional methods  */
+  private checkConditionalMethods() {
     if (this.plug.ingestData) {
       if (typeof this.plug.ingestData !== 'function') {
         throw new Crash(`Plug ${this.plug.name} does not implement the ingestData method properly`);
@@ -87,19 +106,16 @@ export class PlugWrapper<
         this.plug.ingestData = this.ingestData;
       }
     }
-    if (typeof this.plug.start !== 'function') {
-      throw new Crash(`Plug ${this.plug.name} not implement the start method properly`);
-    } else {
-      this.startOriginal = this.plug.start;
-      this.plug.start = this.start;
-    }
-    if (typeof this.plug.stop !== 'function') {
-      throw new Crash(`Plug ${this.plug.name} not implement the stop method properly`);
-    } else {
-      this.stopOriginal = this.plug.stop;
-      this.plug.stop = this.stop;
+    if (this.plug.addCredits) {
+      if (typeof this.plug.addCredits !== 'function') {
+        throw new Crash(`Plug ${this.plug.name} does not implement the addCredits method properly`);
+      } else {
+        this.addCreditsOriginal = this.plug.addCredits;
+        this.plug.addCredits = this.addCredits;
+      }
     }
   }
+
   /**
    * Establish the uncleaned entries in list check internal
    * @param interval - Define the interval to check if there are pending jobs
@@ -237,6 +253,16 @@ export class PlugWrapper<
     // Ingest data operation is retried infinitely using the default values, in other way the normal
     // ingestion process will be blocked
     return this.wrappedOperation(this.ingestDataOriginal, [size]);
+  };
+  /**
+   * Add new credits to the source
+   * @param credits - Credits to be added to the source
+   */
+  private readonly addCredits = async (credits: number): Promise<void> => {
+    if (!this.addCreditsOriginal) {
+      throw new Crash(`Plug ${this.plug.name} does not implement the addCredits method`);
+    }
+    await this.wrappedOperation(this.addCreditsOriginal, [credits]);
   };
   /** Start the Plug and the underlayer resources, making it available */
   private readonly start = async (): Promise<void> => {

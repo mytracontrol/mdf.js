@@ -35,7 +35,7 @@ export interface WrappableSourcePlug<
    * Add new credits to the source
    * @param credits - Credits to be added to the source
    */
-  addCredits?: (credits: number) => void;
+  addCredits?: (credits: number) => Promise<void>;
   /** Enable consuming process */
   init?: () => void;
   /** Stop consuming process */

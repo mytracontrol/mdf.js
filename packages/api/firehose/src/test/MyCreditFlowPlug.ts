@@ -20,7 +20,7 @@ export class MyCreditsFlowPlug extends EventEmitter implements Plugs.Source.Cred
   constructor() {
     super();
   }
-  public addCredits(credits: number): void {
+  public addCredits(credits: number): Promise<void> {
     if (!this.timeInterval) {
       this.credits = credits;
       this.timeInterval = setInterval(() => {
@@ -40,6 +40,7 @@ export class MyCreditsFlowPlug extends EventEmitter implements Plugs.Source.Cred
         }
       }, 20);
     }
+    return Promise.resolve();
   }
   public postConsume(jobId: string): Promise<string | undefined> {
     return Promise.resolve(this.founded ? jobId : undefined);
