@@ -42,9 +42,9 @@ describe('#Observability #Service', () => {
       //@ts-ignore - private property
       expect(service.services.length).toBe(3);
       expect(service).toBeDefined();
-      expect(service.health).toBeDefined();
-      expect(service.metrics).toBeDefined();
-      expect(service.register).toBeDefined();
+      expect(service.healthRegistry).toBeDefined();
+      expect(service.metricsRegistry).toBeDefined();
+      expect(service.registerService).toBeDefined();
       await service.stop();
       await service.start();
       await service.start();
@@ -67,9 +67,9 @@ describe('#Observability #Service', () => {
       //@ts-ignore - private property
       expect(service.services.length).toBe(3);
       expect(service).toBeDefined();
-      expect(service.health).toBeDefined();
-      expect(service.metrics).toBeDefined();
-      expect(service.register).toBeDefined();
+      expect(service.healthRegistry).toBeDefined();
+      expect(service.metricsRegistry).toBeDefined();
+      expect(service.registerService).toBeDefined();
       service
         .start()
         .then(() =>
@@ -110,9 +110,9 @@ describe('#Observability #Service', () => {
       };
       const service = new Observability(config);
       expect(service).toBeDefined();
-      expect(service.health).toBeDefined();
-      expect(service.metrics).toBeDefined();
-      expect(service.register).toBeDefined();
+      expect(service.healthRegistry).toBeDefined();
+      expect(service.metricsRegistry).toBeDefined();
+      expect(service.registerService).toBeDefined();
       undoMocks();
     }, 300);
     it(`Should create an instance of observability service in CLUSTER MODE as MASTER`, async () => {
@@ -130,9 +130,9 @@ describe('#Observability #Service', () => {
       };
       const service = new Observability(config);
       expect(service).toBeDefined();
-      expect(service.health).toBeDefined();
-      expect(service.metrics).toBeDefined();
-      expect(service.register).toBeDefined();
+      expect(service.healthRegistry).toBeDefined();
+      expect(service.metricsRegistry).toBeDefined();
+      expect(service.registerService).toBeDefined();
       undoMocks();
     }, 300);
     it(`Should create an instance of observability service in NO CLUSTER MODE with too much low port`, async () => {
@@ -147,9 +147,9 @@ describe('#Observability #Service', () => {
       };
       const service = new Observability(config);
       expect(service).toBeDefined();
-      expect(service.health).toBeDefined();
-      expect(service.metrics).toBeDefined();
-      expect(service.register).toBeDefined();
+      expect(service.healthRegistry).toBeDefined();
+      expect(service.metricsRegistry).toBeDefined();
+      expect(service.registerService).toBeDefined();
       await service.stop();
       await service.start();
       await service.start();
@@ -167,9 +167,9 @@ describe('#Observability #Service', () => {
       };
       const service = new Observability(config);
       expect(service).toBeDefined();
-      expect(service.health).toBeDefined();
-      expect(service.metrics).toBeDefined();
-      expect(service.register).toBeDefined();
+      expect(service.healthRegistry).toBeDefined();
+      expect(service.metricsRegistry).toBeDefined();
+      expect(service.registerService).toBeDefined();
       await service.stop();
       await service.start();
       await service.start();
@@ -186,12 +186,12 @@ describe('#Observability #Service', () => {
       };
       const service = new Observability(config);
       expect(service).toBeDefined();
-      expect(service.health).toBeDefined();
-      expect(service.metrics).toBeDefined();
-      expect(service.registry).toBeDefined();
-      expect(service.registry.size).toBe(0);
-      service.health.emit('error', new Error('Test error'));
-      expect(service.registry.size).toBe(1);
+      expect(service.healthRegistry).toBeDefined();
+      expect(service.metricsRegistry).toBeDefined();
+      expect(service.errorsRegistry).toBeDefined();
+      expect(service.errorsRegistry.size).toBe(0);
+      service.healthRegistry.emit('error', new Error('Test error'));
+      expect(service.errorsRegistry.size).toBe(1);
     }, 300);
     it(`Should register a service in the registry`, async () => {
       const config: ObservabilityOptions = {
@@ -204,14 +204,14 @@ describe('#Observability #Service', () => {
       };
       const service = new Observability(config);
       expect(service).toBeDefined();
-      expect(service.health).toBeDefined();
-      expect(service.metrics).toBeDefined();
-      expect(service.registry).toBeDefined();
-      expect(service.registry.size).toBe(0);
+      expect(service.healthRegistry).toBeDefined();
+      expect(service.metricsRegistry).toBeDefined();
+      expect(service.errorsRegistry).toBeDefined();
+      expect(service.errorsRegistry.size).toBe(0);
       const myService = new MyService();
       //@ts-ignore - private property
       expect(service.services.length).toBe(3);
-      service.register(myService);
+      service.registerService(myService);
       //@ts-ignore - private property
       expect(service.services.length).toBe(4);
       await service.stop();

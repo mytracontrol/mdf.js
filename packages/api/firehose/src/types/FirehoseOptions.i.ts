@@ -29,10 +29,10 @@ export interface FirehoseOptions<
   postConsumeOptions?: PostConsumeOptions;
   /** Buffer sizes */
   bufferSize?: number;
-  /** Metrics service */
-  metricsService?: MetricsService;
-  /** Register service */
-  registerService?: RegisterService;
+  /** Metrics registry service */
+  metricsRegistry?: MetricsService;
+  /** Error registry service */
+  errorsRegistry?: RegisterService;
   /** Define the number of sinks that must confirm a job, default options is all of them */
   atLeastOne?: boolean;
   /** Logger instance for deep debugging tasks */

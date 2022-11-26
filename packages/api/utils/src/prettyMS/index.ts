@@ -5,12 +5,4 @@
  * or at https://opensource.org/licenses/MIT.
  */
 
-export * from './coerce';
-export * from './escape';
-export * from './findNodeModule';
-export * from './formatEnv';
-export * from './health';
-export * from './loadFile';
-export * from './mocks';
 export * from './prettyMS';
-export * from './retry';

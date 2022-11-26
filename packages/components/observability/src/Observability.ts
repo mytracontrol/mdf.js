@@ -32,11 +32,11 @@ export class Observability {
   /** Services offered under observability instance */
   private readonly services: Health.Service[];
   /** Error registry service */
-  public readonly registry: RegisterService;
+  public readonly errorsRegistry: RegisterService;
   /** Metrics service */
-  public readonly metrics: MetricsService;
+  public readonly metricsRegistry: MetricsService;
   /** Health service */
-  public readonly health: HealthService;
+  public readonly healthRegistry: HealthService;
   /** Services router */
   public router: express.Router;
   /**
@@ -44,11 +44,11 @@ export class Observability {
    * @param options - observability options
    */
   constructor(public readonly options: ObservabilityOptions) {
-    this.health = HealthService.create(options, options.isCluster);
-    this.metrics = MetricsService.create(options.isCluster);
-    this.registry = RegisterService.create(options.maxSize, options.isCluster);
-    this.services = [this.health, this.metrics, this.registry];
-    this.health.on('error', this.onErrorEvent);
+    this.healthRegistry = HealthService.create(options, options.isCluster);
+    this.metricsRegistry = MetricsService.create(options.isCluster);
+    this.errorsRegistry = RegisterService.create(options.maxSize, options.isCluster);
+    this.services = [this.healthRegistry, this.metricsRegistry, this.errorsRegistry];
+    this.healthRegistry.on('error', this.onErrorEvent);
     this.router = express.Router();
     this.app = !this.options.isCluster || cluster.isPrimary ? this.primaryApp() : this.workerApp();
   }
@@ -56,55 +56,8 @@ export class Observability {
    * Register a new service in the observability
    * @param service - service to register
    */
-  register(service: Health.Service): void {
+  public registerService(service: Health.Service): void {
     this.services.push(service);
-  }
-  /**
-   * Error event handler
-   * @param error - error to be registered
-   */
-  private readonly onErrorEvent = (error: Crash | Multi) => {
-    this.registry.push(error);
-  };
-  /** Create an express app that offer all the services routes */
-  private primaryApp(): Express {
-    const app = express();
-    app.use(Middleware.RequestId.handler());
-    app.use(Middleware.BodyParser.JSONParserHandler());
-    app.use(Middleware.Metrics.handler(this.metrics));
-    app.use(
-      `/v${this.options.version}`,
-      (request: Request, response: Response, next: NextFunction) => {
-        this.router(request, response, next);
-      }
-    );
-    app.use(Middleware.ErrorHandler.handler());
-    return app;
-  }
-  /** Create an express app that redirect all the request to the master */
-  private workerApp(): Express {
-    const app = express();
-    app.use(
-      '/',
-      createProxyMiddleware({
-        router: (request: Request) => {
-          return `${request.protocol}://${request.hostname}:${this.getPrimaryPort()}`;
-        },
-        changeOrigin: false,
-        logLevel: 'error',
-      })
-    );
-    return app;
-  }
-  /** Define the port used offer the api */
-  private getPrimaryPort(): number | undefined {
-    if (CONFIG_OBSERVABILITY_MASTER_PORT) {
-      return CONFIG_OBSERVABILITY_MASTER_PORT;
-    }
-    let primaryPort = this.options.port ? this.options.port : DEFAULT_PRIMARY_PORT;
-    primaryPort = primaryPort > 1024 ? primaryPort : DEFAULT_PRIMARY_PORT;
-    primaryPort = primaryPort <= 65535 ? primaryPort : DEFAULT_PRIMARY_PORT;
-    return primaryPort;
   }
   /** Start the observability service */
   public async start(): Promise<void> {
@@ -148,6 +101,53 @@ export class Observability {
         await service.stop.call(service);
       }
     }
+  }
+  /**
+   * Error event handler
+   * @param error - error to be registered
+   */
+  private readonly onErrorEvent = (error: Crash | Multi) => {
+    this.errorsRegistry.push(error);
+  };
+  /** Create an express app that offer all the services routes */
+  private primaryApp(): Express {
+    const app = express();
+    app.use(Middleware.RequestId.handler());
+    app.use(Middleware.BodyParser.JSONParserHandler());
+    app.use(Middleware.Metrics.handler(this.metricsRegistry));
+    app.use(
+      `/v${this.options.version}`,
+      (request: Request, response: Response, next: NextFunction) => {
+        this.router(request, response, next);
+      }
+    );
+    app.use(Middleware.ErrorHandler.handler());
+    return app;
+  }
+  /** Create an express app that redirect all the request to the master */
+  private workerApp(): Express {
+    const app = express();
+    app.use(
+      '/',
+      createProxyMiddleware({
+        router: (request: Request) => {
+          return `${request.protocol}://${request.hostname}:${this.getPrimaryPort()}`;
+        },
+        changeOrigin: false,
+        logLevel: 'error',
+      })
+    );
+    return app;
+  }
+  /** Define the port used offer the api */
+  private getPrimaryPort(): number | undefined {
+    if (CONFIG_OBSERVABILITY_MASTER_PORT) {
+      return CONFIG_OBSERVABILITY_MASTER_PORT;
+    }
+    let primaryPort = this.options.port ? this.options.port : DEFAULT_PRIMARY_PORT;
+    primaryPort = primaryPort > 1024 ? primaryPort : DEFAULT_PRIMARY_PORT;
+    primaryPort = primaryPort <= 65535 ? primaryPort : DEFAULT_PRIMARY_PORT;
+    return primaryPort;
   }
   /**
    * Format the links to be used in the default handler

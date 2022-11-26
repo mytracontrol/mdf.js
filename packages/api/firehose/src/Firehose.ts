@@ -97,13 +97,13 @@ export class Firehose<
       transformOptions: { highWaterMark: this.options.bufferSize },
       logger: this.options.logger,
     });
-    if (this.options.metricsService) {
-      this.metricsHandler = MetricsHandler.enroll(this.options.metricsService);
+    if (this.options.metricsRegistry) {
+      this.metricsHandler = MetricsHandler.enroll(this.options.metricsRegistry);
       for (const source of this.sources) {
         this.metricsHandler.register(source);
       }
     }
-    this.errorRegisterHandler = this.options.registerService;
+    this.errorRegisterHandler = this.options.errorsRegistry;
     this.stopping = false;
   }
   /**
@@ -152,6 +152,7 @@ export class Firehose<
       } else {
         throw new Crash(`Source type not supported`, this.componentId);
       }
+      source.on('error', this.onErrorEvent);
     }
     return sourceStreams;
   }
@@ -184,6 +185,7 @@ export class Firehose<
       } else {
         throw new Crash(`Sink type not supported`, this.componentId);
       }
+      sink.on('error', this.onErrorEvent);
     }
     return sinkStreams;
   }
@@ -242,11 +244,16 @@ export class Firehose<
   ): sink is Plugs.Sink.Jet<Type, Data, CustomHeaders> {
     return typeof sink.multi === 'function' && typeof sink.single === 'function';
   }
-  /** Sink/Source/Engine error event handler */
+  /** Sink/Source/Engine/Plug error event handler */
   private readonly onErrorEvent = (error: Error | Crash) => {
     // Stryker disable next-line all
     this.logger.error(`${error.message}`);
-    this.emit('error', error);
+    if (this.errorRegisterHandler) {
+      this.errorRegisterHandler.push(Crash.from(error));
+    }
+    if (this.listenerCount('error') > 0) {
+      this.emit('error', error);
+    }
   };
   /** Sink/Source/Engine error event handler */
   private readonly onStatusEvent = (status: Health.API.Status) => {
@@ -331,12 +338,12 @@ export class Firehose<
   public async start(): Promise<void> {
     this.wrappingEvents();
     for (const sink of this.sinks) {
-      this.engine.pipe(sink);
       await sink.start();
+      this.engine.pipe(sink);
     }
     for (const source of this.sources) {
-      source.pipe(this.engine);
       await source.start();
+      source.pipe(this.engine);
     }
   }
   /** Perform the unpipe of all the streams */
@@ -344,12 +351,12 @@ export class Firehose<
     this.stopping = true;
     this.unWrappingEvents();
     for (const sink of this.sinks) {
-      this.engine.unpipe(sink);
       await sink.stop();
+      this.engine.unpipe(sink);
     }
     for (const source of this.sources) {
-      source.unpipe(this.engine);
       await source.stop();
+      source.unpipe(this.engine);
     }
   }
   /** Stop and close all the streams */

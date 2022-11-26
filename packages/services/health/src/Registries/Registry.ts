@@ -7,6 +7,7 @@
 
 import { Health } from '@mdf.js/core';
 import { DebugLogger, LoggerInstance } from '@mdf.js/logger';
+import { prettyMS } from '@mdf.js/utils';
 import { merge } from 'lodash';
 import { v4 } from 'uuid';
 import { ServiceMetadata } from '../types';
@@ -82,7 +83,7 @@ export abstract class Registry {
         {
           componentId: this.componentId,
           componentType: 'system',
-          observedValue: process.uptime(),
+          observedValue: prettyMS(process.uptime()),
           observedUnit: 'time',
           status: 'pass' as Health.API.Status,
           time: new Date().toISOString(),
