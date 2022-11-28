@@ -63,7 +63,7 @@ export abstract class Base<
   /** Flag to indicate that an unhealthy status has been emitted recently */
   private lastStatusEmitted?: Health.API.Status;
   /** Wrapped source plug */
-  private readonly plugWrapper: PlugWrapper<Type, Data, CustomHeaders>;
+  public readonly plugWrapper: PlugWrapper<Type, Data, CustomHeaders>;
   /**
    * Indicates the number of handlers that must be successfully processed to consider the job as
    * successfully processed

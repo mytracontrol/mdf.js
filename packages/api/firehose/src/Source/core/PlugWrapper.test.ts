@@ -13,6 +13,8 @@ describe('#Source #PlugWrapper', () => {
     it('Should wrap a postConsume/ingestData/addCredits/start/stop operations', async () => {
       //@ts-ignore - Test environment
       const wrapper = new PlugWrapper({
+        name: 'test',
+        componentId: 'test',
         //@ts-ignore - Test environment
         postConsume: () => {
           return Promise.resolve();
@@ -31,6 +33,9 @@ describe('#Source #PlugWrapper', () => {
           return Promise.resolve();
         },
       });
+      expect(wrapper).toBeDefined();
+      expect(wrapper.name).toBe('test');
+      expect(wrapper.componentId).toBe('test');
       //@ts-ignore - Test environment
       expect(wrapper.postConsume()).resolves.toEqual(undefined);
       //@ts-ignore - Test environment

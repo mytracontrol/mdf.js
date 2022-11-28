@@ -175,8 +175,9 @@ describe('#Port #Redis', () => {
         expect(port.client.listenerCount('connect')).toEqual(0);
         done();
       });
-      port.start().then();
-      expect(port.client.listenerCount('connect')).toEqual(1);
+      port.start().then(() => {
+        expect(port.client.listenerCount('connect')).toEqual(1);
+      });
     }, 300);
     it('Should perform the event wrapping properly for "error" on ReplyError', done => {
       const port = new Port(DEFAULT_CONFIG, new FakeLogger() as LoggerInstance);
@@ -188,8 +189,9 @@ describe('#Port #Redis', () => {
         expect(error.message).toEqual('myError');
         done();
       });
-      port.start().then();
-      port.client.emit('error', new ReplyError('myError'));
+      port.start().then(() => {
+        port.client.emit('error', new ReplyError('myError'));
+      });
     }, 300);
     it('Should perform the event wrapping properly for "error" on Crash', done => {
       const port = new Port(DEFAULT_CONFIG, new FakeLogger() as LoggerInstance);
@@ -201,8 +203,9 @@ describe('#Port #Redis', () => {
         expect(error.message).toEqual('myError');
         done();
       });
-      port.start().then();
-      port.client.emit('error', new Crash('myError'));
+      port.start().then(() => {
+        port.client.emit('error', new Crash('myError'));
+      });
     }, 300);
     it('Should perform the event wrapping properly for "end"', done => {
       const port = new Port(DEFAULT_CONFIG, new FakeLogger() as LoggerInstance);
@@ -211,11 +214,24 @@ describe('#Port #Redis', () => {
       jest.spyOn(port.client, 'quit').mockResolvedValue('OK');
       jest.spyOn(port.client, 'info').mockResolvedValue(memory);
       port.on('closed', error => {
-        expect(error?.message).toEqual('The connection was closed unexpectedly');
+        expect(error?.message).toEqual('The connection was closed intentionally');
         done();
       });
-      port.start().then();
-      port.client.emit('end');
+      port.start().then(() => {
+        port.client.emit('end');
+      });
+    }, 300);
+    it('Should resolve if try to connect when the instance is already connected', async () => {
+      const port = new Port(DEFAULT_CONFIG, new FakeLogger() as LoggerInstance);
+      expect(port).toBeDefined();
+      const mock = jest.spyOn(port.client, 'connect').mockResolvedValue();
+      jest.spyOn(port.client, 'info').mockResolvedValue('OK');
+      jest.spyOn(port.client, 'quit').mockResolvedValue('OK');
+      jest.spyOn(port.client, 'info').mockResolvedValue(memory);
+      await port.start();
+      await port.start();
+      await port.close();
+      expect(mock).toHaveBeenCalledTimes(1);
     }, 300);
   });
   describe('#Sad path', () => {
@@ -223,38 +239,6 @@ describe('#Port #Redis', () => {
       jest.clearAllMocks();
       undoMocks();
     });
-    it('Should rejects if try to connect when the instance is already "ready", "connecting", "reconnecting"', async () => {
-      const port = new Port(DEFAULT_CONFIG, new FakeLogger() as LoggerInstance);
-      expect(port).toBeDefined();
-      //@ts-ignore - Test environment
-      mockProperty(port.client, 'status', 'ready');
-      try {
-        await port.start();
-      } catch (rawError: any) {
-        expect(rawError.message).toEqual('The instance is already connected or connecting: ready');
-        undoMocks();
-      }
-      //@ts-ignore - Test environment
-      mockProperty(port.client, 'status', 'connecting');
-      try {
-        await port.start();
-      } catch (rawError: any) {
-        expect(rawError.message).toEqual(
-          'The instance is already connected or connecting: connecting'
-        );
-        undoMocks();
-      }
-      //@ts-ignore - Test environment
-      mockProperty(port.client, 'status', 'reconnecting');
-      try {
-        await port.start();
-      } catch (rawError: any) {
-        expect(rawError.message).toEqual(
-          'The instance is already connected or connecting: reconnecting'
-        );
-        undoMocks();
-      }
-    }, 300);
     it('Should rejects if try to connect and the methods rejects', async () => {
       const port = new Port(DEFAULT_CONFIG, new FakeLogger() as LoggerInstance);
       expect(port).toBeDefined();
@@ -279,6 +263,8 @@ describe('#Port #Redis', () => {
     it('Should rejects if try to disconnect and the methods rejects', async () => {
       const port = new Port(DEFAULT_CONFIG, new FakeLogger() as LoggerInstance);
       expect(port).toBeDefined();
+      //@ts-ignore - Test environment
+      mockProperty(port, 'connected', true);
       jest.spyOn(port.client, 'quit').mockRejectedValue(new Error('myError'));
       try {
         await port.stop();
@@ -351,8 +337,9 @@ describe('#Port #Redis', () => {
         port.close().then();
         done();
       });
-      port.start().then();
-      expect(port.client.listenerCount('connect')).toEqual(1);
+      port.start().then(() => {
+        expect(port.client.listenerCount('connect')).toEqual(1);
+      });
     }, 300);
     it('Should emit unhealthy event if there is a problem parsing the results', done => {
       const port = new Port(DEFAULT_CONFIG, new FakeLogger() as LoggerInstance);
@@ -384,8 +371,9 @@ describe('#Port #Redis', () => {
         port.close().then();
         done();
       });
-      port.start().then();
-      expect(port.client.listenerCount('connect')).toEqual(1);
+      port.start().then(() => {
+        expect(port.client.listenerCount('connect')).toEqual(1);
+      });
     }, 300);
     it('Should emit unhealthy event if there is a problem in the memory resources the second time that is checked', done => {
       const port = new Port(
@@ -409,8 +397,9 @@ describe('#Port #Redis', () => {
         port.close().then();
         done();
       });
-      port.start().then();
-      expect(port.client.listenerCount('connect')).toEqual(1);
+      port.start().then(() => {
+        expect(port.client.listenerCount('connect')).toEqual(1);
+      });
     }, 300);
     it('Should emit error event if there is a problem getting the info from the server', done => {
       const port = new Port(DEFAULT_CONFIG, new FakeLogger() as LoggerInstance);

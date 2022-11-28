@@ -53,7 +53,8 @@
     "style",
     "amqp-provider",
     "jobs",
-    "firehose"
+    "firehose",
+    "redis-provider"
   ],
 
 }

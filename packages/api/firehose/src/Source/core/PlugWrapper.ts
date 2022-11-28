@@ -17,10 +17,13 @@ import {
 } from './const';
 
 export class PlugWrapper<
-  Type extends string = string,
-  Data = any,
-  CustomHeaders extends Record<string, any> = Record<string, any>
-> extends EventEmitter {
+    Type extends string = string,
+    Data = any,
+    CustomHeaders extends Record<string, any> = Record<string, any>
+  >
+  extends EventEmitter
+  implements Health.Component
+{
   /** Jobs uncleaned after job finish due to problems in the post consume command */
   private readonly uncleanedEntries: string[] = [];
   /** Jobs uncleaned after job finish due to the plugs has declare that not exist */
@@ -115,7 +118,6 @@ export class PlugWrapper<
       }
     }
   }
-
   /**
    * Establish the uncleaned entries in list check internal
    * @param interval - Define the interval to check if there are pending jobs
@@ -185,6 +187,9 @@ export class PlugWrapper<
   private readonly onOperationError = (rawError: Crash | Multi): void => {
     this.lastOperationError = Crash.from(rawError, this.plug.componentId);
     this.lastOperationDate = new Date();
+    if (this.listenerCount('error') > 0) {
+      this.emit('error', this.lastOperationError);
+    }
   };
   /** Register an error in the plug operation */
   private readonly onOperationSuccess = (): void => {
@@ -272,6 +277,14 @@ export class PlugWrapper<
   private readonly stop = async (): Promise<void> => {
     await this.wrappedOperation(this.stopOriginal, []);
   };
+  /** Component name */
+  public get name(): string {
+    return this.plug.name;
+  }
+  /** Component identification */
+  public get componentId(): string {
+    return this.plug.componentId;
+  }
   /**
    * Return the status of the stream in a standard format
    * @returns _check object_ as defined in the draft standard

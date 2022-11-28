@@ -13,10 +13,13 @@ import { merge } from 'lodash';
 import { WrappableSinkPlug } from '../../types';
 
 export class PlugWrapper<
-  Type extends string = string,
-  Data = any,
-  CustomHeaders extends Record<string, any> = Record<string, any>
-> extends EventEmitter {
+    Type extends string = string,
+    Data = any,
+    CustomHeaders extends Record<string, any> = Record<string, any>
+  >
+  extends EventEmitter
+  implements Health.Component
+{
   /** Indicate if the last operation was finished with error */
   private lastOperationError?: Crash | Multi;
   /** Date of the last operation performed */
@@ -81,6 +84,9 @@ export class PlugWrapper<
   private readonly onOperationError = (rawError: Crash | Multi): void => {
     this.lastOperationError = Crash.from(rawError, this.plug.componentId);
     this.lastOperationDate = new Date();
+    if (this.listenerCount('error') > 0) {
+      this.emit('error', this.lastOperationError);
+    }
   };
   /** Register an error in the plug operation */
   private readonly onOperationSuccess = (): void => {
@@ -131,6 +137,14 @@ export class PlugWrapper<
   private readonly stop = async (): Promise<void> => {
     await this.wrappedOperation(this.stopOriginal, []);
   };
+  /** Component name */
+  public get name(): string {
+    return this.plug.name;
+  }
+  /** Component identification */
+  public get componentId(): string {
+    return this.plug.componentId;
+  }
   /**
    * Return the status of the stream in a standard format
    * @returns _check object_ as defined in the draft standard

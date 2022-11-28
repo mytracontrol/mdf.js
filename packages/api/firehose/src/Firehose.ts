@@ -287,12 +287,14 @@ export class Firehose<
   /** Perform the subscription to the events from sources, sinks and engine */
   private wrappingEvents(): void {
     for (const source of this.sources) {
+      source.plugWrapper.on('error', this.onErrorEvent);
       source.on('error', this.onErrorEvent);
       source.on('status', this.onStatusEvent);
       source.on('done', this.onJobDoneEvent);
       source.on('job', this.onJobEvent);
     }
     for (const sink of this.sinks) {
+      sink.plugWrapper.on('error', this.onErrorEvent);
       sink.on('error', this.onErrorEvent);
       sink.on('status', this.onStatusEvent);
       sink.on('lost', this.onLostEvent);

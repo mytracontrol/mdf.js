@@ -69,7 +69,7 @@ export abstract class Base<
   /** Flag to indicate that an unhealthy status has been emitted recently */
   private lastStatusEmitted?: Health.API.Status;
   /** Wrapped source plug */
-  private readonly plugWrapper: PlugWrapper<Type, Data, CustomHeaders>;
+  public readonly plugWrapper: PlugWrapper<Type, Data, CustomHeaders>;
   /**
    * Create a new instance for a firehose sink
    * @param plug - sink plug instance

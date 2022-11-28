@@ -23,6 +23,12 @@ export class Port extends Provider.Port<Client, Config> {
   private isFirstCheck: boolean;
   /** Redis healthy state */
   private healthy: boolean;
+  /**
+   * Instance is connected, this is necessary to manage the reconnection process. When `start` is
+   * called, the instance will try to reconnect to the server if the connection is lost, so `start`
+   * so not be called again.
+   */
+  private connected: boolean;
   /** Time interval for ready check request */
   private readonly interval: number;
   /**
@@ -42,6 +48,7 @@ export class Port extends Provider.Port<Client, Config> {
     this.logger.debug(`New instance of Redis port created: ${this.uuid}`, this.uuid, this.name);
     this.interval = this.config.checkInterval as number;
     this.isWrapped = false;
+    this.connected = false;
     this.healthy = false;
     this.timeInterval = null;
     this.isFirstCheck = true;
@@ -56,15 +63,15 @@ export class Port extends Provider.Port<Client, Config> {
   }
   /** Start the port, making it available */
   public async start(): Promise<void> {
-    this.eventsWrapping(this.instance);
-    if (['ready', 'connecting', 'reconnecting'].includes(this.instance.status)) {
-      throw new Crash(
-        `The instance is already connected or connecting: ${this.instance.status}`,
-        this.uuid
-      );
+    if (this.connected) {
+      // Stryker disable next-line all
+      this.logger.warn(`Port already connected, skipping start`);
+      return;
     }
     try {
       await this.instance.connect();
+      this.connected = true;
+      this.eventsWrapping(this.instance);
       if (!this.timeInterval && !this.config.disableChecks) {
         this.timeInterval = setInterval(this.statusCheck, this.interval);
         this.statusCheck();
@@ -78,9 +85,15 @@ export class Port extends Provider.Port<Client, Config> {
   }
   /** Stop the port, making it unavailable */
   public async stop(): Promise<void> {
+    if (!this.connected) {
+      // Stryker disable next-line all
+      this.logger.warn(`Port already disconnected, skipping stop`);
+      return;
+    }
     try {
       this.eventsUnwrapping(this.instance);
       await this.instance.quit();
+      this.connected = false;
     } catch (rawError) {
       const error = Crash.from(rawError, this.uuid);
       if (error.message !== 'Connection is closed.') {
@@ -236,12 +249,18 @@ export class Port extends Provider.Port<Client, Config> {
   /** Callback function for `connect` event */
   private readonly onConnectEvent = () => this.onEvent('connect', 'connect', false);
   /** Callback function for `ready` event */
-  private readonly onReadyEvent = () => this.onEvent('ready', 'ready', false);
+  private readonly onReadyEvent = () => this.onEvent('ready', 'healthy', true);
   /** Callback function for `error` event */
   private readonly onErrorEvent = (error: ReplyError) =>
     this.onEvent('error', 'error', true, this.errorParse(error));
   /** Callback function for `close` event */
-  private readonly onCloseEvent = () => this.onEvent('close', 'close', false);
+  private readonly onCloseEvent = () =>
+    this.onEvent(
+      'close',
+      'unhealthy',
+      true,
+      new Crash(`The connection was closed unexpectedly`, this.uuid)
+    );
   /** Callback function for `reconnecting` event */
   private readonly onReconnectingEvent = (delay: number) =>
     this.onEvent('reconnecting', 'reconnecting', false, delay);
@@ -251,7 +270,7 @@ export class Port extends Provider.Port<Client, Config> {
       'end',
       'closed',
       true,
-      new Crash(`The connection was closed unexpectedly`, this.uuid)
+      new Crash(`The connection was closed intentionally`, this.uuid)
     );
   /** Callback function for `+node` event */
   private readonly onPlusNodeEvent = () => this.onEvent('+node', '+node', false);

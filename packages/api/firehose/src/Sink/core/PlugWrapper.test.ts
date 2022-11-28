@@ -13,6 +13,8 @@ describe('#Sink #PlugWrapper', () => {
     it('Should wrap a single/multi start/stop operation', async () => {
       //@ts-ignore - Test environment
       const wrapper = new PlugWrapper({
+        name: 'test',
+        componentId: 'test',
         //@ts-ignore - Test environment
         single: () => {
           return Promise.resolve();
@@ -28,6 +30,9 @@ describe('#Sink #PlugWrapper', () => {
           return Promise.resolve();
         },
       });
+      expect(wrapper).toBeDefined();
+      expect(wrapper.name).toBe('test');
+      expect(wrapper.componentId).toBe('test');
       //@ts-ignore - Test environment
       expect(wrapper.single('hi')).resolves.toEqual(undefined);
       //@ts-ignore - Test environment
