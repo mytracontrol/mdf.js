@@ -14,17 +14,9 @@ import EventEmitter from 'events';
 import { Writable } from 'stream';
 import { v4 } from 'uuid';
 import { Engine } from './Engine';
+import { Helpers } from './helpers';
 import { MetricsHandler } from './metrics';
-import * as Sink from './Sink';
-import * as Source from './Source';
-import {
-  FirehoseOptions,
-  Plugs,
-  Sinks,
-  Sources,
-  WrappableSinkPlug,
-  WrappableSourcePlug,
-} from './types';
+import { FirehoseOptions, Sinks, Sources } from './types';
 
 export declare interface Firehose<
   Type extends string = string,
@@ -56,9 +48,9 @@ export class Firehose<
   /** Engine stream */
   private readonly engine: Engine<Type, Data, CustomHeaders>;
   /** Sink streams */
-  private readonly sinks: Sinks<Type, Data, CustomHeaders>[];
+  private readonly sinks: Sinks<Type, Data, CustomHeaders>[] = [];
   /** Source streams */
-  private readonly sources: Sources<Type, Data, CustomHeaders>[];
+  private readonly sources: Sources<Type, Data, CustomHeaders>[] = [];
   /** Metrics handler */
   private readonly metricsHandler?: MetricsHandler;
   /** Error registry handler */
@@ -84,166 +76,39 @@ export class Firehose<
     if (this.options.sinks.length < 1) {
       throw new Crash(`Firehose must have at least one sink`, this.componentId);
     }
-    this.sinks = this.getSinkStreams(this.options.sinks);
     if (this.options.sources.length < 1) {
       throw new Crash(`Firehose must have at least one source`, this.componentId);
     }
-    this.sources = this.getSourceStreams(
-      this.options.sources,
-      this.options.atLeastOne ? 1 : this.sinks.length
-    );
     this.engine = new Engine<Type, Data, CustomHeaders>(this.name, {
       strategies: this.options.strategies,
       transformOptions: { highWaterMark: this.options.bufferSize },
       logger: this.options.logger,
     });
+    this.errorRegisterHandler = this.options.errorsRegistry;
     if (this.options.metricsRegistry) {
       this.metricsHandler = MetricsHandler.enroll(this.options.metricsRegistry);
-      for (const source of this.sources) {
-        this.metricsHandler.register(source);
-      }
     }
-    this.errorRegisterHandler = this.options.errorsRegistry;
     this.stopping = false;
   }
-  /**
-   * Create source streams from source plugs
-   * @param sources - Source plugs to be processed
-   * @param qos - indicates the quality of service for the job, indeed this indicate the number of
-   * sinks that must be successfully processed to consider the job as successfully processed
-   * @returns
-   */
-  private getSourceStreams(
-    sources: Plugs.Source.Any<Type, Data, CustomHeaders>[],
-    qos = 1
-  ): Sources<Type, Data, CustomHeaders>[] {
-    const sourceStreams: Sources<Type, Data, CustomHeaders>[] = [];
-    for (const source of sources) {
-      if (this.isFlowSource(source)) {
-        sourceStreams.push(
-          new Source.Flow<Type, Data, CustomHeaders>(source, {
-            retryOptions: this.options.retryOptions,
-            qos,
-            readableOptions: { highWaterMark: this.options.bufferSize },
-            postConsumeOptions: this.options.postConsumeOptions,
-            logger: this.options.logger,
-          })
-        );
-      } else if (this.isSequenceSource(source)) {
-        sourceStreams.push(
-          new Source.Sequence<Type, Data, CustomHeaders>(source, {
-            retryOptions: this.options.retryOptions,
-            qos,
-            readableOptions: { highWaterMark: this.options.bufferSize },
-            postConsumeOptions: this.options.postConsumeOptions,
-            logger: this.options.logger,
-          })
-        );
-      } else if (this.isCreditsFlowSource(source)) {
-        sourceStreams.push(
-          new Source.CreditsFlow<Type, Data, CustomHeaders>(source, {
-            retryOptions: this.options.retryOptions,
-            qos,
-            readableOptions: { highWaterMark: this.options.bufferSize },
-            postConsumeOptions: this.options.postConsumeOptions,
-            logger: this.options.logger,
-          })
-        );
-      } else {
-        throw new Crash(`Source type not supported`, this.componentId);
-      }
-      source.on('error', this.onErrorEvent);
-    }
-    return sourceStreams;
-  }
-  /**
-   * Create sinks streams from sink plugs
-   * @param sinks - Sinks plugs to be processed
-   * @returns
-   */
-  private getSinkStreams(
-    sinks: Plugs.Sink.Any<Type, Data, CustomHeaders>[]
-  ): Sinks<Type, Data, CustomHeaders>[] {
-    const sinkStreams: Sinks<Type, Data, CustomHeaders>[] = [];
-    for (const sink of sinks) {
-      if (this.isJetSink(sink)) {
-        sinkStreams.push(
-          new Sink.Jet(sink, {
-            retryOptions: this.options.retryOptions,
-            writableOptions: { highWaterMark: this.options.bufferSize },
-            logger: this.options.logger,
-          })
-        );
-      } else if (this.isTapSink(sink)) {
-        sinkStreams.push(
-          new Sink.Tap(sink, {
-            retryOptions: this.options.retryOptions,
-            writableOptions: { highWaterMark: this.options.bufferSize },
-            logger: this.options.logger,
-          })
-        );
-      } else {
-        throw new Crash(`Sink type not supported`, this.componentId);
-      }
-      sink.on('error', this.onErrorEvent);
-    }
-    return sinkStreams;
-  }
-  /**
-   * Check if a source is a valid Flow Source
-   * @param source - source to be checked
-   * @returns
-   */
-  private isFlowSource(
-    source: WrappableSourcePlug<Type, Data, CustomHeaders>
-  ): source is Plugs.Source.Flow<Type, Data, CustomHeaders> {
-    return (
-      typeof source.postConsume === 'function' &&
-      typeof source.ingestData === 'undefined' &&
-      typeof source.init === 'function' &&
-      typeof source.pause === 'function'
+  /** Sink/Source/Engine/Plug error event handler */
+  private readonly onFatalEvent = async (rawError: Error | Crash) => {
+    const cause = Crash.from(rawError, this.componentId);
+    const error = new Crash(
+      `Fatal error in firehose ${this.name}, the firehose will be restarted: ${cause.message}`,
+      this.componentId,
+      { cause }
     );
-  }
-  /**
-   * Check if a source is a valid Sequence Source
-   * @param source - source to be checked
-   * @returns
-   */
-  private isSequenceSource(
-    source: WrappableSourcePlug<Type, Data, CustomHeaders>
-  ): source is Plugs.Source.Sequence<Type, Data, CustomHeaders> {
-    return typeof source.postConsume === 'function' && typeof source.ingestData === 'function';
-  }
-  /**
-   * Check if a source is a valid Credit Flow Source
-   * @param source - source to be checked
-   * @returns
-   */
-  private isCreditsFlowSource(
-    source: WrappableSourcePlug<Type, Data, CustomHeaders>
-  ): source is Plugs.Source.CreditsFlow<Type, Data, CustomHeaders> {
-    return typeof source.postConsume === 'function' && typeof source.addCredits === 'function';
-  }
-  /**
-   * Check if a sink is a valid Tap Sink
-   * @param sink - sink to be checked
-   * @returns
-   */
-  private isTapSink(
-    sink: WrappableSinkPlug<Type, Data, CustomHeaders>
-  ): sink is Plugs.Sink.Tap<Type, Data, CustomHeaders> {
-    return typeof sink.single === 'function' && typeof sink.multi === 'undefined';
-  }
-  /**
-   * Check if a sink is a valid Jet Sink
-   * @param sink - sink to be checked
-   * @returns
-   */
-  private isJetSink(
-    sink: WrappableSinkPlug<Type, Data, CustomHeaders>
-  ): sink is Plugs.Sink.Jet<Type, Data, CustomHeaders> {
-    return typeof sink.multi === 'function' && typeof sink.single === 'function';
-  }
+    // Stryker disable next-line all
+    this.logger.error(`${error.message}`);
+    if (this.errorRegisterHandler) {
+      this.errorRegisterHandler.push(error);
+    }
+    await this.stop();
+    await this.start();
+    if (this.listenerCount('error') > 0) {
+      this.emit('error', error);
+    }
+  };
   /** Sink/Source/Engine/Plug error event handler */
   private readonly onErrorEvent = (error: Error | Crash) => {
     // Stryker disable next-line all
@@ -286,6 +151,14 @@ export class Firehose<
   };
   /** Perform the subscription to the events from sources, sinks and engine */
   private wrappingEvents(): void {
+    for (const source of this.options.sources) {
+      source.on('error', this.onErrorEvent);
+      source.on('fatal', this.onFatalEvent);
+    }
+    for (const sink of this.options.sinks) {
+      sink.on('error', this.onErrorEvent);
+      sink.on('fatal', this.onFatalEvent);
+    }
     for (const source of this.sources) {
       source.plugWrapper.on('error', this.onErrorEvent);
       source.on('error', this.onErrorEvent);
@@ -304,6 +177,12 @@ export class Firehose<
   }
   /** Perform the unsubscription to the events from sources, sinks and engine */
   private unWrappingEvents(): void {
+    for (const source of this.options.sources) {
+      source.off('error', this.onErrorEvent);
+    }
+    for (const sink of this.options.sinks) {
+      sink.off('error', this.onErrorEvent);
+    }
     for (const source of this.sources) {
       source.off('error', this.onErrorEvent);
       source.off('status', this.onStatusEvent);
@@ -338,6 +217,19 @@ export class Firehose<
   }
   /** Perform the piping of all the streams */
   public async start(): Promise<void> {
+    this.sinks.push(...Helpers.GetSinkStreamsFromPlugs(this.options.sinks, this.options));
+    this.sources.push(
+      ...Helpers.GetSourceStreamsFromPlugs(
+        this.options.sources,
+        this.options,
+        this.options.atLeastOne ? 1 : this.sinks.length
+      )
+    );
+    if (this.metricsHandler) {
+      for (const source of this.sources) {
+        this.metricsHandler.register(source);
+      }
+    }
     this.wrappingEvents();
     for (const sink of this.sinks) {
       await sink.start();
@@ -355,11 +247,18 @@ export class Firehose<
     for (const sink of this.sinks) {
       await sink.stop();
       this.engine.unpipe(sink);
+      sink.end();
+      sink.destroy();
+      sink.removeAllListeners();
     }
     for (const source of this.sources) {
       await source.stop();
       source.unpipe(this.engine);
+      source.destroy();
+      source.removeAllListeners();
     }
+    this.sinks.length = 0;
+    this.sources.length = 0;
   }
   /** Stop and close all the streams */
   public close(): void {
@@ -367,14 +266,5 @@ export class Firehose<
     this.engine.end();
     this.engine.destroy();
     this.engine.removeAllListeners();
-    for (const sink of this.sinks) {
-      sink.end();
-      sink.destroy();
-      sink.removeAllListeners();
-    }
-    for (const source of this.sources) {
-      source.destroy();
-      source.removeAllListeners();
-    }
   }
 }

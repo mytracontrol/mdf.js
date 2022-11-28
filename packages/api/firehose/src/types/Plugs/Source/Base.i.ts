@@ -7,16 +7,19 @@
 
 import { Health, Jobs } from '@mdf.js/core';
 import { Crash } from '@mdf.js/crash';
-import EventEmitter from 'events';
 
 export interface Base<
   Type extends string = string,
   Data = any,
   CustomHeaders extends Record<string, any> = Record<string, any>
-> extends EventEmitter,
-    Health.Component {
-  /** Emitted when the component throw an error*/
+> extends Health.Component {
+  /** Emitted when the component throw an error */
   on(event: 'error', listener: (error: Crash | Error) => void): this;
+  /**
+   * Emitted when the component throw an fatal error, this will trigger the restart of the firehose
+   * instance
+   */
+  on(event: 'fatal', listener: (error: Crash | Error) => void): this;
   /** Emitted on every status change */
   on(event: 'status', listener: (status: Health.API.Status) => void): this;
   /** Emitted when there is a new job to be managed */

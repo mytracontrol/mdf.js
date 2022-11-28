@@ -83,7 +83,7 @@ export abstract class Registry {
         {
           componentId: this.componentId,
           componentType: 'system',
-          observedValue: prettyMS(process.uptime()),
+          observedValue: prettyMS(process.uptime() * 1000),
           observedUnit: 'time',
           status: 'pass' as Health.API.Status,
           time: new Date().toISOString(),

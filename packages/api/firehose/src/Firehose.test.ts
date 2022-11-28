@@ -173,20 +173,20 @@ describe('#Firehose', () => {
       let unpipe = false;
       firehose.on('done', async (uuid: string, result: Jobs.Result, error?: Crash) => {
         if (unpipe) {
-          firehose.stop();
+          await firehose.stop();
           //@ts-ignore - Test environment
           expect(firehose.stopping).toEqual(true);
           //@ts-ignore - Test environment
           expect(firehose.engine.destroyed).toEqual(false);
           //@ts-ignore - Test environment
           expect(firehose.engine.readableFlowing).toEqual(false);
-          firehose.close();
+          //@ts-ignore - Test environment
+          expect(firehose.sinks.length).toEqual(0);
+          //@ts-ignore - Test environment
+          expect(firehose.sources.length).toEqual(0);
+          await firehose.close();
           //@ts-ignore - Test environment
           expect(firehose.engine.destroyed).toEqual(true);
-          //@ts-ignore - Test environment
-          expect(firehose.sinks[0].destroyed).toEqual(true);
-          //@ts-ignore - Test environment
-          expect(firehose.sources[0].destroyed).toEqual(true);
           done();
         }
         if (result.jobUserId === '4') {
@@ -570,22 +570,32 @@ describe('#Firehose', () => {
       }).toThrowError('Firehose must have at least one source');
     }, 300);
     it(`Should throw an error if there is a not valid source`, () => {
-      expect(() => {
-        new Firehose('MyFirehose', {
-          //@ts-ignore - Test environment
-          sources: [new MyFlowPlug(), {}],
-          sinks: [new MyTapPlug()],
+      const fh = new Firehose('MyFirehose', {
+        //@ts-ignore - Test environment
+        sources: [new MyFlowPlug(), {}],
+        sinks: [new MyTapPlug()],
+      });
+      fh.start()
+        .then(() => {
+          throw new Error('Should not be here');
+        })
+        .catch(error => {
+          expect(error.message).toEqual('Source type not supported');
         });
-      }).toThrowError('Source type not supported');
     }, 300);
-    it(`Should throw an error if there is a not valid source`, () => {
-      expect(() => {
-        new Firehose('MyFirehose', {
-          sources: [new MyFlowPlug()],
-          //@ts-ignore - Test environment
-          sinks: [new MyTapPlug(), {}],
+    it(`Should throw an error if there is a not valid sink`, () => {
+      const fh = new Firehose('MyFirehose', {
+        sources: [new MyFlowPlug()],
+        //@ts-ignore - Test environment
+        sinks: [new MyTapPlug(), {}],
+      });
+      fh.start()
+        .then(() => {
+          throw new Error('Should not be here');
+        })
+        .catch(error => {
+          expect(error.message).toEqual('Sink type not supported');
         });
-      }).toThrowError('Sink type not supported');
     }, 300);
     it(`Should emit an error if any of the streams/plugs emit an error`, done => {
       const service = new Observability(config);
@@ -918,6 +928,58 @@ describe('#Firehose', () => {
         firehose.close();
         service.stop().then(done);
       }, 200);
+    }, 300);
+    it('Should restart the firehose if there is a fatal error', done => {
+      const service = new Observability(config);
+      const mySinkPlug = new MyTapPlug();
+      const mySourcePlug = new MySequencePlug();
+      const firehose = new Firehose('MyFirehose', {
+        sources: [mySourcePlug],
+        sinks: [mySinkPlug],
+        bufferSize: 2,
+        metricsRegistry: service.metricsRegistry,
+        errorsRegistry: service.errorsRegistry,
+      });
+      expect(firehose).toBeDefined();
+      expect(firehose.name).toEqual('MyFirehose');
+      expect(firehose.componentId).toBeDefined();
+      service.healthRegistry.register(firehose);
+      let jobEmitted = false;
+      let fatalError = false;
+      firehose.on('error', error => {
+        expect(error).toBeDefined();
+        expect(error.message).toEqual(
+          'Fatal error in firehose MyFirehose, the firehose will be restarted: myFatalError'
+        );
+        fatalError = true;
+      });
+      firehose.on('job', job => {
+        expect(job).toBeDefined();
+        expect(job.data).toBeDefined();
+        expect(job.type).toBeDefined();
+        expect(job.type).toEqual('myType');
+        expect(job.jobUserId).toBeDefined();
+        expect(job.options).toBeDefined();
+        expect(job.options?.headers).toBeDefined();
+        expect(job.options?.headers).toEqual({ 'x-my-header': 'my-header-value' });
+        jobEmitted = true;
+      });
+      firehose.on('done', async (uuid: string, result: Jobs.Result, error?: Crash) => {
+        if (result.jobUserId === '4') {
+          mySinkPlug.emit('fatal', new Crash('myFatalError'));
+        }
+        if (result.jobUserId === '16' && fatalError) {
+          firehose.close();
+          service.stop().then(() => {
+            if (jobEmitted) {
+              done();
+            } else {
+              done(new Error('Job not emitted'));
+            }
+          });
+        }
+      });
+      firehose.start().then();
     }, 300);
   });
 });
