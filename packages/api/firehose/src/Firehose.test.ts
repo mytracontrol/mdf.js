@@ -929,57 +929,5 @@ describe('#Firehose', () => {
         service.stop().then(done);
       }, 200);
     }, 300);
-    it('Should restart the firehose if there is a fatal error', done => {
-      const service = new Observability(config);
-      const mySinkPlug = new MyTapPlug();
-      const mySourcePlug = new MySequencePlug();
-      const firehose = new Firehose('MyFirehose', {
-        sources: [mySourcePlug],
-        sinks: [mySinkPlug],
-        bufferSize: 2,
-        metricsRegistry: service.metricsRegistry,
-        errorsRegistry: service.errorsRegistry,
-      });
-      expect(firehose).toBeDefined();
-      expect(firehose.name).toEqual('MyFirehose');
-      expect(firehose.componentId).toBeDefined();
-      service.healthRegistry.register(firehose);
-      let jobEmitted = false;
-      let fatalError = false;
-      firehose.on('error', error => {
-        expect(error).toBeDefined();
-        expect(error.message).toEqual(
-          'Fatal error in firehose MyFirehose, the firehose will be restarted: myFatalError'
-        );
-        fatalError = true;
-      });
-      firehose.on('job', job => {
-        expect(job).toBeDefined();
-        expect(job.data).toBeDefined();
-        expect(job.type).toBeDefined();
-        expect(job.type).toEqual('myType');
-        expect(job.jobUserId).toBeDefined();
-        expect(job.options).toBeDefined();
-        expect(job.options?.headers).toBeDefined();
-        expect(job.options?.headers).toEqual({ 'x-my-header': 'my-header-value' });
-        jobEmitted = true;
-      });
-      firehose.on('done', async (uuid: string, result: Jobs.Result, error?: Crash) => {
-        if (result.jobUserId === '4') {
-          mySinkPlug.emit('fatal', new Crash('myFatalError'));
-        }
-        if (result.jobUserId === '16' && fatalError) {
-          firehose.close();
-          service.stop().then(() => {
-            if (jobEmitted) {
-              done();
-            } else {
-              done(new Error('Job not emitted'));
-            }
-          });
-        }
-      });
-      firehose.start().then();
-    }, 300);
   });
 });

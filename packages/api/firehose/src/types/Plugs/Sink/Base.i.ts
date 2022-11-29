@@ -15,11 +15,6 @@ export interface Base<
 > extends Health.Component {
   /** Emitted when the component throw an error */
   on(event: 'error', listener: (error: Crash | Error) => void): this;
-  /**
-   * Emitted when the component throw an fatal error, this will trigger the restart of the firehose
-   * instance
-   */
-  on(event: 'fatal', listener: (error: Crash | Error) => void): this;
   /** Emitted on every status change */
   on(event: 'status', listener: (status: Health.API.Status) => void): this;
   /**

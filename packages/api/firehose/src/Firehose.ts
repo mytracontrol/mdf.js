@@ -91,25 +91,6 @@ export class Firehose<
     this.stopping = false;
   }
   /** Sink/Source/Engine/Plug error event handler */
-  private readonly onFatalEvent = async (rawError: Error | Crash) => {
-    const cause = Crash.from(rawError, this.componentId);
-    const error = new Crash(
-      `Fatal error in firehose ${this.name}, the firehose will be restarted: ${cause.message}`,
-      this.componentId,
-      { cause }
-    );
-    // Stryker disable next-line all
-    this.logger.error(`${error.message}`);
-    if (this.errorRegisterHandler) {
-      this.errorRegisterHandler.push(error);
-    }
-    await this.stop();
-    await this.start();
-    if (this.listenerCount('error') > 0) {
-      this.emit('error', error);
-    }
-  };
-  /** Sink/Source/Engine/Plug error event handler */
   private readonly onErrorEvent = (error: Error | Crash) => {
     // Stryker disable next-line all
     this.logger.error(`${error.message}`);
@@ -153,11 +134,9 @@ export class Firehose<
   private wrappingEvents(): void {
     for (const source of this.options.sources) {
       source.on('error', this.onErrorEvent);
-      source.on('fatal', this.onFatalEvent);
     }
     for (const sink of this.options.sinks) {
       sink.on('error', this.onErrorEvent);
-      sink.on('fatal', this.onFatalEvent);
     }
     for (const source of this.sources) {
       source.plugWrapper.on('error', this.onErrorEvent);
