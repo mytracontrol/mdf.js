@@ -8,6 +8,7 @@ import { Crash } from '@mdf.js/crash';
 import { LoggerInstance, Provider } from '@mdf.js/provider';
 import { undoMocks } from '@mdf.js/utils';
 import { EventEmitter } from 'events';
+import { ReceiverEvents } from 'rhea-promise';
 import { Factory } from './Factory';
 import { Port } from './Port';
 import { Config } from './types';
@@ -95,6 +96,9 @@ class FakeReceiver extends EventEmitter {
     }
     this.open = false;
   }
+  addCredit(credit: number): void {
+    this.credit += credit;
+  }
 }
 describe('#Port #AMQP #Receiver', () => {
   describe('#Happy path', () => {
@@ -167,7 +171,7 @@ describe('#Port #AMQP #Receiver', () => {
       expect(port.state).toBeFalsy();
       expect(port.checks).toEqual({});
     }, 300);
-    it(`Should start and stop the port properly and fullfil the checks`, () => {
+    it(`Should start/stop/reset the port properly and fullfil the checks`, () => {
       const port = new Port(DEFAULT_CONFIG, new FakeLogger() as LoggerInstance);
       const myContainer = new FakeContainer();
       expect(port).toBeDefined();
@@ -176,11 +180,18 @@ describe('#Port #AMQP #Receiver', () => {
       //@ts-ignore - Test environment
       jest.spyOn(port.instance.connection, 'close').mockResolvedValue();
       //@ts-ignore - Test environment
-      jest.spyOn(port.instance.connection, 'createSession').mockResolvedValue(myContainer);
+      jest.spyOn(port.instance.connection, 'createReceiver').mockImplementation(() => {
+        return myContainer.createReceiver();
+      });
       return port
         .start()
+        .then(() => {
+          port.client.on(ReceiverEvents.message, () => {});
+          expect(port.client.listenerCount(ReceiverEvents.message)).toEqual(2);
+        })
         .then(() => port.start())
         .then(() => {
+          expect(port.client.listenerCount(ReceiverEvents.message)).toEqual(2);
           //@ts-ignore - Test environment
           jest.spyOn(port.instance.connection, 'isOpen').mockReturnValue(true);
           const checks = port.checks;
@@ -189,7 +200,7 @@ describe('#Port #AMQP #Receiver', () => {
               {
                 componentId: checks['credits'][0].componentId,
                 observedUnit: 'credits',
-                observedValue: 10,
+                observedValue: 20,
                 output: undefined,
                 status: 'pass',
                 time: checks['credits'][0].time,
@@ -471,6 +482,32 @@ describe('#Port #AMQP #Receiver', () => {
     }, 300);
   });
   describe('#Sad path', () => {
+    it(`Should fail to reset the port if there is a problem creating the new receiver`, () => {
+      const port = new Port(DEFAULT_CONFIG, new FakeLogger() as LoggerInstance);
+      const myContainer = new FakeContainer();
+      expect(port).toBeDefined();
+      //@ts-ignore - Test environment
+      jest.spyOn(port.instance.connection, 'open').mockResolvedValue();
+      //@ts-ignore - Test environment
+      jest.spyOn(port.instance.connection, 'close').mockResolvedValue();
+      //@ts-ignore - Test environment
+      jest.spyOn(port.instance.connection, 'createReceiver').mockImplementation(() => {
+        return myContainer.createReceiver();
+      });
+      return port
+        .start()
+        .then(() => {
+          myContainer.shouldFailCreate = true;
+        })
+        .then(() => port.start())
+        .catch(error => {
+          expect(error.message).toEqual(
+            'Performing the reset of the AMQP Receiver: Failed to create receiver'
+          );
+          expect(error.cause.message).toEqual('Failed to create receiver');
+          port.close().then();
+        });
+    }, 300);
     it('Should throw an error if try to access to the Receiver but is not initialized', () => {
       const provider = Factory.create();
       expect(() => provider.client).toThrowError('Receiver is not initialized');

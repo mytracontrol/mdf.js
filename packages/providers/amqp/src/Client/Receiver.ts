@@ -118,13 +118,15 @@ export class Receiver extends Container {
   };
   /** Perform the connection to the AMQP broker and the creation of the receiver */
   public override async start(): Promise<void> {
-    if (this.receiver?.isOpen()) {
-      return;
+    if (this.receiver) {
+      // This is done due to a bug in `rhea-promise` that does not allow to re-use the same receiver
+      return this.reset();
     }
     try {
       await super.start();
       this.receiver = await this.connection.createReceiver();
       this.receiverEventsWrapping(this.receiver);
+      return undefined;
     } catch (rawError) {
       const error = Crash.from(rawError, this.componentId);
       throw new Crash(`Error creating the AMQP Receiver: ${error.message}`, this.componentId, {
@@ -146,6 +148,39 @@ export class Receiver extends Container {
       throw new Crash(`Error closing the AMQP Receiver: ${error.message}`, this.componentId, {
         cause: error,
       });
+    }
+  }
+  /**
+   * Perform the reset of the receiver instance by creating a new one and attaching to it all the
+   * listeners
+   */
+  private async reset(): Promise<void> {
+    if (!this.receiver) {
+      return this.start();
+    }
+    try {
+      const actualCredits = this.receiver.credit;
+      const newReceiver = await this.connection.createReceiver();
+      this.receiverEventsUnwrapping(this.receiver);
+      this.receiverEventsWrapping(newReceiver);
+      for (const event of this.receiver.eventNames()) {
+        for (const listener of this.receiver.listeners(event)) {
+          //@ts-ignore - This is due a declaration in rhea-promise library, not real issue
+          newReceiver.on(event, listener);
+          this.receiver.removeAllListeners(event);
+        }
+      }
+      await this.receiver.close({ closeSession: true });
+      this.receiver = newReceiver;
+      this.receiver.addCredit(actualCredits);
+      return undefined;
+    } catch (rawError) {
+      const error = Crash.from(rawError, this.componentId);
+      throw new Crash(
+        `Performing the reset of the AMQP Receiver: ${error.message}`,
+        this.componentId,
+        { cause: error }
+      );
     }
   }
   /** Return the port state as a boolean value, true if the port is available, false in otherwise */
