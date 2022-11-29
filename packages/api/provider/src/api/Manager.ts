@@ -9,6 +9,8 @@ import { Health } from '@mdf.js/core';
 import { Crash, Multi } from '@mdf.js/crash';
 import { DebugLogger, LoggerInstance, SetContext } from '@mdf.js/logger';
 import { formatEnv } from '@mdf.js/utils';
+import { config } from 'dotenv';
+import { expand } from 'dotenv-expand';
 import { EventEmitter } from 'events';
 import Joi, { ValidationError } from 'joi';
 import { cloneDeep, merge } from 'lodash';
@@ -16,6 +18,9 @@ import { v4 } from 'uuid';
 import { ProviderOptions, ProviderState, ProviderStatus } from '../types';
 import { Port } from './Port';
 import { ErrorState, State, StoppedState } from './states';
+
+// Load environment variables from .env file, where API keys and passwords are configured
+expand(config({ path: process.env['CONFIG_MDF_CONFIG_PATH'] }));
 
 type ProviderError = Multi | Crash | undefined;
 

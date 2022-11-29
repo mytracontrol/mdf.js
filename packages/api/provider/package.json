@@ -33,10 +33,13 @@
     "@mdf.js/core": "*",
     "@mdf.js/crash": "*",
     "@mdf.js/logger": "*",
+    "@mdf.js/utils": "*",
     "joi": "^17.6.3",
     "lodash": "^4.17.21",
     "tslib": "^2.4.1",
-    "uuid": "^9.0.0"
+    "uuid": "^9.0.0",
+    "dotenv": "^16.0.3",
+    "dotenv-expand": "^9.0.0"
   },
   "devDependencies": {
     "@mdf.js/repo-config": "*",
