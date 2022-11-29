@@ -6,5 +6,7 @@
  */
 
 export { Health, Jobs } from '@mdf.js/core';
+export { LoggerInstance } from '@mdf.js/logger';
+export { RetryOptions } from '@mdf.js/utils';
 export * from './Firehose';
 export { Plugs } from './types';
