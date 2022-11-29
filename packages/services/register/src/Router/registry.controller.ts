@@ -5,6 +5,7 @@
  * or at https://opensource.org/licenses/MIT.
  */
 
+import { deCycle } from '@mdf.js/utils';
 import { NextFunction, Request, Response } from 'express';
 import { Service } from './registry.service';
 
@@ -28,7 +29,7 @@ export class Controller {
   public errors(request: Request, response: Response, next: NextFunction): void {
     const errors = this.service.errors();
     if (errors.length !== 0) {
-      response.status(200).json(errors);
+      response.status(200).json(deCycle(errors));
     } else {
       response.status(204).send();
     }

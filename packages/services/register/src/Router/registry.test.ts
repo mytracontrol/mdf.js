@@ -23,6 +23,7 @@ app.use(Middleware.RequestId.handler());
 app.use(Middleware.BodyParser.JSONParserHandler());
 app.use(router.router);
 app.use(Middleware.ErrorHandler.handler());
+const UUID_FAKE = 'a1e4e76a-8e1a-425c-883d-4d75760f9cee';
 // #endregion
 // *************************************************************************************************
 // #region Our tests
@@ -39,7 +40,7 @@ describe('#Component #Register', () => {
         });
     }, 300);
     it(`Should response 200 and an the last conflicts when a GET request is performed over /registers`, () => {
-      const myError = new Crash('my error', { cause: new Crash(`my other error`) });
+      const myError = new Crash('my error', UUID_FAKE, { cause: new Crash(`my other error`) });
       persistence.push(myError);
       return request(app)
         .get(`/registers`)
@@ -52,6 +53,56 @@ describe('#Component #Register', () => {
           expect(Array.isArray(response.body)).toBeTruthy();
           expect(response.body.length).toEqual(1);
           expect(response.body[0]).toEqual(myError.toJSON());
+        })
+        .catch(error => {
+          throw error;
+        });
+    }, 300);
+    it(`Should response 200 and an the last conflicts when a GET request is performed over /registers if the error has circular references`, () => {
+      const test: Record<string, any> = { test: 'test' };
+      test['otherTest'] = test;
+      const ownError = new Crash(`myMessage`, UUID_FAKE, {
+        name: 'myError',
+        cause: new Crash(`other error`),
+        info: { test },
+      });
+      persistence.push(ownError);
+      return request(app)
+        .get(`/registers`)
+        .set('Content-Type', 'application/json')
+        .set('Accept', 'application/json')
+        .expect('Content-Type', /json/)
+        .expect(200)
+        .then(response => {
+          expect(typeof response.body).toEqual('object');
+          expect(Array.isArray(response.body)).toBeTruthy();
+          expect(response.body.length).toEqual(2);
+          expect(response.body).toEqual([
+            {
+              name: 'CrashError',
+              message: 'my error',
+              uuid: 'a1e4e76a-8e1a-425c-883d-4d75760f9cee',
+              timestamp: response.body[0].timestamp,
+              subject: 'common',
+              trace: ['CrashError: my error', 'caused by CrashError: my other error'],
+            },
+            {
+              name: 'myError',
+              message: 'myMessage',
+              uuid: 'a1e4e76a-8e1a-425c-883d-4d75760f9cee',
+              timestamp: response.body[1].timestamp,
+              subject: 'common',
+              info: {
+                test: {
+                  test: 'test',
+                  otherTest: {
+                    $ref: '$[\'1\']["info"]["test"]',
+                  },
+                },
+              },
+              trace: ['myError: myMessage', 'caused by CrashError: other error'],
+            },
+          ]);
         })
         .catch(error => {
           throw error;

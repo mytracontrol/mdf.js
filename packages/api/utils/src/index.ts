@@ -6,6 +6,7 @@
  */
 
 export * from './coerce';
+export * from './cycle';
 export * from './escape';
 export * from './findNodeModule';
 export * from './formatEnv';
