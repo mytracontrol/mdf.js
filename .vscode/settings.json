@@ -56,7 +56,8 @@
     "firehose",
     "redis-provider",
     "core",
-    "service-config"
+    "service-config",
+    "openc2"
   ],
 
 }
