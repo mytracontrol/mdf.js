@@ -151,13 +151,17 @@ describe('#Port #ServiceConfig', () => {
         expect(error).toBeInstanceOf(Multi);
         expect(error.message).toEqual('Error in the service configuration');
         const trace = error.trace();
-        expect(trace).toEqual([
-          'CrashError: Error parsing JSON in file src/Client/__mocks__/wrong/preset1.preset.config.json',
-          'caused by SyntaxError: Unexpected end of JSON input',
-          'CrashError: Error parsing YAML in file src/Client/__mocks__/wrong/preset1.preset.config.json',
-          'caused by YAMLParseError: Flow map must end with a } at line 2, column 1:\n\n{\r\n\n^\n',
-          'CrashError: Preset preset1 not found',
-        ]);
+        expect(trace[0]).toEqual(
+          'CrashError: Error parsing JSON in file src/Client/__mocks__/wrong/preset1.preset.config.json'
+        );
+        expect(trace[1]).toEqual('caused by SyntaxError: Unexpected end of JSON input');
+        expect(trace[2]).toEqual(
+          'CrashError: Error parsing YAML in file src/Client/__mocks__/wrong/preset1.preset.config.json'
+        );
+        expect(trace[3].replace(/(\r\n|\n|\r)/gm, '')).toEqual(
+          'caused by YAMLParseError: Flow map must end with a } at line 2, column 1:{^'
+        );
+        expect(trace[4]).toEqual('CrashError: Preset preset1 not found');
         done();
       });
       port.start().catch(error => {
