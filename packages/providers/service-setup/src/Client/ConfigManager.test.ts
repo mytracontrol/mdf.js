@@ -309,8 +309,8 @@ describe('#ConfigManager', () => {
       expect(trace[2]).toEqual(
         'CrashError: Error parsing YAML in file src/Client/__mocks__/wrong/config.config.yaml'
       );
-      expect(trace[3]).toEqual(
-        'caused by YAMLParseError: Flow map must end with a } at line 1, column 2:\n\n{\n ^\n'
+      expect(trace[3].replace(/(\r\n|\n|\r)/gm, '')).toEqual(
+        'caused by YAMLParseError: Flow map must end with a } at line 1, column 2:{ ^'
       );
       expect(trace[4]).toEqual(
         'CrashError: Error parsing JSON in file src/Client/__mocks__/wrong/preset1.preset.config.json'
@@ -319,8 +319,8 @@ describe('#ConfigManager', () => {
       expect(trace[6]).toEqual(
         'CrashError: Error parsing YAML in file src/Client/__mocks__/wrong/preset1.preset.config.json'
       );
-      expect(trace[7]).toEqual(
-        'caused by YAMLParseError: Flow map must end with a } at line 2, column 1:\n\n{\r\n\n^\n'
+      expect(trace[7].replace(/(\r\n|\n|\r)/gm, '')).toContain(
+        'caused by YAMLParseError: Flow map must end with a } at line 2, column 1:{^'
       );
     }, 1000);
     it('Should start with errors if its not possible to process a schema', () => {
@@ -364,8 +364,8 @@ describe('#ConfigManager', () => {
       expect(trace[2]).toEqual(
         'CrashError: Error parsing YAML in file src/Client/__mocks__/wrong/preset1.preset.config.json'
       );
-      expect(trace[3]).toEqual(
-        'caused by YAMLParseError: Flow map must end with a } at line 2, column 1:\n\n{\r\n\n^\n'
+      expect(trace[3].replace(/(\r\n|\n|\r)/gm, '')).toEqual(
+        'caused by YAMLParseError: Flow map must end with a } at line 2, column 1:{^'
       );
       expect(trace[4]).toEqual('CrashError: Preset preset1 not found');
     }, 1000);
