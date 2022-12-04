@@ -59,18 +59,18 @@ export class Multi extends Base {
     super(message, uuid, options);
     // *****************************************************************************************
     // #region causes type safe
-    if (options?.causes !== undefined) {
-      if (options.causes instanceof Crash || options.causes instanceof Error) {
-        this._causes = [options.causes];
-      } else if (!Array.isArray(options.causes)) {
+    if (this._options && this._options['causes'] !== undefined) {
+      if (this._options['causes'] instanceof Crash || this._options['causes'] instanceof Error) {
+        this._causes = [this._options['causes']];
+      } else if (!Array.isArray(this._options['causes'])) {
         throw new Base('Options[causes] must be an array of Error/Crash', uuid);
       } else {
-        options.causes.forEach(cause => {
+        for (const cause of this._options['causes']) {
           if (!(cause instanceof Crash || cause instanceof Error)) {
             throw new Base('Options[causes] must be an array of Error/Crash', uuid);
           }
-        });
-        this._causes = options.causes;
+        }
+        this._causes = this._options['causes'];
       }
     }
     // #endregion

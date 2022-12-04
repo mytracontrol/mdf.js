@@ -95,7 +95,7 @@ export class Consumer extends Component<AdapterWrapper, ConsumerOptions> {
       }
       // Stryker disable next-line all
       this.logger.debug(`${message.request_id} is not a command for this instance`);
-      return;
+      return undefined;
     } catch (rawError) {
       const error = Crash.from(rawError);
       const crashError = new Crash(

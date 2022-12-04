@@ -42,7 +42,7 @@ export class MasterRegistry extends Registry {
       this.onSendRequest();
     }
   }
-  /** Stop polling health diagnostic from workers*/
+  /** Stop polling health diagnostic from workers */
   public stop(): void {
     if (this.timeInterval) {
       clearInterval(this.timeInterval);

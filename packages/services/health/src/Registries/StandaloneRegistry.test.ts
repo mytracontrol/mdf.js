@@ -20,7 +20,7 @@ const microservice: ServiceMetadata = {
   name: 'myMicroservice',
   version: '1',
   release: '1.0.0',
-  processId: UUID_FAKE,
+  instanceId: UUID_FAKE,
   description: 'my microservice description',
 };
 

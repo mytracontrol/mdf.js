@@ -242,7 +242,7 @@ export class Port extends Provider.Port<Client, Config> {
       // Stryker disable next-line all
       this.logger.silly(`Event ${original} arg: ${arg}`);
     }
-    if (broadcasted) {
+    if (broadcasted && this.listenerCount(wrapped) > 0) {
       this.emit(wrapped, ...args);
     }
   }

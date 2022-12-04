@@ -273,7 +273,6 @@ describe('#OpenC2 #Consumer', () => {
                 'CrashError: Error performing [mockConstructor] operation on myAdapter plug',
                 'caused by InterruptionError: Too much attempts [1], the promise will not be retried',
                 'caused by Error: error',
-                'caused by Error: error',
               ],
               status: 'fail',
               time: checks['myAdapter:lastOperation'][0].time,

@@ -27,7 +27,7 @@ const config: ObservabilityOptions = {
   name: 'myObservability',
   version: '1',
   description: 'myObservability service',
-  processId: v4(),
+  instanceId: v4(),
   release: '1.0.0',
   isCluster: false,
 };
@@ -807,9 +807,6 @@ describe('#Firehose', () => {
         const checks = service.healthRegistry.health.checks as Health.API.Checks;
         expect((checks['MyJetPlug:lastOperation'][0].output as string[])[0]).toEqual(
           'Error: Was rejected by my own'
-        );
-        expect((checks['MyJetPlug:lastOperation'][0].output as string[])[1]).toEqual(
-          'caused by Error: Was rejected by my own'
         );
         expect(checks['MyJetPlug:lastOperation'][0].status).toEqual('fail');
         expect(checks['MyJetPlug:lastOperation'][0].observedValue).toEqual('error');

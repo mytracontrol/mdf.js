@@ -40,7 +40,7 @@ export class Crash extends Base {
     if (error instanceof Crash || error instanceof Multi) {
       return error;
     } else if (error instanceof Error) {
-      return new Crash(error.message, uuid || v4(), { cause: error, name: error.name });
+      return new Crash(error.message, uuid || v4(), { name: error.name });
     } else if (typeof error === 'string') {
       return new Crash(error, uuid || v4());
     } else if (

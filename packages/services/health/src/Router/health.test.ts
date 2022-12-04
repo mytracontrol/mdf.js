@@ -22,7 +22,7 @@ const microservice: ServiceMetadata = {
   name: 'myMicroservice',
   version: '1',
   release: '1.0.0',
-  processId: UUID_FAKE,
+  instanceId: UUID_FAKE,
   description: 'my microservice description',
   links: {
     about: 'http://mymicroservice.com',
@@ -61,7 +61,7 @@ describe('#Component #health', () => {
           expect(response.body.releaseId).toEqual(microservice.release);
           expect(response.body.notes).toEqual([]);
           expect(response.body.output).toEqual('');
-          expect(response.body.serviceId).toEqual(microservice.processId);
+          expect(response.body.serviceId).toEqual(microservice.instanceId);
           expect(response.body.checks['myWarned:warn']).toEqual([
             {
               componentId: providerWarn.componentId,

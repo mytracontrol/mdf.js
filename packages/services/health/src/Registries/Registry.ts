@@ -34,7 +34,7 @@ export abstract class Registry {
       releaseId: this.metadata.release,
       notes: [],
       output: '',
-      serviceId: this.metadata.processId,
+      serviceId: this.metadata.instanceId,
       description: this.metadata.description,
       links: this.metadata.links,
     };

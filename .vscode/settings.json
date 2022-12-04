@@ -55,7 +55,8 @@
     "jobs",
     "firehose",
     "redis-provider",
-    "core"
+    "core",
+    "service-config"
   ],
 
 }

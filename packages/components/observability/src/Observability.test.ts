@@ -34,7 +34,7 @@ describe('#Observability #Service', () => {
         name: 'myObservability',
         version: '1',
         description: 'myObservability service',
-        processId: v4(),
+        instanceId: v4(),
         release: '1.0.0',
         isCluster: false,
       };
@@ -59,7 +59,7 @@ describe('#Observability #Service', () => {
         name: 'myObservability',
         version: '1',
         description: 'myObservability service',
-        processId: v4(),
+        instanceId: v4(),
         release: '1.0.0',
         isCluster: true,
       };
@@ -104,7 +104,7 @@ describe('#Observability #Service', () => {
         name: 'myObservability',
         version: '1',
         description: 'myObservability service',
-        processId: v4(),
+        instanceId: v4(),
         release: '1.0.0',
         isCluster: true,
       };
@@ -124,7 +124,7 @@ describe('#Observability #Service', () => {
         name: 'myObservability',
         version: '1',
         description: 'myObservability service',
-        processId: v4(),
+        instanceId: v4(),
         release: '1.0.0',
         isCluster: true,
       };
@@ -140,7 +140,7 @@ describe('#Observability #Service', () => {
         name: 'myObservability',
         version: '1',
         description: 'myObservability service',
-        processId: v4(),
+        instanceId: v4(),
         release: '1.0.0',
         isCluster: false,
         port: 1,
@@ -160,7 +160,7 @@ describe('#Observability #Service', () => {
         name: 'myObservability',
         version: '1',
         description: 'myObservability service',
-        processId: v4(),
+        instanceId: v4(),
         release: '1.0.0',
         isCluster: false,
         port: 70000,
@@ -180,7 +180,7 @@ describe('#Observability #Service', () => {
         name: 'myObservability',
         version: '1',
         description: 'myObservability service',
-        processId: v4(),
+        instanceId: v4(),
         release: '1.0.0',
         isCluster: false,
       };
@@ -198,7 +198,7 @@ describe('#Observability #Service', () => {
         name: 'myObservability',
         version: '1',
         description: 'myObservability service',
-        processId: v4(),
+        instanceId: v4(),
         release: '1.0.0',
         isCluster: false,
       };
