@@ -301,17 +301,27 @@ describe('#ConfigManager', () => {
       expect(manager.isErrored).toBeTruthy();
       expect(manager.error).toBeDefined();
       expect(manager.error?.message).toEqual('Error in the service configuration');
-      const trace = manager.error?.trace();
-      expect(trace).toEqual([
-        'CrashError: Error parsing JSON in file src/Client/__mocks__/wrong/config.config.yaml',
-        'caused by SyntaxError: Unexpected end of JSON input',
-        'CrashError: Error parsing YAML in file src/Client/__mocks__/wrong/config.config.yaml',
-        'caused by YAMLParseError: Flow map must end with a } at line 1, column 2:\n\n{\n ^\n',
-        'CrashError: Error parsing JSON in file src/Client/__mocks__/wrong/preset1.preset.config.json',
-        'caused by SyntaxError: Unexpected end of JSON input',
-        'CrashError: Error parsing YAML in file src/Client/__mocks__/wrong/preset1.preset.config.json',
-        'caused by YAMLParseError: Flow map must end with a } at line 2, column 1:\n\n{\r\n\n^\n',
-      ]);
+      const trace = manager.error?.trace() || [];
+      expect(trace[0]).toEqual(
+        'CrashError: Error parsing JSON in file src/Client/__mocks__/wrong/config.config.yaml'
+      );
+      expect(trace[1]).toEqual('caused by SyntaxError: Unexpected end of JSON input');
+      expect(trace[2]).toEqual(
+        'CrashError: Error parsing YAML in file src/Client/__mocks__/wrong/config.config.yaml'
+      );
+      expect(trace[3]).toEqual(
+        'caused by YAMLParseError: Flow map must end with a } at line 1, column 2:\n\n{\n ^\n'
+      );
+      expect(trace[4]).toEqual(
+        'CrashError: Error parsing JSON in file src/Client/__mocks__/wrong/preset1.preset.config.json'
+      );
+      expect(trace[5]).toEqual('caused by SyntaxError: Unexpected end of JSON input');
+      expect(trace[6]).toEqual(
+        'CrashError: Error parsing YAML in file src/Client/__mocks__/wrong/preset1.preset.config.json'
+      );
+      expect(trace[7]).toEqual(
+        'caused by YAMLParseError: Flow map must end with a } at line 2, column 1:\n\n{\r\n\n^\n'
+      );
     }, 1000);
     it('Should start with errors if its not possible to process a schema', () => {
       const manager = new ConfigManager({
@@ -325,12 +335,14 @@ describe('#ConfigManager', () => {
       expect(manager.isErrored).toBeTruthy();
       expect(manager.error).toBeDefined();
       expect(manager.error?.message).toEqual('Error in the service configuration');
-      const trace = manager.error?.trace();
-      expect(trace).toEqual([
-        'CrashError: Error loading schemas: Error adding the schema: [config.schema] - error: [$schema must be a string]',
-        'caused by CrashError: Error adding the schema: [config.schema] - error: [$schema must be a string]',
-        'caused by Error: $schema must be a string',
-      ]);
+      const trace = manager.error?.trace() || [];
+      expect(trace[0]).toEqual(
+        'CrashError: Error loading schemas: Error adding the schema: [config.schema] - error: [$schema must be a string]'
+      );
+      expect(trace[1]).toEqual(
+        'caused by CrashError: Error adding the schema: [config.schema] - error: [$schema must be a string]'
+      );
+      expect(trace[2]).toEqual('caused by Error: $schema must be a string');
     }, 1000);
     it('Should start with errors if its not possible to parse a preset config file', () => {
       const manager = new ConfigManager({
@@ -344,14 +356,18 @@ describe('#ConfigManager', () => {
       expect(manager.isErrored).toBeTruthy();
       expect(manager.error).toBeDefined();
       expect(manager.error?.message).toEqual('Error in the service configuration');
-      const trace = manager.error?.trace();
-      expect(trace).toEqual([
-        'CrashError: Error parsing JSON in file src/Client/__mocks__/wrong/preset1.preset.config.json',
-        'caused by SyntaxError: Unexpected end of JSON input',
-        'CrashError: Error parsing YAML in file src/Client/__mocks__/wrong/preset1.preset.config.json',
-        'caused by YAMLParseError: Flow map must end with a } at line 2, column 1:\n\n{\r\n\n^\n',
-        'CrashError: Preset preset1 not found',
-      ]);
+      const trace = manager.error?.trace() || [];
+      expect(trace[0]).toEqual(
+        'CrashError: Error parsing JSON in file src/Client/__mocks__/wrong/preset1.preset.config.json'
+      );
+      expect(trace[1]).toEqual('caused by SyntaxError: Unexpected end of JSON input');
+      expect(trace[2]).toEqual(
+        'CrashError: Error parsing YAML in file src/Client/__mocks__/wrong/preset1.preset.config.json'
+      );
+      expect(trace[3]).toEqual(
+        'caused by YAMLParseError: Flow map must end with a } at line 2, column 1:\n\n{\r\n\n^\n'
+      );
+      expect(trace[4]).toEqual('CrashError: Preset preset1 not found');
     }, 1000);
     it('Should start with errors if there is a failure reading files', () => {
       jest.spyOn(fs, 'readFileSync').mockImplementation(() => {
@@ -368,18 +384,20 @@ describe('#ConfigManager', () => {
       expect(manager.isErrored).toBeTruthy();
       expect(manager.error).toBeDefined();
       expect(manager.error?.message).toEqual('Error in the service configuration');
-      const trace = manager.error?.trace();
-      expect(trace).toEqual([
-        'CrashError: Error loading files: Error reading file',
-        'caused by Error: Error reading file',
-        'CrashError: Error loading files: Error reading file',
-        'caused by Error: Error reading file',
-        'CrashError: Error loading files: Error reading file',
-        'caused by Error: Error reading file',
-        'CrashError: Preset preset1 not found',
-        'CrashError: Configuration validation failed: final.schema is not registered in the collection.',
-        'caused by ValidationError: final.schema is not registered in the collection.',
-      ]);
+      const trace = manager.error?.trace() || [];
+      expect(trace[0]).toEqual('CrashError: Error loading files: Error reading file');
+      expect(trace[1]).toEqual('caused by Error: Error reading file');
+      expect(trace[2]).toEqual('CrashError: Error loading files: Error reading file');
+      expect(trace[3]).toEqual('caused by Error: Error reading file');
+      expect(trace[4]).toEqual('CrashError: Error loading files: Error reading file');
+      expect(trace[5]).toEqual('caused by Error: Error reading file');
+      expect(trace[6]).toEqual('CrashError: Preset preset1 not found');
+      expect(trace[7]).toEqual(
+        'CrashError: Configuration validation failed: final.schema is not registered in the collection.'
+      );
+      expect(trace[8]).toEqual(
+        'caused by ValidationError: final.schema is not registered in the collection.'
+      );
     }, 1000);
   });
 });
