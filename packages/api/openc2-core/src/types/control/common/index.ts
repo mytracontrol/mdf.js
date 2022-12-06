@@ -10,6 +10,7 @@ export * from './Actuator.i';
 export * from './Arguments.i';
 export * from './Hashes.i';
 export * from './L4Protocol.i';
+export * from './Namespace.t';
 export * from './Pairs.i';
 export * from './Payload.i';
 export * from './ResponseType.t';

@@ -16,3 +16,4 @@ export * from './OpenC2Jobs.t';
 export * from './OrchestratorOptions.i';
 export * from './ProducerAdapter.i';
 export * from './ProducerOptions.i';
+export * from './ResolverMap.t';

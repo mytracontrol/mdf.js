@@ -14,13 +14,13 @@ import { HealthWrapper } from '.';
 class MyHealthComponent extends EventEmitter implements Health.Component {
   componentId = v4();
   name = 'MyHealth';
-  public get checks(): Health.API.Checks {
+  public get checks(): Health.Checks {
     return {};
   }
   emitError(error: Crash): void {
     this.emit('error', error);
   }
-  emitStatus(status: Health.API.Status): void {
+  emitStatus(status: Health.Status): void {
     this.emit('status', status);
   }
 }

@@ -29,11 +29,11 @@
     "test": "jest --config ./jest.config.js"
   },
   "dependencies": {
+    "@mdf.js/core": "*",
     "@mdf.js/crash": "*",
-    "@mdf.js/provider": "*",
+    "@mdf.js/logger": "*",
     "@mdf.js/utils": "*",
     "@types/redis-errors": "^1.2.0",
-    "debug": "^4.3.4",
     "ioredis": "^5.2.4",
     "joi": "^17.6.3",
     "redis-errors": "^1.2.0",
@@ -41,7 +41,6 @@
   },
   "devDependencies": {
     "@mdf.js/repo-config": "*",
-    "@types/debug": "^4.1.7",
     "@types/redis-errors": "^1.2.0"
   },
   "engines": {

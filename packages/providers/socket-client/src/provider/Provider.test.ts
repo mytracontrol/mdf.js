@@ -4,8 +4,9 @@
  * Use of this source code is governed by an MIT-style license that can be found in the LICENSE file
  * or at https://opensource.org/licenses/MIT.
  */
+import { Layer } from '@mdf.js/core';
 import { Crash } from '@mdf.js/crash';
-import { LoggerInstance, Provider } from '@mdf.js/provider';
+import { LoggerInstance } from '@mdf.js/logger';
 import { SocketIOServer } from '@mdf.js/socket-server-provider';
 import { undoMocks } from '@mdf.js/utils';
 import { Factory } from './Factory';
@@ -43,7 +44,7 @@ describe('#Port #Socket.IO #Client', () => {
     it('Should create provider using the factory instance with default configuration', () => {
       const provider = Factory.create();
       expect(provider).toBeDefined();
-      expect(provider).toBeInstanceOf(Provider.Manager);
+      expect(provider).toBeInstanceOf(Layer.Provider.Manager);
       expect(provider.client).toBeDefined();
       expect(provider.state).toEqual('stopped');
       //@ts-ignore - Test environment
@@ -74,7 +75,7 @@ describe('#Port #Socket.IO #Client', () => {
         },
       });
       expect(provider).toBeDefined();
-      expect(provider).toBeInstanceOf(Provider.Manager);
+      expect(provider).toBeInstanceOf(Layer.Provider.Manager);
       expect(provider.client).toBeDefined();
       expect(provider.state).toEqual('stopped');
       //@ts-ignore - Test environment

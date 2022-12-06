@@ -31,11 +31,10 @@
   "dependencies": {
     "@mdf.js/core": "*",
     "@mdf.js/crash": "*",
+    "@mdf.js/error-registry": "*",
     "@mdf.js/logger": "*",
-    "@mdf.js/metrics-service": "*",
-    "@mdf.js/register-service": "*",
+    "@mdf.js/metrics-registry": "*",
     "@mdf.js/utils": "*",
-    "debug": "^4.3.4",
     "lodash": "^4.17.21",
     "tslib": "^2.4.1",
     "uuid": "^9.0.0"
@@ -43,9 +42,8 @@
   "devDependencies": {
     "@mdf.js/observability": "*",
     "@mdf.js/repo-config": "*",
-    "@types/debug": "^4.1.7",
-    "@types/lodash": "^4.14.190",
-    "@types/uuid": "^8.3.4"
+    "@types/lodash": "^4.14.191",
+    "@types/uuid": "^9.0.0"
   },
   "engines": {
     "node": ">=16.14.2"

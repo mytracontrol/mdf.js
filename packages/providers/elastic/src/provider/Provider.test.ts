@@ -5,8 +5,9 @@
  * or at https://opensource.org/licenses/MIT.
  */
 import { Client } from '@elastic/elasticsearch';
+import { Layer } from '@mdf.js/core';
 import { Crash } from '@mdf.js/crash';
-import { LoggerInstance, Provider } from '@mdf.js/provider';
+import { LoggerInstance } from '@mdf.js/logger';
 import { undoMocks } from '@mdf.js/utils';
 import { Factory } from './Factory';
 import { Port } from './Port';
@@ -50,7 +51,7 @@ describe('#Port #Elastic', () => {
     it('Should create provider using the factory instance with default configuration', () => {
       const provider = Factory.create();
       expect(provider).toBeDefined();
-      expect(provider).toBeInstanceOf(Provider.Manager);
+      expect(provider).toBeInstanceOf(Layer.Provider.Manager);
       expect(provider.client).toBeInstanceOf(Client);
       expect(provider.state).toEqual('stopped');
       //@ts-ignore - Test environment
@@ -77,7 +78,7 @@ describe('#Port #Elastic', () => {
         config: { pingTimeout: undefined },
       });
       expect(provider).toBeDefined();
-      expect(provider).toBeInstanceOf(Provider.Manager);
+      expect(provider).toBeInstanceOf(Layer.Provider.Manager);
       expect(provider.client).toBeInstanceOf(Client);
       expect(provider.state).toEqual('stopped');
       //@ts-ignore - Test environment

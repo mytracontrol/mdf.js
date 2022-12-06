@@ -5,5 +5,8 @@
  * or at https://opensource.org/licenses/MIT.
  */
 
+export { ErrorRegistry } from '@mdf.js/error-registry';
+export { HealthRegistry } from '@mdf.js/health-registry';
+export { MetricsRegistry } from '@mdf.js/metrics-registry';
 export * from './Observability';
-export { ObservabilityOptions } from './types';
+export { ObservabilityOptions, ObservabilityServiceOptions } from './types';

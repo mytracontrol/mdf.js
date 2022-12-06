@@ -20,7 +20,7 @@ export class MyWindowPlug extends EventEmitter implements Plugs.Source.Sequence 
   constructor(public max = -1) {
     super();
   }
-  public get checks(): Health.API.Checks {
+  public get checks(): Health.Checks {
     return {};
   }
   public ingestData(size: number): Promise<Jobs.JobRequest> {

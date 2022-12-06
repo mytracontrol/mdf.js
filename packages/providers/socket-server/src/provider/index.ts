@@ -5,10 +5,10 @@
  * or at https://opensource.org/licenses/MIT.
  */
 
-import { Provider } from '@mdf.js/provider';
+import { Layer } from '@mdf.js/core';
 import { Port } from './Port';
 import { Config, Server } from './types';
 
 export { Factory } from './Factory';
 export { Config, Server } from './types';
-export type Provider = Provider.Manager<Server, Config, Port>;
+export type Provider = Layer.Provider.Manager<Server, Config, Port>;

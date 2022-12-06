@@ -30,12 +30,12 @@
     "test": "jest --config ./jest.config.js"
   },
   "dependencies": {
+    "@mdf.js/core": "*",
     "@mdf.js/crash": "*",
     "@mdf.js/http-server-provider": "*",
-    "@mdf.js/provider": "*",
+    "@mdf.js/logger": "*",
     "@mdf.js/utils": "*",
     "@socket.io/admin-ui": "^0.5.1",
-    "debug": "^4.3.4",
     "express": "^4.18.2",
     "joi": "^17.6.3",
     "socket.io": "^4.5.4",
@@ -43,7 +43,6 @@
   },
   "devDependencies": {
     "@mdf.js/repo-config": "*",
-    "@types/debug": "^4.1.7",
     "@types/express": "^4.17.14"
   },
   "optionalDependencies": {

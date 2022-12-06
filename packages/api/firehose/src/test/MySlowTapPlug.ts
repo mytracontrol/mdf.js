@@ -17,7 +17,7 @@ export class MySlowTapPlug extends EventEmitter implements Plugs.Sink.Tap {
   constructor() {
     super();
   }
-  public get checks(): Health.API.Checks {
+  public get checks(): Health.Checks {
     return {};
   }
   public single(job: Jobs.JobObject): Promise<void> {

@@ -7,9 +7,8 @@
 
 import { Health, Jobs } from '@mdf.js/core';
 import { Crash } from '@mdf.js/crash';
+import { ErrorRegistry } from '@mdf.js/error-registry';
 import { DebugLogger, LoggerInstance, SetContext } from '@mdf.js/logger';
-import { Service as RegisterService } from '@mdf.js/register-service';
-import { overallStatus } from '@mdf.js/utils';
 import EventEmitter from 'events';
 import { Writable } from 'stream';
 import { v4 } from 'uuid';
@@ -26,7 +25,7 @@ export declare interface Firehose<
   /** Due to the implementation of consumer classes, this event will never emitted */
   on(event: 'error', listener: (error: Error | Crash) => void): this;
   /** Emitted on every state change */
-  on(event: 'status', listener: (status: Health.API.Status) => void): this;
+  on(event: 'status', listener: (status: Health.Status) => void): this;
   /** Emitted when a job is created */
   on(event: 'job', listener: (job: Jobs.JobObject<Type, Data, CustomHeaders>) => void): this;
   /** Emitted when a job has ended */
@@ -54,7 +53,7 @@ export class Firehose<
   /** Metrics handler */
   private readonly metricsHandler?: MetricsHandler;
   /** Error registry handler */
-  private readonly errorRegisterHandler?: RegisterService;
+  private readonly errorRegisterHandler?: ErrorRegistry;
   /** Flag to indicate that an stop request has been received */
   private stopping: boolean;
   /**
@@ -102,7 +101,7 @@ export class Firehose<
     }
   };
   /** Sink/Source/Engine error event handler */
-  private readonly onStatusEvent = (status: Health.API.Status) => {
+  private readonly onStatusEvent = (status: Health.Status) => {
     // Stryker disable next-line all
     this.logger.debug(`Status message received from underlayer streams ${status}`);
     this.emit('status', this.overallStatus);
@@ -176,16 +175,16 @@ export class Firehose<
     this.engine.off('status', this.onStatusEvent);
   }
   /** Overall component status */
-  private get overallStatus(): Health.API.Status {
-    return overallStatus(this.checks);
+  private get overallStatus(): Health.Status {
+    return Health.overallStatus(this.checks);
   }
   /**
    * Return the status of the firehose in a standard format
    * @returns _check object_ as defined in the draft standard
    * https://datatracker.ietf.org/doc/html/draft-inadarei-api-health-check-05
    */
-  public get checks(): Health.API.Checks {
-    let overallChecks: Health.API.Checks = {};
+  public get checks(): Health.Checks {
+    let overallChecks: Health.Checks = {};
     for (const source of this.sources) {
       overallChecks = { ...source.checks, ...overallChecks };
     }

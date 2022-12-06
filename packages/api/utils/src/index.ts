@@ -10,7 +10,6 @@ export * from './cycle';
 export * from './escape';
 export * from './findNodeModule';
 export * from './formatEnv';
-export * from './health';
 export * from './loadFile';
 export * from './mocks';
 export * from './prettyMS';

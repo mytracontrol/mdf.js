@@ -29,16 +29,17 @@
     "test": "jest --config ./jest.config.js"
   },
   "dependencies": {
+    "@mdf.js/core": "*",
     "@mdf.js/crash": "*",
-    "@mdf.js/provider": "*",
-    "@mdf.js/utils": "*",
     "@mdf.js/doorkeeper": "*",
-    "yaml": "^2.1.3",
+    "@mdf.js/logger": "*",
+    "@mdf.js/utils": "*",
     "glob": "8.0.3",
     "joi": "^17.6.3",
-    "tslib": "^2.4.1",
     "lodash": "^4.17.21",
-    "uuid": "^9.0.0"
+    "tslib": "^2.4.1",
+    "uuid": "^9.0.0",
+    "yaml": "^2.1.3"
   },
   "devDependencies": {
     "@mdf.js/repo-config": "*",

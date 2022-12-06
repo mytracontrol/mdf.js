@@ -14,6 +14,8 @@ import {
   ConsumerOptions,
   Control,
   OnCommandHandler,
+  Resolver,
+  ResolverEntry,
 } from '../../types';
 import { Component } from '../Component';
 import { AdapterWrapper } from './core';
@@ -22,7 +24,7 @@ export declare interface Consumer {
   /** Emitted when a consumer's operation has some error */
   on(event: 'error', listener: (error: Crash | Error) => void): this;
   /** Emitted on every state change */
-  on(event: 'status', listener: (status: Health.API.Status) => void): this;
+  on(event: 'status', listener: (status: Health.Status) => void): this;
   /** Emitted when a incoming command is received */
   on(event: 'command', listener: (job: CommandJobHandler) => void): this;
 }
@@ -122,14 +124,41 @@ export class Consumer extends Component<AdapterWrapper, ConsumerOptions> {
       this.logger.debug(`${message.request_id} has default response`);
       return defaultResponse;
     } else {
-      return this.executeCommand(this.createJobFromCommand(message));
+      const resolver = this.getResolver(message);
+      if (resolver) {
+        return this.resolveCommand(resolver, message);
+      } else {
+        return this.emitCommandJob(this.createJobFromCommand(message));
+      }
+    }
+  }
+  /**
+   * Resolve a command message using a resolver
+   * @param resolver - resolver function to be executed
+   * @param message - message to be processed
+   * @returns
+   */
+  private async resolveCommand(
+    resolver: Resolver,
+    message: Control.CommandMessage
+  ): Promise<Control.ResponseMessage | undefined> {
+    try {
+      const target = Accessors.getTargetFromCommand(message.content) as keyof Control.Target;
+      const response = await resolver(message.content.target[target]);
+      this.logger.info(`Command was resolved successfully`);
+      return Helpers.ok(message, this.options.id, { [target]: response });
+    } catch (rawError) {
+      const cause = Crash.from(rawError);
+      // Stryker disable next-line all
+      this.logger.error(`Command was resolved with errors: ${cause.message}`);
+      return Helpers.internalError(message, this.options.id, cause.trace().join(','));
     }
   }
   /**
    * Execute a job and wait for the resolution
    * @param message - message to be processed as a job for upper layers
    */
-  private async executeCommand(
+  private async emitCommandJob(
     job: CommandJobHandler
   ): Promise<Control.ResponseMessage | undefined> {
     this.register.push(job);
@@ -179,5 +208,17 @@ export class Consumer extends Component<AdapterWrapper, ConsumerOptions> {
       },
     };
     return new Jobs.JobHandler(jobRequest);
+  }
+  /**
+   * Check if there is a resolver function for the command in the resolver map
+   * @param message - message to be processed
+   */
+  private getResolver(message: Control.CommandMessage): Resolver | undefined {
+    const target = Accessors.getTargetFromCommand(message.content);
+    const entry = `${message.content.action}:${target}` as ResolverEntry;
+    if (this.options.resolver && this.options.resolver[entry]) {
+      return this.options.resolver[entry];
+    }
+    return undefined;
   }
 }

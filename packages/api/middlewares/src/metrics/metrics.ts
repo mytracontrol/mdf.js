@@ -1,15 +1,11 @@
 /**
  * Copyright 2022 Mytra Control S.L. All rights reserved.
- * Note: All information contained herein is, and remains the property of Netin System S.L. and its
- * suppliers, if any. The intellectual and technical concepts contained herein are property of
- * Netin System S.L. and its suppliers and may be covered by European and Foreign patents, patents
- * in process, and are protected by trade secret or copyright.
  *
- * Dissemination of this information or the reproduction of this material is strictly forbidden
- * unless prior written permission is obtained from Netin System S.L.
+ * Use of this source code is governed by an MIT-style license that can be found in the LICENSE file
+ * or at https://opensource.org/licenses/MIT.
  */
 
-import { Counter, Gauge, Histogram, MetricConfig, Service } from '@mdf.js/metrics-service';
+import { Counter, Gauge, Histogram, MetricConfig, MetricsRegistry } from '@mdf.js/metrics-registry';
 import { NextFunction, Request, RequestHandler, Response } from 'express';
 
 /** Global metric for API */
@@ -104,22 +100,22 @@ type MetricInstances = {
 const CONTENT_LENGTH_HEADER = 'content-length';
 /** MetricsExpressMiddleware middleware */
 export class Metrics {
-  /** Metrics service */
-  private readonly service: Service;
+  /** Metrics registry */
+  private readonly service: MetricsRegistry;
   /** Core and API metrics */
   private readonly metrics: MetricInstances;
   /**
    * Return a metrics middleware instance
-   * @param service - Metrics service interface
+   * @param service - Metrics registry interface
    */
-  public static handler(service: Service): RequestHandler {
+  public static handler(service: MetricsRegistry): RequestHandler {
     return new Metrics(service).handler;
   }
   /**
    * Create a new instance of metrics express middleware class
-   * @param service - Metrics service interface
+   * @param service - Metrics registry interface
    */
-  private constructor(service: Service) {
+  private constructor(service: MetricsRegistry) {
     this.service = service;
     this.metrics = this.service.setMetrics<MetricInstances>(METRICS_DEFINITIONS);
   }

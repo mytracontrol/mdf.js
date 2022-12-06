@@ -5,12 +5,12 @@
  * or at https://opensource.org/licenses/MIT.
  */
 
-import { Provider } from '@mdf.js/provider';
+import { Layer } from '@mdf.js/core';
 import { configEntry, CONFIG_PROVIDER_BASE_NAME } from './config';
 import { Port } from './Port';
 import { Config, Receiver } from './types';
 
-export const Factory = Provider.Factory<Receiver, Config, Port>(
+export const Factory = Layer.Provider.ProviderFactoryCreator<Receiver, Config, Port>(
   Port,
   configEntry,
   CONFIG_PROVIDER_BASE_NAME,

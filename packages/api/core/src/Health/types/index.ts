@@ -5,6 +5,8 @@
  * or at https://opensource.org/licenses/MIT.
  */
 
-export * as API from './API';
+export * from './Check.i';
+export * from './Checks.t';
 export * from './Component.i';
-export * from './Service.i';
+export * from './Service';
+export * from './Status.t';

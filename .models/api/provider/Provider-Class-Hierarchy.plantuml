@@ -10,8 +10,8 @@ class MyWrappedClient< extends Port > {
 }
 
 abstract class Port <extends EventEmitter> {
-    # addCheck(measure: string, check: Health.API.Check): boolean
-    + checks: Record<string, Health.API.Check[]>
+    # addCheck(measure: string, check: Health.Check): boolean
+    + checks: Record<string, Health.Check[]>
     + {abstract} client: Client
     + {abstract} state: boolean
     + {abstract} start(): Promise<void>
@@ -23,13 +23,13 @@ abstract class Port <extends EventEmitter> {
     ~ on(event: "unhealthy", listener: (error: Crash) => void): this
     ~ on(event: "closed", listener: (error?: Crash) => void): this
 }
-class Manager <implements Health.API.Component> {
+class Manager <implements Health.Component> {
     - port: Port
-    + state: Health.API.State
+    + state: Health.State
     + actualStateDate: string
     + error: Crash
     + client: Client
-    + checks: Health.API.Checks
+    + checks: Health.Checks
     + start(): Promise<void>
     + stop(): Promise<void>
     + fail(error: Crash): Promise<void>

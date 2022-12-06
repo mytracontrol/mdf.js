@@ -6,7 +6,6 @@
  */
 import { Health } from '@mdf.js/core';
 import { Crash } from '@mdf.js/crash';
-import { overallStatus } from '@mdf.js/utils';
 import { EventEmitter } from 'events';
 import { v4 } from 'uuid';
 
@@ -14,7 +13,7 @@ export class HealthWrapper extends EventEmitter implements Health.Component {
   /** Component identification */
   public readonly componentId = v4();
   /** Flag to indicate that an unhealthy status has been emitted recently */
-  private lastStatusEmitted?: Health.API.Status;
+  private lastStatusEmitted?: Health.Status;
   /**
    * Regular OpenC2 consumer implementation. This class allows the management of incoming command
    * and the underlayer Adapter. The main task of this class is to filter incoming commands that are
@@ -44,14 +43,14 @@ export class HealthWrapper extends EventEmitter implements Health.Component {
    * @returns _check object_ as defined in the draft standard
    * https://datatracker.ietf.org/doc/html/draft-inadarei-api-health-check-05
    */
-  public get checks(): Health.API.Checks {
+  public get checks(): Health.Checks {
     return this.components.reduce((checks, component) => {
       return { ...checks, ...component.checks };
-    }, {} as Health.API.Checks);
+    }, {} as Health.Checks);
   }
   /** Emit the status if it's different from the last emitted status */
-  private emitStatus = (): void => {
-    const actualStatus = overallStatus(this.checks);
+  private readonly emitStatus = (): void => {
+    const actualStatus = Health.overallStatus(this.checks);
     if (this.lastStatusEmitted !== actualStatus) {
       this.lastStatusEmitted = this.overallStatus;
       this.emit('status', this.overallStatus);
@@ -61,14 +60,14 @@ export class HealthWrapper extends EventEmitter implements Health.Component {
    * Manage the error in the producer interface
    * @param error - error to be processed
    */
-  private onErrorHandler = (error: unknown): void => {
+  private readonly onErrorHandler = (error: unknown): void => {
     const crash = Crash.from(error);
     if (this.listenerCount('error') > 0) {
       this.emit('error', crash);
     }
   };
   /** Overall component status */
-  private get overallStatus(): Health.API.Status {
-    return overallStatus(this.checks);
+  private get overallStatus(): Health.Status {
+    return Health.overallStatus(this.checks);
   }
 }

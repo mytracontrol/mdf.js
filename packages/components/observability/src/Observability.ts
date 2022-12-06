@@ -5,13 +5,13 @@
  * or at https://opensource.org/licenses/MIT.
  */
 
-import { Health } from '@mdf.js/core';
+import { Layer } from '@mdf.js/core';
 import { Crash, Links, Multi } from '@mdf.js/crash';
-import { Service as HealthService } from '@mdf.js/health-service';
+import { ErrorRegistry } from '@mdf.js/error-registry';
+import { HealthRegistry } from '@mdf.js/health-registry';
 import { HTTP } from '@mdf.js/http-server-provider';
-import { Service as MetricsService } from '@mdf.js/metrics-service';
+import { MetricsRegistry } from '@mdf.js/metrics-registry';
 import { Middleware } from '@mdf.js/middlewares';
-import { Service as RegisterService } from '@mdf.js/register-service';
 import { coerce } from '@mdf.js/utils';
 import cluster from 'cluster';
 import express, { Express, NextFunction, Request, Response } from 'express';
@@ -29,35 +29,35 @@ export class Observability {
   private readonly app: Express;
   /** Observability server */
   private server?: HTTP.Provider;
-  /** Services offered under observability instance */
-  private readonly services: Health.Service[];
-  /** Error registry service */
-  public readonly errorsRegistry: RegisterService;
-  /** Metrics service */
-  public readonly metricsRegistry: MetricsService;
-  /** Health service */
-  public readonly healthRegistry: HealthService;
-  /** Services router */
+  /** Registries offered under observability instance */
+  private readonly registries: Layer.Service.Registry[];
+  /** Error registry */
+  public readonly errorsRegistry: ErrorRegistry;
+  /** Metrics registry */
+  public readonly metricsRegistry: MetricsRegistry;
+  /** Health registry */
+  public readonly healthRegistry: HealthRegistry;
+  /** Registries router */
   public router: express.Router;
   /**
    * Create an instance of observability service
    * @param options - observability options
    */
   constructor(public readonly options: ObservabilityOptions) {
-    this.healthRegistry = HealthService.create(options, options.isCluster);
-    this.metricsRegistry = MetricsService.create(options.isCluster);
-    this.errorsRegistry = RegisterService.create(options.maxSize, options.isCluster);
-    this.services = [this.healthRegistry, this.metricsRegistry, this.errorsRegistry];
+    this.healthRegistry = HealthRegistry.create(options, options.isCluster);
+    this.metricsRegistry = MetricsRegistry.create(options.isCluster);
+    this.errorsRegistry = ErrorRegistry.create(options.maxSize, options.isCluster);
+    this.registries = [this.healthRegistry, this.metricsRegistry, this.errorsRegistry];
     this.healthRegistry.on('error', this.onErrorEvent);
     this.router = express.Router();
     this.app = !this.options.isCluster || cluster.isPrimary ? this.primaryApp() : this.workerApp();
   }
   /**
-   * Register a new service in the observability
-   * @param service - service to register
+   * Attach a new registry in the observability
+   * @param registry - registry to be attached
    */
-  public registerService(service: Health.Service): void {
-    this.services.push(service);
+  public attach(registry: Layer.Service.Registry): void {
+    this.registries.push(registry);
   }
   /** Start the observability service */
   public async start(): Promise<void> {
@@ -66,7 +66,7 @@ export class Observability {
     }
     const router = express.Router();
     let formattedLinks: Links = {};
-    for (const service of this.services) {
+    for (const service of this.registries) {
       if (typeof service.start === 'function') {
         await service.start.call(service);
       }
@@ -96,7 +96,7 @@ export class Observability {
     }
     await this.server.stop();
     this.server = undefined;
-    for (const service of this.services) {
+    for (const service of this.registries) {
       if (typeof service.stop === 'function') {
         await service.stop.call(service);
       }

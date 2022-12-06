@@ -20,7 +20,7 @@ export class MySequencePlug extends EventEmitter implements Plugs.Source.Sequenc
   constructor() {
     super();
   }
-  public get checks(): Health.API.Checks {
+  public get checks(): Health.Checks {
     return {};
   }
   public ingestData(size: number): Promise<Jobs.JobRequest | Jobs.JobRequest[]> {

@@ -7,7 +7,6 @@
 
 import { Health } from '@mdf.js/core';
 import { Crash } from '@mdf.js/crash';
-import { overallStatus } from '@mdf.js/utils';
 import EventEmitter from 'events';
 import { get, isEqual, uniq } from 'lodash';
 import { v4 } from 'uuid';
@@ -18,7 +17,7 @@ export declare interface ConsumerMap {
   /** Emitted when a producer's operation has some problem */
   on(event: 'error', listener: (error: Crash | Error) => void): this;
   /** Emitted on every state change */
-  on(event: 'status', listener: (status: Health.API.Status) => void): this;
+  on(event: 'status', listener: (status: Health.Status) => void): this;
   /** Emitted when new nodes are included included map */
   on(event: 'new', listener: (nodes: string[]) => void): this;
   /** Emitted when some nodes has been aged */
@@ -31,11 +30,11 @@ export declare interface ConsumerMap {
 
 export class ConsumerMap extends EventEmitter implements Health.Component {
   /** Flag to indicate that an unhealthy status has been emitted recently */
-  private lastStatusEmitted?: Health.API.Status;
+  private lastStatusEmitted?: Health.Status;
   /** Component identification */
   public readonly componentId = v4();
   /** Consumer Map */
-  private readonly map: Map<string, Health.API.Check<Control.Response>>;
+  private readonly map: Map<string, Health.Check<Control.Response>>;
   /** Aging timer  */
   private agingTimer?: NodeJS.Timeout;
   /**
@@ -130,11 +129,11 @@ export class ConsumerMap extends EventEmitter implements Health.Component {
    * @param consumerId - consumer id to get the status
    * @returns
    */
-  public getNode(consumerId: string): Health.API.Check<Control.Response> | undefined {
+  public getNode(consumerId: string): Health.Check<Control.Response> | undefined {
     return this.map.get(consumerId);
   }
   /** Return the state of all the underlying consumers */
-  public get checks(): Health.API.Checks<Control.Response> {
+  public get checks(): Health.Checks<Control.Response> {
     return { [`${this.name}:consumers`]: Array.from(this.map.values()) };
   }
   /** Perform the aging of the consumer map */
@@ -172,8 +171,8 @@ export class ConsumerMap extends EventEmitter implements Health.Component {
     });
   }
   /** Overall component status */
-  private get status(): Health.API.Status {
-    return overallStatus(this.checks);
+  private get status(): Health.Status {
+    return Health.overallStatus(this.checks);
   }
   /** Emit the status if it's different from the last emitted status */
   private emitStatus(): void {

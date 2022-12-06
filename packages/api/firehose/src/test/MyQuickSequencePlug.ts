@@ -23,7 +23,7 @@ export class MyQuickSequencePlug extends EventEmitter implements Plugs.Source.Se
   constructor(public shouldReject: number = 0) {
     super();
   }
-  public get checks(): Health.API.Checks {
+  public get checks(): Health.Checks {
     return {};
   }
   public ingestData(size: number): Promise<Jobs.JobRequest | Jobs.JobRequest[]> {

@@ -1,16 +1,12 @@
 /**
  * Copyright 2022 Mytra Control S.L. All rights reserved.
- * Note: All information contained herein is, and remains the property of Netin System S.L. and its
- * suppliers, if any. The intellectual and technical concepts contained herein are property of
- * Netin System S.L. and its suppliers and may be covered by European and Foreign patents, patents
- * in process, and are protected by trade secret or copyright.
  *
- * Dissemination of this information or the reproduction of this material is strictly forbidden
- * unless prior written permission is obtained from Netin System S.L.
+ * Use of this source code is governed by an MIT-style license that can be found in the LICENSE file
+ * or at https://opensource.org/licenses/MIT.
  */
 // ************************************************************************************************
 // #region Component imports
-import { Service } from '@mdf.js/metrics-service';
+import { MetricsRegistry } from '@mdf.js/metrics-registry';
 import express from 'express';
 import request from 'supertest';
 import { Middleware } from '..';
@@ -19,7 +15,7 @@ import { Middleware } from '..';
 // *************************************************************************************************
 // #region Own express app for testing, including the mandatory middleware
 const app = express();
-const service = Service.create();
+const service = MetricsRegistry.create();
 
 app.use(Middleware.RequestId.handler());
 app.use(Middleware.BodyParser.JSONParserHandler());

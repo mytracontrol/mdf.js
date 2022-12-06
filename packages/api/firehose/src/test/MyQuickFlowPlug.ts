@@ -39,7 +39,7 @@ export class MyQuickFlowPlug extends EventEmitter implements Plugs.Source.Flow {
   public postConsume(jobId: string): Promise<string | undefined> {
     return Promise.resolve(this.founded ? jobId : undefined);
   }
-  public get checks(): Health.API.Checks {
+  public get checks(): Health.Checks {
     return {};
   }
   public start(): Promise<void> {

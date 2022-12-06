@@ -7,6 +7,7 @@
 
 import { Control } from '.';
 import { ComponentOptions } from './ComponentOptions.i';
+import { ResolverMap } from './ResolverMap.t';
 
 export interface ConsumerOptions extends ComponentOptions {
   /** Supported pairs Action-Target pairs */
@@ -15,4 +16,6 @@ export interface ConsumerOptions extends ComponentOptions {
   profiles?: string[];
   /** Actuator */
   actuator?: string[];
+  /** Resolver */
+  resolver?: ResolverMap;
 }

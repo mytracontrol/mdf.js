@@ -54,7 +54,7 @@ export class Sequence<
    * @returns _check object_ as defined in the draft standard
    * https://datatracker.ietf.org/doc/html/draft-inadarei-api-health-check-05
    */
-  override get checks(): Health.API.Checks {
+  override get checks(): Health.Checks {
     return {
       ...super.checks,
       [`${this.name}:window`]: [
@@ -74,7 +74,7 @@ export class Sequence<
     };
   }
   /** Check the status of the requested window */
-  private get windowStatus(): Health.API.Status {
+  private get windowStatus(): Health.Status {
     return this.actualWindowSize < this.requestedWindowSize ? 'pass' : 'warn';
   }
   /**

@@ -16,7 +16,7 @@ export interface Base<
   /** Emitted when the component throw an error */
   on(event: 'error', listener: (error: Crash | Error) => void): this;
   /** Emitted on every status change */
-  on(event: 'status', listener: (status: Health.API.Status) => void): this;
+  on(event: 'status', listener: (status: Health.Status) => void): this;
   /** Emitted when there is a new job to be managed */
   on(event: 'data', listener: (job: Jobs.JobRequest<Type, Data, CustomHeaders>) => void): this;
   /**

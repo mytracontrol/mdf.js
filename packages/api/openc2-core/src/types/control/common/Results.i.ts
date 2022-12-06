@@ -7,12 +7,14 @@
 
 import { ActionTargetPairs } from './Pairs.i';
 /** Allowed property types */
-type AllowedResultPropertyTypes =
+export type AllowedResultPropertyTypes =
   | Record<string, any>
   | string[]
   | number
   | ActionTargetPairs
   | undefined;
+
+import { Namespace } from './Namespace.t';
 
 /** Result object */
 export interface Results {
@@ -27,5 +29,5 @@ export interface Results {
   /** Maximum number of requests per minute supported by design or policy */
   rate_limit?: number;
   /** Specific profile responses */
-  [profile: string]: AllowedResultPropertyTypes;
+  [namespace: Namespace]: AllowedResultPropertyTypes;
 }

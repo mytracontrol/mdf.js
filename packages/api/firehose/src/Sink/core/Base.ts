@@ -7,7 +7,6 @@
 
 import { Health } from '@mdf.js/core';
 import { Crash, Multi } from '@mdf.js/crash';
-import { overallStatus } from '@mdf.js/utils';
 import { merge } from 'lodash';
 import { Readable, Writable } from 'stream';
 import { Plugs, SinkOptions } from '../../types';
@@ -49,7 +48,7 @@ export declare interface Base<
    */
   on(event: 'lost', listener: (src: Writable) => void): this;
   /** Emitted on every state change */
-  on(event: 'status', listener: (status: Health.API.Status) => void): this;
+  on(event: 'status', listener: (status: Health.Status) => void): this;
 }
 
 /** Firehose sink (Writable) plug class */
@@ -67,7 +66,7 @@ export abstract class Base<
   /** Store the last error detected in the stream */
   protected error?: Multi | Crash;
   /** Flag to indicate that an unhealthy status has been emitted recently */
-  private lastStatusEmitted?: Health.API.Status;
+  private lastStatusEmitted?: Health.Status;
   /** Wrapped source plug */
   public readonly plugWrapper: PlugWrapper<Type, Data, CustomHeaders>;
   /**
@@ -99,7 +98,7 @@ export abstract class Base<
    * @returns _check object_ as defined in the draft standard
    * https://datatracker.ietf.org/doc/html/draft-inadarei-api-health-check-05
    */
-  public get checks(): Health.API.Checks {
+  public get checks(): Health.Checks {
     return {
       ...this.plugWrapper.checks,
       [`${this.name}:stream`]: [
@@ -116,11 +115,11 @@ export abstract class Base<
     };
   }
   /** Overall component status */
-  private get overallStatus(): Health.API.Status {
-    return overallStatus(this.checks);
+  private get overallStatus(): Health.Status {
+    return Health.overallStatus(this.checks);
   }
   /** Return the status of the stream in the standard format */
-  private get ownStatus(): Health.API.Status {
+  private get ownStatus(): Health.Status {
     if (!this.writable) {
       return 'fail';
     } else if (this.writableLength >= this.writableHighWaterMark) {

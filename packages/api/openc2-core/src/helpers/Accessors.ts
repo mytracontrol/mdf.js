@@ -93,7 +93,7 @@ export class Accessors {
    * @param status - consumer status
    * @returns
    */
-  public static getStatusFromResponseMessage(response: Control.ResponseMessage): Health.API.Status {
+  public static getStatusFromResponseMessage(response: Control.ResponseMessage): Health.Status {
     if (response.status >= 500) {
       return 'fail';
     } else if (response.status >= 200) {

@@ -5,13 +5,13 @@
  * or at https://opensource.org/licenses/MIT.
  */
 
-import { PortConfigValidationStruct } from '@mdf.js/provider';
+import { Layer } from '@mdf.js/core';
 import { Config } from '../types';
 import { defaultConfig } from './default';
 import { envBasedConfig } from './env';
 import { schema } from './schema';
 
-export const configEntry: PortConfigValidationStruct<Config> = {
+export const configEntry: Layer.Provider.PortConfigValidationStruct<Config> = {
   envBasedConfig,
   defaultConfig,
   schema,

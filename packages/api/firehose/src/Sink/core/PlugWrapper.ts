@@ -150,7 +150,7 @@ export class PlugWrapper<
    * @returns _check object_ as defined in the draft standard
    * https://datatracker.ietf.org/doc/html/draft-inadarei-api-health-check-05
    */
-  public get checks(): Health.API.Checks {
+  public get checks(): Health.Checks {
     return {
       ...this.plug.checks,
       [`${this.plug.name}:lastOperation`]: [

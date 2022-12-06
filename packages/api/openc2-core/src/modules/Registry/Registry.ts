@@ -26,7 +26,7 @@ export class Registry extends EventEmitter implements Health.Component {
   /** Time in milliseconds assigned to check internal */
   private readonly timeInterval: number;
   /** Represent the actual status of the register of jobs */
-  private status: Health.API.Status = 'pass';
+  private status: Health.Status = 'pass';
   /**
    * Creates a new Register instance
    * @param name - Component name
@@ -102,7 +102,7 @@ export class Registry extends EventEmitter implements Health.Component {
    */
   private readonly checkOldPendingJobs = (): void => {
     const now = Date.now();
-    let newStatus: Health.API.Status = 'pass';
+    let newStatus: Health.Status = 'pass';
     for (const [, job] of this.pendingJobs[Symbol.iterator]()) {
       if (now - job.createdAt.getTime() > 1000 * 60 * this.maxInactivityTime) {
         job.done(
@@ -137,8 +137,8 @@ export class Registry extends EventEmitter implements Health.Component {
    * @returns _check object_ as defined in the draft standard
    * https://datatracker.ietf.org/doc/html/draft-inadarei-api-health-check-05
    */
-  public get checks(): Health.API.Checks {
-    const check: Health.API.Check = {
+  public get checks(): Health.Checks {
+    const check: Health.Check = {
       status: this.status,
       componentId: this.componentId,
       componentType: 'source',

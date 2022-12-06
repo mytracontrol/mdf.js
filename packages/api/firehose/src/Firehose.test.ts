@@ -71,7 +71,7 @@ describe('#Firehose', () => {
           expect(metrics.metrics).toContain(`api_all_job_processed_total{type="myType"} 4`);
           expect(metrics.metrics).toContain(`api_all_job_in_processing_total{type="myType"} 6`);
           expect(service.errorsRegistry.size).toEqual(0);
-          const checks = service.healthRegistry.health.checks as Health.API.Checks;
+          const checks = service.healthRegistry.health.checks as Health.Checks;
           expect(checks['MyTapPlug:lastOperation'][0].status).toEqual('pass');
           expect(checks['MyTapPlug:lastOperation'][0].componentType).toEqual('plug');
           expect(checks['MyTapPlug:lastOperation'][0].observedValue).toEqual('ok');
@@ -134,7 +134,7 @@ describe('#Firehose', () => {
           expect(metrics.metrics).toContain(`api_all_job_processed_total{type="myType"} 4`);
           expect(metrics.metrics).toContain(`api_all_job_in_processing_total{type="myType"} 0`);
           expect(service.errorsRegistry.size).toEqual(0);
-          const checks = service.healthRegistry.health.checks as Health.API.Checks;
+          const checks = service.healthRegistry.health.checks as Health.Checks;
           expect(checks['MyTapPlug:lastOperation'][0].status).toEqual('pass');
           expect(checks['MyTapPlug:lastOperation'][0].componentType).toEqual('plug');
           expect(checks['MyTapPlug:lastOperation'][0].observedValue).toEqual('ok');
@@ -651,12 +651,12 @@ describe('#Firehose', () => {
       firehose.start();
       firehose.on('done', async (uuid: string, result: Jobs.Result, error?: Crash) => {
         if (result.jobUserId === '101') {
-          const checks = service.healthRegistry.health.checks as Health.API.Checks;
+          const checks = service.healthRegistry.health.checks as Health.Checks;
           expect(checks['MySequencePlug:unknownJobsInPostConsume'][0].output?.length).toEqual(100);
           expect(checks['MySequencePlug:unknownJobsInPostConsume'][0].status).toEqual('fail');
         }
         if (result.jobUserId === '200') {
-          const checks = service.healthRegistry.health.checks as Health.API.Checks;
+          const checks = service.healthRegistry.health.checks as Health.Checks;
           expect(checks['MySequencePlug:stream'][0].observedUnit).toEqual('jobs');
           expect(checks['MySequencePlug:stream'][0].componentType).toEqual('stream');
           expect(checks['MySequencePlug:stream'][0].status).toEqual('pass');
@@ -703,7 +703,7 @@ describe('#Firehose', () => {
       service.healthRegistry.register(firehose);
       firehose.on('job', job => {
         if (job.jobUserId === '8') {
-          const checks = service.healthRegistry.health.checks as Health.API.Checks;
+          const checks = service.healthRegistry.health.checks as Health.Checks;
           expect(checks['MyWindowPlug:window'][0].observedUnit).toEqual('pending windows jobs');
           expect(checks['MyWindowPlug:window'][0].componentType).toEqual('stream');
           expect(checks['MyWindowPlug:window'][0].status).toEqual('warn');
@@ -743,7 +743,7 @@ describe('#Firehose', () => {
       });
       firehose.on('done', async (uuid: string, result: Jobs.Result, error?: Crash) => {
         if (result.jobUserId === '10') {
-          let checks = service.healthRegistry.health.checks as Health.API.Checks;
+          let checks = service.healthRegistry.health.checks as Health.Checks;
           expect(checks['MySequencePlug:unknownJobsInPostConsume'][0].output).toBeUndefined();
           expect(checks['MySequencePlug:unknownJobsInPostConsume'][0].status).toEqual('pass');
           expect(checks['MySequencePlug:unknownJobsInPostConsume'][0].componentType).toEqual(
@@ -772,7 +772,7 @@ describe('#Firehose', () => {
             'caused by CrashError: my reason to reject'
           );
           setTimeout(() => {
-            checks = service.healthRegistry.health.checks as Health.API.Checks;
+            checks = service.healthRegistry.health.checks as Health.Checks;
             expect(checks['MySequencePlug:uncleanedJobsInPostConsume'][0].output).toBeUndefined();
             expect(checks['MySequencePlug:uncleanedJobsInPostConsume'][0].status).toEqual('pass');
             expect(statusCounter).toEqual(5);
@@ -804,7 +804,7 @@ describe('#Firehose', () => {
         throw new Error('Expected to not receive any done event');
       });
       setTimeout(() => {
-        const checks = service.healthRegistry.health.checks as Health.API.Checks;
+        const checks = service.healthRegistry.health.checks as Health.Checks;
         expect((checks['MyJetPlug:lastOperation'][0].output as string[])[0]).toEqual(
           'Error: Was rejected by my own'
         );
@@ -837,7 +837,7 @@ describe('#Firehose', () => {
         expect(error?.message).toEqual('Errors in job processing');
       });
       setTimeout(async () => {
-        const checks = service.healthRegistry.health.checks as Health.API.Checks;
+        const checks = service.healthRegistry.health.checks as Health.Checks;
         expect((checks['MyTapPlug:lastOperation'][0].output as string[])[0]).toEqual(
           'IrresolvableError: Was rejected by my own'
         );
@@ -873,7 +873,7 @@ describe('#Firehose', () => {
         expect(error?.message).toEqual('Errors in job processing');
       });
       setTimeout(async () => {
-        const checks = service.healthRegistry.health.checks as Health.API.Checks;
+        const checks = service.healthRegistry.health.checks as Health.Checks;
         expect((checks['MyTapPlug:lastOperation'][0].output as string[])[0]).toEqual(
           'IrresolvableError: Was rejected by my own'
         );
@@ -913,7 +913,7 @@ describe('#Firehose', () => {
         called++;
       });
       setTimeout(() => {
-        const checks = service.healthRegistry.health.checks as Health.API.Checks;
+        const checks = service.healthRegistry.health.checks as Health.Checks;
         expect((checks['MyJetPlug:lastOperation'][0].output as string[])[0]).toEqual(
           'IrresolvableError: Was rejected by my own'
         );

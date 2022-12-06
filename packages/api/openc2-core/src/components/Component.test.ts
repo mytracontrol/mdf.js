@@ -360,7 +360,16 @@ describe('#OpenC2 #Components', () => {
           consumerAdapter2.handler(message, onResponse);
         }
       });
-      const consumer1 = new Consumer(consumerAdapter1, { ...consumerOptions, id: 'consumer1' });
+      const consumer1 = new Consumer(consumerAdapter1, {
+        ...consumerOptions,
+        id: 'consumer1',
+        resolver: {
+          'query:x-netin:alarms': (target: any) => {
+            expect(target).toEqual({ entity: '3b6771cb-1ca6-4c1f-a06e-0b413872cd5c' });
+            return Promise.resolve(undefined);
+          },
+        },
+      });
       const consumer2 = new Consumer(consumerAdapter2, { ...consumerOptions, id: 'consumer2' });
       const producer = new Producer(producerAdapter, {
         ...producerOptions,
@@ -373,7 +382,6 @@ describe('#OpenC2 #Components', () => {
         expect(commandJob.data).toEqual({ ...COMMAND, created: date });
         commandJob.done();
       };
-      consumer1.on('command', onJob);
       consumer2.on('command', onJob);
       await consumer1.start();
       await consumer2.start();
@@ -391,7 +399,9 @@ describe('#OpenC2 #Components', () => {
           content: {
             status: 200,
             status_text: undefined,
-            results: undefined,
+            results: {
+              'x-netin:alarms': undefined,
+            },
           },
         },
         {
@@ -1061,7 +1071,16 @@ describe('#OpenC2 #Components', () => {
           consumerAdapter2.handler(message, onResponse);
         }
       });
-      const consumer1 = new Consumer(consumerAdapter1, { ...consumerOptions, id: 'consumer1' });
+      const consumer1 = new Consumer(consumerAdapter1, {
+        ...consumerOptions,
+        id: 'consumer1',
+        resolver: {
+          'query:x-netin:alarms': (target: any) => {
+            expect(target).toEqual({ entity: '3b6771cb-1ca6-4c1f-a06e-0b413872cd5c' });
+            return Promise.reject(new Crash(`myError`));
+          },
+        },
+      });
       const consumer2 = new Consumer(consumerAdapter2, { ...consumerOptions, id: 'consumer2' });
       const producer = new Producer(producerAdapter, {
         ...producerOptions,
@@ -1074,7 +1093,6 @@ describe('#OpenC2 #Components', () => {
         expect(commandJob.data).toEqual({ ...COMMAND, to: ['consumer1'], created: date });
         commandJob.done(new Crash(`myError`));
       };
-      consumer1.on('command', onJob);
       consumer2.on('command', onJob);
       await consumer1.start();
       await consumer2.start();

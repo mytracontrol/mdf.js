@@ -32,7 +32,7 @@ export declare interface Engine {
   /** Emitted when the stream have been closed */
   on(event: 'close', listener: () => void): this;
   /** Emitted on every state change */
-  on(event: 'status', listener: (providerState: Health.API.Status) => void): this;
+  on(event: 'status', listener: (providerState: Health.Status) => void): this;
 }
 
 export class Engine<
@@ -134,7 +134,7 @@ export class Engine<
    * @returns _check object_ as defined in the draft standard
    * https://datatracker.ietf.org/doc/html/draft-inadarei-api-health-check-05
    */
-  public get checks(): Health.API.Checks {
+  public get checks(): Health.Checks {
     return {
       [`engine:stream`]: [
         {
@@ -159,7 +159,7 @@ export class Engine<
     };
   }
   /** Return the status of the stream in the standard format */
-  private get ownStatus(): Health.API.Status {
+  private get ownStatus(): Health.Status {
     if (!this.writable || !this.readable) {
       return 'fail';
     } else if (

@@ -4,7 +4,7 @@
  * Use of this source code is governed by an MIT-style license that can be found in the LICENSE file
  * or at https://opensource.org/licenses/MIT.
  */
-import { LoggerInstance } from '@mdf.js/provider';
+import { LoggerInstance } from '@mdf.js/logger';
 import { Producer } from '../Client';
 import { BasePort } from '../Common';
 import { Config, Producer as KafkaProducer } from './types';

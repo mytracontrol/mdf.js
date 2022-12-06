@@ -30,10 +30,11 @@
     "test": "jest --config ./jest.config.js"
   },
   "dependencies": {
+    "@mdf.js/core": "*",
     "@mdf.js/crash": "*",
-    "@mdf.js/provider": "*",
+    "@mdf.js/logger": "*",
     "@mdf.js/utils": "*",
-    "axios": "^1.2.0",
+    "axios": "^1.2.1",
     "debug": "^4.3.4",
     "joi": "^17.6.3",
     "tslib": "^2.4.1"

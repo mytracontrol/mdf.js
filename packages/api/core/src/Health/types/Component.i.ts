@@ -7,17 +7,18 @@
 
 import { Crash } from '@mdf.js/crash';
 import { EventEmitter } from 'events';
-import { Checks, Status } from './API';
+import { Checks } from './Checks.t';
+import { Status } from './Status.t';
 
 export interface Component extends EventEmitter {
   /** Emitted when the component throw an error*/
   on(event: 'error', listener: (error: Crash | Error) => void): this;
   /** Emitted on every status change */
   on(event: 'status', listener: (status: Status) => void): this;
-  /** Component */
-  componentId: string;
   /** Component name */
   name: string;
+  /** Component */
+  componentId: string;
   /** Checks performed over this component to achieve the resulted status */
   checks: Checks;
 }

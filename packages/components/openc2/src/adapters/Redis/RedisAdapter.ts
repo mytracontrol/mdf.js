@@ -38,7 +38,7 @@ export abstract class RedisAdapter extends Adapter implements Health.Component {
     });
   }
   /** Component checks */
-  public get checks(): Health.API.Checks {
+  public get checks(): Health.Checks {
     return {
       ...this.publisher.checks,
       ...this.subscriber.checks,

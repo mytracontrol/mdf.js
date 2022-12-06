@@ -4,8 +4,9 @@
  * Use of this source code is governed by an MIT-style license that can be found in the LICENSE file
  * or at https://opensource.org/licenses/MIT.
  */
+import { Layer } from '@mdf.js/core';
 import { Crash } from '@mdf.js/crash';
-import { LoggerInstance, Provider } from '@mdf.js/provider';
+import { LoggerInstance } from '@mdf.js/logger';
 import { undoMocks } from '@mdf.js/utils';
 import express from 'express';
 import { Server } from 'http';
@@ -48,7 +49,7 @@ describe('#Port #HTTP-Server', () => {
     it('Should create provider using the factory instance with default configuration and an app', () => {
       const provider = Factory.create({ config: DEFAULT_CONFIG });
       expect(provider).toBeDefined();
-      expect(provider).toBeInstanceOf(Provider.Manager);
+      expect(provider).toBeInstanceOf(Layer.Provider.Manager);
       expect(provider.client).toBeInstanceOf(Server);
       expect(provider.state).toEqual('stopped');
       //@ts-ignore - Test environment
@@ -75,7 +76,7 @@ describe('#Port #HTTP-Server', () => {
         config: DEFAULT_CONFIG,
       });
       expect(provider).toBeDefined();
-      expect(provider).toBeInstanceOf(Provider.Manager);
+      expect(provider).toBeInstanceOf(Layer.Provider.Manager);
       expect(provider.client).toBeInstanceOf(Server);
       expect(provider.state).toEqual('stopped');
       //@ts-ignore - Test environment
@@ -141,7 +142,7 @@ describe('#Port #HTTP-Server', () => {
         port: 8080,
       });
       expect(provider).toBeDefined();
-      expect(provider).toBeInstanceOf(Provider.Manager);
+      expect(provider).toBeInstanceOf(Layer.Provider.Manager);
       expect(provider.client).toBeInstanceOf(Server);
       expect(provider.state).toEqual('stopped');
       const checks = provider.checks;

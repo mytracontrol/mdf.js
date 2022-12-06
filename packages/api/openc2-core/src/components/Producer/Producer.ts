@@ -20,7 +20,7 @@ export declare interface Producer {
   /** Emitted when a producer's operation has some problem */
   on(event: 'error', listener: (error: Crash | Error) => void): this;
   /** Emitted on every state change */
-  on(event: 'status', listener: (status: Health.API.Status) => void): this;
+  on(event: 'status', listener: (status: Health.Status) => void): this;
 }
 
 export class Producer extends Component<AdapterWrapper, ProducerOptions> {

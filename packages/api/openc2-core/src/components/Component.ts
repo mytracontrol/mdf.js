@@ -4,7 +4,7 @@
  * Use of this source code is governed by an MIT-style license that can be found in the LICENSE file
  * or at https://opensource.org/licenses/MIT.
  */
-import { Health } from '@mdf.js/core';
+import { Health, Layer } from '@mdf.js/core';
 import { Crash, Links } from '@mdf.js/crash';
 import { DebugLogger, LoggerInstance, SetContext } from '@mdf.js/logger';
 import EventEmitter from 'events';
@@ -18,12 +18,12 @@ export declare interface Component<T, K> {
   /** Emitted when a producer's operation has some problem */
   on(event: 'error', listener: (error: Crash | Error) => void): this;
   /** Emitted on every state change */
-  on(event: 'status', listener: (status: Health.API.Status) => void): this;
+  on(event: 'status', listener: (status: Health.Status) => void): this;
 }
 
 export abstract class Component<T extends ComponentAdapter, K extends ComponentOptions>
   extends EventEmitter
-  implements Health.Component, Health.Service
+  implements Health.Component, Layer.Service.Registry
 {
   /** Component identification */
   public readonly componentId: string = v4();
@@ -65,7 +65,7 @@ export abstract class Component<T extends ComponentAdapter, K extends ComponentO
    * @returns _check object_ as defined in the draft standard
    * https://datatracker.ietf.org/doc/html/draft-inadarei-api-health-check-05
    */
-  public get checks(): Health.API.Checks {
+  public get checks(): Health.Checks {
     return this.health.checks;
   }
   /** Return an Express router with access to errors registry */
@@ -97,7 +97,7 @@ export abstract class Component<T extends ComponentAdapter, K extends ComponentO
    * Manage the status change in the producer interface
    * @param status - status to be processed
    */
-  private readonly onStatusHandler = (status: Health.API.Status): void => {
+  private readonly onStatusHandler = (status: Health.Status): void => {
     if (this.listenerCount('status') > 0) {
       this.emit('status', status);
     }

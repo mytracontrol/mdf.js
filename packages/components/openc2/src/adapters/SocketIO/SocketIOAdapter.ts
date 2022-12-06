@@ -40,7 +40,7 @@ export abstract class SocketIOAdapter extends Adapter implements Health.Componen
     });
   }
   /** Component checks */
-  public get checks(): Health.API.Checks {
+  public get checks(): Health.Checks {
     return this.provider.checks;
   }
   /** Connect the OpenC2 Adapter to the underlayer transport system */

@@ -5,6 +5,7 @@
  * or at https://opensource.org/licenses/MIT.
  */
 
+import { Namespace } from './Namespace.t';
 import {
   Artifact,
   Device,
@@ -68,5 +69,5 @@ export interface Target {
   /** A uniform resource identifier (URI) */
   uri?: string;
   /** Custom target formats */
-  [custom: string]: any;
+  [namespace: Namespace]: any;
 }

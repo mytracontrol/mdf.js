@@ -7,7 +7,7 @@
 
 import { Health, Jobs } from '@mdf.js/core';
 import { Crash, Multi } from '@mdf.js/crash';
-import { overallStatus, retryBind, RetryOptions } from '@mdf.js/utils';
+import { retryBind, RetryOptions } from '@mdf.js/utils';
 import EventEmitter from 'events';
 import { merge } from 'lodash';
 import { PostConsumeOptions, WrappableSourcePlug } from '../../types';
@@ -35,7 +35,7 @@ export class PlugWrapper<
   /** Uncleaned jobs check internal interval */
   private interval?: NodeJS.Timeout;
   /** Flag to indicate that an unhealthy status has been emitted recently */
-  private lastStatusEmitted?: Health.API.Status;
+  private lastStatusEmitted?: Health.Status;
   /** Indicate if the last operation was finished with error */
   private lastOperationError?: Crash | Multi;
   /** Date of the last operation performed */
@@ -161,8 +161,8 @@ export class PlugWrapper<
     this.stopUncleanedCheckInterval();
   };
   /** Overall component status */
-  private get overallStatus(): Health.API.Status {
-    return overallStatus(this.checks);
+  private get overallStatus(): Health.Status {
+    return Health.overallStatus(this.checks);
   }
   /**
    * Generate the health checks from passed job register
@@ -170,7 +170,7 @@ export class PlugWrapper<
    * @param observedUnit - observed unit identification
    * @returns
    */
-  private getRegisterHealthCheck(register: string[], observedUnit: string): Health.API.Check[] {
+  private getRegisterHealthCheck(register: string[], observedUnit: string): Health.Check[] {
     return [
       {
         status: register.length === 0 ? 'pass' : 'fail',
@@ -290,7 +290,7 @@ export class PlugWrapper<
    * @returns _check object_ as defined in the draft standard
    * https://datatracker.ietf.org/doc/html/draft-inadarei-api-health-check-05
    */
-  public get checks(): Health.API.Checks {
+  public get checks(): Health.Checks {
     return {
       ...this.plug.checks,
       [`${this.plug.name}:unknownJobsInPostConsume`]: this.getRegisterHealthCheck(

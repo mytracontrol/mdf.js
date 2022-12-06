@@ -20,14 +20,14 @@ const DEFAULT_READ_ENV_OPTIONS: ReadEnvOptions = {
  * keys formatted
  * @returns
  */
-export function formatEnv(): Record<string, any>;
+export function formatEnv<T extends Record<string, any> = Record<string, any>>(): T;
 /**
  * Read environment variables (`process.env`), filter them based in the indicated prefix, and return
  * an object with the values sanitized and the keys formatted
  * @param prefix - prefix to filter
  * @returns
  */
-export function formatEnv(prefix: string): Record<string, any>;
+export function formatEnv<T extends Record<string, any> = Record<string, any>>(prefix: string): T;
 /**
  * Read environment variables (`process.env`), filter them based in the indicated prefix, and return
  * an object with the values sanitized and the keys formatted based on the specified options
@@ -35,12 +35,15 @@ export function formatEnv(prefix: string): Record<string, any>;
  * @param options - options to be used for key/value parsing and sanitize
  * @returns
  */
-export function formatEnv(prefix: string, options: Partial<ReadEnvOptions>): Record<string, any>;
-export function formatEnv(
+export function formatEnv<T extends Record<string, any> = Record<string, any>>(
+  prefix: string,
+  options: Partial<ReadEnvOptions>
+): T;
+export function formatEnv<T extends Record<string, any> = Record<string, any>>(
   prefix?: string,
   options: Partial<ReadEnvOptions> = {},
   source: Record<string, string | undefined> = process.env
-): Record<string, any> {
+): T {
   const _options: ReadEnvOptions = merge(DEFAULT_READ_ENV_OPTIONS, options);
   const filteredObject = filterUnprefixed(source, prefix);
   const result: Record<string, any> = {};
@@ -48,5 +51,5 @@ export function formatEnv(
   for (const [key, value] of entries) {
     set(result, formatKey(key, _options, prefix), coerce(value, value));
   }
-  return result;
+  return result as T;
 }

@@ -4,9 +4,10 @@
  * Use of this source code is governed by an MIT-style license that can be found in the LICENSE file
  * or at https://opensource.org/licenses/MIT.
  */
+import { Layer } from '@mdf.js/core';
 import { Crash } from '@mdf.js/crash';
 import { HTTP } from '@mdf.js/http-server-provider';
-import { LoggerInstance, Provider } from '@mdf.js/provider';
+import { LoggerInstance } from '@mdf.js/logger';
 import { findNodeModule } from '@mdf.js/utils';
 import { instrument } from '@socket.io/admin-ui';
 import express, { Express } from 'express';
@@ -21,7 +22,7 @@ if (DEFAULT_DIST_PATH && fs.existsSync(DEFAULT_DIST_PATH)) {
   CONFIG_SERVER_DEFAULT_APP = express().use('/ui', express.static(DEFAULT_DIST_PATH));
 }
 
-export class Port extends Provider.Port<Server, Config> {
+export class Port extends Layer.Provider.Port<Server, Config> {
   /** Socket.io server handler */
   private readonly instance: Server;
   /** HTTP server provider instance */

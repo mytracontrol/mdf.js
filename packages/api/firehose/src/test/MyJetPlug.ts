@@ -19,7 +19,7 @@ export class MyJetPlug extends EventEmitter implements Plugs.Sink.Jet {
   constructor() {
     super();
   }
-  public get checks(): Health.API.Checks {
+  public get checks(): Health.Checks {
     return {};
   }
   public single(job: Jobs.JobObject): Promise<void> {

@@ -31,17 +31,16 @@
     "test": "jest --config ./jest.config.js"
   },
   "dependencies": {
+    "@mdf.js/core": "*",
     "@mdf.js/crash": "*",
-    "@mdf.js/provider": "*",
+    "@mdf.js/logger": "*",
     "@mdf.js/utils": "*",
-    "debug": "^4.3.4",
     "joi": "^17.6.3",
     "mongodb": "^4.12.1",
     "tslib": "^2.4.1"
   },
   "devDependencies": {
-    "@mdf.js/repo-config": "*",
-    "@types/debug": "^4.1.7"
+    "@mdf.js/repo-config": "*"
   },
   "engines": {
     "node": ">=16.14.2"

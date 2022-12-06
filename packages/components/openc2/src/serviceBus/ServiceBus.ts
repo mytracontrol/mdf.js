@@ -29,7 +29,7 @@ export declare interface ServiceBus {
   /** Emitted when a server operation has some problem */
   on(event: 'error', listener: (error: Crash | Error) => void): this;
   /** Emitted on every state change */
-  on(event: 'status', listener: (status: Health.API.Status) => void): this;
+  on(event: 'status', listener: (status: Health.Status) => void): this;
 }
 
 export interface ServiceBusOptions {
@@ -198,7 +198,7 @@ export class ServiceBus extends EventEmitter implements Health.Component {
    * Manage the status change in the service bus
    * @param status - status to be processed
    */
-  private readonly onStatusHandler = (status: Health.API.Status): void => {
+  private readonly onStatusHandler = (status: Health.Status): void => {
     if (this.listenerCount('status') > 0) {
       this.emit('status', status);
     }
@@ -217,7 +217,7 @@ export class ServiceBus extends EventEmitter implements Health.Component {
    * @returns _check object_ as defined in the draft standard
    * https://datatracker.ietf.org/doc/html/draft-inadarei-api-health-check-05
    */
-  public get checks(): Health.API.Checks {
+  public get checks(): Health.Checks {
     return {
       ...this.instance.checks,
       [`${this.name}:serverStats`]: [

@@ -4,11 +4,13 @@
  * Use of this source code is governed by an MIT-style license that can be found in the LICENSE file
  * or at https://opensource.org/licenses/MIT.
  */
-import { LoggerInstance, Provider } from '@mdf.js/provider';
+
+import { Layer } from '@mdf.js/core';
+import { LoggerInstance } from '@mdf.js/logger';
 import { CONFIG_PROVIDER_BASE_NAME } from '../config';
 import { Client, Config } from './types';
 
-export class Port extends Provider.Port<Client, Config> {
+export class Port extends Layer.Provider.Port<Client, Config> {
   /** Elasticsearch connection handler */
   private readonly instance: Client;
   /**

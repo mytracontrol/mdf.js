@@ -6,7 +6,7 @@
  */
 // ************************************************************************************************
 // #region Component imports
-import { Health } from '@mdf.js/core';
+import { Layer } from '@mdf.js/core';
 import { mockProperty, undoMocks } from '@mdf.js/utils';
 import cluster from 'cluster';
 import EventEmitter from 'events';
@@ -17,7 +17,7 @@ import { Observability, ObservabilityOptions } from '.';
 // *************************************************************************************************
 // #region Our tests
 
-class MyService extends EventEmitter implements Health.Service {
+class MyService extends EventEmitter implements Layer.Service.Registry {
   name = 'myService';
   links = {
     openc2: {
@@ -40,11 +40,11 @@ describe('#Observability #Service', () => {
       };
       const service = new Observability(config);
       //@ts-ignore - private property
-      expect(service.services.length).toBe(3);
+      expect(service.registries.length).toBe(3);
       expect(service).toBeDefined();
       expect(service.healthRegistry).toBeDefined();
       expect(service.metricsRegistry).toBeDefined();
-      expect(service.registerService).toBeDefined();
+      expect(service.attach).toBeDefined();
       await service.stop();
       await service.start();
       await service.start();
@@ -65,11 +65,11 @@ describe('#Observability #Service', () => {
       };
       const service = new Observability(config);
       //@ts-ignore - private property
-      expect(service.services.length).toBe(3);
+      expect(service.registries.length).toBe(3);
       expect(service).toBeDefined();
       expect(service.healthRegistry).toBeDefined();
       expect(service.metricsRegistry).toBeDefined();
-      expect(service.registerService).toBeDefined();
+      expect(service.attach).toBeDefined();
       service
         .start()
         .then(() =>
@@ -84,7 +84,7 @@ describe('#Observability #Service', () => {
         .then(response => {
           expect(response.body.status).toEqual('pass');
           expect(response.body.version).toEqual('1');
-          expect(response.body.releaseId).toEqual('1.0.0');
+          expect(response.body.release).toEqual('1.0.0');
           expect(response.body.notes).toEqual([]);
           expect(response.body.output).toEqual('');
         })
@@ -112,7 +112,7 @@ describe('#Observability #Service', () => {
       expect(service).toBeDefined();
       expect(service.healthRegistry).toBeDefined();
       expect(service.metricsRegistry).toBeDefined();
-      expect(service.registerService).toBeDefined();
+      expect(service.attach).toBeDefined();
       undoMocks();
     }, 300);
     it(`Should create an instance of observability service in CLUSTER MODE as MASTER`, async () => {
@@ -132,7 +132,7 @@ describe('#Observability #Service', () => {
       expect(service).toBeDefined();
       expect(service.healthRegistry).toBeDefined();
       expect(service.metricsRegistry).toBeDefined();
-      expect(service.registerService).toBeDefined();
+      expect(service.attach).toBeDefined();
       undoMocks();
     }, 300);
     it(`Should create an instance of observability service in NO CLUSTER MODE with too much low port`, async () => {
@@ -149,7 +149,7 @@ describe('#Observability #Service', () => {
       expect(service).toBeDefined();
       expect(service.healthRegistry).toBeDefined();
       expect(service.metricsRegistry).toBeDefined();
-      expect(service.registerService).toBeDefined();
+      expect(service.attach).toBeDefined();
       await service.stop();
       await service.start();
       await service.start();
@@ -169,7 +169,7 @@ describe('#Observability #Service', () => {
       expect(service).toBeDefined();
       expect(service.healthRegistry).toBeDefined();
       expect(service.metricsRegistry).toBeDefined();
-      expect(service.registerService).toBeDefined();
+      expect(service.attach).toBeDefined();
       await service.stop();
       await service.start();
       await service.start();
@@ -210,10 +210,10 @@ describe('#Observability #Service', () => {
       expect(service.errorsRegistry.size).toBe(0);
       const myService = new MyService();
       //@ts-ignore - private property
-      expect(service.services.length).toBe(3);
-      service.registerService(myService);
+      expect(service.registries.length).toBe(3);
+      service.attach(myService);
       //@ts-ignore - private property
-      expect(service.services.length).toBe(4);
+      expect(service.registries.length).toBe(4);
       await service.stop();
       await service.start();
       await service.start();

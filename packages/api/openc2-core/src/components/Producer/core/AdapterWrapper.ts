@@ -7,7 +7,7 @@
 
 import { Health } from '@mdf.js/core';
 import { Crash, Multi } from '@mdf.js/crash';
-import { overallStatus, retryBind, RetryOptions } from '@mdf.js/utils';
+import { retryBind, RetryOptions } from '@mdf.js/utils';
 import EventEmitter from 'events';
 import { merge } from 'lodash';
 import { validate } from 'uuid';
@@ -17,7 +17,7 @@ export class AdapterWrapper extends EventEmitter implements Health.Component {
   /** Operation retry options */
   private readonly retryOptions: RetryOptions;
   /** Flag to indicate that an unhealthy status has been emitted recently */
-  private lastStatusEmitted?: Health.API.Status;
+  private lastStatusEmitted?: Health.Status;
   /** Indicate if the last operation was finished with error */
   private lastOperationError?: Crash | Multi;
   /** Date of the last operation performed */
@@ -103,8 +103,8 @@ export class AdapterWrapper extends EventEmitter implements Health.Component {
     }
   }
   /** Overall component status */
-  private get status(): Health.API.Status {
-    return overallStatus(this.checks);
+  private get status(): Health.Status {
+    return Health.overallStatus(this.checks);
   }
   /** Emit the status if it's different from the last emitted status */
   private emitStatus(): void {
@@ -135,7 +135,7 @@ export class AdapterWrapper extends EventEmitter implements Health.Component {
    * @returns _check object_ as defined in the draft standard
    * https://datatracker.ietf.org/doc/html/draft-inadarei-api-health-check-05
    */
-  public get checks(): Health.API.Checks {
+  public get checks(): Health.Checks {
     return {
       ...this.adapter.checks,
       [`${this.adapter.name}:lastOperation`]: [

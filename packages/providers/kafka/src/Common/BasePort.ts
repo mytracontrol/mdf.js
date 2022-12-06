@@ -4,13 +4,14 @@
  * Use of this source code is governed by an MIT-style license that can be found in the LICENSE file
  * or at https://opensource.org/licenses/MIT.
  */
+import { Layer } from '@mdf.js/core';
 import { Crash } from '@mdf.js/crash';
-import { LoggerInstance, Provider } from '@mdf.js/provider';
+import { LoggerInstance } from '@mdf.js/logger';
 import { Consumer, Producer, SystemStatus } from '../Client';
 import { CONFIG_PROVIDER_BASE_NAME } from './config';
 import { BaseConfig } from './types';
 
-export abstract class BasePort<Client, Config extends BaseConfig> extends Provider.Port<
+export abstract class BasePort<Client, Config extends BaseConfig> extends Layer.Provider.Port<
   Client,
   Config
 > {
