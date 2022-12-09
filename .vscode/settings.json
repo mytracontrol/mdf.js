@@ -58,7 +58,8 @@
     "core",
     "service-config",
     "openc2",
-    "app-wrapper"
+    "app-wrapper",
+    "ci"
   ],
 
 }
