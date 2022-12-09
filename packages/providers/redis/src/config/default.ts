@@ -13,7 +13,7 @@ import { CONFIG_ARTIFACT_ID, reconnectOnError, retryStrategy } from './utils';
 /** Default REDIS connection host */
 const CONFIG_REDIS_HOST = '127.0.0.1';
 /** Default REDIS connection port */
-const CONFIG_REDIS_PORT = 28910;
+const CONFIG_REDIS_PORT = 6379;
 /** Default REDIS connection database */
 const CONFIG_REDIS_DB = 0;
 /** Default REDIS connection password */

@@ -62,3 +62,4 @@ export enum Action {
 }
 
 export type ActionType = `${Action}`;
+export const ACTION_TYPES: ActionType[] = Object.values(Action);

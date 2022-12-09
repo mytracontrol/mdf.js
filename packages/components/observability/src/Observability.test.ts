@@ -37,6 +37,9 @@ describe('#Observability #Service', () => {
         instanceId: v4(),
         release: '1.0.0',
         isCluster: false,
+        links: {
+          self: 'http://localhost:3000',
+        },
       };
       const service = new Observability(config);
       //@ts-ignore - private property
@@ -45,10 +48,15 @@ describe('#Observability #Service', () => {
       expect(service.healthRegistry).toBeDefined();
       expect(service.metricsRegistry).toBeDefined();
       expect(service.attach).toBeDefined();
+      expect(service.links).toBeUndefined();
       await service.stop();
       await service.start();
       await service.start();
-
+      expect(service.links).toEqual({
+        health: 'http://127.0.0.1:9080/v1/health',
+        metrics: 'http://127.0.0.1:9080/v1/metrics',
+        registers: 'http://127.0.0.1:9080/v1/registers',
+      });
       // @ts-ignore - private property
       request(service.app).get('/v1/health').expect(200);
 

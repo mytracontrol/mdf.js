@@ -5,4 +5,4 @@
  * or at https://opensource.org/licenses/MIT.
  */
 
-export * as Config from './provider';
+export * as Setup from './provider';

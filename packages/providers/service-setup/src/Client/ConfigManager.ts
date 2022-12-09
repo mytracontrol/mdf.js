@@ -22,9 +22,9 @@ type FileEntry = [string, string];
 /** Class responsible of file management, both configuration file as validator files  */
 export class ConfigManager<Config extends Record<string, unknown> = Record<string, unknown>> {
   /** Unique identifier */
-  private uuid: string = v4();
+  private readonly uuid: string = v4();
   /** Logger instance for deep debugging tasks */
-  private logger = new DebugLogger(`mdf:ConfigManager`);
+  private readonly logger = new DebugLogger(`mdf:config-manager`);
   /** Configuration checker based on DoorKeeper */
   private readonly checker?;
   /** Presets configuration map */
@@ -108,9 +108,17 @@ export class ConfigManager<Config extends Record<string, unknown> = Record<strin
    * @param prefix - Prefix to use to filter the environment variables
    * @returns
    */
-  private loadConfigEnv(prefix?: string): Partial<Config> {
-    if (prefix) {
-      return formatEnv(prefix) as Partial<Config>;
+  private loadConfigEnv(prefix?: string | string[] | Record<string, string>): Partial<Config> {
+    if (typeof prefix === 'string') {
+      return formatEnv(prefix);
+    } else if (Array.isArray(prefix)) {
+      return prefix.reduce((acc, item) => merge(acc, formatEnv(item)), {});
+    } else if (typeof prefix === 'object') {
+      const result: Record<string, unknown> = {};
+      for (const [key, value] of Object.entries(prefix)) {
+        result[key] = formatEnv(value);
+      }
+      return result as Partial<Config>;
     } else {
       return {};
     }

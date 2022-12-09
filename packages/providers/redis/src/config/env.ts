@@ -12,11 +12,11 @@ import { CONFIG_ARTIFACT_ID, reconnectOnError, retryStrategy } from './utils';
 // *************************************************************************************************
 // #region Environment variables
 /** Default REDIS connection host */
-const CONFIG_REDIS_HOST = '127.0.0.1';
+const CONFIG_REDIS_HOST = process.env['CONFIG_REDIS_HOST'];
 /** Default REDIS connection port */
-const CONFIG_REDIS_PORT = 28910;
+const CONFIG_REDIS_PORT = coerce<number>(process.env['CONFIG_REDIS_PORT']);
 /** Default REDIS connection database */
-const CONFIG_REDIS_DB = 0;
+const CONFIG_REDIS_DB = coerce<number>(process.env['CONFIG_REDIS_DB']);
 /** Default REDIS connection password */
 const CONFIG_REDIS_PASSWORD = process.env['CONFIG_REDIS_PASSWORD'];
 /** Default REDIS connection retry delay factor */

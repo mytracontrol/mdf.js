@@ -38,6 +38,57 @@ export class Consumer extends Component<AdapterWrapper, ConsumerOptions> {
     super(new AdapterWrapper(adapter, options.retryOptions), options);
     // Stryker disable next-line all
     this.logger.debug(`OpenC2 Consumer created - [${options.id}]`);
+    this.validateResolver(options);
+  }
+  /**
+   * Validate the resolver map if exists
+   * @param options - configuration options
+   * @returns
+   */
+  private validateResolver(options: ConsumerOptions): void {
+    if (!options.resolver) {
+      return;
+    }
+    for (const entry of Object.keys(options.resolver)) {
+      const { actionType, namespace, target } = this.validateResolverEntry(entry as ResolverEntry);
+      if (!this.options.actionTargetPairs[actionType]) {
+        throw new Crash(`Invalid resolver entry, action type not supported: ${entry}`, {
+          name: 'ValidationError',
+        });
+      } else if (!this.options.actionTargetPairs[actionType]?.includes(`${namespace}:${target}`)) {
+        throw new Crash(`Invalid resolver entry, target not supported: ${entry}`, {
+          name: 'ValidationError',
+        });
+      } else {
+        return;
+      }
+    }
+  }
+  /**
+   * Validate a resolver entry format
+   * @param entry - resolver entry to validate
+   */
+  private validateResolverEntry(entry: ResolverEntry): {
+    actionType: Control.ActionType;
+    namespace: Control.Namespace;
+    target: string;
+  } {
+    const { 0: actionType, 1: namespace, 2: target } = entry.split(':');
+    if (!actionType || !namespace || !target) {
+      throw new Crash(`Invalid resolver entry, invalid format: ${entry}`, {
+        name: 'ValidationError',
+      });
+    } else if (!Control.ACTION_TYPES.includes(actionType as Control.ActionType)) {
+      throw new Crash(`Invalid resolver entry, unknown action type: ${actionType}`, {
+        name: 'ValidationError',
+      });
+    } else {
+      return {
+        actionType: actionType as Control.ActionType,
+        namespace: namespace as Control.Namespace,
+        target,
+      };
+    }
   }
   /** Consumer actuators */
   public get actuator(): string[] | undefined {
@@ -146,7 +197,9 @@ export class Consumer extends Component<AdapterWrapper, ConsumerOptions> {
       const target = Accessors.getTargetFromCommand(message.content) as keyof Control.Target;
       const response = await resolver(message.content.target[target]);
       this.logger.info(`Command was resolved successfully`);
-      return Helpers.ok(message, this.options.id, { [target]: response });
+      const result =
+        response !== undefined && response !== null ? { [target]: response } : undefined;
+      return Helpers.ok(message, this.options.id, result);
     } catch (rawError) {
       const cause = Crash.from(rawError);
       // Stryker disable next-line all

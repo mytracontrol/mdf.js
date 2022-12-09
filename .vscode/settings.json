@@ -57,7 +57,8 @@
     "redis-provider",
     "core",
     "service-config",
-    "openc2"
+    "openc2",
+    "app-wrapper"
   ],
 
 }

@@ -6,3 +6,4 @@
  */
 
 export { RegisterFacade as ErrorRegistry } from './RegisterFacade';
+export { ErrorRecord } from './types';

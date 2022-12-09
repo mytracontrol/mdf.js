@@ -8,7 +8,7 @@
 /** Application definition */
 export interface Metadata {
   /**
-   * Service instance identification in a human readable format
+   * Service name
    * @example `myOwnService`
    */
   name: string;

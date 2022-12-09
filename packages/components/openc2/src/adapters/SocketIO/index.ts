@@ -5,5 +5,7 @@
  * or at https://opensource.org/licenses/MIT.
  */
 
+import { SocketIOClient } from '@mdf.js/socket-client-provider';
 export * from './SocketIOConsumerAdapter';
 export * from './SocketIOProducerAdapter';
+export type Config = SocketIOClient.Config;

@@ -8,14 +8,16 @@
 import { ActionType, AllowedResultPropertyTypes, Namespace } from './control';
 
 export type ResolverEntry = `${ActionType}:${Namespace}:${string}`;
-export type Resolver = <T = any>(target: T) => Promise<AllowedResultPropertyTypes>;
+export type Resolver = <T = any>(target: T) => Promise<AllowedResultPropertyTypes | void>;
 export type ResolverMap = {
   /**
    * Map of each action supported by this actuator to the list of targets applicable to that action
    * @example
+   * ```ts
    * {
    *  'query:x-ownDomain:ownValue': ...
    * }
+   * ```
    */
   [entry in ResolverEntry]?: Resolver;
 };

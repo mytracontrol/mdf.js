@@ -39,6 +39,8 @@ export class Observability {
   public readonly healthRegistry: HealthRegistry;
   /** Registries router */
   public router: express.Router;
+  /** Health associated links */
+  private _links?: Links;
   /**
    * Create an instance of observability service
    * @param options - observability options
@@ -51,6 +53,40 @@ export class Observability {
     this.healthRegistry.on('error', this.onErrorEvent);
     this.router = express.Router();
     this.app = !this.options.isCluster || cluster.isPrimary ? this.primaryApp() : this.workerApp();
+  }
+  /** Health associated links */
+  public get links(): Links | undefined {
+    let formattedLinks: Links | undefined;
+    if (this._links) {
+      formattedLinks = {};
+      for (const [contextKey, firstLevel] of Object.entries(this._links)) {
+        if (typeof firstLevel === 'string') {
+          formattedLinks[contextKey] = `${this.baseURL}${firstLevel}`;
+        } else {
+          const formattedContextLinks: { [link: string]: string } = {};
+          for (const [innerContextKey, secondLevel] of Object.entries(firstLevel)) {
+            formattedContextLinks[innerContextKey] = `${this.baseURL}${secondLevel}`;
+          }
+          formattedLinks[contextKey] = formattedContextLinks;
+        }
+      }
+    }
+    return formattedLinks;
+  }
+  /** Get the base url whew the observability is served */
+  private get baseURL(): string {
+    const address = this.server?.client?.address();
+    let baseURL: string;
+    if (address) {
+      if (typeof address === 'string') {
+        baseURL = address;
+      } else {
+        baseURL = `http://${address.address}:${address.port}`;
+      }
+    } else {
+      baseURL = '';
+    }
+    return baseURL;
   }
   /**
    * Attach a new registry in the observability
@@ -77,7 +113,8 @@ export class Observability {
         formattedLinks = merge(formattedLinks, service.links);
       }
     }
-    router.use(Middleware.Default.handler(this.formatLinks(formattedLinks)));
+    this._links = this.formatLinks(formattedLinks);
+    router.use(Middleware.Default.handler(this._links));
     this.router = router;
     this.server = HTTP.Factory.create({
       name: 'observability',

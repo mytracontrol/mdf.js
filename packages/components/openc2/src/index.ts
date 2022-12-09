@@ -5,7 +5,21 @@
  * or at https://opensource.org/licenses/MIT.
  */
 
-export { Consumer, ConsumerOptions, Control, Producer, ProducerOptions } from '@mdf.js/openc2-core';
+export {
+  CommandJobDone,
+  CommandJobHandler,
+  Consumer,
+  ConsumerOptions,
+  Control,
+  Gateway,
+  GatewayOptions,
+  Producer,
+  ProducerOptions,
+  Registry,
+  Resolver,
+  ResolverEntry,
+  ResolverMap,
+} from '@mdf.js/openc2-core';
 export * as Adapters from './adapters';
 export * as Factory from './factories';
 export { ServiceBus, ServiceBusOptions } from './serviceBus';

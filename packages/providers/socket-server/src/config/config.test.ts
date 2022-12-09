@@ -19,6 +19,7 @@ describe(`#Config #${CONFIG_PROVIDER_BASE_NAME.toLocaleUpperCase()}`, () => {
         host: 'localhost',
         path: '/socket.io',
         enableUI: true,
+        perMessageDeflate: true,
       });
     }, 300);
   });

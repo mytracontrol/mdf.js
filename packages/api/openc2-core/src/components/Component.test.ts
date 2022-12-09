@@ -399,9 +399,7 @@ describe('#OpenC2 #Components', () => {
           content: {
             status: 200,
             status_text: undefined,
-            results: {
-              'x-netin:alarms': undefined,
-            },
+            results: undefined,
           },
         },
         {

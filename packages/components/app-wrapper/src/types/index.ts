@@ -5,7 +5,5 @@
  * or at https://opensource.org/licenses/MIT.
  */
 
-import { Redis } from '@mdf.js/redis-provider';
-export * from './RedisConsumerAdapter';
-export * from './RedisProducerAdapter';
-export type Config = Redis.Config;
+export * from './ApplicationWrapperOptions';
+export * from './ConsumerAdapterOptions.i';

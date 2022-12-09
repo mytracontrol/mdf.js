@@ -11,6 +11,7 @@ export type AllowedResultPropertyTypes =
   | Record<string, any>
   | string[]
   | number
+  | string
   | ActionTargetPairs
   | undefined;
 

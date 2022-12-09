@@ -15,6 +15,7 @@ const CONFIG_SOCKET_IO_SERVER_PATH = `/socket.io`;
 const CONFIG_SOCKET_IO_SERVER_ENABLE_UI = true;
 const CONFIG_SOCKET_IO_SERVER_CORS__ORIGIN = /[\s\S]*/;
 const CONFIG_SOCKET_IO_SERVER_CORS__CREDENTIALS = true;
+const CONFIG_SOCKET_IO_SERVER_PER_MESSAGE_DEFLATE = true;
 
 export const defaultConfig: Config = {
   port: CONFIG_SOCKET_IO_SERVER_PORT,
@@ -25,5 +26,6 @@ export const defaultConfig: Config = {
     origin: CONFIG_SOCKET_IO_SERVER_CORS__ORIGIN,
     credentials: CONFIG_SOCKET_IO_SERVER_CORS__CREDENTIALS,
   },
+  perMessageDeflate: CONFIG_SOCKET_IO_SERVER_PER_MESSAGE_DEFLATE,
 };
 // #endregion

@@ -40,13 +40,17 @@ export interface ServiceSetupOptions {
    */
   configFiles?: string[];
   /**
-   * Prefix to be used to load the configuration from the environment variables. The prefix will be
-   * used to filter the environment variables and only the ones that start with the prefix will be
-   * loaded. The prefix will be removed from the environment variable name and the remaining part
-   * will be used as the configuration property name. The configuration property name will be
-   * converted to camel case.
+   * Prefix or prefixes to use on configuration loading from the environment variables. The prefix
+   * will be used to filter the environment variables. The prefix will be removed from the
+   * environment variable name and the remaining part will be used as the configuration property
+   * name. The configuration property name will be converted to camel case.
    * Environment variables will override the configuration from the configuration files.
-   * @example `MY_APP_`
+   * @example
+   * ```ts
+   * `MY_APP_` // as single prefix
+   * ['MY_APP_', 'MY_OTHER_APP_'] // as array of prefixes
+   * { MY_APP: 'myApp', MY_OTHER_APP: 'myOtherApp' } // as object with prefixes
+   * ```
    */
-  envPrefix?: string;
+  envPrefix?: string | string[] | Record<string, string>;
 }

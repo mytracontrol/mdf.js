@@ -239,7 +239,7 @@ describe('#ConfigManager', () => {
         },
       });
     }, 1000);
-    it('Should read all the files, without error in the validation and as the preset1 modified by environment values', () => {
+    it('Should read all the files, without error in the validation and as the preset1 modified by environment values as a single string', () => {
       process.env['CONFIG_TEST_CONFIG__TEST'] = '4';
       const manager = new ConfigManager({
         name: 'test',
@@ -256,6 +256,104 @@ describe('#ConfigManager', () => {
         },
         otherConfig: {
           otherTest: 'a',
+        },
+      });
+      expect(manager.error).toBeUndefined();
+      expect(manager.isErrored).toBeFalsy();
+      expect(manager.defaultConfig).toEqual({
+        config: {
+          test: 2,
+        },
+        otherConfig: {
+          otherTest: '-a',
+        },
+      });
+      expect(manager.presets).toEqual({
+        preset1: {
+          config: {
+            test: 2,
+          },
+          otherConfig: {
+            otherTest: 'a',
+          },
+        },
+        preset2: {
+          config: {
+            test: 4,
+          },
+          otherConfig: {
+            otherTest: 'b',
+          },
+        },
+      });
+    }, 1000);
+    it('Should read all the files, without error in the validation and as the preset1 modified by environment values as an array of strings', () => {
+      process.env['A_CONFIG__TEST'] = '4';
+      process.env['B_OTHER_CONFIG__OTHER_TEST'] = 'b';
+      const manager = new ConfigManager({
+        name: 'test',
+        configFiles: ['src/Client/__mocks__/*.config.*'],
+        presetFiles: ['src/Client/__mocks__/*.preset.*.*'],
+        schemaFiles: ['src/Client/__mocks__/*.schema.*'],
+        schema: 'final.schema',
+        preset: 'preset1',
+        envPrefix: ['A_', 'B_'],
+      });
+      expect(manager.config).toEqual({
+        config: {
+          test: 4,
+        },
+        otherConfig: {
+          otherTest: 'b',
+        },
+      });
+      expect(manager.error).toBeUndefined();
+      expect(manager.isErrored).toBeFalsy();
+      expect(manager.defaultConfig).toEqual({
+        config: {
+          test: 2,
+        },
+        otherConfig: {
+          otherTest: '-a',
+        },
+      });
+      expect(manager.presets).toEqual({
+        preset1: {
+          config: {
+            test: 2,
+          },
+          otherConfig: {
+            otherTest: 'a',
+          },
+        },
+        preset2: {
+          config: {
+            test: 4,
+          },
+          otherConfig: {
+            otherTest: 'b',
+          },
+        },
+      });
+    }, 1000);
+    it('Should read all the files, without error in the validation and as the preset1 modified by environment values as an object of strings', () => {
+      process.env['MY_A_TEST'] = '4';
+      process.env['MY_B_OTHER_TEST'] = 'b';
+      const manager = new ConfigManager({
+        name: 'test',
+        configFiles: ['src/Client/__mocks__/*.config.*'],
+        presetFiles: ['src/Client/__mocks__/*.preset.*.*'],
+        schemaFiles: ['src/Client/__mocks__/*.schema.*'],
+        schema: 'final.schema',
+        preset: 'preset1',
+        envPrefix: { config: 'MY_A_', otherConfig: 'MY_B_' },
+      });
+      expect(manager.config).toEqual({
+        config: {
+          test: 4,
+        },
+        otherConfig: {
+          otherTest: 'b',
         },
       });
       expect(manager.error).toBeUndefined();

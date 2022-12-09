@@ -6,3 +6,4 @@
  */
 
 export * from './Metadata.i';
+export * from './Resource.i';

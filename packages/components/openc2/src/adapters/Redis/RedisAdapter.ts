@@ -29,11 +29,11 @@ export abstract class RedisAdapter extends Adapter implements Health.Component {
   ) {
     super(adapterOptions, type);
     this.publisher = Redis.Factory.create({
-      config: redisOptions,
+      config: { ...redisOptions, connectionName: `${this.name}-publisher` },
       name: `${this.name}-publisher`,
     });
     this.subscriber = Redis.Factory.create({
-      config: { ...redisOptions, disableChecks: true },
+      config: { ...redisOptions, connectionName: `${this.name}-subscriber`, disableChecks: true },
       name: `${this.name}-subscriber`,
     });
   }

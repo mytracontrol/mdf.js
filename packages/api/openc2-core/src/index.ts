@@ -17,4 +17,7 @@ export {
   OnCommandHandler,
   ProducerAdapter,
   ProducerOptions,
+  Resolver,
+  ResolverEntry,
+  ResolverMap,
 } from './types';

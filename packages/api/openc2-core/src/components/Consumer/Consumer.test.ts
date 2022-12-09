@@ -250,6 +250,42 @@ describe('#OpenC2 #Consumer', () => {
         'Adapter myAdapter does not implement the unsubscribe method'
       );
     });
+    it(`Should throw an error if resolver map is not valid`, () => {
+      //@ts-ignore - Test environment
+      expect(
+        () =>
+          new Consumer(new MyAdapter(), {
+            ...options,
+            //@ts-ignore - Test environment
+            resolver: { 'wrong:x-netin:value': () => Promise.resolve('') },
+          })
+      ).toThrowError('Invalid resolver entry, unknown action type: wrong');
+      //@ts-ignore - Test environment
+      expect(
+        () =>
+          new Consumer(new MyAdapter(), {
+            ...options,
+            //@ts-ignore - Test environment
+            resolver: { 'query:x-netin': () => Promise.resolve('') },
+          })
+      ).toThrowError('Invalid resolver entry, invalid format: query:x-netin');
+      //@ts-ignore - Test environment
+      expect(
+        () =>
+          new Consumer(new MyAdapter(), {
+            ...options,
+            resolver: { 'stop:x-netin:value': () => Promise.resolve('') },
+          })
+      ).toThrowError('Invalid resolver entry, action type not supported: stop:x-netin:value');
+      //@ts-ignore - Test environment
+      expect(
+        () =>
+          new Consumer(new MyAdapter(), {
+            ...options,
+            resolver: { 'query:x-netin:value': () => Promise.resolve('') },
+          })
+      ).toThrowError('Invalid resolver entry, target not supported: query:x-netin:value');
+    });
     it(`Should fail to start if subscribe method rejects`, async () => {
       const adapter = new MyAdapter();
       jest.spyOn(adapter, 'subscribe').mockRejectedValueOnce(new Error('error'));

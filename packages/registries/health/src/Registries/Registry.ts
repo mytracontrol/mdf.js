@@ -8,9 +8,20 @@
 import { Health, Layer } from '@mdf.js/core';
 import { DebugLogger, LoggerInstance } from '@mdf.js/logger';
 import { prettyMS } from '@mdf.js/utils';
-import { merge } from 'lodash';
+import { merge, pick } from 'lodash';
 import { v4 } from 'uuid';
 
+const METADATA_PROPERTIES = [
+  'name',
+  'description',
+  'version',
+  'release',
+  'instanceId',
+  'serviceId',
+  'serviceGroupId',
+  'tags',
+  'links',
+];
 export abstract class Registry {
   /** Instance unique identifier for trace purposes */
   public readonly componentId: string = v4();
@@ -29,7 +40,7 @@ export abstract class Registry {
     this.logger = new DebugLogger(`mdf:health`);
     this.metadata = metadata;
     this.baseHealth = {
-      ...metadata,
+      ...(pick(metadata, METADATA_PROPERTIES) as Layer.App.Metadata),
       notes: [],
       output: '',
     };

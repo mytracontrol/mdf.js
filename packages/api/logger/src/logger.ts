@@ -65,7 +65,7 @@ export class Logger implements LoggerInstance {
    * @param label - logger label
    * @param configuration - logger configuration
    */
-  constructor(label: string, configuration: LoggerConfig);
+  constructor(label: string, configuration?: LoggerConfig);
   constructor(private label = 'mdf-app', configuration?: LoggerConfig) {
     // Stryker disable all
     this._debug = Debug('mdf:logger');
