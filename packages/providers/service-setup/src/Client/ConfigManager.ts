@@ -75,7 +75,7 @@ export class ConfigManager<Config extends Record<string, unknown> = Record<strin
   private selectConfig(): Partial<Config> {
     if (this.options.preset) {
       if (this.presets[this.options.preset]) {
-        return this.presets[this.options.preset];
+        return merge(cloneDeep(this.defaultConfig), this.presets[this.options.preset]);
       } else {
         this.addError(new Crash(`Preset ${this.options.preset} not found`));
         return this.defaultConfig;
