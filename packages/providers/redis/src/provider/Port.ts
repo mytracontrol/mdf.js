@@ -78,10 +78,12 @@ export class Port extends Layer.Provider.Port<Client, Config> {
         this.statusCheck();
       }
     } catch (rawError) {
-      const error = Crash.from(rawError, this.uuid);
-      throw new Crash(`Error performing the connection to Redis instance: ${error.message}`, {
-        cause: error,
-      });
+      const cause = Crash.from(rawError, this.uuid);
+      if (cause.message !== 'Redis is already connecting/connected') {
+        throw new Crash(`Error performing the connection to Redis instance: ${cause.message}`, {
+          cause: cause,
+        });
+      }
     }
   }
   /** Stop the port, making it unavailable */
