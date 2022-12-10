@@ -62,9 +62,9 @@ export abstract class RedisAdapter extends Adapter implements Health.Component {
   /** Connect the OpenC2 Adapter to the underlayer transport system */
   public async stop(): Promise<void> {
     try {
-      await this.publisher.stop();
-      await this.subscriber.stop();
       await this.subscriber.client.punsubscribe(...this.subscriptions);
+      await this.subscriber.stop();
+      await this.publisher.stop();
     } catch (rawError) {
       const error = Crash.from(rawError);
       throw new Crash(

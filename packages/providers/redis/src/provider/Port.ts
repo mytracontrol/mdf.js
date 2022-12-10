@@ -96,10 +96,10 @@ export class Port extends Layer.Provider.Port<Client, Config> {
       await this.instance.quit();
       this.connected = false;
     } catch (rawError) {
-      const error = Crash.from(rawError, this.uuid);
-      if (error.message !== 'Connection is closed.') {
-        throw new Crash(`Error performing the disconnection to Redis instance: ${error.message}`, {
-          cause: error,
+      const cause = Crash.from(rawError, this.uuid);
+      if (cause.message !== 'Connection is closed.') {
+        throw new Crash(`Error performing the disconnection to Redis instance: ${cause.message}`, {
+          cause,
         });
       }
     } finally {
