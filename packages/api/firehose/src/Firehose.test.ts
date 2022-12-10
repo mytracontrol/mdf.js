@@ -87,7 +87,7 @@ describe('#Firehose', () => {
             'result of last operation'
           );
           expect(checks['MySequencePlug:lastOperation'][0].time).toBeDefined();
-          firehose.close();
+          await firehose.close();
           service.stop().then(() => {
             if (jobEmitted) {
               done();
@@ -150,7 +150,7 @@ describe('#Firehose', () => {
             'result of last operation'
           );
           expect(checks['MyCreditsFlowPlug:lastOperation'][0].time).toBeDefined();
-          firehose.close();
+          await firehose.close();
           service.stop().then(() => {
             if (jobEmitted) {
               done();
@@ -223,11 +223,11 @@ describe('#Firehose', () => {
             `api_publishing_job_duration_milliseconds_bucket{le="10000",type="myType"} 10`
           );
           expect(service.errorsRegistry.size).toEqual(0);
-          firehose.close();
+          await firehose.close();
           service.stop().then(done);
         }
         if (result.jobUserId === '11') {
-          firehose.close();
+          await firehose.close();
           service.stop().then(() => done(new Error('Job should not be emitted')));
         }
       });
@@ -265,7 +265,7 @@ describe('#Firehose', () => {
           expect(metrics.metrics).toBeDefined();
           expect(metrics.metrics).toContain(`api_all_job_processed_total{type="myType"} 10`);
           expect(service.errorsRegistry.size).toEqual(0);
-          firehose.close();
+          await firehose.close();
           service.stop().then(done);
         }
       });
@@ -293,7 +293,7 @@ describe('#Firehose', () => {
           expect(metrics.metrics).toBeDefined();
           expect(metrics.metrics).toContain(`api_all_job_processed_total{type="myType"} 10`);
           expect(service.errorsRegistry.size).toEqual(0);
-          firehose.close();
+          await firehose.close();
           service.stop().then(done);
         }
       });
@@ -321,11 +321,11 @@ describe('#Firehose', () => {
           expect(metrics.metrics).toBeDefined();
           expect(metrics.metrics).toContain(`api_all_job_processed_total{type="myType"} 10`);
           expect(service.errorsRegistry.size).toEqual(0);
-          firehose.close();
+          await firehose.close();
           service.stop().then(done);
         }
         if (result.jobUserId === '11') {
-          firehose.close();
+          await firehose.close();
           service.stop().then(() => done(new Error('Job should not be emitted')));
         }
       });
@@ -353,7 +353,7 @@ describe('#Firehose', () => {
           expect(metrics.metrics).toBeDefined();
           expect(metrics.metrics).toContain(`api_all_job_processed_total{type="myType"} 10`);
           expect(service.errorsRegistry.size).toEqual(0);
-          firehose.close();
+          await firehose.close();
           service.stop().then(done);
         }
       });
@@ -382,7 +382,7 @@ describe('#Firehose', () => {
           expect(metrics.metrics).toBeDefined();
           expect(metrics.metrics).toContain(`api_all_job_processed_total{type="myType"} 4`);
           expect(service.errorsRegistry.size).toEqual(0);
-          firehose.close();
+          await firehose.close();
           service.stop().then(done);
         }
       });
@@ -411,7 +411,7 @@ describe('#Firehose', () => {
           expect(metrics.metrics).toBeDefined();
           expect(metrics.metrics).toContain(`api_all_job_processed_total{type="myType"} 10`);
           expect(service.errorsRegistry.size).toEqual(0);
-          firehose.close();
+          await firehose.close();
           service.stop().then(done);
         }
       });
@@ -449,7 +449,7 @@ describe('#Firehose', () => {
       service.healthRegistry.register(firehose);
       firehose.on('done', async (uuid: string, result: Jobs.Result, error?: Crash) => {
         if (result.jobUserId === '10') {
-          firehose.close();
+          await firehose.close();
           service.stop().then(done);
         }
       });
@@ -496,7 +496,7 @@ describe('#Firehose', () => {
           expect(service.errorsRegistry.errors[0].trace[2]).toContain(
             'failed with CrashError: Strategy myType return an undefined job or a job with no data, it has not be applied'
           );
-          firehose.close();
+          await firehose.close();
           service.stop().then(done);
         }
       });
@@ -545,7 +545,7 @@ describe('#Firehose', () => {
           expect(service.errorsRegistry.errors[0].trace[2]).toContain(
             'failed with CrashError: Strategy myType throw an error during process: Invalid count, it has not be applied'
           );
-          firehose.close();
+          await firehose.close();
           service.stop().then(done);
         }
       });
@@ -614,8 +614,7 @@ describe('#Firehose', () => {
           expect(service.errorsRegistry.errors.length).toEqual(5);
           expect(service.errorsRegistry.errors[0].subject).toEqual('MyFirehose');
           expect(service.errorsRegistry.errors[0].trace[0]).toContain('Error: Error from stream');
-          myFirehose.close();
-          done();
+          myFirehose.close().then(done);
         }
       });
       myFirehose.start();
@@ -682,7 +681,7 @@ describe('#Firehose', () => {
           expect(checks['engine:stream'][1].componentType).toEqual('stream');
           expect(checks['engine:stream'][1].status).toEqual('pass');
           expect(checks['engine:stream'][1].observedValue).toEqual('0/200');
-          firehose.close();
+          await firehose.close();
           service.stop().then(done);
         }
       });
@@ -711,8 +710,7 @@ describe('#Firehose', () => {
           expect(checks['MyWindowPlug:window'][0].output).toEqual(
             'All the requested jobs has been ingested, but no new request has been received'
           );
-          firehose.close();
-          done();
+          firehose.close().then(done);
         }
       });
       firehose.start();
@@ -776,8 +774,10 @@ describe('#Firehose', () => {
             expect(checks['MySequencePlug:uncleanedJobsInPostConsume'][0].output).toBeUndefined();
             expect(checks['MySequencePlug:uncleanedJobsInPostConsume'][0].status).toEqual('pass');
             expect(statusCounter).toEqual(5);
-            firehose.close();
-            service.stop().then(done);
+            firehose
+              .close()
+              .then(() => service.stop())
+              .then(done);
           }, 40);
         }
       });
@@ -810,8 +810,10 @@ describe('#Firehose', () => {
         );
         expect(checks['MyJetPlug:lastOperation'][0].status).toEqual('fail');
         expect(checks['MyJetPlug:lastOperation'][0].observedValue).toEqual('error');
-        firehose.close();
-        service.stop().then(done);
+        firehose
+          .close()
+          .then(() => service.stop())
+          .then(done);
       }, 200);
     }, 300);
     it('Should indicate that the lastOperation was finished with error if single rejects and call if the error is IrresolvableError with Sequence Source', done => {
@@ -846,8 +848,10 @@ describe('#Firehose', () => {
         expect(metrics).toBeDefined();
         expect(metrics.metrics).toBeDefined();
         expect(metrics.metrics).toContain(`api_all_errors_job_processing_total{type="myType"} 200`);
-        firehose.close();
-        service.stop().then(done);
+        firehose
+          .close()
+          .then(() => service.stop())
+          .then(done);
       }, 200);
     }, 300);
     it('Should indicate that the lastOperation was finished with error if single rejects and call if the error is IrresolvableError with a Flow Source', done => {
@@ -884,8 +888,10 @@ describe('#Firehose', () => {
         expect(metrics.metrics).toBeDefined();
         expect(metrics.metrics).toContain(`api_all_errors_job_processing_total{type="myType"} 200`);
         expect(metrics.metrics).toContain(`api_publishing_throughput_sum{type="myType"} 492`);
-        firehose.close();
-        service.stop().then(done);
+        firehose
+          .close()
+          .then(() => service.stop())
+          .then(done);
       }, 200);
     }, 300);
     it('Should indicate that the lastOperation was finished with error if single/multi rejects and call if the error is IrresolvableError', done => {
@@ -922,8 +928,10 @@ describe('#Firehose', () => {
         if (called !== 200) {
           throw new Error('Expected to receive done event');
         }
-        firehose.close();
-        service.stop().then(done);
+        firehose
+          .close()
+          .then(() => service.stop())
+          .then(done);
       }, 200);
     }, 300);
   });

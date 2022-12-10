@@ -239,8 +239,8 @@ export class Firehose<
     this.sources.length = 0;
   }
   /** Stop and close all the streams */
-  public close(): void {
-    this.stop();
+  public async close(): Promise<void> {
+    await this.stop();
     this.engine.end();
     this.engine.destroy();
     this.engine.removeAllListeners();
