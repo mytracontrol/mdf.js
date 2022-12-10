@@ -185,7 +185,7 @@ describe('#RedisProducerAdapter', () => {
     }, 300);
   });
   describe('#Sad path', () => {
-    it('Should start/stop the instance properly', done => {
+    it('Should throw an error if there is a problem starting/stopping the instance', done => {
       const adapter = new RedisProducerAdapter({ id: 'myId' });
 
       //@ts-ignore - Testing private property
