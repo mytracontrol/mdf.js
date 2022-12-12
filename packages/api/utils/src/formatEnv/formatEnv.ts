@@ -39,6 +39,20 @@ export function formatEnv<T extends Record<string, any> = Record<string, any>>(
   prefix: string,
   options: Partial<ReadEnvOptions>
 ): T;
+/**
+ * Process a source, encoded as a environment variables file, filter them based in the indicated
+ * prefix, and return an object with the values sanitized and the keys formatted based on the
+ * specified options
+ * @param prefix - prefix to filter
+ * @param options - options to be used for key/value parsing and sanitize
+ * @param source - source to be processed
+ * @returns
+ */
+export function formatEnv<T extends Record<string, any> = Record<string, any>>(
+  prefix: string,
+  options: Partial<ReadEnvOptions>,
+  source: Record<string, string | undefined>
+): T;
 export function formatEnv<T extends Record<string, any> = Record<string, any>>(
   prefix?: string,
   options: Partial<ReadEnvOptions> = {},

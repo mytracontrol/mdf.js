@@ -9,10 +9,14 @@ import { Crash, Multi } from '@mdf.js/crash';
 import { DoorKeeper } from '@mdf.js/doorkeeper';
 import { DebugLogger } from '@mdf.js/logger';
 import { formatEnv } from '@mdf.js/utils';
+import ENV from 'dotenv';
+import escalade from 'escalade/sync';
 import fs from 'fs';
 import glob from 'glob';
 import { cloneDeep, merge } from 'lodash';
+import normalize, { Input, Package } from 'normalize-package-data';
 import path from 'path';
+import TOML from 'toml';
 import { v4 } from 'uuid';
 import YAML from 'yaml';
 import { ServiceSetupOptions } from './types';
@@ -35,6 +39,8 @@ export class ConfigManager<Config extends Record<string, unknown> = Record<strin
   public readonly envConfig: Partial<Config> = {};
   /** Final configuration */
   public readonly config: Partial<Config> = {};
+  /** Package version info */
+  public readonly package?: Package;
   /** Validation error, if exist */
   private _error?: Multi;
   /**
@@ -44,12 +50,13 @@ export class ConfigManager<Config extends Record<string, unknown> = Record<strin
   constructor(private readonly options: ServiceSetupOptions) {
     this.checker = this.loadSchemas(options.schemaFiles);
     this.presets = this.loadPresets(options.presetFiles);
-    this.defaultConfig = this.loadConfigFile(options.configFiles);
+    this.defaultConfig = this.loadDefaultConfigFiles(options.configFiles);
     this.envConfig = this.loadConfigEnv(options.envPrefix);
     this.config = this.validate(
       merge(cloneDeep(this.selectConfig()), this.envConfig),
       options.schema
     );
+    this.package = this.loadPackageInfo();
   }
   /** Flag to indicate that the final configuration has some errors */
   public get isErrored(): boolean {
@@ -104,19 +111,42 @@ export class ConfigManager<Config extends Record<string, unknown> = Record<strin
     }
   }
   /**
+   * Load the package.json file information
+   * @returns
+   */
+  private loadPackageInfo(): Package | undefined {
+    let packageInfo: Package | undefined;
+    try {
+      const packagePath = escalade(process.cwd(), (dir, names) => {
+        return names.includes('package.json') && 'package.json';
+      });
+      if (packagePath) {
+        packageInfo = JSON.parse(fs.readFileSync(packagePath, 'utf8'));
+        normalize(packageInfo as Input);
+      }
+    } catch (rawError) {
+      const cause = Crash.from(rawError);
+      this.addError(new Crash(`Error loading package info: ${cause.message}`, { cause }));
+    }
+    return packageInfo;
+  }
+  /**
    * Load the configuration from the environment variables
    * @param prefix - Prefix to use to filter the environment variables
    * @returns
    */
-  private loadConfigEnv(prefix?: string | string[] | Record<string, string>): Partial<Config> {
+  private loadConfigEnv(
+    prefix?: string | string[] | Record<string, string>,
+    source: Record<string, string | undefined> = process.env
+  ): Partial<Config> {
     if (typeof prefix === 'string') {
-      return formatEnv(prefix);
+      return formatEnv(prefix, {}, source);
     } else if (Array.isArray(prefix)) {
-      return prefix.reduce((acc, item) => merge(acc, formatEnv(item)), {});
+      return prefix.reduce((acc, item) => merge(acc, formatEnv(item, {}, source)), {});
     } else if (typeof prefix === 'object') {
       const result: Record<string, unknown> = {};
       for (const [key, value] of Object.entries(prefix)) {
-        result[key] = formatEnv(value);
+        result[key] = formatEnv(value, {}, source);
       }
       return result as Partial<Config>;
     } else {
@@ -128,7 +158,7 @@ export class ConfigManager<Config extends Record<string, unknown> = Record<strin
    * @param patterns - List of patterns to be used to find config files
    * @returns
    */
-  private loadConfigFile(patterns?: string[]): Partial<Config> {
+  private loadDefaultConfigFiles(patterns?: string[]): Partial<Config> {
     let config: Partial<Config> = {};
     for (const [name, content] of this.listFiles(patterns)) {
       const partialConfig = this.parse(name, content);
@@ -203,25 +233,80 @@ export class ConfigManager<Config extends Record<string, unknown> = Record<strin
    * @param content - Content to be parsed
    * @returns
    */
-  private parse(filename: string, content: string): Partial<Config> | undefined {
-    let jsonParseError: Crash | undefined = undefined;
+  private parse(filePath: string, content: string): Partial<Config> | undefined {
+    const extension = path.extname(filePath);
+    const filename = path.basename(filePath);
+    try {
+      switch (extension) {
+        case '.json':
+          return this.parseJSON(content);
+        case '.yaml':
+        case '.yml':
+          return this.parseYAML(content);
+        case '.toml':
+          return this.parseTOML(content);
+        case '.env':
+          return this.parseENV(content);
+        default:
+          this.addError(new Crash(`Unsupported file extension: ${extension} - ${filename}`));
+          return undefined;
+      }
+    } catch (rawError) {
+      const cause = Crash.from(rawError);
+      this.addError(new Crash(`Error parsing file ${filename}: ${cause.message}`, { cause }));
+      return undefined;
+    }
+  }
+  /**
+   * Parse a JSON string and a return a partial configuration
+   * @param content - Content to be parsed
+   * @returns
+   */
+  private parseJSON(content: string): Partial<Config> | undefined {
     try {
       return JSON.parse(content);
     } catch (rawError) {
       const cause = Crash.from(rawError);
-      jsonParseError = new Crash(`Error parsing JSON in file ${filename}`, {
-        cause,
-      });
+      throw new Crash(`Error parsing JSON`, { cause });
     }
+  }
+  /**
+   * Parse a YAML string and a return a partial configuration
+   * @param content - Content to be parsed
+   * @returns
+   */
+  private parseYAML(content: string): Partial<Config> | undefined {
     try {
       return YAML.parse(content);
     } catch (rawError) {
-      if (jsonParseError) {
-        this.addError(jsonParseError);
-      }
       const cause = Crash.from(rawError);
-      this.addError(new Crash(`Error parsing YAML in file ${filename}`, { cause }));
-      return undefined;
+      throw new Crash(`Error parsing YAML`, { cause });
+    }
+  }
+  /**
+   * Parse a TOML string and a return a partial configuration
+   * @param content - Content to be parsed
+   * @returns
+   */
+  private parseTOML(content: string): Partial<Config> | undefined {
+    try {
+      return TOML.parse(content);
+    } catch (rawError) {
+      const cause = Crash.from(rawError);
+      throw new Crash(`Error parsing TOML`, { cause });
+    }
+  }
+  /**
+   * Parse a ENV string and a return a partial configuration
+   * @param content - Content to be parsed
+   * @returns
+   */
+  private parseENV(content: string): Partial<Config> | undefined {
+    try {
+      return this.loadConfigEnv(this.options.envPrefix, ENV.parse(content));
+    } catch (rawError) {
+      const cause = Crash.from(rawError);
+      throw new Crash(`Error parsing ENV`, { cause });
     }
   }
 }

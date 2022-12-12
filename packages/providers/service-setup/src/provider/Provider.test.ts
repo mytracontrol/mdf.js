@@ -15,10 +15,10 @@ import { Config } from './types';
 
 const DEFAULT_CONFIG: Config = {
   name: 'test',
-  configFiles: ['src/Client/__mocks__/*.config.*'],
-  presetFiles: ['src/Client/__mocks__/*.preset.*.*'],
-  schemaFiles: ['src/Client/__mocks__/*.schema.*'],
-  schema: 'final.schema',
+  configFiles: ['src/Client/__mocks__/*.*'],
+  presetFiles: ['src/Client/__mocks__/presets/*.*'],
+  schemaFiles: ['src/Client/__mocks__/schemas/*.*'],
+  schema: 'final',
   preset: 'preset1',
 };
 class FakeLogger {
@@ -77,10 +77,10 @@ describe('#Port #ServiceConfig', () => {
         logger: new FakeLogger() as LoggerInstance,
         config: {
           name: 'test',
-          configFiles: ['src/Client/__mocks__/*.config.*'],
-          presetFiles: ['src/Client/__mocks__/*.preset.*.*'],
-          schemaFiles: ['src/Client/__mocks__/*.schema.*'],
-          schema: 'final.schema',
+          configFiles: ['src/Client/__mocks__/*.*'],
+          presetFiles: ['src/Client/__mocks__/presets/*.*'],
+          schemaFiles: ['src/Client/__mocks__/schemas/*.*'],
+          schema: 'final',
           preset: 'preset1',
         },
       });
@@ -138,9 +138,9 @@ describe('#Port #ServiceConfig', () => {
       const port = new Port(
         {
           name: 'test',
-          configFiles: ['src/Client/__mocks__/*.config.*'],
+          configFiles: ['src/Client/__mocks__/*.*'],
           presetFiles: ['src/Client/__mocks__/wrong/*.preset.*.*'],
-          schemaFiles: ['src/Client/__mocks__/*.schema.*'],
+          schemaFiles: ['src/Client/__mocks__/schemas/*.*'],
           schema: 'final.schema',
           preset: 'preset1',
         },
@@ -152,17 +152,14 @@ describe('#Port #ServiceConfig', () => {
         expect(error).toBeInstanceOf(Multi);
         expect(error.message).toEqual('Error in the service configuration');
         const trace = error.trace();
-        expect(trace[0]).toEqual(
-          'CrashError: Error parsing JSON in file src/Client/__mocks__/wrong/preset1.preset.config.json'
-        );
-        expect(trace[1]).toEqual('caused by SyntaxError: Unexpected end of JSON input');
-        expect(trace[2]).toEqual(
-          'CrashError: Error parsing YAML in file src/Client/__mocks__/wrong/preset1.preset.config.json'
-        );
-        expect(trace[3].replace(/(\r\n|\n|\r)/gm, '')).toEqual(
-          'caused by YAMLParseError: Flow map must end with a } at line 2, column 1:{^'
-        );
-        expect(trace[4]).toEqual('CrashError: Preset preset1 not found');
+        expect(trace).toEqual([
+          'CrashError: Error parsing file preset1.preset.config.json: Error parsing JSON',
+          'caused by CrashError: Error parsing JSON',
+          'caused by SyntaxError: Unexpected end of JSON input',
+          'CrashError: Preset preset1 not found',
+          'CrashError: Configuration validation failed: final.schema is not registered in the collection.',
+          'caused by ValidationError: final.schema is not registered in the collection.',
+        ]);
         done();
       });
       port.start().catch(error => {

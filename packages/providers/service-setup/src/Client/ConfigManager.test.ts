@@ -13,11 +13,12 @@ describe('#ConfigManager', () => {
     it('Should read all the files, without error in the validation and as the preset1', () => {
       const manager = new ConfigManager({
         name: 'test',
-        configFiles: ['src/Client/__mocks__/*.config.*'],
-        presetFiles: ['src/Client/__mocks__/*.preset.*.*'],
-        schemaFiles: ['src/Client/__mocks__/*.schema.*'],
-        schema: 'final.schema',
+        configFiles: ['src/Client/__mocks__/*.*'],
+        presetFiles: ['src/Client/__mocks__/presets/*.*'],
+        schemaFiles: ['src/Client/__mocks__/schemas/*.*'],
+        schema: 'final',
         preset: 'preset1',
+        envPrefix: 'MY_PREFIX_A_',
       });
       expect(manager.config).toEqual({
         config: {
@@ -31,7 +32,7 @@ describe('#ConfigManager', () => {
       expect(manager.isErrored).toBeFalsy();
       expect(manager.defaultConfig).toEqual({
         config: {
-          test: 2,
+          test: 0,
         },
         otherConfig: {
           otherTest: '-a',
@@ -54,19 +55,27 @@ describe('#ConfigManager', () => {
             otherTest: 'b',
           },
         },
+        preset3: {
+          config: {
+            test: 5,
+          },
+          otherConfig: {
+            otherTest: 'j',
+          },
+        },
       });
     }, 1000);
     it('Should read all the files, without error in the validation and as the default config', () => {
       const manager = new ConfigManager({
         name: 'test',
-        configFiles: ['src/Client/__mocks__/*.config.*'],
-        presetFiles: ['src/Client/__mocks__/*.preset.*.*'],
-        schemaFiles: ['src/Client/__mocks__/*.schema.*'],
-        schema: 'final.schema',
+        configFiles: ['src/Client/__mocks__/*.*'],
+        presetFiles: ['src/Client/__mocks__/presets/*.*'],
+        schemaFiles: ['src/Client/__mocks__/schemas/*.*'],
+        schema: 'final',
       });
       expect(manager.config).toEqual({
         config: {
-          test: 2,
+          test: 0,
         },
         otherConfig: {
           otherTest: '-a',
@@ -76,7 +85,7 @@ describe('#ConfigManager', () => {
       expect(manager.isErrored).toBeFalsy();
       expect(manager.defaultConfig).toEqual({
         config: {
-          test: 2,
+          test: 0,
         },
         otherConfig: {
           otherTest: '-a',
@@ -99,20 +108,25 @@ describe('#ConfigManager', () => {
             otherTest: 'b',
           },
         },
+        preset3: {
+          config: {
+            test: 5,
+          },
+        },
       });
     }, 1000);
     it('Should read all the files, with error (due to preset is not present) and return default config due to preset not exits', () => {
       const manager = new ConfigManager({
         name: 'test',
-        configFiles: ['src/Client/__mocks__/*.config.*'],
-        presetFiles: ['src/Client/__mocks__/*.preset.*.*'],
-        schemaFiles: ['src/Client/__mocks__/*.schema.*'],
-        schema: 'final.schema',
-        preset: 'preset3',
+        configFiles: ['src/Client/__mocks__/*.*'],
+        presetFiles: ['src/Client/__mocks__/presets/*.*'],
+        schemaFiles: ['src/Client/__mocks__/schemas/*.*'],
+        schema: 'final',
+        preset: 'preset4',
       });
       expect(manager.config).toEqual({
         config: {
-          test: 2,
+          test: 0,
         },
         otherConfig: {
           otherTest: '-a',
@@ -121,10 +135,10 @@ describe('#ConfigManager', () => {
       expect(manager.error).toBeDefined();
       expect(manager.isErrored).toBeTruthy();
       const trace = manager.error?.trace();
-      expect(trace).toEqual(['CrashError: Preset preset3 not found']);
+      expect(trace).toEqual(['CrashError: Preset preset4 not found']);
       expect(manager.defaultConfig).toEqual({
         config: {
-          test: 2,
+          test: 0,
         },
         otherConfig: {
           otherTest: '-a',
@@ -145,6 +159,11 @@ describe('#ConfigManager', () => {
           },
           otherConfig: {
             otherTest: 'b',
+          },
+        },
+        preset3: {
+          config: {
+            test: 5,
           },
         },
       });
@@ -152,15 +171,15 @@ describe('#ConfigManager', () => {
     it('Should read all the files, with error in the validation and return default config', () => {
       const manager = new ConfigManager({
         name: 'test',
-        configFiles: ['src/Client/__mocks__/*.config.*'],
-        presetFiles: ['src/Client/__mocks__/*.preset.*.*'],
+        configFiles: ['src/Client/__mocks__/*.*'],
+        presetFiles: ['src/Client/__mocks__/presets/*.*'],
         schemaFiles: ['src/Client/__mocks__/badSchemas/*.schema.*'],
-        schema: 'final.schema',
+        schema: 'final',
         preset: 'preset',
       });
       expect(manager.config).toEqual({
         config: {
-          test: 2,
+          test: 0,
         },
         otherConfig: {
           otherTest: '-a',
@@ -170,7 +189,7 @@ describe('#ConfigManager', () => {
       expect(manager.isErrored).toBeTruthy();
       expect(manager.defaultConfig).toEqual({
         config: {
-          test: 2,
+          test: 0,
         },
         otherConfig: {
           otherTest: '-a',
@@ -191,6 +210,11 @@ describe('#ConfigManager', () => {
           },
           otherConfig: {
             otherTest: 'b',
+          },
+        },
+        preset3: {
+          config: {
+            test: 5,
           },
         },
       });
@@ -198,13 +222,13 @@ describe('#ConfigManager', () => {
     it('Should read all the files, without error in the config selection and return default config', () => {
       const manager = new ConfigManager({
         name: 'test',
-        configFiles: ['src/Client/__mocks__/*.config.*'],
-        presetFiles: ['src/Client/__mocks__/*.preset.*.*'],
+        configFiles: ['src/Client/__mocks__/*.*'],
+        presetFiles: ['src/Client/__mocks__/presets/*.*'],
         preset: 'preset',
       });
       expect(manager.config).toEqual({
         config: {
-          test: 2,
+          test: 0,
         },
         otherConfig: {
           otherTest: '-a',
@@ -214,7 +238,7 @@ describe('#ConfigManager', () => {
       expect(manager.isErrored).toBeTruthy();
       expect(manager.defaultConfig).toEqual({
         config: {
-          test: 2,
+          test: 0,
         },
         otherConfig: {
           otherTest: '-a',
@@ -235,6 +259,11 @@ describe('#ConfigManager', () => {
           },
           otherConfig: {
             otherTest: 'b',
+          },
+        },
+        preset3: {
+          config: {
+            test: 5,
           },
         },
       });
@@ -243,10 +272,10 @@ describe('#ConfigManager', () => {
       process.env['CONFIG_TEST_CONFIG__TEST'] = '4';
       const manager = new ConfigManager({
         name: 'test',
-        configFiles: ['src/Client/__mocks__/*.config.*'],
-        presetFiles: ['src/Client/__mocks__/*.preset.*.*'],
-        schemaFiles: ['src/Client/__mocks__/*.schema.*'],
-        schema: 'final.schema',
+        configFiles: ['src/Client/__mocks__/*.*'],
+        presetFiles: ['src/Client/__mocks__/presets/*.*'],
+        schemaFiles: ['src/Client/__mocks__/schemas/*.*'],
+        schema: 'final',
         preset: 'preset1',
         envPrefix: 'CONFIG_TEST_',
       });
@@ -262,7 +291,7 @@ describe('#ConfigManager', () => {
       expect(manager.isErrored).toBeFalsy();
       expect(manager.defaultConfig).toEqual({
         config: {
-          test: 2,
+          test: 0,
         },
         otherConfig: {
           otherTest: '-a',
@@ -285,6 +314,11 @@ describe('#ConfigManager', () => {
             otherTest: 'b',
           },
         },
+        preset3: {
+          config: {
+            test: 5,
+          },
+        },
       });
     }, 1000);
     it('Should read all the files, without error in the validation and as the preset1 modified by environment values as an array of strings', () => {
@@ -292,10 +326,10 @@ describe('#ConfigManager', () => {
       process.env['B_OTHER_CONFIG__OTHER_TEST'] = 'b';
       const manager = new ConfigManager({
         name: 'test',
-        configFiles: ['src/Client/__mocks__/*.config.*'],
-        presetFiles: ['src/Client/__mocks__/*.preset.*.*'],
-        schemaFiles: ['src/Client/__mocks__/*.schema.*'],
-        schema: 'final.schema',
+        configFiles: ['src/Client/__mocks__/*.*'],
+        presetFiles: ['src/Client/__mocks__/presets/*.*'],
+        schemaFiles: ['src/Client/__mocks__/schemas/*.*'],
+        schema: 'final',
         preset: 'preset1',
         envPrefix: ['A_', 'B_'],
       });
@@ -311,7 +345,7 @@ describe('#ConfigManager', () => {
       expect(manager.isErrored).toBeFalsy();
       expect(manager.defaultConfig).toEqual({
         config: {
-          test: 2,
+          test: 0,
         },
         otherConfig: {
           otherTest: '-a',
@@ -334,6 +368,11 @@ describe('#ConfigManager', () => {
             otherTest: 'b',
           },
         },
+        preset3: {
+          config: {
+            test: 5,
+          },
+        },
       });
     }, 1000);
     it('Should read all the files, without error in the validation and as the preset1 modified by environment values as an object of strings', () => {
@@ -341,10 +380,10 @@ describe('#ConfigManager', () => {
       process.env['MY_B_OTHER_TEST'] = 'b';
       const manager = new ConfigManager({
         name: 'test',
-        configFiles: ['src/Client/__mocks__/*.config.*'],
-        presetFiles: ['src/Client/__mocks__/*.preset.*.*'],
-        schemaFiles: ['src/Client/__mocks__/*.schema.*'],
-        schema: 'final.schema',
+        configFiles: ['src/Client/__mocks__/*.*'],
+        presetFiles: ['src/Client/__mocks__/presets/*.*'],
+        schemaFiles: ['src/Client/__mocks__/schemas/*.*'],
+        schema: 'final',
         preset: 'preset1',
         envPrefix: { config: 'MY_A_', otherConfig: 'MY_B_' },
       });
@@ -360,7 +399,7 @@ describe('#ConfigManager', () => {
       expect(manager.isErrored).toBeFalsy();
       expect(manager.defaultConfig).toEqual({
         config: {
-          test: 2,
+          test: 0,
         },
         otherConfig: {
           otherTest: '-a',
@@ -383,6 +422,12 @@ describe('#ConfigManager', () => {
             otherTest: 'b',
           },
         },
+        preset3: {
+          config: {
+            test: 5,
+          },
+          otherConfig: {},
+        },
       });
     }, 1000);
   });
@@ -391,9 +436,9 @@ describe('#ConfigManager', () => {
       const manager = new ConfigManager({
         name: 'test',
         configFiles: ['src/Client/__mocks__/wrong/*.config.*'],
-        presetFiles: ['src/Client/__mocks__/*.preset.*.*'],
-        schemaFiles: ['src/Client/__mocks__/*.schema.*'],
-        schema: 'final.schema',
+        presetFiles: ['src/Client/__mocks__/presets/*.*'],
+        schemaFiles: ['src/Client/__mocks__/schemas/*.*'],
+        schema: 'final',
         preset: 'preset1',
       });
       expect(manager.isErrored).toBeTruthy();
@@ -401,33 +446,25 @@ describe('#ConfigManager', () => {
       expect(manager.error?.message).toEqual('Error in the service configuration');
       const trace = manager.error?.trace() || [];
       expect(trace[0]).toEqual(
-        'CrashError: Error parsing JSON in file src/Client/__mocks__/wrong/config.config.yaml'
+        'CrashError: Error parsing file config.config.yaml: Error parsing YAML'
       );
-      expect(trace[1]).toEqual('caused by SyntaxError: Unexpected end of JSON input');
-      expect(trace[2]).toEqual(
-        'CrashError: Error parsing YAML in file src/Client/__mocks__/wrong/config.config.yaml'
-      );
-      expect(trace[3].replace(/(\r\n|\n|\r)/gm, '')).toEqual(
+      expect(trace[1]).toEqual('caused by CrashError: Error parsing YAML');
+      expect(trace[2].replace(/(\r\n|\n|\r)/gm, '')).toEqual(
         'caused by YAMLParseError: Flow map must end with a } at line 1, column 2:{ ^'
       );
-      expect(trace[4]).toEqual(
-        'CrashError: Error parsing JSON in file src/Client/__mocks__/wrong/preset1.preset.config.json'
+      expect(trace[3]).toEqual(
+        'CrashError: Error parsing file preset1.preset.config.json: Error parsing JSON'
       );
+      expect(trace[4]).toEqual('caused by CrashError: Error parsing JSON');
       expect(trace[5]).toEqual('caused by SyntaxError: Unexpected end of JSON input');
-      expect(trace[6]).toEqual(
-        'CrashError: Error parsing YAML in file src/Client/__mocks__/wrong/preset1.preset.config.json'
-      );
-      expect(trace[7].replace(/(\r\n|\n|\r)/gm, '')).toContain(
-        'caused by YAMLParseError: Flow map must end with a } at line 2, column 1:{^'
-      );
     }, 1000);
     it('Should start with errors if its not possible to process a schema', () => {
       const manager = new ConfigManager({
         name: 'test',
-        configFiles: ['src/Client/__mocks__/*.config.*'],
-        presetFiles: ['src/Client/__mocks__/*.preset.*.*'],
+        configFiles: ['src/Client/__mocks__/*.*'],
+        presetFiles: ['src/Client/__mocks__/presets/*.*'],
         schemaFiles: ['src/Client/__mocks__/wrong/*.schema.*'],
-        schema: 'final.schema',
+        schema: 'final',
         preset: 'preset1',
       });
       expect(manager.isErrored).toBeTruthy();
@@ -445,10 +482,10 @@ describe('#ConfigManager', () => {
     it('Should start with errors if its not possible to parse a preset config file', () => {
       const manager = new ConfigManager({
         name: 'test',
-        configFiles: ['src/Client/__mocks__/*.config.*'],
+        configFiles: ['src/Client/__mocks__/*.*'],
         presetFiles: ['src/Client/__mocks__/wrong/*.preset.*.*'],
-        schemaFiles: ['src/Client/__mocks__/*.schema.*'],
-        schema: 'final.schema',
+        schemaFiles: ['src/Client/__mocks__/schemas/*.*'],
+        schema: 'final',
         preset: 'preset1',
       });
       expect(manager.isErrored).toBeTruthy();
@@ -456,16 +493,11 @@ describe('#ConfigManager', () => {
       expect(manager.error?.message).toEqual('Error in the service configuration');
       const trace = manager.error?.trace() || [];
       expect(trace[0]).toEqual(
-        'CrashError: Error parsing JSON in file src/Client/__mocks__/wrong/preset1.preset.config.json'
+        'CrashError: Error parsing file preset1.preset.config.json: Error parsing JSON'
       );
-      expect(trace[1]).toEqual('caused by SyntaxError: Unexpected end of JSON input');
-      expect(trace[2]).toEqual(
-        'CrashError: Error parsing YAML in file src/Client/__mocks__/wrong/preset1.preset.config.json'
-      );
-      expect(trace[3].replace(/(\r\n|\n|\r)/gm, '')).toEqual(
-        'caused by YAMLParseError: Flow map must end with a } at line 2, column 1:{^'
-      );
-      expect(trace[4]).toEqual('CrashError: Preset preset1 not found');
+      expect(trace[1]).toEqual('caused by CrashError: Error parsing JSON');
+      expect(trace[2]).toEqual('caused by SyntaxError: Unexpected end of JSON input');
+      expect(trace[3]).toEqual('CrashError: Preset preset1 not found');
     }, 1000);
     it('Should start with errors if there is a failure reading files', () => {
       jest.spyOn(fs, 'readFileSync').mockImplementation(() => {
@@ -473,29 +505,29 @@ describe('#ConfigManager', () => {
       });
       const manager = new ConfigManager({
         name: 'test',
-        configFiles: ['src/Client/__mocks__/*.config.*'],
-        presetFiles: ['src/Client/__mocks__/*.preset.*.*'],
-        schemaFiles: ['src/Client/__mocks__/*.schema.*'],
-        schema: 'final.schema',
+        configFiles: ['src/Client/__mocks__/*.*'],
+        presetFiles: ['src/Client/__mocks__/presets/*.*'],
+        schemaFiles: ['src/Client/__mocks__/schemas/*.*'],
+        schema: 'final',
         preset: 'preset1',
       });
       expect(manager.isErrored).toBeTruthy();
       expect(manager.error).toBeDefined();
       expect(manager.error?.message).toEqual('Error in the service configuration');
       const trace = manager.error?.trace() || [];
-      expect(trace[0]).toEqual('CrashError: Error loading files: Error reading file');
-      expect(trace[1]).toEqual('caused by Error: Error reading file');
-      expect(trace[2]).toEqual('CrashError: Error loading files: Error reading file');
-      expect(trace[3]).toEqual('caused by Error: Error reading file');
-      expect(trace[4]).toEqual('CrashError: Error loading files: Error reading file');
-      expect(trace[5]).toEqual('caused by Error: Error reading file');
-      expect(trace[6]).toEqual('CrashError: Preset preset1 not found');
-      expect(trace[7]).toEqual(
-        'CrashError: Configuration validation failed: final.schema is not registered in the collection.'
-      );
-      expect(trace[8]).toEqual(
-        'caused by ValidationError: final.schema is not registered in the collection.'
-      );
+      expect(trace).toEqual([
+        'CrashError: Error loading files: Error reading file',
+        'caused by Error: Error reading file',
+        'CrashError: Error loading files: Error reading file',
+        'caused by Error: Error reading file',
+        'CrashError: Error loading files: Error reading file',
+        'caused by Error: Error reading file',
+        'CrashError: Preset preset1 not found',
+        'CrashError: Configuration validation failed: final is not registered in the collection.',
+        'caused by ValidationError: final is not registered in the collection.',
+        'CrashError: Error loading package info: Error reading file',
+        'caused by Error: Error reading file',
+      ]);
     }, 1000);
   });
 });

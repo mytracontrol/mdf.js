@@ -5,4 +5,5 @@
  * or at https://opensource.org/licenses/MIT.
  */
 
+export * from './Client';
 export * as Setup from './provider';
