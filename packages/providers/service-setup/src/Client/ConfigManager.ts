@@ -24,7 +24,7 @@ import { ServiceSetupOptions } from './types';
 type FileEntry = [string, string];
 
 /** Class responsible of file management, both configuration file as validator files  */
-export class ConfigManager<Config extends { [key: string]: unknown } = { [key: string]: unknown }> {
+export class ConfigManager<Config extends Record<string, any> = Record<string, any>> {
   /** Unique identifier */
   private readonly uuid: string = v4();
   /** Logger instance for deep debugging tasks */
