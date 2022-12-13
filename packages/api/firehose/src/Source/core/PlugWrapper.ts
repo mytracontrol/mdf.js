@@ -257,7 +257,7 @@ export class PlugWrapper<
     }
     // Ingest data operation is retried infinitely using the default values, in other way the normal
     // ingestion process will be blocked
-    return this.wrappedOperation(this.ingestDataOriginal, [size]);
+    return this.wrappedOperation(this.ingestDataOriginal, [size], this.retryOptions);
   };
   /**
    * Add new credits to the source
@@ -267,7 +267,7 @@ export class PlugWrapper<
     if (!this.addCreditsOriginal) {
       throw new Crash(`Plug ${this.plug.name} does not implement the addCredits method`);
     }
-    await this.wrappedOperation(this.addCreditsOriginal, [credits]);
+    await this.wrappedOperation(this.addCreditsOriginal, [credits], this.retryOptions);
   };
   /** Start the Plug and the underlayer resources, making it available */
   private readonly start = async (): Promise<void> => {
