@@ -38,7 +38,7 @@ export class ConfigManager<Config extends Record<string, any> = Record<string, a
   /** Environment configuration */
   public readonly envConfig: Partial<Config> = {};
   /** Final configuration */
-  public readonly config: Partial<Config> = {};
+  public readonly config: Config;
   /** Package version info */
   public readonly package?: Package;
   /** Validation error, if exist */
@@ -97,17 +97,17 @@ export class ConfigManager<Config extends Record<string, any> = Record<string, a
    * @param schema - Schema to be used to validate the configuration
    * @returns - The validated configuration
    */
-  private validate(config: Partial<Config>, schema?: string): Partial<Config> {
+  private validate(config: Partial<Config>, schema?: string): Config {
     if (schema && this.checker) {
       try {
         return this.checker.attempt(schema, config, this.uuid);
       } catch (rawError) {
         const cause = Crash.from(rawError);
         this.addError(new Crash(`Configuration validation failed: ${cause.message}`, { cause }));
-        return config;
+        return this.defaultConfig as Config;
       }
     } else {
-      return config;
+      return config as Config;
     }
   }
   /**
