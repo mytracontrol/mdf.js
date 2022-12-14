@@ -25,7 +25,7 @@ export class AppWrapper {
   /** Logger instance */
   public readonly logger: LoggerInstance;
   /** Consumer instance */
-  public readonly consumer: Consumer;
+  public readonly consumer?: Consumer;
   /** The application wrapped has performed the bootstrap */
   private booted = false;
   /** The application wrapped has been started */
@@ -53,18 +53,20 @@ export class AppWrapper {
       version: this.options.application?.version ?? '1',
       instanceId: this.instanceId,
     });
-    this.consumer = this.createConsumer(
-      {
-        ...this.options.consumer,
-        id: this.options.consumer?.id ?? this.options.name,
-        resolver: this.resolverMap,
-        actionTargetPairs: this.actionTargetPairs,
-        logger: this.options.consumer?.logger ?? this.logger,
-      },
-      this.options.adapter
-    );
-    this.observability.attach(this.consumer);
-    this.observability.healthRegistry.register(this.consumer);
+    if (this.options.consumer) {
+      this.consumer = this.createConsumer(
+        {
+          ...this.options.consumer,
+          id: this.options.consumer?.id ?? this.options.name,
+          resolver: this.resolverMap,
+          actionTargetPairs: this.actionTargetPairs,
+          logger: this.options.consumer?.logger ?? this.logger,
+        },
+        this.options.adapter
+      );
+      this.observability.attach(this.consumer);
+      this.observability.healthRegistry.register(this.consumer);
+    }
   }
   /**
    * Create the consumer based on the configuration options
@@ -192,8 +194,10 @@ export class AppWrapper {
       await retryBind(this.observability.start, this.observability, [], this.options.retryOptions);
       const links = JSON.stringify(this.observability.links, null, 2);
       this.logger.info(`Observability engine started, the health information is at: ${links}`);
-      await retryBind(this.consumer.start, this.consumer, [], this.options.retryOptions);
-      this.logger.info('OpenC2 Consumer engine started');
+      if (this.consumer) {
+        await retryBind(this.consumer.start, this.consumer, [], this.options.retryOptions);
+        this.logger.info('OpenC2 Consumer engine started');
+      }
       this.booted = true;
     } catch (rawError) {
       const cause = Crash.from(rawError);
@@ -237,8 +241,10 @@ export class AppWrapper {
         return;
       }
       this.logger.info('Shutting down application engine ...');
-      await retryBind(this.consumer.stop, this.consumer, [], this.options.retryOptions);
-      this.logger.info('OpenC2 Consumer engine stopped');
+      if (this.consumer) {
+        await retryBind(this.consumer.stop, this.consumer, [], this.options.retryOptions);
+        this.logger.info('OpenC2 Consumer engine stopped');
+      }
       await retryBind(this.observability.stop, this.observability, [], this.options.retryOptions);
       this.logger.info('Observability engine stopped');
       this.booted = false;

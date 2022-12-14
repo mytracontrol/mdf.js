@@ -84,6 +84,55 @@ describe('#AppWrapper class', () => {
         instanceId: wrapper.instanceId,
         notes: [],
         output: '',
+        status: 'pass',
+        checks: {
+          'test:uptime': [
+            {
+              componentId: checks['test:uptime'][0].componentId,
+              componentType: 'system',
+              observedValue: checks['test:uptime'][0].observedValue,
+              observedUnit: 'time',
+              status: 'pass',
+              time: checks['test:uptime'][0].time,
+            },
+          ],
+          'oneResource:status': [
+            {
+              status: 'pass',
+              componentId: 'myComponentId',
+            },
+          ],
+          'twoResource:status': [
+            {
+              status: 'pass',
+              componentId: 'myComponentId',
+            },
+          ],
+          'threeResource:status': [
+            {
+              status: 'pass',
+              componentId: 'myComponentId',
+            },
+          ],
+        },
+      });
+    });
+    it('Should create a valid instance with default values and consumer', async () => {
+      const wrapper = new AppWrapper({ name: 'test', consumer: {} });
+      expect(wrapper).toBeInstanceOf(AppWrapper);
+      expect(wrapper.instanceId).toBeDefined();
+      wrapper.register(new ResourceMock('oneResource'));
+      wrapper.register([new ResourceMock('twoResource'), new ResourceMock('threeResource')]);
+      const health = wrapper.observability.healthRegistry.health;
+      const checks = health.checks as Health.Checks;
+      expect(health).toEqual({
+        name: 'test',
+        description: 'test',
+        release: '1.0.0',
+        version: '1',
+        instanceId: wrapper.instanceId,
+        notes: [],
+        output: '',
         status: 'warn',
         checks: {
           'test:commands': [
@@ -406,30 +455,34 @@ describe('#AppWrapper class', () => {
       expect(wrapper.consumer.options.resolver).toHaveProperty('query:x-myNamespace:other');
     });
     it('Should bootstrap and shutdown properly', async () => {
-      const wrapper = new AppWrapper({ name: 'test' });
+      const wrapper = new AppWrapper({ name: 'test', consumer: {} });
       const resource = new ResourceMock('oneResource');
       wrapper.register(resource);
       jest.spyOn(wrapper.observability, 'start').mockResolvedValue();
       jest.spyOn(wrapper.observability, 'stop').mockResolvedValue();
+      //@ts-ignore - private property
       jest.spyOn(wrapper.consumer, 'start').mockResolvedValue();
+      //@ts-ignore - private property
       jest.spyOn(wrapper.consumer, 'stop').mockResolvedValue();
       //@ts-ignore - private property
       expect(wrapper.booted).toBeFalsy();
       await wrapper.bootstrap();
       await wrapper.bootstrap();
       expect(wrapper.observability.start).toHaveBeenCalledTimes(1);
+      //@ts-ignore - private property
       expect(wrapper.consumer.start).toHaveBeenCalledTimes(1);
       //@ts-ignore - private property
       expect(wrapper.booted).toBeTruthy();
       await wrapper.shutdown();
       await wrapper.shutdown();
       expect(wrapper.observability.stop).toHaveBeenCalledTimes(1);
+      //@ts-ignore - private property
       expect(wrapper.consumer.stop).toHaveBeenCalledTimes(1);
       //@ts-ignore - private property
       expect(wrapper.booted).toBeFalsy();
     });
     it('Should start and stop properly', async () => {
-      const wrapper = new AppWrapper({ name: 'test' });
+      const wrapper = new AppWrapper({ name: 'test', consumer: {} });
       const resource = new ResourceMock('oneResource');
       const otherResource = new ResourceMockWithOutMethod('otherResourceWithOutMethod');
       wrapper.register(resource);
@@ -437,7 +490,9 @@ describe('#AppWrapper class', () => {
       wrapper.register(otherResource);
       jest.spyOn(wrapper.observability, 'start').mockResolvedValue();
       jest.spyOn(wrapper.observability, 'stop').mockResolvedValue();
+      //@ts-ignore - private property
       jest.spyOn(wrapper.consumer, 'start').mockResolvedValue();
+      //@ts-ignore - private property
       jest.spyOn(wrapper.consumer, 'stop').mockResolvedValue();
       jest.spyOn(resource, 'start').mockResolvedValue();
       jest.spyOn(resource, 'stop').mockResolvedValue();
@@ -448,6 +503,7 @@ describe('#AppWrapper class', () => {
       await wrapper.start();
       await wrapper.start();
       expect(wrapper.observability.start).toHaveBeenCalledTimes(1);
+      //@ts-ignore - private property
       expect(wrapper.consumer.start).toHaveBeenCalledTimes(1);
       expect(resource.start).toHaveBeenCalledTimes(1);
       //@ts-ignore - private property
@@ -457,6 +513,7 @@ describe('#AppWrapper class', () => {
       await wrapper.stop();
       await wrapper.stop();
       expect(wrapper.observability.stop).toHaveBeenCalledTimes(1);
+      //@ts-ignore - private property
       expect(wrapper.consumer.stop).toHaveBeenCalledTimes(1);
       expect(resource.stop).toHaveBeenCalledTimes(1);
       //@ts-ignore - private property
@@ -465,12 +522,14 @@ describe('#AppWrapper class', () => {
       expect(wrapper.started).toBeFalsy();
     });
     it('Should execute the commands', async () => {
-      const wrapper = new AppWrapper({ name: 'test', namespace: 'x-myNamespace' });
+      const wrapper = new AppWrapper({ name: 'test', namespace: 'x-myNamespace', consumer: {} });
       const resource = new ResourceMock('oneResource');
       wrapper.register(resource);
       jest.spyOn(wrapper.observability, 'start').mockResolvedValue();
       jest.spyOn(wrapper.observability, 'stop').mockResolvedValue();
+      //@ts-ignore - private property
       jest.spyOn(wrapper.consumer, 'start').mockResolvedValue();
+      //@ts-ignore - private property
       jest.spyOn(wrapper.consumer, 'stop').mockResolvedValue();
       jest.spyOn(resource, 'start').mockResolvedValue();
       jest.spyOn(resource, 'stop').mockResolvedValue();
@@ -709,6 +768,7 @@ describe('#AppWrapper class', () => {
       //@ts-ignore - private property
       await wrapper.consumer.processCommand(queryStart);
       expect(wrapper.observability.start).toHaveBeenCalledTimes(1);
+      //@ts-ignore - private property
       expect(wrapper.consumer.start).toHaveBeenCalledTimes(1);
       expect(resource.start).toHaveBeenCalledTimes(1);
       //@ts-ignore - private property
@@ -720,6 +780,7 @@ describe('#AppWrapper class', () => {
       //@ts-ignore - private property
       await wrapper.consumer.processCommand(queryStop);
       expect(wrapper.observability.stop).toHaveBeenCalledTimes(1);
+      //@ts-ignore - private property
       expect(wrapper.consumer.stop).toHaveBeenCalledTimes(1);
       expect(resource.stop).toHaveBeenCalledTimes(1);
       //@ts-ignore - private property
@@ -737,6 +798,7 @@ describe('#AppWrapper class', () => {
           retryOptions: {
             attempts: 2,
           },
+          consumer: {},
           adapter: {
             //@ts-ignore - Invalid adapter
             type: 'invalid',
@@ -754,6 +816,7 @@ describe('#AppWrapper class', () => {
           retryOptions: {
             attempts: 2,
           },
+          consumer: {},
         });
         await wrapper.bootstrap();
         throw new Error('Should not be here');
@@ -769,12 +832,15 @@ describe('#AppWrapper class', () => {
         retryOptions: {
           attempts: 2,
         },
+        consumer: {},
       });
       const resource = new ResourceMock('oneResource');
       wrapper.register(resource);
       jest.spyOn(wrapper.observability, 'start').mockResolvedValue();
       jest.spyOn(wrapper.observability, 'stop').mockRejectedValue(new Error('Error stopping'));
+      //@ts-ignore - private property
       jest.spyOn(wrapper.consumer, 'start').mockResolvedValue();
+      //@ts-ignore - private property
       jest.spyOn(wrapper.consumer, 'stop').mockResolvedValue();
       await wrapper.bootstrap();
       try {
@@ -792,13 +858,16 @@ describe('#AppWrapper class', () => {
         retryOptions: {
           attempts: 2,
         },
+        consumer: {},
       });
       const resource = new ResourceMock('oneResource');
       resource.rejectStart = true;
       wrapper.register(resource);
       jest.spyOn(wrapper.observability, 'start').mockResolvedValue();
       jest.spyOn(wrapper.observability, 'stop').mockResolvedValue();
+      //@ts-ignore - private property
       jest.spyOn(wrapper.consumer, 'start').mockResolvedValue();
+      //@ts-ignore - private property
       jest.spyOn(wrapper.consumer, 'stop').mockResolvedValue();
       try {
         await wrapper.start();
@@ -815,13 +884,16 @@ describe('#AppWrapper class', () => {
         retryOptions: {
           attempts: 2,
         },
+        consumer: {},
       });
       const resource = new ResourceMock('oneResource');
       resource.rejectStop = true;
       wrapper.register(resource);
       jest.spyOn(wrapper.observability, 'start').mockResolvedValue();
       jest.spyOn(wrapper.observability, 'stop').mockResolvedValue();
+      //@ts-ignore - private property
       jest.spyOn(wrapper.consumer, 'start').mockResolvedValue();
+      //@ts-ignore - private property
       jest.spyOn(wrapper.consumer, 'stop').mockResolvedValue();
       try {
         await wrapper.start();
