@@ -62,7 +62,7 @@ export class AppWrapper<AppConfig extends Record<string, any> = Record<string, a
    * @param resources - Application resources
    */
   constructor(
-    private readonly options: ApplicationWrapperOptions,
+    private readonly options: ApplicationWrapperOptions = {},
     private readonly resources: Layer.App.Resource[] = []
   ) {
     this.setupProvider = Setup.Factory.create({
