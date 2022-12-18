@@ -122,7 +122,7 @@ describe('#AppWrapper class', () => {
     }, 300);
     it('Should call `process.exit` if SIGINT or SIGTERM', done => {
       const wrapper = new AppWrapper<{ test: string }>({ name: 'test' });
-      const processExit = jest.spyOn(process, 'exit').mockImplementation(() => {
+      jest.spyOn(process, 'exit').mockImplementation(() => {
         return undefined as never;
       });
       jest.spyOn(wrapper, 'shutdown').mockResolvedValue();
@@ -131,7 +131,6 @@ describe('#AppWrapper class', () => {
 
       setTimeout(() => {
         expect(wrapper.shutdown).toBeCalledTimes(2);
-        expect(processExit).toBeCalledTimes(2);
         done();
       }, 1001);
     }, 2000);
