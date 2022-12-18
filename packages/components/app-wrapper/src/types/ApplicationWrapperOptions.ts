@@ -15,7 +15,7 @@ import { ConsumerAdapterOptions } from './ConsumerAdapterOptions.i';
 
 export interface ApplicationWrapperOptions {
   /** Application or or microservice name */
-  name: string;
+  name?: string;
   /** Application setup options */
   setup?: ServiceSetupOptions;
   /** Application definition */

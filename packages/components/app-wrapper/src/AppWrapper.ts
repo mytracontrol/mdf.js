@@ -25,7 +25,7 @@ const customizer: MergeWithCustomizer = (objValue, srcValue) => {
   return undefined;
 };
 
-type InternalSetupConfig = Partial<Omit<ApplicationWrapperOptions, 'setup' | 'name'>>;
+type InternalSetupConfig = Partial<Omit<ApplicationWrapperOptions, 'setup'>>;
 const SHUTDOWN_DELAY = 1000;
 const INTERNAL_OPTIONS = [
   'name',
@@ -73,11 +73,7 @@ export class AppWrapper<AppConfig extends Record<string, any> = Record<string, a
     this.internalSetup = this.setupProvider.client as ConfigManager<
       ApplicationWrapperOptions & AppConfig
     >;
-    this.logger = SetContext(
-      new Logger(this.options.name, this.loggerConfig),
-      'app',
-      this.instanceId
-    );
+    this.logger = SetContext(new Logger(this.name, this.loggerConfig), 'app', this.instanceId);
     this.observability = new Observability(this.observabilityConfig);
     if (this.options.consumer) {
       this.consumer = this.createConsumer(this.consumerConfig, this.openC2AdapterConfig);
@@ -109,6 +105,18 @@ export class AppWrapper<AppConfig extends Record<string, any> = Record<string, a
       throw new Crash(`Unknown consumer adapter type: ${adapterOptions.type}`);
     }
   }
+  /** Get the application name */
+  private get name(): string {
+    return this.options.name || this.internalSetup.config.name || 'app-wrapper';
+  }
+  /** Get the application description */
+  private get description(): string {
+    return (
+      this.options.application?.description ||
+      this.internalSetup.config.application?.description ||
+      this.name
+    );
+  }
   /** Get the Setup configuration options */
   private get setupConfig(): Setup.Config {
     return merge(this.options.setup, {
@@ -132,8 +140,8 @@ export class AppWrapper<AppConfig extends Record<string, any> = Record<string, a
     const config = {
       ...this.options.application,
       ...this.options.observability,
-      name: this.options.name,
-      description: this.options.application?.description ?? this.options.name,
+      name: this.name,
+      description: this.description,
       release: this.release,
       version,
       instanceId: this.instanceId,
@@ -147,7 +155,7 @@ export class AppWrapper<AppConfig extends Record<string, any> = Record<string, a
   /** Get the OpenC2 consumer options */
   private get consumerConfig(): ConsumerOptions {
     return merge(cloneDeep(this.options.consumer), this.internalSetup.config.consumer, {
-      id: this.options.consumer?.id ?? this.options.name,
+      id: this.options.consumer?.id ?? this.name,
       resolver: this.resolverMap,
       actionTargetPairs: this.actionTargetPairs,
       logger: this.options.consumer?.logger ?? this.logger,
@@ -268,10 +276,6 @@ export class AppWrapper<AppConfig extends Record<string, any> = Record<string, a
       this.logger.debug(`Registering resource: ${entry.name}`);
       this.observability.healthRegistry.register(entry);
     }
-  }
-  /** Application name */
-  public get name(): string {
-    return this.options.name;
   }
   /** Application release */
   public get release(): string {
