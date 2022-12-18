@@ -11,9 +11,9 @@ import { CONFIG_ARTIFACT_ID } from './utils';
 // *************************************************************************************************
 // #region Default values
 const CONFIG_SERVICE_SETUP_NAME = CONFIG_ARTIFACT_ID;
-const CONFIG_SERVICE_SETUP_PRESET_FILES = 'config/presets/*.preset.json';
-const CONFIG_SERVICE_SETUP_SCHEMA_FILES = 'config/schemas/*.schema.json';
-const CONFIG_SERVICE_SETUP_CONFIG_FILES = 'config/*.config.json';
+const CONFIG_SERVICE_SETUP_CONFIG_FILES = `${process.cwd()}/config/*.*`;
+const CONFIG_SERVICE_SETUP_PRESET_FILES = `${process.cwd()}/config/presets/*.*`;
+const CONFIG_SERVICE_SETUP_SCHEMA_FILES = `${process.cwd()}/config/schemas/*.*`;
 
 export const defaultConfig: Config = {
   name: CONFIG_SERVICE_SETUP_NAME,

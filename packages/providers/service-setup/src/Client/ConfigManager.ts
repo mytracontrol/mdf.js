@@ -5,12 +5,15 @@
  * or at https://opensource.org/licenses/MIT.
  */
 
-import { Crash, Multi } from '@mdf.js/crash';
+import { Layer } from '@mdf.js/core';
+import { Crash, Links, Multi } from '@mdf.js/crash';
 import { DoorKeeper } from '@mdf.js/doorkeeper';
 import { DebugLogger } from '@mdf.js/logger';
 import { formatEnv } from '@mdf.js/utils';
 import ENV from 'dotenv';
 import escalade from 'escalade/sync';
+import EventEmitter from 'events';
+import express from 'express';
 import fs from 'fs';
 import glob from 'glob';
 import { cloneDeep, merge } from 'lodash';
@@ -19,12 +22,16 @@ import path from 'path';
 import TOML from 'toml';
 import { v4 } from 'uuid';
 import YAML from 'yaml';
+import { Router } from './Router';
 import { ServiceSetupOptions } from './types';
 
 type FileEntry = [string, string];
 
 /** Class responsible of file management, both configuration file as validator files  */
-export class ConfigManager<Config extends Record<string, any> = Record<string, any>> {
+export class ConfigManager<Config extends Record<string, any> = Record<string, any>>
+  extends EventEmitter
+  implements Layer.Service.Registry
+{
   /** Unique identifier */
   private readonly uuid: string = v4();
   /** Logger instance for deep debugging tasks */
@@ -41,6 +48,8 @@ export class ConfigManager<Config extends Record<string, any> = Record<string, a
   public readonly config: Config;
   /** Package version info */
   public readonly package?: Package;
+  /** Config router */
+  private readonly _router: Router;
   /** Validation error, if exist */
   private _error?: Multi;
   /**
@@ -48,6 +57,7 @@ export class ConfigManager<Config extends Record<string, any> = Record<string, a
    * @param options - Service setup options
    */
   constructor(private readonly options: ServiceSetupOptions) {
+    super();
     this.checker = this.loadSchemas(options.schemaFiles);
     this.presets = this.loadPresets(options.presetFiles);
     this.defaultConfig = this.loadDefaultConfigFiles(options.configFiles);
@@ -57,6 +67,27 @@ export class ConfigManager<Config extends Record<string, any> = Record<string, a
       options.schema
     );
     this.package = this.loadPackageInfo();
+    if (this.isErrored && this.listenerCount('error') > 0) {
+      this.emit('error', this.error);
+    }
+    this._router = new Router(this);
+  }
+  /** Service name */
+  public get name(): string {
+    return this.options.name;
+  }
+  /** Return an Express router with access to config information */
+  public get router(): express.Router {
+    return this._router.router;
+  }
+  /** Return links offered by this service */
+  public get links(): Links {
+    return {
+      config: {
+        config: '/config/config',
+        presets: '/config/presets',
+      },
+    };
   }
   /** Flag to indicate that the final configuration has some errors */
   public get isErrored(): boolean {

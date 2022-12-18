@@ -8,18 +8,44 @@
 import { Health, Layer } from '@mdf.js/core';
 import { Crash } from '@mdf.js/crash';
 import { ErrorRecord } from '@mdf.js/error-registry';
-import { Logger, LoggerInstance, SetContext } from '@mdf.js/logger';
+import { Logger, LoggerConfig, LoggerInstance, SetContext } from '@mdf.js/logger';
 import { MetricsResponse } from '@mdf.js/metrics-registry';
-import { Observability } from '@mdf.js/observability';
+import { Observability, ObservabilityOptions } from '@mdf.js/observability';
 import { Consumer, ConsumerOptions, Control, Factory, ResolverMap } from '@mdf.js/openc2';
-import { retryBind } from '@mdf.js/utils';
-import { merge } from 'lodash';
+import { ConfigManager, Setup } from '@mdf.js/service-setup-provider';
+import { retryBind, RetryOptions } from '@mdf.js/utils';
+import { cloneDeep, merge, mergeWith, MergeWithCustomizer } from 'lodash';
 import { v4 } from 'uuid';
 import { ApplicationWrapperOptions, ConsumerAdapterOptions } from './types';
 
-export class AppWrapper {
+const customizer: MergeWithCustomizer = (objValue, srcValue) => {
+  if (Array.isArray(objValue)) {
+    return Array.from(new Set(objValue.concat(srcValue)).values());
+  }
+  return undefined;
+};
+
+type InternalSetupConfig = Partial<Omit<ApplicationWrapperOptions, 'setup' | 'name'>>;
+const SHUTDOWN_DELAY = 1000;
+const INTERNAL_OPTIONS = [
+  'name',
+  'setup',
+  'application',
+  'namespace',
+  'observability',
+  'logger',
+  'consumer',
+  'adapter',
+  'retryOptions',
+];
+
+export class AppWrapper<AppConfig extends Record<string, any> = Record<string, any>> {
   /** Instance identifier */
   public readonly instanceId = v4();
+  /** Application setup provider */
+  private readonly setupProvider: Setup.Provider;
+  /** Application setup config */
+  private readonly internalSetup: Setup.Client<InternalSetupConfig & AppConfig>;
   /** Observability instance */
   public readonly observability: Observability;
   /** Logger instance */
@@ -39,34 +65,28 @@ export class AppWrapper {
     private readonly options: ApplicationWrapperOptions,
     private readonly resources: Layer.App.Resource[] = []
   ) {
+    this.setupProvider = Setup.Factory.create({
+      name: this.options.name,
+      config: this.setupConfig,
+      useEnvironment: 'CONFIG_SERVICE_SETUP_',
+    });
+    this.internalSetup = this.setupProvider.client as ConfigManager<
+      ApplicationWrapperOptions & AppConfig
+    >;
     this.logger = SetContext(
-      new Logger(this.options.name, this.options.logger),
+      new Logger(this.options.name, this.loggerConfig),
       'app',
       this.instanceId
     );
-    this.observability = new Observability({
-      ...this.options.application,
-      ...this.options.observability,
-      name: this.options.name,
-      description: this.options.application?.description ?? this.options.name,
-      release: this.options.application?.release ?? '1.0.0',
-      version: this.options.application?.version ?? '1',
-      instanceId: this.instanceId,
-    });
+    this.observability = new Observability(this.observabilityConfig);
     if (this.options.consumer) {
-      this.consumer = this.createConsumer(
-        {
-          ...this.options.consumer,
-          id: this.options.consumer?.id ?? this.options.name,
-          resolver: this.resolverMap,
-          actionTargetPairs: this.actionTargetPairs,
-          logger: this.options.consumer?.logger ?? this.logger,
-        },
-        this.options.adapter
-      );
+      this.consumer = this.createConsumer(this.consumerConfig, this.openC2AdapterConfig);
       this.observability.attach(this.consumer);
       this.observability.healthRegistry.register(this.consumer);
     }
+    this.observability.attach(this.internalSetup);
+    process.on('SIGINT', () => this.finish('SIGINT'));
+    process.on('SIGTERM', () => this.finish('SIGTERM'));
   }
   /**
    * Create the consumer based on the configuration options
@@ -89,6 +109,50 @@ export class AppWrapper {
       throw new Crash(`Unknown consumer adapter type: ${adapterOptions.type}`);
     }
   }
+  /** Get the Setup configuration options */
+  private get setupConfig(): Setup.Config {
+    return merge(this.options.setup, {
+      name: this.options.name,
+      envPrefix: {
+        application: 'CONFIG_APPLICATION_',
+        observability: 'CONFIG_OBSERVABILITY_',
+        logger: 'CONFIG_LOGGER_',
+        consumer: 'CONFIG_OC2_CONSUMER_',
+        retryOptions: 'CONFIG_RETRY_OPTIONS_',
+      },
+    });
+  }
+  /** Get the logger configuration options */
+  private get loggerConfig(): LoggerConfig | undefined {
+    return merge(cloneDeep(this.options.logger), this.internalSetup.config.logger);
+  }
+  /** Get the observability configuration options */
+  private get observabilityConfig(): ObservabilityOptions {
+    const version = this.options.application?.version || this.release.split('.')[0] || '1';
+    const config = {
+      ...this.options.application,
+      ...this.options.observability,
+      name: this.options.name,
+      description: this.options.application?.description ?? this.options.name,
+      release: this.release,
+      version,
+      instanceId: this.instanceId,
+    };
+    return merge(
+      config,
+      this.internalSetup.config.observability,
+      this.internalSetup.config.application
+    );
+  }
+  /** Get the OpenC2 consumer options */
+  private get consumerConfig(): ConsumerOptions {
+    return merge(cloneDeep(this.options.consumer), this.internalSetup.config.consumer, {
+      id: this.options.consumer?.id ?? this.options.name,
+      resolver: this.resolverMap,
+      actionTargetPairs: this.actionTargetPairs,
+      logger: this.options.consumer?.logger ?? this.logger,
+    });
+  }
   /** Get the resolver map for the OpenC2 interface */
   private get resolverMap(): ResolverMap | undefined {
     if (this.options.namespace) {
@@ -99,9 +163,16 @@ export class AppWrapper {
         [`start:${this.options.namespace}:resources`]: this.start,
         [`stop:${this.options.namespace}:resources`]: this.stop,
       };
-      return merge(defaultResolver, this.options.consumer?.resolver);
+      return merge(
+        defaultResolver,
+        this.options.consumer?.resolver,
+        this.internalSetup.config.consumer?.resolver
+      );
     } else {
-      return this.options.consumer?.resolver;
+      return merge(
+        cloneDeep(this.options.consumer?.resolver),
+        this.internalSetup.config.consumer?.resolver
+      );
     }
   }
   /** Get the action-target pairs map for the OpenC2 interface */
@@ -117,14 +188,37 @@ export class AppWrapper {
         start: [`${this.options.namespace}:resources`],
         stop: [`${this.options.namespace}:resources`],
       };
-      return merge(defaultPairs, this.options.consumer?.actionTargetPairs);
+      return mergeWith(
+        defaultPairs,
+        this.options.consumer?.actionTargetPairs,
+        this.internalSetup.config.consumer?.actionTargetPairs,
+        customizer
+      );
     } else if (this.options.consumer?.actionTargetPairs) {
       return this.options.consumer?.actionTargetPairs;
     } else {
-      return {
-        query: ['features'],
-      };
+      return merge(
+        {
+          query: ['features'],
+        },
+        this.options.consumer?.actionTargetPairs,
+        this.internalSetup.config.consumer?.actionTargetPairs
+      );
     }
+  }
+  /** Get the OpenC2 adapter options */
+  private get openC2AdapterConfig(): ConsumerAdapterOptions | undefined {
+    if (!this.options.adapter && !this.internalSetup.config.adapter) {
+      return undefined;
+    }
+    return merge(cloneDeep(this.options.adapter), this.internalSetup.config.adapter);
+  }
+  /** Get the retry options */
+  private get retryOptions(): RetryOptions | undefined {
+    if (!this.options.retryOptions && !this.internalSetup.config.retryOptions) {
+      return undefined;
+    }
+    return merge(cloneDeep(this.options.retryOptions), this.internalSetup.config.retryOptions);
   }
   /** Return the health information from the observability instance */
   private readonly health = async (): Promise<Health.AppHealth> => {
@@ -144,7 +238,7 @@ export class AppWrapper {
    */
   private readonly wrappedStart = async (resource: Layer.App.Resource): Promise<void> => {
     if (typeof resource.start === 'function') {
-      await retryBind(resource.start, resource, [], this.options.retryOptions);
+      await retryBind(resource.start, resource, [], this.retryOptions);
     } else {
       this.logger.info(`${resource.name} has not a start method`);
       await Promise.resolve();
@@ -157,7 +251,7 @@ export class AppWrapper {
    */
   private readonly wrappedStop = async (resource: Layer.App.Resource): Promise<void> => {
     if (typeof resource.stop === 'function') {
-      await retryBind(resource.stop, resource, [], this.options.retryOptions);
+      await retryBind(resource.stop, resource, [], this.retryOptions);
     } else {
       this.logger.info(`${resource.name} has not a stop method`);
       await Promise.resolve();
@@ -181,8 +275,37 @@ export class AppWrapper {
   }
   /** Application release */
   public get release(): string {
-    return this.options.application?.release || '0.0.0';
+    return this.options.application?.release || this.internalSetup.package?.version || '1.0.0';
   }
+  /**
+   * Return the specific application configuration, this means everything except internal config
+   * objects
+   */
+  public get setup(): AppConfig {
+    const config: { [x: string]: any } = {};
+    for (const [key, value] of Object.entries(this.internalSetup.config)) {
+      if (!INTERNAL_OPTIONS.includes(key)) {
+        config[key] = value;
+      }
+    }
+    return config as AppConfig;
+  }
+  /**
+   * Perform the finish of the application engine and exit the process
+   * @param signal - The signal received
+   */
+  private readonly finish = async (signal: string): Promise<void> => {
+    this.logger.warn(`Received ${signal} signal, finishing application engine ...`);
+    try {
+      await this.shutdown();
+    } catch (rawError) {
+      const cause = Crash.from(rawError);
+      this.logger.crash(cause);
+    } finally {
+      this.logger.info(`Application engine finished`);
+      setTimeout(process.exit, SHUTDOWN_DELAY, signal === 'SIGINT' ? 0 : 1);
+    }
+  };
   /** Perform the shutdown of all the application resources */
   public readonly bootstrap = async (): Promise<void> => {
     try {
@@ -191,11 +314,11 @@ export class AppWrapper {
       }
       this.logger.info(`Welcome to ${this.name} - ${this.release} - ${this.instanceId}`);
       this.logger.info('Bootstrapping application engine ...');
-      await retryBind(this.observability.start, this.observability, [], this.options.retryOptions);
+      await retryBind(this.observability.start, this.observability, [], this.retryOptions);
       const links = JSON.stringify(this.observability.links, null, 2);
       this.logger.info(`Observability engine started, the health information is at: ${links}`);
       if (this.consumer) {
-        await retryBind(this.consumer.start, this.consumer, [], this.options.retryOptions);
+        await retryBind(this.consumer.start, this.consumer, [], this.retryOptions);
         this.logger.info('OpenC2 Consumer engine started');
       }
       this.booted = true;
@@ -242,10 +365,10 @@ export class AppWrapper {
       }
       this.logger.info('Shutting down application engine ...');
       if (this.consumer) {
-        await retryBind(this.consumer.stop, this.consumer, [], this.options.retryOptions);
+        await retryBind(this.consumer.stop, this.consumer, [], this.retryOptions);
         this.logger.info('OpenC2 Consumer engine stopped');
       }
-      await retryBind(this.observability.stop, this.observability, [], this.options.retryOptions);
+      await retryBind(this.observability.stop, this.observability, [], this.retryOptions);
       this.logger.info('Observability engine stopped');
       this.booted = false;
     } catch (rawError) {

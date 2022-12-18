@@ -14,12 +14,20 @@ import { CONFIG_ARTIFACT_ID, CONFIG_PROVIDER_BASE_NAME } from './utils';
 describe(`#Config #${CONFIG_PROVIDER_BASE_NAME.toLocaleUpperCase()}`, () => {
   describe('#Happy path', () => {
     it(`Should has a default config`, () => {
-      expect(defaultConfig).toMatchObject({
-        name: CONFIG_ARTIFACT_ID,
-        presetFiles: ['config/presets/*.preset.json'],
-        schemaFiles: ['config/schemas/*.schema.json'],
-        configFiles: ['config/*.config.json'],
-      });
+      expect(defaultConfig).toBeDefined();
+      expect(defaultConfig.configFiles).toBeDefined();
+      expect(defaultConfig.schemaFiles).toBeDefined();
+      expect(defaultConfig.presetFiles).toBeDefined();
+      const configFiles = defaultConfig.configFiles as string[];
+      const schemaFiles = defaultConfig.schemaFiles as string[];
+      const presetFiles = defaultConfig.presetFiles as string[];
+      expect(configFiles).toHaveLength(1);
+      expect(schemaFiles).toHaveLength(1);
+      expect(presetFiles).toHaveLength(1);
+      expect(configFiles[0]).toContain('/config/*.*');
+      expect(schemaFiles[0]).toContain('/config/schemas/*.*');
+      expect(presetFiles[0]).toContain('/config/presets/*.*');
+      expect(defaultConfig.name).toBe(CONFIG_ARTIFACT_ID);
     }, 1000);
   });
 });

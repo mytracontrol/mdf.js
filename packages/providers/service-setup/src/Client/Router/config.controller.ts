@@ -7,7 +7,7 @@
 
 import { BoomHelpers } from '@mdf.js/crash';
 import { NextFunction, Request, Response } from 'express';
-import { Service } from './oc2.service';
+import { Service } from './config.service';
 
 /** Controller class */
 export class Controller {
@@ -17,23 +17,20 @@ export class Controller {
    */
   constructor(private readonly service: Service) {}
   /**
-   * Return array of messages, pendingJobs and jobs used as fifo registry
+   * Return the configuration objects
    * @param request - HTTP request express object
    * @param response - HTTP response express object
    * @param next - Next express middleware function
    */
   public query(request: Request, response: Response, next: NextFunction): void {
-    let selector: Promise<any[]> | undefined;
+    let selector: Promise<Record<string, any>> | undefined;
     const param = request.params['id'];
     switch (param) {
-      case 'jobs':
-        selector = this.service.jobs();
+      case 'presets':
+        selector = this.service.presets();
         break;
-      case 'messages':
-        selector = this.service.messages();
-        break;
-      case 'pendingJobs':
-        selector = this.service.pendingJobs();
+      case 'config':
+        selector = this.service.config();
         break;
       default:
         selector = undefined;
@@ -43,11 +40,7 @@ export class Controller {
     } else {
       selector
         .then(result => {
-          if (result.length > 0) {
-            response.status(200).json(result);
-          } else {
-            response.status(204).send();
-          }
+          response.status(200).json(result);
         })
         .catch(next);
     }

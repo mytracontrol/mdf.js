@@ -7,7 +7,7 @@
 import { Health, Layer } from '@mdf.js/core';
 import { Logger } from '@mdf.js/logger';
 import { Control } from '@mdf.js/openc2';
-import { undoMocks } from '@mdf.js/utils';
+import { mockProperty, undoMocks } from '@mdf.js/utils';
 import EventEmitter from 'events';
 import { v4 } from 'uuid';
 import { AppWrapper } from './AppWrapper';
@@ -69,7 +69,9 @@ class ResourceMockWithOutMethod extends EventEmitter {
 describe('#AppWrapper class', () => {
   describe('#Happy path', () => {
     it('Should create a valid instance with default values', async () => {
-      const wrapper = new AppWrapper({ name: 'test' });
+      const wrapper = new AppWrapper<{ test: string }>({ name: 'test' });
+      //@ts-ignore private property
+      mockProperty(wrapper.internalSetup, 'config', { test: 'test' });
       expect(wrapper).toBeInstanceOf(AppWrapper);
       expect(wrapper.instanceId).toBeDefined();
       wrapper.register(new ResourceMock('oneResource'));
@@ -79,8 +81,8 @@ describe('#AppWrapper class', () => {
       expect(health).toEqual({
         name: 'test',
         description: 'test',
-        release: '1.0.0',
-        version: '1',
+        release: '0.0.1',
+        version: '0',
         instanceId: wrapper.instanceId,
         notes: [],
         output: '',
@@ -116,7 +118,23 @@ describe('#AppWrapper class', () => {
           ],
         },
       });
-    });
+      expect(wrapper.setup).toEqual({ test: 'test' });
+    }, 300);
+    it('Should call `process.exit` if SIGINT or SIGTERM', done => {
+      const wrapper = new AppWrapper<{ test: string }>({ name: 'test' });
+      const processExit = jest.spyOn(process, 'exit').mockImplementation(() => {
+        return undefined as never;
+      });
+      jest.spyOn(wrapper, 'shutdown').mockResolvedValue();
+      process.emit('SIGINT');
+      process.emit('SIGTERM');
+
+      setTimeout(() => {
+        expect(wrapper.shutdown).toBeCalledTimes(2);
+        expect(processExit).toBeCalledTimes(2);
+        done();
+      }, 1001);
+    }, 2000);
     it('Should create a valid instance with default values and consumer', async () => {
       const wrapper = new AppWrapper({ name: 'test', consumer: {} });
       expect(wrapper).toBeInstanceOf(AppWrapper);
@@ -128,8 +146,8 @@ describe('#AppWrapper class', () => {
       expect(health).toEqual({
         name: 'test',
         description: 'test',
-        release: '1.0.0',
-        version: '1',
+        release: '0.0.1',
+        version: '0',
         instanceId: wrapper.instanceId,
         notes: [],
         output: '',
@@ -207,7 +225,7 @@ describe('#AppWrapper class', () => {
           ],
         },
       });
-    });
+    }, 300);
     it('Should create a valid instance with non-default values with redis adapter', async () => {
       const wrapper = new AppWrapper({
         name: 'test',
@@ -235,6 +253,9 @@ describe('#AppWrapper class', () => {
           logger: new Logger('myConsumerId'),
           resolver: {
             'query:x-myNamespace:other': (): Promise<number> => Promise.resolve(3),
+          },
+          actionTargetPairs: {
+            query: ['x-myNamespace:other'],
           },
         },
         namespace: 'x-myNamespace',
@@ -339,7 +360,7 @@ describe('#AppWrapper class', () => {
       expect(wrapper.consumer.options.resolver).toHaveProperty('start:x-myNamespace:resources');
       //@ts-ignore - private property
       expect(wrapper.consumer.options.resolver).toHaveProperty('stop:x-myNamespace:resources');
-    });
+    }, 300);
     it('Should create a valid instance with non-default values with socket-io adapter', async () => {
       const wrapper = new AppWrapper({
         name: 'test',
@@ -453,7 +474,7 @@ describe('#AppWrapper class', () => {
       });
       //@ts-ignore - private property
       expect(wrapper.consumer.options.resolver).toHaveProperty('query:x-myNamespace:other');
-    });
+    }, 300);
     it('Should bootstrap and shutdown properly', async () => {
       const wrapper = new AppWrapper({ name: 'test', consumer: {} });
       const resource = new ResourceMock('oneResource');
@@ -480,7 +501,7 @@ describe('#AppWrapper class', () => {
       expect(wrapper.consumer.stop).toHaveBeenCalledTimes(1);
       //@ts-ignore - private property
       expect(wrapper.booted).toBeFalsy();
-    });
+    }, 300);
     it('Should start and stop properly', async () => {
       const wrapper = new AppWrapper({ name: 'test', consumer: {} });
       const resource = new ResourceMock('oneResource');
@@ -520,7 +541,7 @@ describe('#AppWrapper class', () => {
       expect(wrapper.booted).toBeFalsy();
       //@ts-ignore - private property
       expect(wrapper.started).toBeFalsy();
-    });
+    }, 300);
     it('Should execute the commands', async () => {
       const wrapper = new AppWrapper({ name: 'test', namespace: 'x-myNamespace', consumer: {} });
       const resource = new ResourceMock('oneResource');
@@ -625,8 +646,8 @@ describe('#AppWrapper class', () => {
             'x-myNamespace:health': {
               name: 'test',
               description: 'test',
-              version: '1',
-              release: '1.0.0',
+              version: '0',
+              release: '0.0.1',
               instanceId: resultOfQueryHealth.content.results['x-myNamespace:health'].instanceId,
               notes: [],
               output: '',
@@ -788,7 +809,7 @@ describe('#AppWrapper class', () => {
       //@ts-ignore - private property
       expect(wrapper.started).toBeFalsy();
       undoMocks();
-    });
+    }, 300);
   });
   describe('#Sad path', () => {
     it('Should throw an error if the adapter is not valid', async () => {
@@ -808,7 +829,7 @@ describe('#AppWrapper class', () => {
       } catch (error) {
         expect((error as Error).message).toEqual('Unknown consumer adapter type: invalid');
       }
-    });
+    }, 300);
     it('Should throw an error if try to bootstrap and its not possible', async () => {
       try {
         const wrapper = new AppWrapper({
@@ -825,7 +846,7 @@ describe('#AppWrapper class', () => {
           'Error bootstrapping the application engine: Too much attempts [2], the promise will not be retried'
         );
       }
-    });
+    }, 300);
     it('Should throw an error in try to shutdown and its not possible', async () => {
       const wrapper = new AppWrapper({
         name: 'test',
@@ -851,7 +872,7 @@ describe('#AppWrapper class', () => {
           'Error shutting down the application engine: Too much attempts [2], the promise will not be retried'
         );
       }
-    });
+    }, 300);
     it('Should throw an error in try to start and its not possible', async () => {
       const wrapper = new AppWrapper({
         name: 'test',
@@ -877,7 +898,7 @@ describe('#AppWrapper class', () => {
           'Error starting the application resources: Too much attempts [2], the promise will not be retried'
         );
       }
-    });
+    }, 300);
     it('Should throw an error in try to stop and its not possible', async () => {
       const wrapper = new AppWrapper({
         name: 'test',
@@ -904,6 +925,6 @@ describe('#AppWrapper class', () => {
           'Error stopping the application resources: Too much attempts [2], the promise will not be retried'
         );
       }
-    });
+    }, 300);
   });
 });

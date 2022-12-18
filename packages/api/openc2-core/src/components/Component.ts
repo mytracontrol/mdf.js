@@ -68,7 +68,7 @@ export abstract class Component<T extends ComponentAdapter, K extends ComponentO
   public get checks(): Health.Checks {
     return this.health.checks;
   }
-  /** Return an Express router with access to errors registry */
+  /** Return an Express router with access to OpenC2 information */
   public get router(): express.Router {
     return this._router.router;
   }

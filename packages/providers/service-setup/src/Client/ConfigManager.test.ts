@@ -30,6 +30,13 @@ describe('#ConfigManager', () => {
       });
       expect(manager.error).toBeUndefined();
       expect(manager.isErrored).toBeFalsy();
+      expect(manager.router).toBeDefined();
+      expect(manager.links).toEqual({
+        config: {
+          config: '/config/config',
+          presets: '/config/presets',
+        },
+      });
       expect(manager.defaultConfig).toEqual({
         config: {
           test: 0,

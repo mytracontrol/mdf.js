@@ -9,12 +9,15 @@ import { Layer } from '@mdf.js/core';
 import { LoggerConfig } from '@mdf.js/logger';
 import { ObservabilityServiceOptions } from '@mdf.js/observability';
 import { ConsumerOptions, Control } from '@mdf.js/openc2';
+import { ServiceSetupOptions } from '@mdf.js/service-setup-provider';
 import { RetryOptions } from '@mdf.js/utils';
 import { ConsumerAdapterOptions } from './ConsumerAdapterOptions.i';
 
 export interface ApplicationWrapperOptions {
   /** Application or or microservice name */
   name: string;
+  /** Application setup options */
+  setup?: ServiceSetupOptions;
   /** Application definition */
   application?: Partial<Omit<Layer.App.Metadata, 'instanceId' | 'name'>>;
   /** Namespace used by this application */
