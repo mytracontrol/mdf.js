@@ -334,7 +334,23 @@ export class ConfigManager<Config extends Record<string, any> = Record<string, a
    */
   private parseENV(content: string): Partial<Config> | undefined {
     try {
-      return this.loadConfigEnv(this.options.envPrefix, ENV.parse(content));
+      const variables = ENV.parse(content);
+      let prefixes: string[];
+      if (typeof this.options.envPrefix === 'string') {
+        prefixes = [this.options.envPrefix];
+      } else if (Array.isArray(this.options.envPrefix)) {
+        prefixes = this.options.envPrefix;
+      } else if (typeof this.options.envPrefix === 'object') {
+        prefixes = Object.keys(this.options.envPrefix);
+      } else {
+        prefixes = [];
+      }
+      for (const [key, value] of Object.entries(variables)) {
+        if (prefixes.length === 0 || !prefixes.some(prefix => key.startsWith(prefix))) {
+          process.env[key] = value;
+        }
+      }
+      return this.loadConfigEnv(this.options.envPrefix, variables);
     } catch (rawError) {
       const cause = Crash.from(rawError);
       throw new Crash(`Error parsing ENV`, { cause });

@@ -42,7 +42,7 @@ describe('#ConfigManager', () => {
           test: 0,
         },
         otherConfig: {
-          otherTest: '-a',
+          otherTest: 3,
         },
       });
       expect(manager.presets).toEqual({
@@ -71,6 +71,8 @@ describe('#ConfigManager', () => {
           },
         },
       });
+      expect(process.env['MY_CRAZY_STUFF']).toEqual('2');
+      expect(process.env['MY_PREFIX_A_OTHER_CONFIG__OTHER_TEST']).toBeUndefined();
     }, 1000);
     it('Should read all the files, without error in the validation and as the default config', () => {
       const manager = new ConfigManager({
@@ -121,6 +123,8 @@ describe('#ConfigManager', () => {
           },
         },
       });
+      expect(process.env['MY_CRAZY_STUFF']).toEqual('2');
+      expect(process.env['MY_PREFIX_A_OTHER_CONFIG__OTHER_TEST']).toEqual('3');
     }, 1000);
     it('Should read all the files, with error (due to preset is not present) and return default config due to preset not exits', () => {
       const manager = new ConfigManager({
@@ -174,6 +178,8 @@ describe('#ConfigManager', () => {
           },
         },
       });
+      expect(process.env['MY_CRAZY_STUFF']).toEqual('2');
+      expect(process.env['MY_PREFIX_A_OTHER_CONFIG__OTHER_TEST']).toEqual('3');
     }, 1000);
     it('Should read all the files, with error in the validation and return default config', () => {
       const manager = new ConfigManager({
@@ -225,6 +231,8 @@ describe('#ConfigManager', () => {
           },
         },
       });
+      expect(process.env['MY_CRAZY_STUFF']).toEqual('2');
+      expect(process.env['MY_PREFIX_A_OTHER_CONFIG__OTHER_TEST']).toEqual('3');
     }, 1000);
     it('Should read all the files, without error in the config selection and return default config', () => {
       const manager = new ConfigManager({
@@ -274,6 +282,8 @@ describe('#ConfigManager', () => {
           },
         },
       });
+      expect(process.env['MY_CRAZY_STUFF']).toEqual('2');
+      expect(process.env['MY_PREFIX_A_OTHER_CONFIG__OTHER_TEST']).toEqual('3');
     }, 1000);
     it('Should read all the files, without error in the validation and as the preset1 modified by environment values as a single string', () => {
       process.env['CONFIG_TEST_CONFIG__TEST'] = '4';
@@ -327,6 +337,8 @@ describe('#ConfigManager', () => {
           },
         },
       });
+      expect(process.env['MY_CRAZY_STUFF']).toEqual('2');
+      expect(process.env['MY_PREFIX_A_OTHER_CONFIG__OTHER_TEST']).toEqual('3');
     }, 1000);
     it('Should read all the files, without error in the validation and as the preset1 modified by environment values as an array of strings', () => {
       process.env['A_CONFIG__TEST'] = '4';
@@ -381,6 +393,8 @@ describe('#ConfigManager', () => {
           },
         },
       });
+      expect(process.env['MY_CRAZY_STUFF']).toEqual('2');
+      expect(process.env['MY_PREFIX_A_OTHER_CONFIG__OTHER_TEST']).toEqual('3');
     }, 1000);
     it('Should read all the files, without error in the validation and as the preset1 modified by environment values as an object of strings', () => {
       process.env['MY_A_TEST'] = '4';
@@ -436,6 +450,8 @@ describe('#ConfigManager', () => {
           otherConfig: {},
         },
       });
+      expect(process.env['MY_CRAZY_STUFF']).toEqual('2');
+      expect(process.env['MY_PREFIX_A_OTHER_CONFIG__OTHER_TEST']).toEqual('3');
     }, 1000);
   });
   describe('#Sad path', () => {
