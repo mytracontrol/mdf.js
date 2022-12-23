@@ -93,6 +93,37 @@ describe('#Component #service-setup', () => {
           done(error);
         });
     }, 300);
+    it(`Should response 200 and html text when a GET request is performed over /config/readme`, done => {
+      request(app)
+        .get(`/config/readme`)
+        .set('Content-Type', 'html/text')
+        .set('Accept', 'html/text')
+        .expect('Content-Type', /text/)
+        .expect(200)
+        .then(response => {
+          expect(response.body).toEqual({});
+          done();
+        })
+        .catch(error => {
+          done(error);
+        });
+    }, 300);
+  });
+  describe('#Sad path', () => {
+    it(`Should response 404 when a GET request is performed over /config/unknown`, done => {
+      request(app)
+        .get(`/config/unknown`)
+        .set('Content-Type', 'application/json')
+        .set('Accept', 'application/json')
+        .expect(400)
+        .then(response => {
+          expect(response.body).toEqual({});
+          done();
+        })
+        .catch(error => {
+          done(error);
+        });
+    }, 300);
   });
 });
 // #endregion

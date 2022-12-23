@@ -20,6 +20,7 @@ describe('#ConfigManager', () => {
         preset: 'preset1',
         envPrefix: 'MY_PREFIX_A_',
       });
+      expect(manager.name).toEqual('test');
       expect(manager.config).toEqual({
         config: {
           test: 2,
@@ -35,6 +36,7 @@ describe('#ConfigManager', () => {
         config: {
           config: '/config/config',
           presets: '/config/presets',
+          readme: '/config/readme',
         },
       });
       expect(manager.defaultConfig).toEqual({
@@ -549,6 +551,8 @@ describe('#ConfigManager', () => {
         'CrashError: Configuration validation failed: final is not registered in the collection.',
         'caused by ValidationError: final is not registered in the collection.',
         'CrashError: Error loading package info: Error reading file',
+        'caused by Error: Error reading file',
+        'CrashError: Error loading README info: Error reading file',
         'caused by Error: Error reading file',
       ]);
     }, 1000);

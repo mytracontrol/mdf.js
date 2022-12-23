@@ -45,4 +45,23 @@ export class Controller {
         .catch(next);
     }
   }
+  /**
+   * Return the readme object
+   * @param request - HTTP request express object
+   * @param response - HTTP response express object
+   * @param next - Next express middleware function
+   * @returns
+   */
+  public readme(request: Request, response: Response, next: NextFunction): void {
+    this.service
+      .readme()
+      .then(result => {
+        if (!result) {
+          response.status(204).send();
+        } else {
+          response.status(200).send(result);
+        }
+      })
+      .catch(next);
+  }
 }

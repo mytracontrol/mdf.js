@@ -40,6 +40,7 @@ export class Router {
    */
   private buildRoutes(path: string): express.Router {
     const router = express.Router();
+    router.route(`${path}/readme`).get(this.controller.readme.bind(this.controller));
     router.route(`${path}/:id`).get(this.controller.query.bind(this.controller));
     return router;
   }

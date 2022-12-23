@@ -17,6 +17,7 @@ import express from 'express';
 import fs from 'fs';
 import glob from 'glob';
 import { cloneDeep, merge } from 'lodash';
+import markdown from 'markdown-it';
 import normalize, { Input, Package } from 'normalize-package-data';
 import path from 'path';
 import TOML from 'toml';
@@ -48,6 +49,8 @@ export class ConfigManager<Config extends Record<string, any> = Record<string, a
   public readonly config: Config;
   /** Package version info */
   public readonly package?: Package;
+  /** Readme file content */
+  public readonly readme?: string;
   /** Config router */
   private readonly _router: Router;
   /** Validation error, if exist */
@@ -67,6 +70,7 @@ export class ConfigManager<Config extends Record<string, any> = Record<string, a
       options.schema
     );
     this.package = this.loadPackageInfo();
+    this.readme = this.loadReadme();
     if (this.isErrored && this.listenerCount('error') > 0) {
       this.emit('error', this.error);
     }
@@ -86,6 +90,7 @@ export class ConfigManager<Config extends Record<string, any> = Record<string, a
       config: {
         config: '/config/config',
         presets: '/config/presets',
+        readme: '/config/readme',
       },
     };
   }
@@ -160,6 +165,26 @@ export class ConfigManager<Config extends Record<string, any> = Record<string, a
       this.addError(new Crash(`Error loading package info: ${cause.message}`, { cause }));
     }
     return packageInfo;
+  }
+  /**
+   * Load the readme.md file information
+   * @returns
+   */
+  private loadReadme(): string | undefined {
+    let readme: string | undefined;
+    try {
+      const markdownPath = escalade(process.cwd(), (dir, names) => {
+        return names.includes('README.md') && 'README.md';
+      });
+      if (markdownPath) {
+        const md = markdown({ html: true, linkify: true, typographer: true });
+        readme = md.render(fs.readFileSync(markdownPath, 'utf8'));
+      }
+    } catch (rawError) {
+      const cause = Crash.from(rawError);
+      this.addError(new Crash(`Error loading README info: ${cause.message}`, { cause }));
+    }
+    return readme;
   }
   /**
    * Load the configuration from the environment variables

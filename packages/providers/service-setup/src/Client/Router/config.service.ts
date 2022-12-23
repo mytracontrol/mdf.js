@@ -22,4 +22,8 @@ export class Service {
   public async config(): Promise<Record<string, Record<string, any>>> {
     return this.model.config();
   }
+  /** Return the readme object */
+  public async readme(): Promise<string | undefined> {
+    return this.model.readme();
+  }
 }
