@@ -61,7 +61,7 @@ export class ConfigManager<Config extends Record<string, any> = Record<string, a
    */
   constructor(private readonly options: ServiceSetupOptions) {
     super();
-    this.checker = this.loadSchemas(options.schemaFiles);
+    this.checker = options.checker ?? this.loadSchemas(options.schemaFiles);
     this.presets = this.loadPresets(options.presetFiles);
     this.defaultConfig = this.loadDefaultConfigFiles(options.configFiles);
     this.envConfig = this.loadConfigEnv(options.envPrefix);

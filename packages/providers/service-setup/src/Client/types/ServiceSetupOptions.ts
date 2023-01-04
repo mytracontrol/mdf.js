@@ -5,6 +5,8 @@
  * or at https://opensource.org/licenses/MIT.
  */
 
+import { DoorKeeper } from '@mdf.js/doorkeeper';
+
 export interface ServiceSetupOptions {
   /** Service name */
   name: string;
@@ -28,6 +30,12 @@ export interface ServiceSetupOptions {
    * file path or glob pattern.
    */
   schemaFiles?: string[];
+  /**
+   * DoorKeeper instance to be used to validate the configuration. If none is indicated, the setup
+   * instance will be try to create a new DoorKeeper instance using the schema files indicated in
+   * the options. If the schema files are not indicated, the configuration will not be validated.
+   */
+  checker?: DoorKeeper;
   /**
    * Schema to be used to validate the configuration. If none is indicated, the configuration will
    * not be validated. The schema name should be the same as the file name without the extension.
