@@ -11,10 +11,11 @@ import EventEmitter from 'events';
 import express from 'express';
 import {
   AggregatorRegistry as ClusterRegistry,
-  metric,
   Metric,
-  register as WorkerRegistry,
+  MetricObjectWithValues,
+  MetricValue,
   Registry as StandAloneRegistry,
+  register as WorkerRegistry,
 } from 'prom-client';
 import { Aggregator } from './Aggregator';
 import { Router } from './Router';
@@ -112,7 +113,9 @@ export class MetricsFacade extends EventEmitter implements Layer.Service.Registr
   /** Get a single metric value in JSON format
    * @param name - name of metric
    */
-  public async getMetricAsJSON(name: string): Promise<metric | undefined> {
+  public async getMetricAsJSON(
+    name: string
+  ): Promise<MetricObjectWithValues<MetricValue<string>> | undefined> {
     return this.aggregator.getMetricAsJSON(name);
   }
   /** Start service function */

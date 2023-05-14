@@ -26,7 +26,7 @@
     "clean": "rimraf \"{tsconfig.build.tsbuildinfo,dist}\"",
     "licenses": "license-checker --start ./ --production --csv --out ../../../licenses/providers/elastic/licenses.csv --customPath ../../../.config/customFormat.json",
     "mutants": "stryker run stryker.conf.js",
-    "test": "jest --config ./jest.config.js"
+    "test": "jest --detectOpenHandles --config ./jest.config.js"
   },
   "dependencies": {
     "@elastic/elasticsearch": "^7.13.0",
@@ -34,8 +34,8 @@
     "@mdf.js/crash": "*",
     "@mdf.js/logger": "*",
     "@mdf.js/utils": "*",
-    "joi": "^17.6.3",
-    "tslib": "^2.4.1"
+    "joi": "^17.9.2",
+    "tslib": "^2.5.0"
   },
   "devDependencies": {
     "@mdf.js/repo-config": "*"

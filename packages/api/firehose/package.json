@@ -26,7 +26,7 @@
     "clean": "rimraf \"{tsconfig.build.tsbuildinfo,dist}\"",
     "licenses": "license-checker --start ./ --production --csv --out ../../../licenses/api/firehose/licenses.csv --customPath ../../../.config/customFormat.json",
     "mutants": "stryker run stryker.conf.js",
-    "test": "jest --config ./jest.config.js"
+    "test": "jest --detectOpenHandles --config ./jest.config.js"
   },
   "dependencies": {
     "@mdf.js/core": "*",
@@ -36,14 +36,14 @@
     "@mdf.js/metrics-registry": "*",
     "@mdf.js/utils": "*",
     "lodash": "^4.17.21",
-    "tslib": "^2.4.1",
+    "tslib": "^2.5.0",
     "uuid": "^9.0.0"
   },
   "devDependencies": {
     "@mdf.js/observability": "*",
     "@mdf.js/repo-config": "*",
-    "@types/lodash": "^4.14.191",
-    "@types/uuid": "^9.0.0"
+    "@types/lodash": "^4.14.194",
+    "@types/uuid": "^9.0.1"
   },
   "engines": {
     "node": ">=16.14.2"

@@ -27,17 +27,17 @@
     "clean": "rimraf \"{tsconfig.build.tsbuildinfo,dist}\"",
     "licenses": "license-checker --start ./ --production --csv --out ../../../licenses/providers/http-client/licenses.csv --customPath ../../../.config/customFormat.json",
     "mutants": "stryker run stryker.conf.js",
-    "test": "jest --config ./jest.config.js"
+    "test": "jest --detectOpenHandles --config ./jest.config.js"
   },
   "dependencies": {
     "@mdf.js/core": "*",
     "@mdf.js/crash": "*",
     "@mdf.js/logger": "*",
     "@mdf.js/utils": "*",
-    "axios": "^1.2.1",
+    "axios": "^1.4.0",
     "debug": "^4.3.4",
-    "joi": "^17.6.3",
-    "tslib": "^2.4.1"
+    "joi": "^17.9.2",
+    "tslib": "^2.5.0"
   },
   "devDependencies": {
     "@mdf.js/repo-config": "*",

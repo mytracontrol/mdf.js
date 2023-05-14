@@ -62,7 +62,8 @@ export const envBasedConfig: Config = {
   host: CONFIG_AMQP_HOST,
   hostname: CONFIG_AMQP_HOSTNAME,
   port: CONFIG_AMQP_PORT,
-  transport: CONFIG_AMQP_TRANSPORT as 'tls' | 'tcp' | 'ssl' | undefined,
+  //@ts-ignore - the configuration options has been changed in the latest version of rhea
+  transport: CONFIG_AMQP_TRANSPORT,
   container_id: CONFIG_AMQP_CONTAINER_ID,
   id: CONFIG_AMQP_ID,
   reconnect: CONFIG_AMQP_RECONNECT,

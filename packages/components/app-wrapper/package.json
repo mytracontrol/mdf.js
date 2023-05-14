@@ -26,25 +26,25 @@
     "clean": "rimraf \"{tsconfig.build.tsbuildinfo,dist}\"",
     "licenses": "license-checker --start ./ --production --csv --out ../../../licenses/components/application/licenses.csv --customPath ../../../.config/customFormat.json",
     "mutants": "stryker run stryker.conf.js",
-    "test": "jest --config ./jest.config.js"
+    "test": "jest --detectOpenHandles --config ./jest.config.js"
   },
   "dependencies": {
     "@mdf.js/core": "*",
     "@mdf.js/crash": "*",
-    "@mdf.js/logger": "*",
-    "@mdf.js/utils": "*",
-    "@mdf.js/observability": "*",
     "@mdf.js/error-registry": "*",
+    "@mdf.js/logger": "*",
     "@mdf.js/metrics-registry": "*",
-    "@mdf.js/service-setup-provider": "*",
+    "@mdf.js/observability": "*",
     "@mdf.js/openc2": "*",
-    "uuid": "^9.0.0",
-    "lodash": "^4.17.21"
+    "@mdf.js/service-setup-provider": "*",
+    "@mdf.js/utils": "*",
+    "lodash": "^4.17.21",
+    "uuid": "^9.0.0"
   },
   "devDependencies": {
     "@mdf.js/repo-config": "*",
-    "@types/uuid": "^9.0.0",
-    "@types/lodash": "^4.14.191"
+    "@types/lodash": "^4.14.194",
+    "@types/uuid": "^9.0.1"
   },
   "engines": {
     "node": ">=16.14.2"

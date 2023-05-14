@@ -1,0 +1,33 @@
+{
+  "entryPoints": [
+    "src/index.ts"
+  ],
+  "tsconfig": "./tsconfig.build.json",
+  "entryPointStrategy": "resolve",
+  "exclude": [
+    "**/dist/**",
+    "**/node_modules",
+    "src/**/*.test.ts",
+    "src/**/test/*.*"
+  ],
+  "externalPattern": ["**/node_modules/**"],
+  "excludeExternals": true,
+  "excludePrivate": true,
+  "excludeProtected": true,
+  "excludeInternal": true,
+  "includes": [],
+  "media": "media",
+  "out": "../../../docs/api/core",
+  "markedOptions": {
+    "gfm": true
+  },
+  "name": "@mdf.js/core",
+  "includeVersion": true,
+  "disableSources": true,
+  "excludeTags": [],
+  "readme": "README.md",
+  "categorizeByGroup": false,
+  "categoryOrder": ["Crash", "Multi", "Boom", "*"],
+  "cleanOutputDir": true,
+  "gitRevision": "master",
+}

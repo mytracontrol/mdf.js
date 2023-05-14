@@ -15,7 +15,7 @@ import escalade from 'escalade/sync';
 import EventEmitter from 'events';
 import express from 'express';
 import fs from 'fs';
-import glob from 'glob';
+import { sync } from 'glob';
 import { cloneDeep, merge } from 'lodash';
 import markdown from 'markdown-it';
 import normalize, { Input, Package } from 'normalize-package-data';
@@ -271,7 +271,7 @@ export class ConfigManager<Config extends Record<string, any> = Record<string, a
   private listFiles(patterns: string[] = []): FileEntry[] {
     const files: string[] = [];
     for (const pattern of patterns) {
-      files.push(...glob.sync(pattern));
+      files.push(...sync(pattern));
     }
     try {
       return files

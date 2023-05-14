@@ -27,22 +27,22 @@
     "clean": "rimraf \"{tsconfig.build.tsbuildinfo,dist}\"",
     "licenses": "license-checker --start ./ --production --csv --out ../../../licenses/api/logger/licenses.csv --customPath ../../../.config/customFormat.json",
     "mutants": "stryker run stryker.conf.js",
-    "test": "jest --config ./jest.config.js"
+    "test": "jest --detectOpenHandles --config ./jest.config.js"
   },
   "dependencies": {
     "@mdf.js/crash": "*",
     "@mdf.js/utils": "*",
     "debug": "^4.3.4",
     "fluent-logger": "^3.4.1",
-    "joi": "^17.6.3",
-    "tslib": "^2.4.1",
+    "joi": "^17.9.2",
+    "tslib": "^2.5.0",
     "uuid": "^9.0.0",
     "winston": "^3.8.2"
   },
   "devDependencies": {
     "@mdf.js/repo-config": "*",
     "@types/debug": "^4.1.7",
-    "@types/uuid": "^9.0.0"
+    "@types/uuid": "^9.0.1"
   },
   "engines": {
     "node": ">=16.14.2"

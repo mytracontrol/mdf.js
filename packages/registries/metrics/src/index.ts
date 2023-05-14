@@ -5,12 +5,20 @@
  * or at https://opensource.org/licenses/MIT.
  */
 
-export { Counter, Gauge, Histogram, Metric, metric, Summary } from 'prom-client';
+export {
+  Counter,
+  Gauge,
+  Histogram,
+  Metric,
+  MetricObjectWithValues,
+  MetricValue,
+  Summary,
+} from 'prom-client';
 export { MetricsFacade as MetricsRegistry } from './MetricsFacade';
 export {
+  METRIC_TYPES,
   MetricConfig,
   MetricInstancesObject,
-  MetricsResponse,
   MetricType,
-  METRIC_TYPES,
+  MetricsResponse,
 } from './types';

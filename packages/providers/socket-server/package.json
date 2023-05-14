@@ -27,7 +27,7 @@
     "clean": "rimraf \"{tsconfig.build.tsbuildinfo,dist}\"",
     "licenses": "license-checker --start ./ --production --csv --out ../../../licenses/providers/socket-server/licenses.csv --customPath ../../../.config/customFormat.json",
     "mutants": "stryker run stryker.conf.js",
-    "test": "jest --config ./jest.config.js"
+    "test": "jest --detectOpenHandles --config ./jest.config.js"
   },
   "dependencies": {
     "@mdf.js/core": "*",
@@ -37,17 +37,17 @@
     "@mdf.js/utils": "*",
     "@socket.io/admin-ui": "^0.5.1",
     "express": "^4.18.2",
-    "joi": "^17.6.3",
-    "socket.io": "^4.5.4",
-    "tslib": "^2.4.1"
+    "joi": "^17.9.2",
+    "socket.io": "^4.6.1",
+    "tslib": "^2.5.0"
   },
   "devDependencies": {
     "@mdf.js/repo-config": "*",
-    "@types/express": "^4.17.15"
+    "@types/express": "^4.17.17"
   },
   "optionalDependencies": {
     "bufferutil": "^4.0.6",
-    "utf-8-validate": "^5.0.9"
+    "utf-8-validate": "^6.0.3"
   },
   "engines": {
     "node": ">=16.14.2"

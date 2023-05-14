@@ -31,16 +31,16 @@
     "licenses": "license-checker --start ./ --production --csv --out ../../../licenses/api/crash/licenses.csv --customPath ../../../.config/customFormat.json",
     "lint": "eslint \"src/**/*.ts\" --quiet --fix",
     "mutants": "stryker run stryker.conf.js",
-    "test": "jest --config ./jest.config.js"
+    "test": "jest --detectOpenHandles --config ./jest.config.js"
   },
   "dependencies": {
-    "tslib": "^2.4.1",
+    "tslib": "^2.5.0",
     "uuid": "^9.0.0"
   },
   "devDependencies": {
     "@mdf.js/repo-config": "*",
-    "@types/uuid": "^9.0.0",
-    "joi": "^17.6.3"
+    "@types/uuid": "^9.0.1",
+    "joi": "^17.9.2"
   },
   "engines": {
     "node": ">=16.14.2"

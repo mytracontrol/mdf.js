@@ -7,21 +7,22 @@
 import { Crash } from '@mdf.js/crash';
 import {
   AggregatorRegistry as ClusterRegistry,
-  collectDefaultMetrics,
   Counter,
   CounterConfiguration,
   Gauge,
   GaugeConfiguration,
   Histogram,
   HistogramConfiguration,
-  metric,
   Metric,
+  MetricObjectWithValues,
+  MetricValue,
   Registry,
   Summary,
   SummaryConfiguration,
+  collectDefaultMetrics,
 } from 'prom-client';
 import { v4 } from 'uuid';
-import { MetricConfig, MetricInstancesObject, MetricsResponse, METRIC_TYPES } from '../types';
+import { METRIC_TYPES, MetricConfig, MetricInstancesObject, MetricsResponse } from '../types';
 
 /** MetricsAggregator, management of all the metrics for this artifact */
 export class Aggregator {
@@ -51,7 +52,7 @@ export class Aggregator {
   /** Return the metrics in text/plain format */
   public async metrics(): Promise<MetricsResponse> {
     const contentType = this.registry.contentType;
-    let metrics: string | metric[];
+    let metrics: string | MetricValue<string>[];
     if (this.registry instanceof ClusterRegistry) {
       metrics = await this.registry.clusterMetrics();
     } else {
@@ -64,9 +65,11 @@ export class Aggregator {
   }
   /** Return the actual metrics in JSON format */
   public async metricsJSON(): Promise<MetricsResponse> {
+    const contentType = 'application/json';
+    const metrics = await this.registry.getMetricsAsJSON();
     return Promise.resolve({
-      metrics: await this.registry.getMetricsAsJSON(),
-      contentType: 'application/json',
+      metrics,
+      contentType,
     });
   }
   /**
@@ -119,10 +122,13 @@ export class Aggregator {
    * Get a single metric value in JSON format
    * @param name - name of metric
    */
-  public async getMetricAsJSON(name: string): Promise<metric | undefined> {
-    const metrics = await (await this.metricsJSON()).metrics;
+  public async getMetricAsJSON(
+    name: string
+  ): Promise<MetricObjectWithValues<MetricValue<string>> | undefined> {
+    const metrics = (await this.metricsJSON()).metrics;
     if (Array.isArray(metrics)) {
-      return metrics.find(entry => entry.name === name);
+      const founded = metrics.find(entry => entry.name === name);
+      return founded;
     } else {
       return undefined;
     }

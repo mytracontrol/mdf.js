@@ -5,11 +5,11 @@
  * or at https://opensource.org/licenses/MIT.
  */
 
-import { metric } from 'prom-client';
+import { MetricObjectWithValues, MetricValue } from 'prom-client';
 
 export interface MetricsResponse {
   /** Grouped metrics */
-  metrics: string | metric[];
+  metrics: string | MetricObjectWithValues<MetricValue<string>>[];
   /** Content type for HTTP headers */
   contentType: string;
 }
