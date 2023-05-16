@@ -20,6 +20,7 @@ import {
   ProducerOptions,
 } from '../types';
 
+// eslint-disable-next-line @typescript-eslint/no-empty-function
 const NOOP: () => void = () => {};
 const producerOptions: ProducerOptions = {
   id: 'myProducer',
@@ -338,6 +339,34 @@ describe('#OpenC2 #Components', () => {
       });
       Promise.all([consumer1.start(), consumer2.start(), producer.start()]).then();
     }, 300);
+    it(`Should perform a valid command from REST interface directly over the consumer`, done => {
+      const consumerAdapter = new MyConsumerAdapter();
+      const consumer = new Consumer(consumerAdapter, {
+        ...consumerOptions,
+        id: 'consumer1',
+        resolver: {
+          'query:x-netin:alarms': (target: any) => {
+            expect(target).toEqual({ entity: '3b6771cb-1ca6-4c1f-a06e-0b413872cd5c' });
+            return Promise.resolve(undefined);
+          },
+        },
+      });
+      const onResponse = (
+        error?: Crash,
+        responses?: Control.ResponseMessage | Control.ResponseMessage[]
+      ) => {
+        if (error) {
+          throw error;
+        } else if (responses) {
+          const response = Array.isArray(responses) ? responses[0] : responses;
+          expect(response.request_id).toEqual(COMMAND.request_id);
+          Promise.all([consumer.stop()]).then();
+          done();
+        }
+      };
+      // @ts-ignore - we are testing the REST interface
+      consumer._router.emit('command', COMMAND, onResponse);
+    }, 300);
     it(`Should perform a valid command to several consumers, omitting responses for other providers or acks`, async () => {
       const consumerAdapter1 = new MyConsumerAdapter();
       const consumerAdapter2 = new MyConsumerAdapter();
@@ -420,6 +449,93 @@ describe('#OpenC2 #Components', () => {
       await consumer1.stop();
       await consumer2.stop();
       await producer.stop();
+    }, 300);
+    it(`Should perform a valid command to several consumers, omitting responses for other providers or acks when command comes from REST interface`, done => {
+      const consumerAdapter1 = new MyConsumerAdapter();
+      const consumerAdapter2 = new MyConsumerAdapter();
+      const producerAdapter = new MyProducerAdapter();
+      producerAdapter.on('message', message => {
+        const onResponse = (error?: Crash | Error, response?: Control.ResponseMessage) => {
+          if (error) {
+            throw error;
+          }
+          if (response) {
+            producerAdapter.emit(response.request_id, response);
+            producerAdapter.emit(response.request_id, { ...response, to: ['otherTarget'] });
+            producerAdapter.emit(response.request_id, { ...response, status: 102 });
+          }
+        };
+        if (consumerAdapter1.handler) {
+          consumerAdapter1.handler(message, onResponse);
+        }
+        if (consumerAdapter2.handler) {
+          consumerAdapter2.handler(message, onResponse);
+        }
+      });
+      const consumer1 = new Consumer(consumerAdapter1, {
+        ...consumerOptions,
+        id: 'consumer1',
+        resolver: {
+          'query:x-netin:alarms': (target: any) => {
+            expect(target).toEqual({ entity: '3b6771cb-1ca6-4c1f-a06e-0b413872cd5c' });
+            return Promise.resolve(undefined);
+          },
+        },
+      });
+      const consumer2 = new Consumer(consumerAdapter2, { ...consumerOptions, id: 'consumer2' });
+      const producer = new Producer(producerAdapter, {
+        ...producerOptions,
+        id: 'myProducer',
+        lookupInterval: 0,
+        lookupTimeout: 0,
+      });
+      const date = new Date().getTime();
+      const onJob = (commandJob: CommandJobHandler) => {
+        expect(commandJob.data).toEqual({ ...COMMAND, created: date });
+        commandJob.done();
+      };
+      consumer2.on('command', onJob);
+      const onResponse = (error?: Crash, responses?: Control.ResponseMessage[]) => {
+        if (error) {
+          throw error;
+        } else if (responses) {
+          expect(responses).toEqual([
+            {
+              content_type: 'application/openc2+json;version=1.0',
+              msg_type: 'response',
+              request_id: '3b6771cb-1ca6-4c1f-a06e-0b413872cd5c',
+              status: 200,
+              created: responses[0].created,
+              from: 'consumer1',
+              to: ['myProducer'],
+              content: {
+                status: 200,
+                status_text: undefined,
+                results: undefined,
+              },
+            },
+            {
+              content_type: 'application/openc2+json;version=1.0',
+              msg_type: 'response',
+              request_id: '3b6771cb-1ca6-4c1f-a06e-0b413872cd5c',
+              status: 200,
+              created: responses[1].created,
+              from: 'consumer2',
+              to: ['myProducer'],
+              content: {
+                status: 200,
+                status_text: undefined,
+                results: undefined,
+              },
+            },
+          ]);
+          Promise.all([consumer1.stop(), consumer2.stop(), producer.stop()]).then(() => done());
+        }
+      };
+      Promise.all([consumer1.start(), consumer2.start(), producer.start()]).then(() => {
+        // @ts-ignore - we are testing the REST interface
+        producer._router.emit('command', { ...COMMAND, created: date }, onResponse);
+      });
     }, 300);
     it(`Should perform a valid command to several consumers, omitting responses for other providers or acks, with direct responses`, async () => {
       const producerAdapter = new MyProducerAdapter();
@@ -702,6 +818,48 @@ describe('#OpenC2 #Components', () => {
       }
       await consumer1.stop();
       await producer.stop();
+    }, 300);
+    it(`Should reject with a 400 status if the command is incorrect when command comes from REST interface`, done => {
+      const consumerAdapter1 = new MyConsumerAdapter();
+      const producerAdapter = new MyProducerAdapter();
+      producerAdapter.on('message', message => {
+        const onResponse = (error?: Crash | Error, response?: Control.ResponseMessage) => {
+          if (error) {
+            throw error;
+          }
+          if (response) {
+            producerAdapter.emit(response.request_id, response);
+          }
+        };
+        if (consumerAdapter1.handler) {
+          consumerAdapter1.handler(message, onResponse);
+        }
+      });
+      const consumer1 = new Consumer(consumerAdapter1, { ...consumerOptions, id: 'consumer1' });
+      const producer = new Producer(producerAdapter, {
+        ...producerOptions,
+        id: 'myProducer',
+        lookupInterval: 0,
+        lookupTimeout: 0,
+      });
+      const responseHandler = (error?: Crash, responses?: Control.ResponseMessage[]) => {
+        if (responses) {
+          throw new Error('Should not be here');
+        } else if (error) {
+          expect(error.message).toEqual('Command was not fulfilled: [status 400]');
+          Promise.all([consumer1.stop(), producer.stop()]).then(() => done());
+        } else {
+          throw new Error('Should not be here');
+        }
+      };
+      Promise.all([consumer1.start(), producer.start()]).then(() => {
+        // @ts-ignore - we are testing the REST interface
+        producer._router.emit(
+          'command',
+          { ...COMMAND_INVALID_QUERY, to: ['consumer1'] },
+          responseHandler
+        );
+      });
     }, 300);
     it(`Should resolve an empty array if the command does not request response`, async () => {
       const consumerAdapter1 = new MyConsumerAdapter();

@@ -40,6 +40,7 @@ export class Producer extends Component<AdapterWrapper, ProducerOptions> {
       this.options.agingInterval || DEFAULT_AGING_CHECK_INTERVAL,
       this.options.maxAge || DEFAULT_MAX_AGE
     );
+    this._router.on('command', this.onCommandHandler);
     this.health.add(this.consumerMap);
     // Stryker disable next-line all
     this.logger.debug(`OpenC2 Producer created - [${options.id}]`);
@@ -117,6 +118,19 @@ export class Producer extends Component<AdapterWrapper, ProducerOptions> {
       throw error;
     }
   }
+  /**
+   * Process incoming command message from the router
+   * @param incomingMessage - incoming message
+   * @param done - callback to return the response
+   */
+  private readonly onCommandHandler = (
+    incomingMessage: Control.CommandMessage,
+    done: (error?: Crash, response?: Control.ResponseMessage[]) => void
+  ) => {
+    this.command(incomingMessage)
+      .then(result => done(undefined, result))
+      .catch(error => done(error, undefined));
+  };
   /** Perform the lookup of OpenC2 consumers */
   private readonly lookup: () => void = () => {
     const command = Helpers.queryFeatures(this.options.lookupTimeout || 30000);

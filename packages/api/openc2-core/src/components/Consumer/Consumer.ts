@@ -36,6 +36,7 @@ export class Consumer extends Component<AdapterWrapper, ConsumerOptions> {
    */
   constructor(adapter: ConsumerAdapter, options: ConsumerOptions) {
     super(new AdapterWrapper(adapter, options.retryOptions), options);
+    this._router.on('command', this.onCommandHandler);
     // Stryker disable next-line all
     this.logger.debug(`OpenC2 Consumer created - [${options.id}]`);
     this.validateResolver(options);
@@ -122,9 +123,10 @@ export class Consumer extends Component<AdapterWrapper, ConsumerOptions> {
   /**
    * Process incoming command message from the adapter
    * @param incomingMessage - incoming message
+   * @param done - callback to return the response
    */
   private readonly onCommandHandler: OnCommandHandler = (
-    incomingMessage: Control.Message,
+    incomingMessage: Control.CommandMessage,
     done: (error?: Crash | Error, message?: Control.ResponseMessage) => void
   ): void => {
     this.processCommand(incomingMessage)
@@ -136,9 +138,9 @@ export class Consumer extends Component<AdapterWrapper, ConsumerOptions> {
    * responded
    * @param incomingMessage - incoming message
    */
-  private async processCommand(
-    incomingMessage: Control.Message
-  ): Promise<Control.ResponseMessage | undefined> {
+  private readonly processCommand = async (
+    incomingMessage: Control.CommandMessage
+  ): Promise<Control.ResponseMessage | undefined> => {
     try {
       const message = Checkers.isValidCommandSync(incomingMessage, this.componentId);
       // Stryker disable next-line all
@@ -159,7 +161,7 @@ export class Consumer extends Component<AdapterWrapper, ConsumerOptions> {
       this.onErrorHandler(crashError);
       throw crashError;
     }
-  }
+  };
   /**
    * Process incoming command message and select a default response or emit a new job to execute
    * the command

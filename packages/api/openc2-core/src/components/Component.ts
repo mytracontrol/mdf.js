@@ -10,8 +10,8 @@ import { DebugLogger, LoggerInstance, SetContext } from '@mdf.js/logger';
 import EventEmitter from 'events';
 import express from 'express';
 import { v4 } from 'uuid';
-import { HealthWrapper, Registry } from '../modules';
 import { Router } from '../Router';
+import { HealthWrapper, Registry } from '../modules';
 import { ComponentAdapter, ComponentOptions } from '../types';
 
 export declare interface Component<T, K> {
@@ -30,7 +30,7 @@ export abstract class Component<T extends ComponentAdapter, K extends ComponentO
   /** Component commands and message register */
   protected readonly register: Registry;
   /** Registry router */
-  private readonly _router: Router;
+  protected readonly _router: Router;
   /** Logger instance */
   protected readonly logger: LoggerInstance;
   /** Health wrapper instance */
