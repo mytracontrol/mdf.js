@@ -1,0 +1,42 @@
+@startuml Provider-States-Events
+
+skinparam backgroundColor transparent
+
+!STOPPED_STATE = "1a66c2"
+!RUNNING_STATE = "228811"
+!FAILED_STATE = "CC0033"
+
+skinparam State {
+  borderColor #1b1b1b
+  FontColor #fff
+  FontName Serif
+  FontSize 11
+  stereotypeFontColor #aaa
+  stereotypeFontSize 11
+  arrowColor #fff
+  arrowFontName Serif
+  arrowFontColor #bbb
+  arrowFontSize 11
+  startColor $ACCENT
+  endColor $ACCENTDARK
+}
+
+state STOPPED {
+    state STOPPED #STOPPED_STATE: Administratively offline or not\n initialized so resources cannot\n be accessed
+}
+state RUNNING {
+    state RUNNING #RUNNING_STATE: Online and initialized, the access\n to resources is possible
+}
+state ERROR {
+    state ERROR #FAILED_STATE: Online, but in a degraded state,\n the access to resources is not\n possible
+}
+    
+[*] --> STOPPED
+STOPPED -[#FAILED_STATE,dashed]-> ERROR : "unhealthy"
+RUNNING -[#FAILED_STATE,dashed]-> ERROR : "unhealthy"
+RUNNING -[#STOPPED_STATE,dashed]-> ERROR : "closed"
+ERROR -[#FAILED_STATE,dashed]-> ERROR: "unhealthy"
+ERROR -[#RUNNING_STATE,dashed]-> RUNNING: "healthy"
+ERROR -[#STOPPED_STATE,dashed]-> STOPPED: "closed"
+
+@enduml

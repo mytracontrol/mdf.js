@@ -1,0 +1,53 @@
+{
+  "name": "@mdf.js/logger",
+  "version": "0.0.1",
+  "description": "MMS - API Logger - Enhanced logger library for mms artifacts",
+  "keywords": [
+    "NodeJS",
+    "MMS",
+    "API",
+    "winston",
+    "logger"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mytracontrol/mdf.js.git",
+    "directory": "packages/api/logger"
+  },
+  "license": "MIT",
+  "author": "Mytra Control S.L.",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist/**/*"
+  ],
+  "scripts": {
+    "build": "yarn clean && tsc -p tsconfig.build.json",
+    "check-dependencies": "npm-check",
+    "clean": "rimraf \"{tsconfig.build.tsbuildinfo,dist}\"",
+    "licenses": "license-checker --start ./ --production --csv --out ../../../licenses/api/logger/licenses.csv --customPath ../../../.config/customFormat.json",
+    "mutants": "stryker run stryker.conf.js",
+    "test": "jest --detectOpenHandles --config ./jest.config.js"
+  },
+  "dependencies": {
+    "@mdf.js/crash": "*",
+    "@mdf.js/utils": "*",
+    "debug": "^4.3.4",
+    "fluent-logger": "^3.4.1",
+    "joi": "^17.9.2",
+    "tslib": "^2.5.0",
+    "uuid": "^9.0.0",
+    "winston": "^3.8.2"
+  },
+  "devDependencies": {
+    "@mdf.js/repo-config": "*",
+    "@types/debug": "^4.1.7",
+    "@types/uuid": "^9.0.1"
+  },
+  "engines": {
+    "node": ">=16.14.2"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

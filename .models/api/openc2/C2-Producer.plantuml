@@ -1,0 +1,41 @@
+@startuml C2-Producer
+
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+
+skinparam linetype ortho
+skinparam nodesep 100
+skinparam ranksep 100
+
+AddElementTag("main", $bgColor="#0070C0", $fontColor="#FFFFFF", $legendText="Main component")
+AddElementTag("reused", $bgColor="#7030A0", $fontColor="#FFFFFF", $legendText="Interface componet, used in more schemas")
+AddElementTag("health", $borderColor="#FF0000", $legendText="Implement Health Component interface")
+
+AddRelTag("DottedLine", $lineStyle = DottedLine(), $legendText="Async event")
+
+'###################################################################################################
+'External components and systems
+SystemQueue_Ext("TRANSPORT_SYSTEM", "Transport", "Transport system used to interconnect the nodes that participate in the system (MQTT, Redis, HTTP ...)", $tags=reused)
+System_Ext("UPPER_LAYER", "Upper layer", "Use the producer and consumer interface to stablish perform command and control operations", $tags=reused)
+Component_Ext("REGISTER", "Register", "Repository", "Store a historical list of messages, both command and responses, and the actual pending Jobs", $tags=health+reused)
+'###################################################################################################
+Boundary(PRODUCER_INTERFACE, "Producer interface") {
+    Container("PRODUCER", "Producer", "Main", "Allow upper layers to perform commands against the consumers that participate in the system", $tags=main+health)
+    Component("PRODUCER_ADAPTER", "ProducerAdapter", "Adapter", "Adapt the transport system to the producer, making the sync or async transport processes transparent")
+}
+Lay_D(REGISTER, TRANSPORT_SYSTEM)
+
+Rel_D(UPPER_LAYER, PRODUCER, "command")
+Rel_U(PRODUCER, UPPER_LAYER, "reponses", "resolve")
+
+Rel_D(PRODUCER, PRODUCER_ADAPTER, "publish")
+Rel_U(PRODUCER_ADAPTER, PRODUCER, "response", "resolve")
+Rel_U(PRODUCER_ADAPTER, PRODUCER, "responses", "emitted", $tags="DottedLine")
+
+Rel_R(PRODUCER_ADAPTER, TRANSPORT_SYSTEM, "publish")
+Rel_L(TRANSPORT_SYSTEM, PRODUCER_ADAPTER, "response", "resolve")
+Rel_L(TRANSPORT_SYSTEM, PRODUCER_ADAPTER, "responses", "emitted", $tags="DottedLine")
+
+Rel_R(PRODUCER, REGISTER, "push", "message")
+
+SHOW_LEGEND()
+@enduml

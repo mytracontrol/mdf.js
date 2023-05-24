@@ -1,0 +1,33 @@
+steps:
+  - task: Yarn@3
+    displayName: 'Install node_modules with devDependencies'
+    inputs:
+      projectDirectory: '.'
+      arguments: 'install'
+
+  - task: Yarn@3
+    displayName: Publish package to internal feed as oficial version
+    condition: and(succeeded(), eq(variables.isMaster, true))
+    inputs:
+      projectDirectory: '.'
+      arguments: 'lerna publish $(Build.BuildNumber) --amend --dist-tag latest --conventional-commits --loglevel silly -m "chore(release): publish %v" --yes'
+      customEndpoint: 'NPM-Registry'
+    continueOnError: true
+
+  - task: Yarn@3
+    displayName: Publish package to internal feed as beta version
+    condition: and(succeeded(), or(eq(variables.isRelease, true), eq(variables.isHotfix, true)))
+    inputs:
+      projectDirectory: '.'
+      arguments: 'lerna publish $(Build.BuildNumber) --amend --pre-dist-tag beta --loglevel silly -m "chore(release): publish %v" --yes'
+      customEndpoint: 'NPM-Registry'
+    continueOnError: true
+
+  - task: Yarn@3
+    displayName: Publish package to internal feed as alfa version
+    condition: and(succeeded(), eq(variables.isDevelop, true))
+    inputs:
+      projectDirectory: '.'
+      arguments: 'lerna publish $(Build.BuildNumber) --amend --dist-tag alpha --loglevel silly -m "chore(release): publish %v" --yes'
+      customEndpoint: 'NPM-Registry'
+    continueOnError: true

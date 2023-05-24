@@ -1,0 +1,28 @@
+/**
+ * Copyright 2022 Mytra Control S.L. All rights reserved.
+ *
+ * Use of this source code is governed by an MIT-style license that can be found in the LICENSE file
+ * or at https://opensource.org/licenses/MIT.
+ */
+// *************************************************************************************************
+// #region Arrange
+import { defaultConfig } from './default';
+import { CONFIG_PROVIDER_BASE_NAME } from './utils';
+// #endregion
+// *************************************************************************************************
+// #region HTTP config
+describe(`#Config #${CONFIG_PROVIDER_BASE_NAME.toLocaleUpperCase()}`, () => {
+  describe('#Happy path', () => {
+    it(`Should has a default config`, () => {
+      expect(defaultConfig).toMatchObject({
+        port: 8080,
+        host: 'localhost',
+        path: '/socket.io',
+        enableUI: true,
+        perMessageDeflate: true,
+      });
+    }, 300);
+  });
+});
+
+// #endregion

@@ -1,0 +1,110 @@
+# # Netin - Parameters for Release notes generation and publish
+# parameters:
+#   - name: artifactName
+#     displayName: NDF artifact mame
+#     type: string
+#     default: NameNotSet
+#   - name: artifactWikiFileName
+#     displayName: Name of the WIKI file
+#     default: $(artifactName)
+# steps:
+# - task: XplatGenerateReleaseNotes@3
+#   displayName: Generate Release Notes
+#   inputs:
+#     outputfile: 'RELEASE.md'
+#     templateLocation: 'InLine'
+#     inlinetemplate: |
+#       --------------------------------------------
+      
+#       ## 🚀 **{{buildDetails.buildNumber}}** - {{date buildDetails.finishTime "DD-MM-YYYY"}}
+#       {{#if (hasWorkItemType this.workItems 'Feature')}}
+
+#       ### 🆕 Features
+      
+#       {{#forEach this.workItems}}
+#       {{#if (eq (lookup this.fields 'System.WorkItemType' ) 'Feature')}}
+#         - #{{this.id}}  
+#       {{#if (lookup this.fields 'System.ReleaseNotes')}}
+#           - {{ sanitize (lookup this.fields 'System.ReleaseNotes')}}
+#       {{/if}}
+#       {{/if}}
+#       {{/forEach}}
+     
+
+#       {{/if}}
+#       {{#if (hasWorkItemType this.workItems 'Requirement')}}
+#       ### 🔧 Notable changes
+      
+#       {{#forEach this.workItems}}
+#       {{#if (eq (lookup this.fields 'System.ReleaseNotes' ) 'Requirement')}}
+#         - #{{this.id}}  
+#       {{#if (lookup this.fields 'System.Description')}}
+#           - {{ sanitize (lookup this.fields 'System.ReleaseNotes')}}
+#       {{/if}}
+#       {{/if}}
+#       {{/forEach}}
+      
+      
+#       {{/if}}
+#       {{#if (hasWorkItemType this.workItems 'Bug')}}
+#       ### 🐞 Bugfixes
+      
+#       {{#forEach this.workItems}}
+#       {{#if (eq (lookup this.fields 'System.WorkItemType' ) 'Bug')}}
+#         - #{{this.id}} 
+#       {{#if (lookup this.fields 'System.ReleaseNotes')}}
+#           - {{sanitize (lookup this.fields 'System.ReleaseNotes')}}
+#       {{/if}}
+#       {{/if}}
+#       {{/forEach}}
+
+
+#       {{/if}}
+#       {{#if (hasWorkItemType this.workItems 'Upgrade')}}
+#       ### ⬆️ Upgrades
+
+#       {{#forEach this.workItems}}
+#       {{#if (eq (lookup this.fields 'System.WorkItemType' ) 'Upgrade')}}
+#         - #{{this.id}} 
+#       {{#if (lookup this.fields 'System.ReleaseNotes')}}
+#           - {{sanitize (lookup this.fields 'System.ReleaseNotes')}}
+#       {{/if}}
+#       {{/if}}
+#       {{/forEach}}
+
+
+#       {{/if}}
+#     checkStage: true
+#     stopOnRedeploy: true
+#     sortWi: true
+#     dumpPayloadToConsole: true
+#     dumpPayloadToFile: false
+#     replaceFile: true
+#     getParentsAndChildren: true
+#     getAllParents: true
+#     getIndirectPullRequests: False
+#     stopOnError: False
+#     considerPartiallySuccessfulReleases: False
+#     customHandlebarsExtensionCode: |
+#         module.exports = {
+#           hasWorkItemType: function (array, typeName) {
+#             return array.some(workItem => workItem.fields['System.WorkItemType'] === typeName);
+#           }
+#         }
+# - task: WikiUpdaterTask@1
+#   displayName: Push release notes to WIKI
+#   inputs:
+#     repo: 'https://devopmytra.visualstudio.com/NetinSystems/_git/NS-Artifacts_Release_Notes-WIKI'
+#     filename: '${{parameters.artifactWikiFileName}}.md'
+#     replaceFile: false
+#     dataIsFile: true
+#     sourceFile: 'RELEASE.md'
+#     message: 'doc(wiki): update release notes for ${{parameters.artifactName}}'
+#     gitname: '$BUILD_REQUESTEDFOR'
+#     gitemail: '$BUILD_REQUESTEDFOREMAIL'
+#     user: $(WIKI_REPO_USER)
+#     password: $(WIKI_REPO_PAT)
+#     useAgentToken: false
+#     trimLeadingSpecialChar: true
+#     fixSpaces: true
+#     insertLinefeed: false

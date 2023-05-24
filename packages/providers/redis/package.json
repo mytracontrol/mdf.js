@@ -1,0 +1,52 @@
+{
+  "name": "@mdf.js/redis-provider",
+  "version": "0.0.1",
+  "description": "MMS - Redis Port for Javascript/Typescript",
+  "keywords": [
+    "NodeJS",
+    "provider",
+    "MMS",
+    "redis"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mytracontrol/mdf.js.git",
+    "directory": "packages/providers/redis"
+  },
+  "license": "MIT",
+  "author": "Mytra Control S.L.",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist/**/*"
+  ],
+  "scripts": {
+    "build": "yarn clean && tsc -p tsconfig.build.json",
+    "check-dependencies": "npm-check",
+    "clean": "rimraf \"{tsconfig.build.tsbuildinfo,dist}\"",
+    "licenses": "license-checker --start ./ --production --csv --out ../../../licenses/providers/redis/licenses.csv --customPath ../../../.config/customFormat.json",
+    "mutants": "stryker run stryker.conf.js",
+    "test": "jest --detectOpenHandles --config ./jest.config.js"
+  },
+  "dependencies": {
+    "@mdf.js/core": "*",
+    "@mdf.js/crash": "*",
+    "@mdf.js/logger": "*",
+    "@mdf.js/utils": "*",
+    "@types/redis-errors": "^1.2.0",
+    "ioredis": "^5.3.2",
+    "joi": "^17.9.2",
+    "redis-errors": "^1.2.0",
+    "tslib": "^2.5.0"
+  },
+  "devDependencies": {
+    "@mdf.js/repo-config": "*",
+    "@types/redis-errors": "^1.2.0"
+  },
+  "engines": {
+    "node": ">=16.14.2"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

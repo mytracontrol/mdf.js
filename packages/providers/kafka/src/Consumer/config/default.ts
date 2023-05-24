@@ -1,0 +1,83 @@
+/**
+ * Copyright 2022 Mytra Control S.L. All rights reserved.
+ *
+ * Use of this source code is governed by an MIT-style license that can be found in the LICENSE file
+ * or at https://opensource.org/licenses/MIT.
+ */
+
+import { hostname } from 'os';
+import { CONFIG_KAFKA_CLIENT__LOG_LEVEL, defaultLogCreator } from '../../Common';
+import { Config as ConsumerConfig } from '../types';
+
+// *************************************************************************************************
+// #region Default values
+const CONFIG_KAFKA_CLIENT__BROKERS = '127.0.0.1:9092';
+const CONFIG_KAFKA_CLIENT__SSL = false;
+const CONFIG_KAFKA_CLIENT__CLIENT_ID = hostname();
+const CONFIG_KAFKA_CLIENT__CONNECTION_TIMEOUT = 1000;
+const CONFIG_KAFKA_CLIENT__REQUEST_TIMEOUT = 30000;
+const CONFIG_KAFKA_CLIENT__ENFORCE_REQUEST_TIMEOUT = false;
+
+const CONFIG_KAFKA_CLIENT__RETRY__MAX_RETRY_TIME = 30000;
+const CONFIG_KAFKA_CLIENT__RETRY__INITIAL_RETRY_TIME = 300;
+const CONFIG_KAFKA_CLIENT__RETRY__FACTOR = 0.2;
+const CONFIG_KAFKA_CLIENT__RETRY__MULTIPLIER = 2;
+const CONFIG_KAFKA_CLIENT__RETRY__RETRIES = Number.MAX_VALUE;
+
+const CONFIG_KAFKA_CONSUMER__GROUP_ID = hostname();
+const CONFIG_KAFKA_CONSUMER__SESSION_TIMEOUT = 30000;
+const CONFIG_KAFKA_CONSUMER__REBALANCE_TIMEOUT = 60000;
+const CONFIG_KAFKA_CONSUMER__HEARTBEAT_INTERVAL = 3000;
+const CONFIG_KAFKA_CONSUMER__METADATA_MAX_AGE = 300000;
+const CONFIG_KAFKA_CONSUMER__ALLOW_AUTO_TOPIC_CREATION = true;
+const CONFIG_KAFKA_CONSUMER__MAX_BYTES_PER_PARTITION = 1048576;
+const CONFIG_KAFKA_CONSUMER__MIN_BYTES = 1;
+const CONFIG_KAFKA_CONSUMER__MAX_BYTES = 10485760;
+const CONFIG_KAFKA_CONSUMER__MAX_WAIT_TIME_IN_MS = 5000;
+const CONFIG_KAFKA_CONSUMER__RETRY__MAX_RETRY_TIME = 30000;
+const CONFIG_KAFKA_CONSUMER__RETRY__INITIAL_RETRY_TIME = 300;
+const CONFIG_KAFKA_CONSUMER__RETRY__FACTOR = 0.2;
+const CONFIG_KAFKA_CONSUMER__RETRY__MULTIPLIER = 2;
+const CONFIG_KAFKA_CONSUMER__RETRY__RETRIES = 5;
+const CONFIG_KAFKA_CONSUMER__READ_UNCOMMITTED = false;
+
+export const defaultConfig: ConsumerConfig = {
+  client: {
+    brokers: CONFIG_KAFKA_CLIENT__BROKERS.split(','),
+    ssl: CONFIG_KAFKA_CLIENT__SSL,
+    clientId: CONFIG_KAFKA_CLIENT__CLIENT_ID,
+    connectionTimeout: CONFIG_KAFKA_CLIENT__CONNECTION_TIMEOUT,
+    requestTimeout: CONFIG_KAFKA_CLIENT__REQUEST_TIMEOUT,
+    enforceRequestTimeout: CONFIG_KAFKA_CLIENT__ENFORCE_REQUEST_TIMEOUT,
+    retry: {
+      maxRetryTime: CONFIG_KAFKA_CLIENT__RETRY__MAX_RETRY_TIME,
+      initialRetryTime: CONFIG_KAFKA_CLIENT__RETRY__INITIAL_RETRY_TIME,
+      factor: CONFIG_KAFKA_CLIENT__RETRY__FACTOR,
+      multiplier: CONFIG_KAFKA_CLIENT__RETRY__MULTIPLIER,
+      retries: CONFIG_KAFKA_CLIENT__RETRY__RETRIES,
+    },
+    logLevel: CONFIG_KAFKA_CLIENT__LOG_LEVEL,
+    logCreator: defaultLogCreator,
+  },
+  consumer: {
+    groupId: CONFIG_KAFKA_CONSUMER__GROUP_ID,
+    sessionTimeout: CONFIG_KAFKA_CONSUMER__SESSION_TIMEOUT,
+    rebalanceTimeout: CONFIG_KAFKA_CONSUMER__REBALANCE_TIMEOUT,
+    heartbeatInterval: CONFIG_KAFKA_CONSUMER__HEARTBEAT_INTERVAL,
+    metadataMaxAge: CONFIG_KAFKA_CONSUMER__METADATA_MAX_AGE,
+    allowAutoTopicCreation: CONFIG_KAFKA_CONSUMER__ALLOW_AUTO_TOPIC_CREATION,
+    maxBytesPerPartition: CONFIG_KAFKA_CONSUMER__MAX_BYTES_PER_PARTITION,
+    minBytes: CONFIG_KAFKA_CONSUMER__MIN_BYTES,
+    maxBytes: CONFIG_KAFKA_CONSUMER__MAX_BYTES,
+    maxWaitTimeInMs: CONFIG_KAFKA_CONSUMER__MAX_WAIT_TIME_IN_MS,
+    retry: {
+      maxRetryTime: CONFIG_KAFKA_CONSUMER__RETRY__MAX_RETRY_TIME,
+      initialRetryTime: CONFIG_KAFKA_CONSUMER__RETRY__INITIAL_RETRY_TIME,
+      factor: CONFIG_KAFKA_CONSUMER__RETRY__FACTOR,
+      multiplier: CONFIG_KAFKA_CONSUMER__RETRY__MULTIPLIER,
+      retries: CONFIG_KAFKA_CONSUMER__RETRY__RETRIES,
+    },
+    readUncommitted: CONFIG_KAFKA_CONSUMER__READ_UNCOMMITTED,
+  },
+};
+// #endregion

@@ -1,0 +1,20 @@
+parameters:
+- name: nodeVersion
+  displayName: Node.js version
+  type: string
+  default: '14'
+- name: yarnVersion
+  displayName: Yarn version
+  type: string
+  default: '1.22'
+
+steps:
+- task: UseNode@1
+  displayName: 'Install Node.js version ${{parameters.nodeVersion}}'
+  inputs:
+    version: '${{parameters.nodeVersion}}'
+
+- task: YarnInstaller@3
+  displayName: 'Install Yarn version ${{parameters.yarnVersion}}'
+  inputs:
+    versionSpec: '${{parameters.yarnVersion}}'

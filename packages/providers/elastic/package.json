@@ -1,0 +1,49 @@
+{
+  "name": "@mdf.js/elastic-provider",
+  "version": "0.0.1",
+  "description": "MMS - Elastic Port for Javascript/Typescript",
+  "keywords": [
+    "NodeJS",
+    "provider",
+    "MMS",
+    "elastic"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mytracontrol/mdf.js.git",
+    "directory": "packages/providers/elastic"
+  },
+  "license": "MIT",
+  "author": "Mytra Control S.L.",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist/**/*"
+  ],
+  "scripts": {
+    "build": "yarn clean && tsc -p tsconfig.build.json",
+    "check-dependencies": "npm-check",
+    "clean": "rimraf \"{tsconfig.build.tsbuildinfo,dist}\"",
+    "licenses": "license-checker --start ./ --production --csv --out ../../../licenses/providers/elastic/licenses.csv --customPath ../../../.config/customFormat.json",
+    "mutants": "stryker run stryker.conf.js",
+    "test": "jest --detectOpenHandles --config ./jest.config.js"
+  },
+  "dependencies": {
+    "@elastic/elasticsearch": "^7.13.0",
+    "@mdf.js/core": "*",
+    "@mdf.js/crash": "*",
+    "@mdf.js/logger": "*",
+    "@mdf.js/utils": "*",
+    "joi": "^17.9.2",
+    "tslib": "^2.5.0"
+  },
+  "devDependencies": {
+    "@mdf.js/repo-config": "*"
+  },
+  "engines": {
+    "node": ">=16.14.2"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

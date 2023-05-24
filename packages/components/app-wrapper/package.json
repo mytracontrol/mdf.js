@@ -1,0 +1,55 @@
+{
+  "name": "@mdf.js/app-wrapper",
+  "version": "0.0.1",
+  "description": "MMS - API - Application",
+  "keywords": [
+    "NodeJS",
+    "MMS",
+    "API",
+    "APP"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mytracontrol/mdf.js.git",
+    "directory": "packages/components/application"
+  },
+  "license": "MIT",
+  "author": "Mytra Control S.L.",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist/**/*"
+  ],
+  "scripts": {
+    "build": "yarn clean && tsc -p tsconfig.build.json",
+    "check-dependencies": "npm-check",
+    "clean": "rimraf \"{tsconfig.build.tsbuildinfo,dist}\"",
+    "licenses": "license-checker --start ./ --production --csv --out ../../../licenses/components/application/licenses.csv --customPath ../../../.config/customFormat.json",
+    "mutants": "stryker run stryker.conf.js",
+    "test": "jest --detectOpenHandles --config ./jest.config.js"
+  },
+  "dependencies": {
+    "@mdf.js/core": "*",
+    "@mdf.js/crash": "*",
+    "@mdf.js/error-registry": "*",
+    "@mdf.js/logger": "*",
+    "@mdf.js/metrics-registry": "*",
+    "@mdf.js/observability": "*",
+    "@mdf.js/openc2": "*",
+    "@mdf.js/service-setup-provider": "*",
+    "@mdf.js/utils": "*",
+    "lodash": "^4.17.21",
+    "uuid": "^9.0.0"
+  },
+  "devDependencies": {
+    "@mdf.js/repo-config": "*",
+    "@types/lodash": "^4.14.194",
+    "@types/uuid": "^9.0.1"
+  },
+  "engines": {
+    "node": ">=16.14.2"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

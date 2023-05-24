@@ -1,0 +1,20 @@
+{
+    // Use IntelliSense para saber los atributos posibles.
+    // Mantenga el puntero para ver las descripciones de los existentes atributos.
+    // Para más información, visite: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Jest test with debugger",
+            "type": "node",
+            "request": "launch",
+            "program": "yarn",
+            "args": ["turbo", "test", "--filter=openc2-core"],
+            "console": "integratedTerminal",
+            "disableOptimisticBPs": true,
+            "windows": {
+              "program": "${workspaceFolder}/node_modules/jest/bin/jest"
+            }
+        }
+    ]
+}

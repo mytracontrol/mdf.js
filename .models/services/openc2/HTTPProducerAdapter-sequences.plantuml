@@ -1,0 +1,44 @@
+@startuml http-producer-adapter-sequence
+
+!pragma teoz true
+skinparam sequenceArrowThickness 2
+skinparam roundcorner 20
+skinparam maxmessagesize 200
+
+skinparam ParticipantPadding 30
+skinparam BoxPadding 30
+skinparam SequenceBoxBackgroundColor AliceBlue
+skinparam ActorBorderColor SaddleBrown
+skinparam sequenceMessageAlign left
+
+participant "Upper Layer" as Upper << (S, LightBlue) >> order 0
+box "Producer"
+participant "Producer" as Producer << (C,#ADD1B2) >> order 1
+participant "HTTPProducerAdapter" as Adapter << (C,#ADD1B2) >> order 2
+end box
+participant "Consumer" as Consumer << (S, LightBlue) >> order 4
+
+group Async command process
+Upper -> Producer : command(command)
+activate Producer
+Producer -> Adapter : publish(command)
+Adapter -> Producer : resolves()
+{start} Producer -> Adapter : subscribe(handler)
+loop number of destinations
+Adapter -> Adapter : getById(command.to)
+Adapter -> Consumer : POST {URL}/.well-known/openc2\ncommand
+activate Consumer
+Consumer -> Consumer : process(command)
+Consumer -> Adapter : response\nHTTP/1.1 200 OK
+deactivate Consumer
+Adapter -> Producer : handler("response")
+...
+end
+{end} Producer --> Producer : onTimeOut()
+Producer -> Adapter : unsubscribe(handler)
+Producer -> Upper : resolve(responses)
+{start} <-> {end} : getDelay(command)
+deactivate Producer
+end
+
+@enduml

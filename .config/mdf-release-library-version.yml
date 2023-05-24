@@ -1,0 +1,36 @@
+# ## Netin - Parameters for release process of a new artifact version
+# parameters:
+#   - name: artifactName
+#     displayName: NDF artifact mame
+#     type: string
+#     default: NameNotSet
+#   - name: artifactWikiFileName
+#     displayName: Name of the WIKI file
+#     default: $(artifactName)
+# stages:
+#   - stage: 'RELEASE'
+#     condition: eq(variables.isMaster, true)
+#     displayName: 'Release process for ${{parameters.artifactName}} artifact for version $(Build.BuildNumber)'
+#     pool:
+#       name: NUCHUB
+#     jobs:
+#       - deployment: 'PROCESS'
+#         displayName: 'Perform the release publication'
+#         workspace:
+#           clean: 'all'
+#         timeoutInMinutes: 15
+#         environment:
+#           name: 'NETIN-PUBLIC-RELEASES'
+#         strategy:
+#           runOnce:
+#             deploy:
+#               steps:
+#                 - checkout: self
+#                   clean: true
+#                   persistCredentials: true
+#                 - template: mdf-setup-gitversion.yml
+#                 - template: mdf-setup-node-and-yarn.yml
+#                 - template: mdf-release-publish-release-notes.yml
+#                   parameters:
+#                     artifactName: ${{parameters.artifactName}}
+#                     artifactWikiFileName: ${{parameters.artifactWikiFileName}}

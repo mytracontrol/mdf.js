@@ -1,0 +1,83 @@
+@startuml sequences-consumer-sync-async
+
+skinparam sequenceArrowThickness 2
+skinparam roundcorner 20
+skinparam maxmessagesize 200
+
+
+skinparam ParticipantPadding 30
+skinparam BoxPadding 30
+skinparam SequenceBoxBackgroundColor AliceBlue
+skinparam ActorBorderColor SaddleBrown
+skinparam sequenceMessageAlign left
+
+
+participant "Tansport Layer" as Transport << (S, LightBlue) >> order 0
+box "Consumer"
+participant "Consumer Adapter" as Adapter << (C,#ADD1B2) >> order 1
+participant "Consumer" as Consumer << (C,#ADD1B2) >> order 2
+end box
+box JobExecution
+participant JobHandler << (C,#ADD1B2) >> order 3
+end box
+participant "Upper Layer" as Upper << (S, LightBlue) >> order 4
+
+group Initialization
+    Upper -> Consumer : subscribe("command")
+    Consumer -> Adapter : subscribe(handler)
+end
+
+group Sync command process
+    Transport -> Adapter : execute(command)
+    activate Adapter
+    Adapter -> Consumer : handler(command, done)
+    activate Consumer
+    box JobExecution
+    create JobHandler
+    end box
+    Consumer --> JobHandler : subscribe("done")
+    activate JobHandler
+    Consumer --> Upper : emit("command", JobHandler)
+    activate Upper
+    Upper -> JobHandler : done()
+    deactivate Upper
+    JobHandler --> Consumer : emit("done")
+    deactivate JobHandler
+    destroy JobHandler
+    Consumer -> Adapter : done(response)
+    deactivate Consumer
+    Adapter -> Transport : done(response)
+    deactivate Adapter
+end
+
+group Initialization
+    Upper -> Consumer : subscribe("command")
+    Consumer -> Adapter : subscribe(handler)
+    Adapter -> Transport : subscribe("message")
+end
+
+group Async command process
+    Transport --> Adapter : emit("message", command)
+    activate Adapter
+    Adapter -> Consumer : handler(command, done)
+    activate Consumer
+    box JobExecution
+    create JobHandler
+    Consumer --> JobHandler : createJobFromCommand(command)
+    end box
+    Consumer --> JobHandler : subscribe("done")
+    activate JobHandler
+    Consumer --> Upper : emit("command", JobHandler)
+    activate Upper
+    Upper -> JobHandler : done()
+    deactivate Upper
+    JobHandler --> Consumer : emit("done")
+    deactivate JobHandler
+    destroy JobHandler
+    Consumer -> Adapter : done(response)
+    deactivate Consumer
+    Adapter --> Transport : publish(response)
+    deactivate Adapter
+end
+
+@enduml

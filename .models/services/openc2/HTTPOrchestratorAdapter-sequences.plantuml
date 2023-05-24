@@ -1,0 +1,76 @@
+@startuml http-orchestrator-adapter-sequence
+
+!pragma teoz true
+
+skinparam sequenceArrowThickness 2
+skinparam roundcorner 20
+skinparam maxmessagesize 200
+
+skinparam ParticipantPadding 30
+skinparam BoxPadding 30
+skinparam SequenceBoxBackgroundColor AliceBlue
+skinparam ActorBorderColor SaddleBrown
+skinparam sequenceMessageAlign left
+
+participant "Consumer" as Consumer << (S, LightBlue) >> order 0
+participant "HTTPServer" as Transport << (C,#ADD1B2) >> order 1
+box "Orchestrator" #LightBlue
+participant "HTTPOrchestratorAdapter" as Adapter << (C,#ADD1B2) >> order 2
+participant "Orchestrator" as Orchestrator << (C,#ADD1B2) >> order 3
+end box
+participant "Upper Layer" as Upper << (S,LightBlue) >> order 4
+
+group GET /.well-known/openc2 [Consumer stablish connection]
+Consumer -> Transport : GET /.well-known/openc2\n{ from: consumerId }
+Transport -> Transport : map.set(consumerId, stream)
+Transport -> Consumer : HTTP/1.1 200 OK\n{ Connection: keep-alive } 
+activate Consumer #Gold
+Transport -> Adapter : notify(consumerId)
+Adapter -> Orchestrator : notify(consumerId)
+activate Orchestrator
+Orchestrator -> Adapter : publish(command)\ntype: queryFeatures\nto: consumerId\nfrom: orchestratorId
+Adapter -> Orchestrator : resolves()
+{start} Orchestrator -> Adapter : subscribe(handler)
+Adapter --> Transport : emit("command")
+Transport -> Transport : map.get(consumerId)
+Transport -> Consumer : write(command)
+activate Consumer
+Consumer -> Consumer : process(command) 
+Consumer -> Transport: POST /.well-known/openc2\n response
+deactivate Consumer
+Transport -> Adapter : respond(response)
+Adapter -> Orchestrator : handler(response)\ntype: queryResponse\nto: orchestratorId\nfrom: consumerId
+{end} Orchestrator --> Orchestrator : onTimeout()
+{start} <-> {end} : getDelay(command)
+Orchestrator -> Orchestrator : map.set(consumerId, response)
+deactivate Orchestrator
+end
+
+
+group Async command process
+Upper -> Orchestrator : command(command)
+activate Orchestrator
+Orchestrator -> Adapter : publish(command)\ntype: queryFeatures\nto: consumerId\nfrom: orchestratorId
+Adapter -> Orchestrator : resolves()
+{start} Orchestrator -> Adapter : subscribe(handler)
+loop number of destinations
+Adapter --> Transport : emit("command")
+Transport -> Transport : map.get(consumerId)
+Transport -> Consumer : write(command)
+activate Consumer
+Consumer -> Consumer : process(command) 
+Consumer -> Transport: POST /.well-known/openc2\n response
+deactivate Consumer
+Transport -> Adapter : respond(response)
+Adapter -> Orchestrator : handler(response)\ntype: queryResponse\nto: orchestratorId\nfrom: consumerId
+...
+end
+{end} Orchestrator --> Orchestrator : onTimeout()
+Orchestrator -> Adapter : unsubscribe(handler)
+Orchestrator -> Upper : resolve(responses)
+{start} <-> {end} : getDelay(command)
+deactivate Orchestrator
+end
+deactivate Consumer
+
+@enduml
