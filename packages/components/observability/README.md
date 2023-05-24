@@ -20,13 +20,12 @@ ___
 
 ## **Table of contents**
 
-- [**@mdf.js**](#mdf)
+- [**@mdf.js**](#mdfjs)
   - [**Table of contents**](#table-of-contents)
   - [**Introduction**](#introduction)
   - [**Installation**](#installation)
   - [**Information**](#information)
   - [**Use**](#use)
-  - [**Collaboration**](#collaboration)
   - [**License**](#license)
 
 ## **Introduction**
@@ -36,8 +35,6 @@ ___
 ## **Information**
 
 ## **Use**
-
-
 
 ## **License**
 
