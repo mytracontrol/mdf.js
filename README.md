@@ -72,7 +72,7 @@ The complete framework is composed of the following packages:
     - mock: Functions for mocking objects, specially useful for testing in Jest.
     - prettyMS: Functions for formatting milliseconds.
 - Providers:
-  - [*@mdf.js/amqp-provider**](https://www.npmjs.com/package/@mdf.js/amqp-provider): Package for managing AMQP connections, based on [**rhea-promise**](https://www.npmjs.com/package/rhea-promise).
+  - [**@mdf.js/amqp-provider**](https://www.npmjs.com/package/@mdf.js/amqp-provider): Package for managing AMQP connections, based on [**rhea-promise**](https://www.npmjs.com/package/rhea-promise).
   - [**@mdf.js/elastic-provider**](https://www.npmjs.com/package/@mdf.js/elastic-provider): Package for managing Elastic connections, based on [**@elastic/elasticsearch**](https://www.npmjs.com/package/@elastic/elasticsearch).
   - [**@mdf.js/http-client-provider**](https://www.npmjs.com/package/@mdf.js/http-client-provider): Package for managing HTTP connections, based on [**axios**](https://www.npmjs.com/package/axios).
   - [**@mdf.js/http-server-provider**](https://www.npmjs.com/package/@mdf.js/http-server-provider): Package for managing HTTP servers, based on [**express**](https://www.npmjs.com/package/express).
