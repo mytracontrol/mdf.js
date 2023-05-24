@@ -26,6 +26,7 @@ const config = {
     projectType: "custom",
     configFile: `jest.config.js`,
   },
+  incremental: true,
   tsconfigFile: `tsconfig.spec.json`,
   disableTypeChecks: `src/**/*.ts`,
   mutate: [`src/**/*.ts`, `!src/**/*.test.ts`]

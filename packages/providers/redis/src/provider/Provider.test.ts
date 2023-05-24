@@ -169,11 +169,17 @@ describe('#Port #Redis', () => {
             },
           ],
         });
+        // @ts-ignore - Test environment
+        mockProperty(port.instance, 'status', 'ready');
         // This is to test that can not wrap method twice
         port.start().then();
+        expect(port.state).toBeTruthy();
+        // @ts-ignore - Test environment
+        expect(port.timeInterval).toBeDefined();
         expect(port.client.listenerCount('connect')).toEqual(1);
         port.close().then();
         expect(port.client.listenerCount('connect')).toEqual(0);
+        undoMocks();
         done();
       });
       port.start().then(() => {
