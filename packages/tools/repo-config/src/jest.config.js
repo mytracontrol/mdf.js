@@ -11,6 +11,7 @@ module.exports = {
   transform: {
     '^.+\\.ts$': ['ts-jest', {
       tsconfig: `<rootDir>/tsconfig.spec.json`,
+      useESM: true,
   }],
   },
   moduleNameMapper: {
