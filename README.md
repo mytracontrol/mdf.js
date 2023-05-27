@@ -1,8 +1,10 @@
 # **@mdf.js**
 
-[![Node Version](https://img.shields.io/static/v1?style=flat&logo=node.js&logoColor=green&label=node&message=%3E=16%20||%2018&color=blue)](https://nodejs.org/en/)
-[![Typescript Version](https://img.shields.io/static/v1?style=flat&logo=typescript&label=Typescript&message=4.8&color=blue)](https://www.typescriptlang.org/)
+[![Node Version](https://img.shields.io/static/v1?style=flat&logo=node.js&logoColor=green&label=node&message=%3E=20&color=blue)](https://nodejs.org/en/)
+[![Typescript Version](https://img.shields.io/static/v1?style=flat&logo=typescript&label=Typescript&message=5.0&color=blue)](https://www.typescriptlang.org/)
 [![Known Vulnerabilities](https://img.shields.io/static/v1?style=flat&logo=snyk&label=Vulnerabilities&message=0&color=300A98F)](https://snyk.io/package/npm/snyk)
+[![Build Status](https://devopmytra.visualstudio.com/MytraManagementSystem/_apis/build/status%2FMytra%20Development%20Framework%20-%20mds.js?branchName=master)](https://devopmytra.visualstudio.com/MytraManagementSystem/_build/latest?definitionId=429&branchName=master)
+[![Mutation testing badge](https://img.shields.io/endpoint?style=flat&url=https%3A%2F%2Fbadge-api.stryker-mutator.io%2Fgithub.com%2Fmytracontrol%2Fmdf.js%2Fmaster)](https://dashboard.stryker-mutator.io/reports/github.com/mytracontrol/mdf.js/master)
 
 <!-- markdownlint-disable MD033 MD041 -->
 <p align="center">
@@ -13,7 +15,6 @@
 
 <h1 style="text-align:center;margin-bottom:0">Mytra Development Framework - @mdf.js </h1>
 <h5 style="text-align:center;margin-top:0">Typescript framework for core application development</h5>
-
 <!-- markdownlint-enable MD033 -->
 
 ___

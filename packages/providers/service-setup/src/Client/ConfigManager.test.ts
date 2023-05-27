@@ -481,7 +481,9 @@ describe('#ConfigManager', () => {
         'CrashError: Error parsing file preset1.preset.config.json: Error parsing JSON'
       );
       expect(trace[4]).toEqual('caused by CrashError: Error parsing JSON');
-      expect(trace[5]).toEqual('caused by SyntaxError: Unexpected end of JSON input');
+      expect(trace[5]).toContain(
+        `caused by SyntaxError: Expected property name or '}' in JSON at position`
+      );
     }, 1000);
     it('Should start with errors if its not possible to process a schema', () => {
       const manager = new ConfigManager({
@@ -521,7 +523,9 @@ describe('#ConfigManager', () => {
         'CrashError: Error parsing file preset1.preset.config.json: Error parsing JSON'
       );
       expect(trace[1]).toEqual('caused by CrashError: Error parsing JSON');
-      expect(trace[2]).toEqual('caused by SyntaxError: Unexpected end of JSON input');
+      expect(trace[2]).toContain(
+        `caused by SyntaxError: Expected property name or '}' in JSON at position`
+      );
       expect(trace[3]).toEqual('CrashError: Preset preset1 not found');
     }, 1000);
     it('Should start with errors if there is a failure reading files', () => {

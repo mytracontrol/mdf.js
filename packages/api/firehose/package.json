@@ -36,13 +36,13 @@
     "@mdf.js/metrics-registry": "*",
     "@mdf.js/utils": "*",
     "lodash": "^4.17.21",
-    "tslib": "^2.5.0",
+    "tslib": "^2.5.2",
     "uuid": "^9.0.0"
   },
   "devDependencies": {
     "@mdf.js/observability": "*",
     "@mdf.js/repo-config": "*",
-    "@types/lodash": "^4.14.194",
+    "@types/lodash": "^4.14.195",
     "@types/uuid": "^9.0.1"
   },
   "engines": {

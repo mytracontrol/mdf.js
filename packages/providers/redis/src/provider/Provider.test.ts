@@ -240,6 +240,47 @@ describe('#Port #Redis', () => {
       await port.close();
       expect(mock).toHaveBeenCalledTimes(1);
     }, 300);
+    it('Should resolve if try to connect and an error is throw by the connect with the message "Redis is already connecting/connected"', async () => {
+      const port = new Port(DEFAULT_CONFIG, new FakeLogger() as LoggerInstance);
+      expect(port).toBeDefined();
+      const mock = jest
+        .spyOn(port.client, 'connect')
+        .mockRejectedValue(new Error('Redis is already connecting/connected'));
+      jest.spyOn(port.client, 'info').mockResolvedValue('OK');
+      jest.spyOn(port.client, 'quit').mockResolvedValue('OK');
+      jest.spyOn(port.client, 'info').mockResolvedValue(memory);
+      await port.start();
+      await port.close();
+      expect(mock).toHaveBeenCalledTimes(1);
+    }, 300);
+    it('Should resolve if try to disconnect when the instance is already disconnected', async () => {
+      try {
+        const port = new Port(DEFAULT_CONFIG, new FakeLogger() as LoggerInstance);
+        expect(port).toBeDefined();
+        jest.spyOn(port.client, 'info').mockResolvedValue(memory);
+        await port.close();
+      } catch (error) {
+        console.log(error);
+        throw new Error('Should not be here');
+      }
+    }, 300);
+    it('Should resolve if try to disconnect and an error is throw by the quit method with the message "Connection is closed."', async () => {
+      try {
+        const port = new Port(DEFAULT_CONFIG, new FakeLogger() as LoggerInstance);
+        expect(port).toBeDefined();
+        //@ts-ignore - Test environment
+        mockProperty(port, 'connected', true);
+        const mock = jest
+          .spyOn(port.client, 'quit')
+          .mockRejectedValue(new Error('Connection is closed.'));
+        jest.spyOn(port.client, 'info').mockResolvedValue(memory);
+        await port.close();
+        expect(mock).toHaveBeenCalledTimes(1);
+      } catch (error) {
+        console.log(error);
+        throw new Error('Should not be here');
+      }
+    }, 300);
   });
   describe('#Sad path', () => {
     afterEach(() => {
@@ -286,7 +327,7 @@ describe('#Port #Redis', () => {
         undoMocks();
       }
     }, 300);
-    it('Should emit unhealthy healthy and unhealthy events properly', done => {
+    it('Should emit healthy and unhealthy events properly', done => {
       const port = new Port(
         { ...DEFAULT_CONFIG, checkInterval: 50 },
         new FakeLogger() as LoggerInstance
@@ -358,9 +399,7 @@ describe('#Port #Redis', () => {
         throw error;
       });
       port.on('unhealthy', error => {
-        expect(error.message).toEqual(
-          'Error parsing the Redis INFO stats: Unexpected token , in JSON at position 65, please contact with the developers'
-        );
+        expect(error.message).toContain('Error parsing the Redis INFO stats: Unexpected token');
         const checks = port.checks;
         expect(checks).toEqual({
           memory: [
@@ -368,8 +407,7 @@ describe('#Port #Redis', () => {
               componentId: checks['memory'][0].componentId,
               observedUnit: 'used memory / max memory',
               observedValue: '- bytes / - bytes',
-              output:
-                'Error parsing the Redis INFO stats: Unexpected token , in JSON at position 65, please contact with the developers',
+              output: error.message,
               status: 'fail',
               time: checks['memory'][0].time,
             },

@@ -152,14 +152,18 @@ describe('#Port #ServiceConfig', () => {
         expect(error).toBeInstanceOf(Multi);
         expect(error.message).toEqual('Error in the service configuration');
         const trace = error.trace();
-        expect(trace).toEqual([
-          'CrashError: Error parsing file preset1.preset.config.json: Error parsing JSON',
-          'caused by CrashError: Error parsing JSON',
-          'caused by SyntaxError: Unexpected end of JSON input',
-          'CrashError: Preset preset1 not found',
-          'CrashError: Configuration validation failed: final.schema is not registered in the collection.',
-          'caused by ValidationError: final.schema is not registered in the collection.',
-        ]);
+        expect(trace[0]).toEqual(
+          `CrashError: Error parsing file preset1.preset.config.json: Error parsing JSON`
+        );
+        expect(trace[1]).toEqual(`caused by CrashError: Error parsing JSON`);
+        expect(trace[2]).toContain(`caused by SyntaxError: Expected property name or '}' in JSON`);
+        expect(trace[3]).toEqual(`CrashError: Preset preset1 not found`);
+        expect(trace[4]).toEqual(
+          `CrashError: Configuration validation failed: final.schema is not registered in the collection.`
+        );
+        expect(trace[5]).toEqual(
+          `caused by ValidationError: final.schema is not registered in the collection.`
+        );
         done();
       });
       port.start().catch(error => {

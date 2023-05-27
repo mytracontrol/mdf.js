@@ -1,31 +1,31 @@
-# Resumen
+# Summary
 
-- [ ] Bug fix (arregla un fallo sin afectar a las funcionalidades actuales)
-- [ ] Nueva funcionalidad (añade un funcionalidad sin afectar a las actuales)
-- [ ] Cambio importante (añade o modifica una funcionalidad que afecta a las funcionalidades actuales)
+- [ ] Bug fix (corrects a fault without impacting current features)
+- [ ] New feature (adds a new functionality without affecting the existing ones)
+- [ ] Major change (adds or modifies a feature that impacts existing functionalities)
 
-_Describa el problema específico que se está solucionando, solo un resumen servirá si hay un enlace al elemento de trabajo que aborda este cambio._
+Provide a description of the specific problem that is being solved. A summary would suffice if there is a link to the work item addressing this change.
 
-## Que ha cambiado?
+## What has changed?
 
-_Resuma el cambio realizado, p.ej.: añadido nuevo template para npm, modificado nombre descriptivo de fase ..._
+Summarize the change made, e.g., added new npm template, modified descriptive phase name ...
 
-### Areas afectadas
+### Affected Areas
 
-_Especifique las áreas específicas que se han visto afectados por este cambio. p.ej. proceso de publicación de alarms, estrategia de calculo de datapoints ..._
+Specify the particular areas that have been impacted by this change. e.g., alarm publication process, datapoint calculation strategy ...
 
-### Areas no afectadas
+### Unaffected Areas
 
-_Enumere las áreas que normalmente se podría suponer que se han cambiado pero que no lo son en este caso. El objetivo es ahorrar tiempo al revisor y al evaluador._
+List the areas that one might assume have been changed but have not been in this instance. The aim is to save time for the reviewer and evaluator.
 
-### Checklist de autor antes de realizar la publicación
+### Author's Checklist Before Publication
 
-- [ ] He comprobado que la modificación funciona correctamente.
-- [ ] La modificación sigue los [estándares](https://devopmytra.visualstudio.com/NetinSystems/_wiki/wikis/NetinSystems.wiki/1381/Netin-Systems-DevOps) marcados por el grupo de DevOps de Netin Systems.
-- [ ] La modificaciones no incluyen claves, tokens o información confidencial en la pipeline.
-- [ ] Se han realizado los test unitarios correspondientes para cubrir el nuevo código y/o eliminado los test que ya no son necesarios.
+- [ ] I have verified that the modification works correctly.
+- [ ] The modification adheres to the [standards](https://devopmytra.visualstudio.com/NetinSystems/_wiki/wikis/NetinSystems.wiki/1381/Netin-Systems-DevOps) set by the Netin Systems DevOps group.
+- [ ] The modifications do not include keys, tokens, or confidential information in the pipeline.
+- [ ] Corresponding unit tests have been conducted to cover the new code and/or the tests that are no longer necessary have been removed.
 
-### Comprobación de la modificación
+### Verification of Modification
 
-_Describa las pruebas que ha realizado como parte de este cambio. Anótelo aquí para el revisor y el evaluador._
-_Aporte el enlace a pipeline ejecutada de forma exitosa._
+Describe the tests you have performed as part of this change. Note it here for the reviewer and the evaluator.
+Provide the link to the successfully executed pipeline.

@@ -17,7 +17,7 @@ variables:
     value: 'mdf-js-api'
     ## Node version
   - name: nodeVersion
-    value: '18'
+    value: '20'
     ## Releases Wiki page
   - name: artifactWikiFileName
     value: '@mdf.js%2Djs-%2D-API'

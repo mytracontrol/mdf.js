@@ -13,8 +13,8 @@ import { MetricsResponse } from '@mdf.js/metrics-registry';
 import { Observability, ObservabilityOptions } from '@mdf.js/observability';
 import { Consumer, ConsumerOptions, Control, Factory, ResolverMap } from '@mdf.js/openc2';
 import { ConfigManager, Setup } from '@mdf.js/service-setup-provider';
-import { retryBind, RetryOptions } from '@mdf.js/utils';
-import { cloneDeep, merge, mergeWith, MergeWithCustomizer } from 'lodash';
+import { RetryOptions, retryBind } from '@mdf.js/utils';
+import { MergeWithCustomizer, cloneDeep, merge, mergeWith } from 'lodash';
 import { v4 } from 'uuid';
 import { ApplicationWrapperOptions, ConsumerAdapterOptions } from './types';
 
@@ -248,6 +248,7 @@ export class AppWrapper<AppConfig extends Record<string, any> = Record<string, a
     if (typeof resource.start === 'function') {
       await retryBind(resource.start, resource, [], this.retryOptions);
     } else {
+      // Stryker disable next-line all
       this.logger.info(`${resource.name} has not a start method`);
       await Promise.resolve();
     }
@@ -261,6 +262,7 @@ export class AppWrapper<AppConfig extends Record<string, any> = Record<string, a
     if (typeof resource.stop === 'function') {
       await retryBind(resource.stop, resource, [], this.retryOptions);
     } else {
+      // Stryker disable next-line all
       this.logger.info(`${resource.name} has not a stop method`);
       await Promise.resolve();
     }
@@ -273,6 +275,7 @@ export class AppWrapper<AppConfig extends Record<string, any> = Record<string, a
     const resources = Array.isArray(resource) ? resource : [resource];
     this.resources.push(...resources);
     for (const entry of resources) {
+      // Stryker disable next-line all
       this.logger.debug(`Registering resource: ${entry.name}`);
       this.observability.healthRegistry.register(entry);
     }
@@ -299,6 +302,7 @@ export class AppWrapper<AppConfig extends Record<string, any> = Record<string, a
    * @param signal - The signal received
    */
   private readonly finish = async (signal: string): Promise<void> => {
+    // Stryker disable next-line all
     this.logger.warn(`Received ${signal} signal, finishing application engine ...`);
     try {
       await this.shutdown();
@@ -306,6 +310,7 @@ export class AppWrapper<AppConfig extends Record<string, any> = Record<string, a
       const cause = Crash.from(rawError);
       this.logger.crash(cause);
     } finally {
+      // Stryker disable next-line all
       this.logger.info(`Application engine finished`);
       setTimeout(process.exit, SHUTDOWN_DELAY, signal === 'SIGINT' ? 0 : 1);
     }
@@ -316,13 +321,17 @@ export class AppWrapper<AppConfig extends Record<string, any> = Record<string, a
       if (this.booted) {
         return;
       }
+      // Stryker disable next-line all
       this.logger.info(`Welcome to ${this.name} - ${this.release} - ${this.instanceId}`);
+      // Stryker disable next-line all
       this.logger.info('Bootstrapping application engine ...');
       await retryBind(this.observability.start, this.observability, [], this.retryOptions);
       const links = JSON.stringify(this.observability.links, null, 2);
+      // Stryker disable next-line all
       this.logger.info(`Observability engine started, the health information is at: ${links}`);
       if (this.consumer) {
         await retryBind(this.consumer.start, this.consumer, [], this.retryOptions);
+        // Stryker disable next-line all
         this.logger.info('OpenC2 Consumer engine started');
       }
       this.booted = true;
@@ -344,12 +353,16 @@ export class AppWrapper<AppConfig extends Record<string, any> = Record<string, a
       if (!this.booted) {
         await this.bootstrap();
       }
+      // Stryker disable next-line all
       this.logger.info('Starting application resources ...');
       for (const resource of this.resources) {
+        // Stryker disable next-line all
         this.logger.info(`Starting resource: ${resource.name} ...`);
         await this.wrappedStart(resource);
+        // Stryker disable next-line all
         this.logger.info(`... ${resource.name} started`);
       }
+      // Stryker disable next-line all
       this.logger.info('... application resources started');
       this.started = true;
     } catch (rawError) {
@@ -367,12 +380,15 @@ export class AppWrapper<AppConfig extends Record<string, any> = Record<string, a
       if (!this.booted) {
         return;
       }
+      // Stryker disable next-line all
       this.logger.info('Shutting down application engine ...');
       if (this.consumer) {
         await retryBind(this.consumer.stop, this.consumer, [], this.retryOptions);
+        // Stryker disable next-line all
         this.logger.info('OpenC2 Consumer engine stopped');
       }
       await retryBind(this.observability.stop, this.observability, [], this.retryOptions);
+      // Stryker disable next-line all
       this.logger.info('Observability engine stopped');
       this.booted = false;
     } catch (rawError) {
@@ -380,6 +396,7 @@ export class AppWrapper<AppConfig extends Record<string, any> = Record<string, a
       const error = new Crash(`Error shutting down the application engine: ${cause.message}`, {
         cause,
       });
+      // Stryker disable next-line all
       this.logger.crash(error);
       throw error;
     }
@@ -393,12 +410,16 @@ export class AppWrapper<AppConfig extends Record<string, any> = Record<string, a
       if (this.booted) {
         await this.shutdown();
       }
+      // Stryker disable next-line all
       this.logger.info('Stopping application resources ...');
       for (const resource of this.resources) {
+        // Stryker disable next-line all
         this.logger.info(`Stopping resource: ${resource.name} ...`);
         await this.wrappedStop(resource);
+        // Stryker disable next-line all
         this.logger.info(`... ${resource.name} stopped`);
       }
+      // Stryker disable next-line all
       this.logger.info('... application resources stopped');
       this.started = false;
     } catch (rawError) {
@@ -406,6 +427,7 @@ export class AppWrapper<AppConfig extends Record<string, any> = Record<string, a
       const error = new Crash(`Error stopping the application resources: ${cause.message}`, {
         cause,
       });
+      // Stryker disable next-line all
       this.logger.crash(error);
       throw error;
     }
