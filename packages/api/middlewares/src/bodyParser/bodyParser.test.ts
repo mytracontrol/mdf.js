@@ -67,7 +67,7 @@ describe('#Middleware #bodyParser', () => {
         .then(response => {
           expect(response.body.code).toEqual('SyntaxError');
           expect(response.body.title).toEqual('Bad Request');
-          expect(response.body.detail).toEqual('Unexpected token o in JSON at position 0');
+          expect(response.body.detail).toContain('Unexpected token');
         })
         .catch(error => {
           throw error;

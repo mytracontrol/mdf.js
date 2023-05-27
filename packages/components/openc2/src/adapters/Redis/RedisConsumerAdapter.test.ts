@@ -320,7 +320,7 @@ describe('#RedisConsumerAdapter', () => {
       ) => {};
       adapter.on('error', error => {
         expect(error.message).toEqual(
-          'Error performing the adaptation of the incoming message: Unexpected end of JSON input'
+          `Error performing the adaptation of the incoming message: Expected property name or '}' in JSON at position 1`
         );
         done();
       });

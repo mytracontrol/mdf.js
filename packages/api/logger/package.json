@@ -35,13 +35,13 @@
     "debug": "^4.3.4",
     "fluent-logger": "^3.4.1",
     "joi": "^17.9.2",
-    "tslib": "^2.5.0",
+    "tslib": "^2.5.2",
     "uuid": "^9.0.0",
     "winston": "^3.8.2"
   },
   "devDependencies": {
     "@mdf.js/repo-config": "*",
-    "@types/debug": "^4.1.7",
+    "@types/debug": "^4.1.8",
     "@types/uuid": "^9.0.1"
   },
   "engines": {

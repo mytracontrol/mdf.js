@@ -36,8 +36,8 @@
     "@mdf.js/logger": "*",
     "@mdf.js/utils": "*",
     "joi": "^17.9.2",
-    "mongodb": "^4.13.0",
-    "tslib": "^2.5.0"
+    "mongodb": "^5.5.0",
+    "tslib": "^2.5.2"
   },
   "devDependencies": {
     "@mdf.js/repo-config": "*"

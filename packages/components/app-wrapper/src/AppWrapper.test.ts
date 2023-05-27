@@ -78,6 +78,7 @@ describe('#AppWrapper class', () => {
       wrapper.register([new ResourceMock('twoResource'), new ResourceMock('threeResource')]);
       const health = wrapper.observability.healthRegistry.health;
       const checks = health.checks as Health.Checks;
+      //
       expect(health).toEqual({
         name: 'test',
         description: 'test',

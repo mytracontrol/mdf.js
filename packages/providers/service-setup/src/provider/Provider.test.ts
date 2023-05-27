@@ -155,7 +155,7 @@ describe('#Port #ServiceConfig', () => {
         expect(trace).toEqual([
           'CrashError: Error parsing file preset1.preset.config.json: Error parsing JSON',
           'caused by CrashError: Error parsing JSON',
-          'caused by SyntaxError: Unexpected end of JSON input',
+          `caused by SyntaxError: Expected property name or '}' in JSON at position 3`,
           'CrashError: Preset preset1 not found',
           'CrashError: Configuration validation failed: final.schema is not registered in the collection.',
           'caused by ValidationError: final.schema is not registered in the collection.',

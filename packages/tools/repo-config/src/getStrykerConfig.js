@@ -4,13 +4,15 @@
  * Use of this source code is governed by an MIT-style license that can be found in the LICENSE file
  * or at https://opensource.org/licenses/MIT.
  */
+const { execSync } = require('child_process');
 const config = {
   packageManager: "yarn",
   testRunner: "jest",
   reporters: [
     "html",
     "clear-text",
-    "progress"
+    "progress",
+    "dashboard"
   ],
   checkers: [
     "typescript"
@@ -34,9 +36,16 @@ const config = {
 module.exports = function (modulePath) {
   const modulePathParts = modulePath.split('/');
   const rootPath = `${__dirname}/../../../..`;
-  const packetPath = `${modulePathParts[modulePathParts.length - 2]}/${modulePathParts[modulePathParts.length - 1]}`;
+  const module = modulePathParts[modulePathParts.length - 1];
+  const packetPath = `${modulePathParts[modulePathParts.length - 2]}/${module}`;
+  const gitBranch = execSync('git rev-parse --abbrev-ref HEAD').toString().trim();
   return {
     ...config,
+    dashboard: {
+      project: `github.com/mytracontrol/mdf.js`,
+      module,
+      version: gitBranch,
+    },
     tempDirName: `${rootPath}/tmp/${packetPath}/stryker-tmp`,
     htmlReporter: {
       fileName: `${rootPath}/mutations/${packetPath}/report.html`

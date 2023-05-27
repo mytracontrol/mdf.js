@@ -8,7 +8,7 @@ import { Health, Jobs } from '@mdf.js/core';
 import { Crash, Multi } from '@mdf.js/crash';
 import { DebugLogger, LoggerInstance, SetContext } from '@mdf.js/logger';
 import { get, merge } from 'lodash';
-import { Transform } from 'stream';
+import { Readable, Transform } from 'stream';
 import { v4 } from 'uuid';
 import { EngineOptions } from '../types';
 
@@ -33,6 +33,12 @@ export declare interface Engine {
   on(event: 'close', listener: () => void): this;
   /** Emitted on every state change */
   on(event: 'status', listener: (providerState: Health.Status) => void): this;
+  /** Emitted when the stream is finished */
+  on(event: 'finish', listener: () => void): this;
+  /** Emitted when the stream is piped with a readable stream */
+  on(event: 'pipe', listener: (source: Readable) => void): this;
+  /** Emitted when the stream is piped with a readable stream */
+  on(event: 'unpipe', listener: (source: Readable) => void): this;
 }
 
 export class Engine<
