@@ -11,11 +11,11 @@ module.exports = {
   transform: {
     '^.+\\.ts$': ['ts-jest', {
       tsconfig: `<rootDir>/tsconfig.spec.json`,
-      useESM: true,
   }],
   },
   moduleNameMapper: {
     uuid: require.resolve('uuid'),
+    "string-with": require.resolve('string-width'),
   },
   testEnvironmentOptions: {
     customExportConditions: ['node', 'require', 'default'],
