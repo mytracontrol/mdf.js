@@ -31,7 +31,7 @@
     "licenses": "license-checker --start ./ --production --csv --out ../../../licenses/api/crash/licenses.csv --customPath ../../../.config/customFormat.json",
     "lint": "eslint \"src/**/*.ts\" --quiet --fix",
     "mutants": "stryker run stryker.conf.js",
-    "test": "cross-env NODE_OPTIONS=--experimental-vm-modules jest --detectOpenHandles --config ./jest.config.js"
+    "test": "jest --detectOpenHandles --config ./jest.config.js"
   },
   "dependencies": {
     "tslib": "^2.5.2",

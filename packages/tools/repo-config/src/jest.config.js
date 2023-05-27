@@ -14,8 +14,7 @@ module.exports = {
   }],
   },
   moduleNameMapper: {
-    uuid: require.resolve('uuid'),
-    "string-with": require.resolve('string-width'),
+    uuid: require.resolve('uuid')
   },
   testEnvironmentOptions: {
     customExportConditions: ['node', 'require', 'default'],
