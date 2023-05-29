@@ -43,7 +43,7 @@
     "@mdf.js/repo-config": "*"
   },
   "engines": {
-    "node": ">=16.14.2"
+    "node": ">=20"
   },
   "publishConfig": {
     "access": "public"
