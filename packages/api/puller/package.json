@@ -34,7 +34,8 @@
     "@mdf.js/logger": "*",
     "@mdf.js/utils": "*",
     "lodash": "^4.17.21",
-    "uuid": "^9.0.0"
+    "uuid": "^9.0.0",
+    "bottleneck": "^2.19.5"
   },
   "devDependencies": {
     "@mdf.js/repo-config": "*",
