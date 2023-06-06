@@ -18,6 +18,9 @@ type ValidatedOutput<T, K> = K extends keyof T ? T[K] : any;
 /** AJV options but all errors must be true */
 export type DoorkeeperOptions = Options;
 
+/** Callback function for the validation process */
+export type ResultCallback<T, K> = (error?: Crash | Multi, result?: ValidatedOutput<T, K>) => void;
+
 /** Wrapping class for AJV */
 export class DoorKeeper<T = void> {
   readonly uuid = v4();
@@ -32,47 +35,6 @@ export class DoorKeeper<T = void> {
     this.ajv = AJVFormats(AJVKeyWords(AJVError(new AJV(this.options))));
     this.ajv.addKeyword({ keyword: 'markdownDescription' });
     this.ajv.addKeyword({ keyword: 'defaultSnippets' });
-  }
-  /**
-   * Registers a group of schemas from an object using the keys of the
-   * object as key and the value as the validation schema
-   * @param schemas - Object containing the [key, validation schema]
-   * @returns - the instance
-   */
-  register(schemas: Record<SchemaSelector<T>, AnySchema>): DoorKeeper<T>;
-  /**
-   * Registers a group of schemas from an array and compiles them
-   * @param schemas - Array containing the
-   * @returns - the instance
-   */
-  register(schemas: AnySchema[]): DoorKeeper<T>;
-  /**
-   * Registers one schema with its key
-   * @param key - the key with which identify the schema
-   * @param validatorSchema - the schema to be registered
-   * @returns - the instance
-   */
-  register(key: SchemaSelector<T>, validatorSchema: AnySchema): DoorKeeper<T>;
-  register(
-    keyOrArraySchemasOrObjectSchemas: SchemaSelector<T> | AnySchema[] | Record<string, AnySchema>,
-    validatorSchema?: AnySchema
-  ): DoorKeeper<T> {
-    if (
-      typeof keyOrArraySchemasOrObjectSchemas === 'string' &&
-      typeof validatorSchema === 'object' &&
-      !Array.isArray(validatorSchema)
-    ) {
-      this.addSchema(validatorSchema, keyOrArraySchemasOrObjectSchemas);
-    } else if (Array.isArray(keyOrArraySchemasOrObjectSchemas)) {
-      this.compileSchemas(keyOrArraySchemasOrObjectSchemas);
-    } else if (typeof keyOrArraySchemasOrObjectSchemas === 'object') {
-      for (const [key, _schema] of Object.entries(keyOrArraySchemasOrObjectSchemas)) {
-        this.addSchema(_schema, key);
-      }
-    } else {
-      throw new Crash('Invalid parameters, no schema will be registered', this.uuid);
-    }
-    return this;
   }
   /**
    * Add a new schema to the ajv collection
@@ -106,127 +68,6 @@ export class DoorKeeper<T = void> {
         );
       }
     }
-  }
-  /**
-   * Validate an Object against the input schema
-   * @param schema - The schema we want to validate
-   * @param data - Object to be validated
-   * @param uuid - unique identifier for this operation
-   * @param callback - callback function with the result of the validation
-   */
-  validate<K extends SchemaSelector<T>>(
-    schema: K,
-    data: any,
-    uuid: string,
-    callback: (error?: Crash | Multi, result?: ValidatedOutput<T, K>) => void
-  ): void;
-  /**
-   * Validate an Object against the input schema
-   * @param schema - The schema we want to validate
-   * @param data - Object to be validated
-   * @param uuid - unique identifier for this operation
-   */
-  validate<K extends SchemaSelector<T>>(
-    schema: K,
-    data: any,
-    uuid: string
-  ): Promise<ValidatedOutput<T, K>>;
-  validate<K extends SchemaSelector<T>>(
-    schema: K,
-    data: any,
-    uuid: string,
-    callback?: (error?: Crash | Multi, result?: ValidatedOutput<T, K>) => void
-  ): Promise<ValidatedOutput<T, K>> | void {
-    const validator = this.ajv.getSchema(schema);
-    let error: Crash | Multi | undefined = undefined;
-    // *********************************************************************************************
-    // #region No valid schema
-    if (validator === undefined) {
-      error = new Crash(`${schema} is not registered in the collection.`, uuid, {
-        name: 'ValidationError',
-        info: { schema, data },
-      });
-    }
-    // #endregion
-    // *********************************************************************************************
-    // #region Check the against schema
-    else {
-      if (!validator(data)) {
-        if (validator.errors) {
-          error = this.multify(validator.errors, schema, uuid, data);
-        } else {
-          error = new Crash(`Unexpected error in JSON schema validation process`, uuid, {
-            name: 'ValidationError',
-            info: { schema, data },
-          });
-        }
-      }
-    }
-    // #endregion
-    // *********************************************************************************************
-    // #region Return the result
-    if (callback) {
-      callback(error, data);
-    } else {
-      if (error) {
-        return Promise.reject(error);
-      } else {
-        return Promise.resolve(data);
-      }
-    }
-    //#endregion
-  }
-
-  /**
-   * Checks if the input schema is registered
-   * @param schema - schema asked for
-   * @returns - if the schema is registered in the ajv collection
-   */
-  isSchemaRegistered<K extends SchemaSelector<T>>(schema: K): boolean {
-    return !!this.ajv.getSchema(schema);
-  }
-
-  /**
-   * Try to validate an Object against the input schema or throw a validation
-   * error
-   * @param schema - The schema we want to validate
-   * @param data - Object to be validated
-   * @param uuid - unique identifier for this operation
-   */
-  public attempt<K extends SchemaSelector<T>>(
-    schema: K,
-    data: any,
-    uuid: string
-  ): ValidatedOutput<T, K> {
-    const validator = this.ajv.getSchema(schema);
-    // *********************************************************************************************
-    // #region No valid schema
-    if (validator === undefined) {
-      throw new Crash(`${schema} is not registered in the collection.`, uuid, {
-        name: 'ValidationError',
-        info: { schema, data },
-      });
-    }
-    // #endregion
-    // *********************************************************************************************
-    // #region Check the against schema
-    else {
-      if (!validator(data)) {
-        if (validator.errors) {
-          throw this.multify(validator.errors, schema, uuid, data);
-        } else {
-          throw new Crash(`Unexpected error in JSON schema validation process`, uuid, {
-            name: 'ValidationError',
-            info: { schema, data },
-          });
-        }
-      }
-    }
-    // #endregion
-    // *********************************************************************************************
-    // #region Return the result
-    return data as ValidatedOutput<T, K>;
-    //#endregion
   }
   /**
    * Create a Multi error from AJV ErrorObject array
@@ -292,5 +133,196 @@ export class DoorKeeper<T = void> {
       }
     }
     return message;
+  }
+  /**
+   *
+   * @param schema - The schema we want to validate
+   * @param data - Object to be validated
+   * @param uuid - unique identifier for this operation
+   */
+  private checkSchema<K extends SchemaSelector<T>>(schema: K, data: any, uuid = v4()): void {
+    const validator = this.ajv.getSchema(schema);
+    if (validator === undefined) {
+      throw new Crash(`${schema} is not registered in the collection.`, uuid, {
+        name: 'ValidationError',
+        info: { schema, data },
+      });
+    } else {
+      if (!validator(data)) {
+        if (validator.errors) {
+          throw this.multify(validator.errors, schema, uuid, data);
+        } else {
+          throw new Crash(`Unexpected error in JSON schema validation process`, uuid, {
+            name: 'ValidationError',
+            info: { schema, data },
+          });
+        }
+      }
+    }
+  }
+  /**
+   * Registers a group of schemas from an object using the keys of the
+   * object as key and the value as the validation schema
+   * @param schemas - Object containing the [key, validation schema]
+   * @returns - the instance
+   */
+  public register(schemas: Record<SchemaSelector<T>, AnySchema>): DoorKeeper<T>;
+  /**
+   * Registers a group of schemas from an array and compiles them
+   * @param schemas - Array containing the
+   * @returns - the instance
+   */
+  public register(schemas: AnySchema[]): DoorKeeper<T>;
+  /**
+   * Registers one schema with its key
+   * @param key - the key with which identify the schema
+   * @param validatorSchema - the schema to be registered
+   * @returns - the instance
+   */
+  public register(key: SchemaSelector<T>, validatorSchema: AnySchema): DoorKeeper<T>;
+  public register(
+    keyOrArraySchemasOrObjectSchemas: SchemaSelector<T> | AnySchema[] | Record<string, AnySchema>,
+    validatorSchema?: AnySchema
+  ): DoorKeeper<T> {
+    if (
+      typeof keyOrArraySchemasOrObjectSchemas === 'string' &&
+      typeof validatorSchema === 'object' &&
+      !Array.isArray(validatorSchema)
+    ) {
+      this.addSchema(validatorSchema, keyOrArraySchemasOrObjectSchemas);
+    } else if (Array.isArray(keyOrArraySchemasOrObjectSchemas)) {
+      this.compileSchemas(keyOrArraySchemasOrObjectSchemas);
+    } else if (typeof keyOrArraySchemasOrObjectSchemas === 'object') {
+      for (const [key, _schema] of Object.entries(keyOrArraySchemasOrObjectSchemas)) {
+        this.addSchema(_schema, key);
+      }
+    } else {
+      throw new Crash('Invalid parameters, no schema will be registered', this.uuid);
+    }
+    return this;
+  }
+  /**
+   * Checks if the input schema is registered
+   * @param schema - schema asked for
+   * @returns - if the schema is registered in the ajv collection
+   */
+  public isSchemaRegistered<K extends SchemaSelector<T>>(schema: K): boolean {
+    return !!this.ajv.getSchema(schema);
+  }
+  /**
+   * Validate an Object against the input schema
+   * @param schema - The schema we want to validate
+   * @param data - Object to be validated
+   * @param uuid - unique identifier for this operation
+   * @param callback - callback function with the result of the validation
+   */
+  public validate<K extends SchemaSelector<T>>(
+    schema: K,
+    data: any,
+    uuid: string,
+    callback: ResultCallback<T, K>
+  ): void;
+  /**
+   * Validate an Object against the input schema
+   * @param schema - The schema we want to validate
+   * @param data - Object to be validated
+   * @param callback - callback function with the result of the validation
+   */
+  public validate<K extends SchemaSelector<T>>(
+    schema: K,
+    data: any,
+    callback: ResultCallback<T, K>
+  ): void;
+  /**
+   * Validate an Object against the input schema
+   * @param schema - The schema we want to validate
+   * @param data - Object to be validated
+   * @param uuid - unique identifier for this operation
+   */
+  public validate<K extends SchemaSelector<T>>(
+    schema: K,
+    data: any,
+    uuid: string
+  ): Promise<ValidatedOutput<T, K>>;
+  /**
+   * Validate an Object against the input schema
+   * @param schema - The schema we want to validate
+   * @param data - Object to be validated
+   * @param uuid - unique identifier for this operation
+   */
+  public validate<K extends SchemaSelector<T>>(
+    schema: K,
+    data: any
+  ): Promise<ValidatedOutput<T, K>>;
+  public validate<K extends SchemaSelector<T>>(
+    schema: K,
+    data: any,
+    uuidOrCallBack?: string | ResultCallback<T, K>,
+    callbackOrUndefined?: ResultCallback<T, K>
+  ): Promise<ValidatedOutput<T, K>> | void {
+    let error: Crash | Multi | undefined;
+    const uuid = typeof uuidOrCallBack === 'string' ? uuidOrCallBack : v4();
+    const callback = typeof uuidOrCallBack === 'function' ? uuidOrCallBack : callbackOrUndefined;
+    try {
+      this.checkSchema(schema, data, uuid);
+    } catch (rawError) {
+      error = Crash.from(rawError);
+    } finally {
+      if (callback) {
+        callback(error, data);
+      } else {
+        if (error) {
+          return Promise.reject(error);
+        } else {
+          return Promise.resolve(data);
+        }
+      }
+    }
+  }
+  /**
+   * Try to validate an Object against the input schema or throw a ValidationError
+   * @param schema - The schema we want to validate
+   * @param data - Object to be validated
+   */
+  public attempt<K extends SchemaSelector<T>>(schema: K, data: any): ValidatedOutput<T, K>;
+  /**
+   * Try to validate an Object against the input schema or throw a ValidationError
+   * @param schema - The schema we want to validate
+   * @param data - Object to be validated
+   * @param uuid - unique identifier for this operation
+   */
+  public attempt<K extends SchemaSelector<T>>(
+    schema: K,
+    data: any,
+    uuid: string
+  ): ValidatedOutput<T, K>;
+  public attempt<K extends SchemaSelector<T>>(
+    schema: K,
+    data: any,
+    uuid?: string
+  ): ValidatedOutput<T, K> {
+    this.checkSchema(schema, data, uuid);
+    return data as ValidatedOutput<T, K>;
+  }
+  /**
+   * Validate an Object against the input schema and return a boolean
+   * @param schema - The schema we want to validate
+   * @param data - Object to be validated
+   */
+  public check<K extends SchemaSelector<T>>(schema: K, data: any): boolean;
+  /**
+   * Validate an Object against the input schema and return a boolean
+   * @param schema - The schema we want to validate
+   * @param data - Object to be validated
+   * @param uuid - unique identifier for this operation
+   */
+  public check<K extends SchemaSelector<T>>(schema: K, data: any, uuid: string): boolean;
+  public check<K extends SchemaSelector<T>>(schema: K, data: any, uuid?: string): boolean {
+    try {
+      this.checkSchema(schema, data, uuid);
+      return true;
+    } catch (error) {
+      return false;
+    }
   }
 }

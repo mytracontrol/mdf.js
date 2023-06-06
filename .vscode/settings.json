@@ -59,7 +59,8 @@
     "service-config",
     "openc2",
     "app-wrapper",
-    "ci"
+    "ci",
+    "doorkeeper"
   ],
 
 }
