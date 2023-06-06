@@ -121,9 +121,77 @@ describe('#DoorKeeper #package', () => {
     });
     it(`Should resolve a correct JSON object when try to validate a schema that is in the scope and is CORRECT`, async () => {
       await expect(dk.validate('Config.Artifact', artifact, v4())).resolves.toBe(artifact);
+      await expect(dk.validate('Config.Artifact', artifact)).resolves.toBe(artifact);
+    });
+    it(`Should invoke the callback a correct JSON object when try to validate a schema that is in the scope and is CORRECT`, done => {
+      dk.validate('Config.Artifact', artifact, (error, result) => {
+        expect(error).toBeUndefined();
+        expect(result).toEqual(artifact);
+        done();
+      });
+    });
+    it(`Should invoke the callback a correct JSON object when try to validate a schema that is in the scope and is CORRECT using external uuid`, done => {
+      dk.validate('Config.Artifact', artifact, v4(), (error, result) => {
+        expect(error).toBeUndefined();
+        expect(result).toEqual(artifact);
+        done();
+      });
+    });
+    it(`Should invoke the callback with an error when try to validate a schema that is in the scope and is INCORRECT`, done => {
+      dk.validate('Config.Artifact', {}, (error, result) => {
+        expect(error).toBeInstanceOf(Multi);
+        expect((error as Multi).message).toEqual('Errors during the schema validation process');
+        expect((error as Multi).name).toEqual('ValidationError');
+        expect((error as Multi).causes).toBeDefined();
+        const causes = (error as Multi).causes as Crash[];
+        for (const cause of causes) {
+          expect(cause).toBeInstanceOf(Crash);
+          expect(cause.name).toEqual('ValidationError');
+        }
+        const trace = (error as Multi).trace();
+        expect(trace).toEqual([
+          "ValidationError: must have required property 'id'",
+          "ValidationError: must have required property 'processId'",
+          "ValidationError: must have required property 'release'",
+          "ValidationError: must have required property 'version'",
+        ]);
+        expect(result).toEqual({});
+        done();
+      });
+    });
+    it(`Should invoke the callback with an error when try to validate a schema that is in the scope and is INCORRECT using external uuid`, done => {
+      dk.validate('Config.Artifact', {}, v4(), (error, result) => {
+        expect(error).toBeInstanceOf(Multi);
+        expect((error as Multi).message).toEqual('Errors during the schema validation process');
+        expect((error as Multi).name).toEqual('ValidationError');
+        expect((error as Multi).causes).toBeDefined();
+        const causes = (error as Multi).causes as Crash[];
+        for (const cause of causes) {
+          expect(cause).toBeInstanceOf(Crash);
+          expect(cause.name).toEqual('ValidationError');
+        }
+        const trace = (error as Multi).trace();
+        expect(trace).toEqual([
+          "ValidationError: must have required property 'id'",
+          "ValidationError: must have required property 'processId'",
+          "ValidationError: must have required property 'release'",
+          "ValidationError: must have required property 'version'",
+        ]);
+        expect(result).toEqual({});
+        done();
+      });
     });
     it(`Should resolve a correct JSON object when attempt to validate a schema that is in the scope and is CORRECT`, () => {
       expect(dk.attempt('Config.Artifact', artifact, v4())).toBe(artifact);
+      expect(dk.attempt('Config.Artifact', artifact)).toBe(artifact);
+    });
+    it(`Should return a TRUE value when try to check a schema that is in the scope and is CORRECT`, () => {
+      expect(dk.check('Config.Artifact', artifact)).toBeTruthy();
+      expect(dk.check('Config.Artifact', artifact, v4())).toBeTruthy();
+    });
+    it(`Should return a FALSE value when try to check a schema that is in the scope and is INCORRECT`, () => {
+      expect(dk.check('Config.Artifact', {})).toBeFalsy();
+      expect(dk.check('Config.Artifact', {}, v4())).toBeFalsy();
     });
   });
   describe('#Sad path', () => {
