@@ -12,16 +12,17 @@ export class DLList<T> {
   private decr: () => void;
   private _first: DLNode<T> | null;
   private _last: DLNode<T> | null;
-  public length: number;
+  private _length: number;
   constructor(incr: () => void, decr: () => void) {
     this.incr = incr;
     this.decr = decr;
     this._first = null;
     this._last = null;
-    this.length = 0;
+    this._length = 0;
   }
-  push(value: T): void {
-    this.length++;
+  public push(value: T): void {
+    this._length++;
+
     if (typeof this.incr === 'function') {
       this.incr();
     }
@@ -37,18 +38,17 @@ export class DLList<T> {
       this._first = this._last = node;
     }
   }
-  shift(): T | undefined {
-    let value: T | undefined;
+  public shift(): T | null {
     if (this._first == null) {
-      return;
+      return null;
     } else {
-      this.length--;
+      this._length--;
 
       if (typeof this.decr === 'function') {
         this.decr();
       }
 
-      value = this._first.value;
+      const value = this._first.value;
       if (this._first.next != null) {
         this._first = this._first.next;
         this._first.prev = null;
@@ -61,14 +61,14 @@ export class DLList<T> {
     }
   }
 
-  first(): T | undefined {
+  public first(): T | null {
     if (this._first != null) {
       return this._first.value;
     }
-    return undefined;
+    return null;
   }
 
-  getArray(): T[] {
+  public getArray(): T[] {
     let node: DLNode<T> | null = this._first;
     const results: T[] = [];
     while (node != null) {
@@ -78,25 +78,30 @@ export class DLList<T> {
     return results;
   }
 
-  forEachShift(cb: (value: T) => void): void {
-    let nodeValue: T | undefined = this.shift();
-    while (nodeValue != undefined) {
+  public forEachShift(cb: (value: T) => void): void {
+    let nodeValue: T | null = this.shift();
+    while (nodeValue != null) {
       cb(nodeValue);
       nodeValue = this.shift();
     }
   }
 
-  debug(): { value: T; prev: T | undefined; next: T | undefined }[] {
+  public debug(): { value: T; prev: T | null; next: T | null }[] {
     let node: DLNode<T> | null = this._first;
-    const results: { value: T; prev: T | undefined; next: T | undefined }[] = [];
+    const results: { value: T; prev: T | null; next: T | null }[] = [];
     while (node != null) {
       results.push({
         value: node.value,
-        prev: node.prev != null ? node.prev.value : undefined,
-        next: node.next != null ? node.next.value : undefined,
+        prev: node.prev != null ? node.prev.value : null,
+        next: node.next != null ? node.next.value : null,
       });
       node = node.next;
     }
     return results;
+  }
+
+  // -------------- GETTERS --------------------
+  public get length(): number {
+    return this._length;
   }
 }

@@ -5,30 +5,30 @@
  * or at https://opensource.org/licenses/MIT.
  */
 
-import { BottleneckError } from './BottleneckError';
+import { BottleneckError } from '../BottleneckError';
 
 export class States {
-  private status: string[];
+  private _status: string[];
   private _jobs: Record<string, number>;
-  private counts: number[];
+  private _counts: number[];
 
-  constructor(status1: string[]) {
-    this.status = status1;
+  constructor(status: string[]) {
+    this._status = status;
     this._jobs = {};
-    this.counts = this.status.map(() => 0);
+    this._counts = this._status.map(() => 0);
   }
 
   next(id: string): void {
     const current = this._jobs[id];
     if (current != undefined) {
       const next = current + 1;
-      if (next < this.status.length) {
-        this.counts[current]--;
-        this.counts[next]++;
+      if (next < this._status.length) {
+        this._counts[current]--;
+        this._counts[next]++;
         this._jobs[id]++;
       } else {
         // Last state - DONE
-        this.counts[current]--;
+        this._counts[current]--;
         delete this._jobs[id];
       }
     }
@@ -37,13 +37,13 @@ export class States {
   start(id: string): void {
     const initial = 0;
     this._jobs[id] = initial;
-    this.counts[initial]++;
+    this._counts[initial]++;
   }
 
   remove(id: string): boolean {
     const current = this._jobs[id];
     if (current != undefined) {
-      this.counts[current]--;
+      this._counts[current]--;
       delete this._jobs[id];
       return true;
     } else {
@@ -52,14 +52,14 @@ export class States {
   }
 
   jobStatus(id: string): string | null {
-    return this.status[this._jobs[id]] ?? null;
+    return this._status[this._jobs[id]] ?? null;
   }
 
   statusJobs(status?: string): string[] {
     if (status != undefined) {
-      const pos = this.status.indexOf(status);
+      const pos = this._status.indexOf(status);
       if (pos < 0) {
-        throw new BottleneckError(`status must be one of ${this.status.join(', ')}`);
+        throw new BottleneckError(`status must be one of ${this._status.join(', ')}`);
       }
       const results: string[] = [];
       for (const [k, v] of Object.entries(this._jobs)) {
@@ -74,9 +74,14 @@ export class States {
   }
 
   statusCounts(): Record<string, number> {
-    return this.counts.reduce((acc: Record<string, number>, v: number, i: number) => {
-      acc[this.status[i]] = v;
+    return this._counts.reduce((acc: Record<string, number>, v: number, i: number) => {
+      acc[this._status[i]] = v;
       return acc;
     }, {});
+  }
+
+  // ------------- Getters -------------
+  public get counts(): number[] {
+    return this._counts;
   }
 }

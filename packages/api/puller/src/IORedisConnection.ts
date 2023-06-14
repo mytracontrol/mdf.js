@@ -1,7 +1,7 @@
-import { Events } from './Events';
 import { IORedisConnectionDefaultOptions } from './IORedisConnection.interfaces';
-import { getTemplateKeys, getTemplatePayload, names } from './Scripts';
-import { load } from './parser';
+import { Events } from './events/Events';
+import { load } from './parser/Parser';
+import { getTemplateKeys, getTemplatePayload, names } from './scripts/Scripts';
 
 export class IORedisConnection {
   datastore = 'ioredis';
@@ -16,6 +16,7 @@ export class IORedisConnection {
   private events: Events;
   private terminated: boolean;
   private limiters: any;
+  // TODO: DONE: Changed to private and added getter
   private ready: Promise<any>;
   constructor(options: any = {}) {
     load(options, this.defaults, this);
@@ -91,7 +92,7 @@ export class IORedisConnection {
 
   __scriptArgs__(name: string, id: string, args: any, cb: any): any {
     const keys = getTemplateKeys(name, id);
-    const scriptArgs: (number | string | any)[] = [...[length], ...keys, ...args, ...cb];
+    const scriptArgs: (number | string | any)[] = [keys.length, ...keys, ...args, ...cb];
     return scriptArgs;
   }
 
@@ -115,5 +116,10 @@ export class IORedisConnection {
       this.subscriber.disconnect();
       return Promise.resolve();
     }
+  }
+
+  // ------------------ GETTERS ------------------
+  public get _ready(): Promise<any> {
+    return this.ready;
   }
 }

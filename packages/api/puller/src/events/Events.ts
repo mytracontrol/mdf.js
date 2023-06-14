@@ -71,7 +71,6 @@ export class Events {
       this._events[name] = this._events[name].filter(listener => listener.status !== 'none');
 
       const promises = this._events[name].map(async listener => {
-        // TODO: This condition wont be met bc this._events[name] was filtered above
         if (listener.status === 'none') {
           return null;
         }
@@ -89,7 +88,8 @@ export class Events {
           }
         } catch (error) {
           // TODO: Check. Original: if ("name" !== "error")
-          if (name !== 'error') {
+          console.log(`name: ${name}}`);
+          if (name != 'error') {
             this.trigger('error', error);
           }
           return null;

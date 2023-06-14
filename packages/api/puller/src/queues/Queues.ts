@@ -5,13 +5,18 @@
  * or at https://opensource.org/licenses/MIT.
  */
 
-import { DLList } from './DLList';
-import { Events } from './Events';
+import { DLList } from '../dlList/DLList';
+import { Events } from '../events/Events';
+import { Job } from '../job/Job';
 
 export class Queues {
   private _events: Events;
   private _length: number;
-  private _lists: DLList<any>[];
+  private _lists: DLList<Job>[];
+
+  public on: any;
+  public once: any;
+  public removeAllListeners: any;
 
   constructor(num_priorities: number) {
     this._events = new Events(this);
@@ -32,23 +37,23 @@ export class Queues {
     }
   }
 
-  incr(): void {
+  private incr(): void {
     if (this._length++ === 0) {
       this._events.trigger('leftzero');
     }
   }
 
-  decr(): void {
+  private decr(): void {
     if (--this._length === 0) {
       this._events.trigger('zero');
     }
   }
 
-  push(job: any): void {
+  public push(job: Job): void {
     return this._lists[job.options.priority].push(job);
   }
 
-  queued(priority?: number): number {
+  public queued(priority?: number): number {
     if (priority != null) {
       return this._lists[priority].length;
     } else {
@@ -56,13 +61,13 @@ export class Queues {
     }
   }
 
-  shiftAll(fn: (value: any) => void): void {
-    return this._lists.forEach(list => {
-      return list.forEachShift(fn);
+  public shiftAll(fn: (value: any) => void): void {
+    this._lists.forEach(list => {
+      list.forEachShift(fn);
     });
   }
 
-  getFirst(arr: DLList<any>[] = this._lists): DLList<any> | [] {
+  public getFirst(arr: DLList<Job>[] = this._lists): DLList<Job> | [] {
     for (const list of arr) {
       if (list.length > 0) {
         return list;
@@ -71,8 +76,22 @@ export class Queues {
     return [];
   }
 
-  shiftLastFrom(priority: number): any {
+  public shiftLastFrom(priority: number): Job | null | undefined {
     const reversedListsFromPriority = this._lists.slice(priority).reverse();
     return this.getFirst(reversedListsFromPriority).shift();
+  }
+
+  // ------------------ GETTERS ------------------
+
+  public get length(): number {
+    return this._length;
+  }
+
+  public get events(): Events {
+    return this._events;
+  }
+
+  public get lists(): DLList<Job>[] {
+    return this._lists;
   }
 }

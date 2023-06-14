@@ -165,7 +165,7 @@ export const getTemplatePayload = function (name: string): string {
   const template = templates[name];
   return [
     headers.refs,
-    ...template.headers.map((h: string) => headers[h as keyof Headers]), // TODO: Fix this
+    ...template.headers.map((h: string) => headers[h as keyof Headers]),
     template.refresh_expiration ? headers.refresh_expiration : '',
     template.code,
   ].join('\n');
