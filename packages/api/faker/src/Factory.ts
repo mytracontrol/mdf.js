@@ -12,31 +12,44 @@ import { Crash } from '@mdf.js/crash';
 import { Chance } from 'chance';
 import _ from 'lodash';
 
-/** Function type to create attributes */
-type AttributeBuilder<T, K extends keyof T> = (...args: any) => T[K] | undefined;
-/** Function type to create options */
-type OptionsBuilder = (...args: any) => any;
-type AttributeDependencies<T, K extends keyof T> = (K | string)[] | AttributeBuilder<T, K> | T[K];
-/** Interface for options generation */
-interface Option<T> {
-  dependencies?: (keyof T | string)[];
-  builder: OptionsBuilder;
-}
+/** Type for attribute dependencies */
+export type Dependencies<T, K extends keyof T> = (K | string)[];
+/** Type for function for attribute builder function */
+export type Builder<T, K extends keyof T> = (...args: any) => T[K] | undefined;
+/** Type for attribute default value */
+export type DefaultValue<T, K extends keyof T> = T[K];
+/** Type for attribute value option */
+type GeneratorOptions<T, K extends keyof T> =
+  | Builder<T, K>
+  | DefaultValue<T, K>
+  | Dependencies<T, K>;
 /** Interface for attribute generation */
-interface Attribute<T> {
-  dependencies?: (keyof T | string)[];
-  builder: AttributeBuilder<T, keyof T>;
+interface Entry<T> {
+  dependencies?: Dependencies<T, keyof T>;
+  builder: Builder<T, keyof T>;
+}
+/** Interface for default object */
+export interface DefaultObject {
+  [key: string]: any;
+}
+/** Interface for default options */
+export interface DefaultOptions {
+  likelihood?: number;
+  [key: string]: any;
 }
 
 /** Factory for building JavaScript objects, mostly useful for setting up test data */
-export class Factory<T extends Record<string, any>> {
+export class Factory<
+  T extends DefaultObject = DefaultObject,
+  R extends DefaultOptions = DefaultOptions
+> {
   /** Options for programmatic generation of attributes */
   private _opts: {
-    [key: string]: Option<T>;
+    [K in keyof R]: Entry<R>;
   };
   /** Attributes of this factory, based on a interface */
   private _attrs: {
-    [K in keyof T]?: Attribute<T>;
+    [K in keyof T]: Entry<T>;
   };
   /** Auto incrementing sequence attribute */
   private _seques: {
@@ -48,8 +61,8 @@ export class Factory<T extends Record<string, any>> {
   private readonly _chance;
   /** Create a new factory instance */
   public constructor() {
-    this._opts = {};
-    this._attrs = {};
+    this._opts = {} as { [K in keyof R]: Entry<R> };
+    this._attrs = {} as { [K in keyof T]: Entry<T> };
     this._seques = {};
     this._callbacks = [];
     this._chance = new Chance();
@@ -62,7 +75,7 @@ export class Factory<T extends Record<string, any>> {
    * factory.attr('name');
    * ```
    */
-  public attr<K extends keyof T>(attr: K): Factory<T>;
+  public attr<K extends keyof T>(attr: K): Factory<T, R>;
   /**
    * Define an attribute on this factory using a default value (e.g. a string or number)
    * @param attr - Name of attribute
@@ -72,7 +85,7 @@ export class Factory<T extends Record<string, any>> {
    * factory.attr('name', 'John Doe');
    * ```
    */
-  public attr<K extends keyof T>(attr: K, defaultValue: T[K]): Factory<T>;
+  public attr<K extends keyof T>(attr: K, defaultValue: DefaultValue<T, K>): Factory<T, R>;
   /**
    * Define an attribute on this factory using a generator function
    * @param attr - Name of attribute
@@ -82,7 +95,7 @@ export class Factory<T extends Record<string, any>> {
    * factory.attr('name', () => function() { return 'John Doe'; });
    * ```
    */
-  public attr<K extends keyof T>(attr: K, generator: AttributeBuilder<T, K>): Factory<T>;
+  public attr<K extends keyof T>(attr: K, generator: Builder<T, K>): Factory<T, R>;
   /**
    * Define an attribute on this factory using a generator function and dependencies on options or
    * other attributes
@@ -100,15 +113,15 @@ export class Factory<T extends Record<string, any>> {
    */
   public attr<K extends keyof T>(
     attr: K,
-    dependencies: (K | string)[],
-    generator: AttributeBuilder<T, K>
-  ): Factory<T>;
+    dependencies: Dependencies<T, K>,
+    generator: Builder<T, K>
+  ): Factory<T, R>;
   public attr<K extends keyof T>(
     attr: K,
-    attributeDependencies?: AttributeDependencies<T, K>,
-    generator?: AttributeBuilder<T, K>
-  ): Factory<T> {
-    this._attrs[attr] = this._SafeType(attributeDependencies, generator);
+    generatorOptions?: GeneratorOptions<T, K>,
+    builder?: Builder<T, K>
+  ): Factory<T, R> {
+    this._attrs[attr] = this._SafeType<T>(generatorOptions, builder);
     return this;
   }
   /**
@@ -124,10 +137,12 @@ export class Factory<T extends Record<string, any>> {
    * });
    * ```
    */
-  public attrs(attributes: { [K in keyof T]: AttributeBuilder<T, K> | T[K] }): Factory<T> {
+  public attrs(attributes: {
+    [K in keyof T]: DefaultValue<T, K> | Builder<T, K>;
+  }): Factory<T, R> {
     for (const attr in attributes) {
       if (attributes.hasOwnProperty(attr)) {
-        this.attr(attr, this._ReturnFunction(attributes[attr]));
+        this.attr(attr, attributes[attr]);
       }
     }
     return this;
@@ -145,7 +160,7 @@ export class Factory<T extends Record<string, any>> {
    * factory.option('withAddress', false);
    * ```
    */
-  public option(opt: string, defaultValue: any): Factory<T>;
+  public option<K extends keyof R>(opt: K, defaultValue: DefaultValue<R, K>): Factory<T, R>;
   /**
    * Define an option for this factory using a generator function. Options are values that are not
    * directly used in the generated object, but can be used to influence the generation process.
@@ -159,7 +174,7 @@ export class Factory<T extends Record<string, any>> {
    * factory.option('withAddress', () => function() { return false; });
    * ```
    */
-  public option(opt: string, generator: OptionsBuilder): Factory<T>;
+  public option<K extends keyof R>(opt: K, generator: Builder<R, K>): Factory<T, R>;
   /**
    * Define an option for this factory using a generator function with dependencies in other
    * options. Options are values that are not directly used in the generated object, but can be
@@ -172,13 +187,17 @@ export class Factory<T extends Record<string, any>> {
    * @param generator - Value generator function with dependencies in other options. The generator
    * function will be called with the resolved values of the dependencies as arguments.
    */
-  public option(opt: string, dependencies: string[], generator: OptionsBuilder): Factory<T>;
-  public option(
-    opt: string,
-    dependencies: string[] | OptionsBuilder | any,
-    generator?: OptionsBuilder
-  ): Factory<T> {
-    this._opts[opt] = this._SafeType(dependencies, generator);
+  public option<K extends keyof R>(
+    opt: K,
+    dependencies: Dependencies<R, K>,
+    generator: Builder<R, K>
+  ): Factory<T, R>;
+  public option<K extends keyof R>(
+    opt: K,
+    generatorOptions: GeneratorOptions<R, K>,
+    builder?: Builder<R, K>
+  ): Factory<T, R> {
+    this._opts[opt] = this._SafeType<R>(generatorOptions, builder);
     return this;
   }
   /**
@@ -189,7 +208,7 @@ export class Factory<T extends Record<string, any>> {
    * factory.sequence('id');
    * ```
    */
-  public sequence<K extends keyof T>(attr: K): Factory<T>;
+  public sequence<K extends keyof T>(attr: K): Factory<T, R>;
   /**
    * Define an auto incrementing sequence attribute of the object where the sequence value is
    * generated by a generator function that is called with the current sequence value as argument.
@@ -200,7 +219,7 @@ export class Factory<T extends Record<string, any>> {
    * factory.sequence('id', (i) => function() { return i + 11; });
    * ```
    */
-  public sequence<K extends keyof T>(attr: K, generator: AttributeBuilder<T, K>): Factory<T>;
+  public sequence<K extends keyof T>(attr: K, generator: Builder<T, K>): Factory<T, R>;
   /**
    * Define an auto incrementing sequence attribute of the object where the sequence value is
    * generated by a generator function that is called with the current sequence value as argument
@@ -219,24 +238,23 @@ export class Factory<T extends Record<string, any>> {
   public sequence<K extends keyof T>(
     attr: K,
     dependencies: (K | string)[],
-    generator: AttributeBuilder<T, K>
-  ): Factory<T>;
+    generator: Builder<T, K>
+  ): Factory<T, R>;
   public sequence<K extends keyof T>(
     attr: K,
-    dependencies?: (K | string)[] | AttributeBuilder<T, K> | T[K],
-    generator?: AttributeBuilder<T, K>
-  ): Factory<T> {
-    const _dependencies = dependencies || [];
-    const _generator = generator || (i => i);
-    const _attribute = this._SafeType(_dependencies, _generator);
-    if (_attribute.dependencies === undefined) {
+    generatorOptions?: GeneratorOptions<T, K>,
+    builder?: Builder<T, K>
+  ): Factory<T, R> {
+    const _attribute = this._SafeType(generatorOptions, builder);
+    if (generatorOptions === undefined && builder === undefined) {
+      _attribute.builder = i => i + 1;
       _attribute.dependencies = [];
     }
-    return this.attr(attr, _attribute.dependencies, () => {
-      const args: any[] = [].slice.call(_attribute.builder.arguments);
-      this._seques[attr] = (this._seques[attr] as number) + 1 || 1;
-      args.unshift(this._seques[attr] as number);
-      return _attribute.builder(...args);
+
+    return this.attr(attr, _attribute.dependencies || [], (...args: any[]) => {
+      const value = _attribute.builder(this._seques[attr] || 0, ...args);
+      this._seques[attr] = value;
+      return value;
     });
   }
   /**
@@ -250,7 +268,7 @@ export class Factory<T extends Record<string, any>> {
    * });
    * ```
    */
-  public after(callback: (object: T, options: { [key: string]: any }) => T | void): Factory<T> {
+  public after(callback: (object: T, options: { [key: string]: any }) => T | void): Factory<T, R> {
     this._callbacks.push(callback);
     return this;
   }
@@ -275,7 +293,7 @@ export class Factory<T extends Record<string, any>> {
       options['likelihood'] < 0 ||
       options['likelihood'] > 100
     ) {
-      throw new Crash('Error, likelihood must be a number between 0 and 100', {
+      throw new Crash('Likelihood must be a number between 0 and 100', {
         likelihood: options['likelihood'],
       });
     }
@@ -286,7 +304,7 @@ export class Factory<T extends Record<string, any>> {
     for (const attr in this._attrs) {
       const stack: (keyof T | string)[] = [];
       returnableObject[attr] = this._Build(
-        _attributes[attr] as Attribute<T>,
+        _attributes[attr] as Entry<T>,
         returnableObject,
         resolvedOptions,
         _attributes,
@@ -350,11 +368,11 @@ export class Factory<T extends Record<string, any>> {
    * overwritten.
    * @param factory - Factory to extend this factory with
    */
-  public extend<P extends T>(factory: Factory<T>): Factory<P> {
+  public extend<P extends T, H extends R>(factory: Factory<T, R>): Factory<P, H> {
     Object.assign(this._attrs, factory._attrs);
     Object.assign(this._opts, factory._opts);
     this._callbacks.push(...factory._callbacks);
-    return this as unknown as Factory<P>;
+    return this as unknown as Factory<P, H>;
   }
   /** Reset all the sequences of this factory */
   public reset(): void {
@@ -364,8 +382,8 @@ export class Factory<T extends Record<string, any>> {
    * Create an object with standard Options from a key-value pairs object
    * @param options - object containing option key value pairs
    */
-  private _ConvertToOptions(options: { [key: string]: any }): { [key: string]: Option<T> } {
-    const opts: { [key: string]: Option<T> } = {};
+  private _ConvertToOptions(options: { [key: string]: any }): { [key: string]: Entry<T> } {
+    const opts: { [key: string]: Entry<T> } = {};
     for (const opt in options) {
       opts[opt] = { dependencies: undefined, builder: () => options[opt] };
     }
@@ -381,16 +399,23 @@ export class Factory<T extends Record<string, any>> {
    * @param stack - stack of recursive calls
    */
   private _Build(
-    meta: Attribute<T> | Option<T>,
+    meta: Entry<T>,
     object: { [K in keyof T]?: T[K] },
     resolvedOptions: { [key: string]: any },
-    attributes: { [K in keyof T]?: Attribute<T> },
-    options: { [key: string]: Option<T> },
+    attributes: { [K in keyof T]?: Entry<T> },
+    options: { [key: string]: Entry<T> },
     stack: (keyof T | string)[],
     likelihood = 100
   ): any {
     if (!meta) {
-      throw new Error('Error in factory build process');
+      throw new Crash('Error in factory build process', {
+        meta,
+        object,
+        resolvedOptions,
+        attributes,
+        options,
+        stack,
+      });
     }
     if (!meta.dependencies) {
       if (!this._chance.bool({ likelihood })) {
@@ -427,13 +452,15 @@ export class Factory<T extends Record<string, any>> {
     dependencies: (string | keyof T)[],
     object: { [K in keyof T]?: T[K] },
     resolvedOptions: { [key: string]: any },
-    attributes: { [K in keyof T]?: Attribute<T> },
-    options: { [key: string]: Option<T> },
+    attributes: { [K in keyof T]?: Entry<T> },
+    options: { [key: string]: Entry<T> },
     stack: (keyof T | string)[]
   ): any[] {
     return dependencies.map(dep => {
       if (stack.indexOf(dep) >= 0) {
-        throw new Error(`Detect a dependency cycle: ${stack.concat([dep]).join(' -> ')}`);
+        throw new Crash(`Detect a dependency cycle: ${stack.concat([dep]).join(' -> ')}`, {
+          stack: stack.concat([dep]),
+        });
       }
       let value: any;
       if (object[dep as keyof T] !== undefined) {
@@ -452,7 +479,7 @@ export class Factory<T extends Record<string, any>> {
         value = resolvedOptions[dep as string];
       } else if (attributes[dep as keyof T]) {
         object[dep as keyof T] = this._Build(
-          attributes[dep as keyof T] as Attribute<T>,
+          attributes[dep as keyof T] as Entry<T>,
           object,
           resolvedOptions,
           attributes,
@@ -468,9 +495,9 @@ export class Factory<T extends Record<string, any>> {
    * Return Generator function if the argument is not a function
    * @param generator - Generator function or value
    */
-  private _ReturnFunction<K extends keyof T>(
-    generator: AttributeBuilder<T, K> | T[K] | undefined
-  ): AttributeBuilder<T, K> {
+  private _ReturnFunction<H extends T | R>(
+    generator?: Builder<H, keyof H> | DefaultValue<H, keyof H>
+  ): Builder<H, keyof H> {
     if (generator instanceof Function) {
       return generator;
     } else {
@@ -478,31 +505,32 @@ export class Factory<T extends Record<string, any>> {
     }
   }
   /**
-   * Return a Attribute generator object from attribute function parameter
-   * @param attributeDependencies - Dependency array
-   * @param generator - Default value or generator function
+   * Return a Entry object with dependencies and builder function
+   * @param generatorOptions - Default value or generator function or dependencies
+   * @param generator - Generator function or value
    */
-  private _SafeType<K extends keyof T>(
-    attributeDependencies?: AttributeDependencies<T, K>,
-    generator?: AttributeBuilder<T, K> | T[K]
-  ): Attribute<T> {
-    let _dependencies: (K | string)[] | undefined;
-    let _builder: AttributeBuilder<T, K>;
+  private _SafeType<H extends T | R>(
+    generatorOptions?: GeneratorOptions<H, keyof H>,
+    generator?: Builder<H, keyof H>
+  ): Entry<H> {
+    let _dependencies: Dependencies<H, keyof H> | undefined;
+    let _builder: Builder<H, keyof H>;
     if (generator === undefined) {
-      if (!Array.isArray(attributeDependencies)) {
-        _dependencies = undefined;
-        _builder = this._ReturnFunction(attributeDependencies);
-      } else {
+      if (Array.isArray(generatorOptions)) {
         throw new Crash('Generator function is required if dependencies are defined', {
-          attributeDependencies,
+          attributeDependencies: generatorOptions,
         });
       }
+      _dependencies = undefined;
+      _builder = this._ReturnFunction<H>(generatorOptions);
     } else {
-      if (Array.isArray(attributeDependencies)) {
-        _dependencies = attributeDependencies;
+      if (Array.isArray(generatorOptions)) {
+        _dependencies = generatorOptions;
         _builder = this._ReturnFunction(generator);
       } else {
-        throw new Crash('Dependencies must be an array', { attributeDependencies });
+        throw new Crash('Dependencies must be an array', {
+          attributeDependencies: generatorOptions,
+        });
       }
     }
     return { dependencies: _dependencies, builder: _builder };
@@ -512,9 +540,16 @@ export class Factory<T extends Record<string, any>> {
    * @param type - type of good data
    */
   private _wrongData(type: string): any {
-    const _typeof: string[] = ['undefined', 'boolean', 'number', 'string'].filter(
-      entry => entry !== type
-    );
+    const _typeof: string[] = [
+      'undefined',
+      'boolean',
+      'number',
+      'string',
+      'object',
+      'symbol',
+      'bigint',
+      'function',
+    ].filter(entry => entry !== type);
     const selected = this._chance.pickone(_typeof);
     switch (selected) {
       case 'undefined':
@@ -540,9 +575,9 @@ export class Factory<T extends Record<string, any>> {
    * @param attributes - object containing attribute override key value pairs
    */
   private _convertToAttributes(attributes: { [K in keyof T]?: T[K] }): {
-    [K in keyof T]?: Attribute<T>;
+    [K in keyof T]?: Entry<T>;
   } {
-    const attrs: { [K in keyof T]?: Attribute<T> } = {};
+    const attrs: { [K in keyof T]?: Entry<T> } = {};
     for (const attr in attributes) {
       attrs[attr] = { dependencies: undefined, builder: () => attributes[attr] };
     }
