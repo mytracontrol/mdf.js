@@ -26,8 +26,6 @@ const DEFAULT_CONFIG: Config = {
     autosettle: true,
   },
   reconnect: 5000,
-  rejectUnauthorized: false,
-  requestCert: false,
   transport: 'tcp',
   username: 'consumer',
 };
