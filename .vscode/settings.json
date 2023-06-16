@@ -61,7 +61,8 @@
     "app-wrapper",
     "ci",
     "doorkeeper",
-    "faker"
+    "faker",
+    "kafka-provider"
   ],
 
 }

@@ -6,7 +6,7 @@
  */
 
 import { coerce, loadFile } from '@mdf.js/utils';
-import { Mechanism, SASLMechanismOptions } from 'kafkajs';
+import { SASLMechanismOptions } from 'kafkajs';
 import { ConnectionOptions } from 'tls';
 import { logger } from '../../Common';
 import { Config as ProducerConfig } from '../types';
@@ -103,7 +103,7 @@ const CONFIG_KAFKA_CLIENT__SASL_USERNAME = process.env['CONFIG_KAFKA_CLIENT__SAS
 const CONFIG_KAFKA_CLIENT__SASL_PASSWORD = process.env['CONFIG_KAFKA_CLIENT__SASL_PASSWORD'];
 let CONFIG_KAFKA_CLIENT_SASL:
   | SASLMechanismOptions<'plain' | 'scram-sha-256' | 'scram-sha-512'>
-  | Mechanism
+  //| Mechanism
   | undefined = undefined;
 if (
   CONFIG_KAFKA_CLIENT__SASL_MECHANISM &&
