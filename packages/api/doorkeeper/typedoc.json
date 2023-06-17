@@ -1,4 +1,5 @@
 {
+  "extends": ["../../../typedoc.json"],
   "entryPoints": [
     "src/index.ts"
   ],
@@ -22,7 +23,7 @@
     "gfm": true
   },
   "name": "@mdf.js/doorkeeper",
-  "includeVersion": true,
+  "includeVersion": false,
   "disableSources": true,
   "excludeTags": [],
   "readme": "README.md",
