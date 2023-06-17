@@ -10,7 +10,7 @@ steps:
   inputs:
     projectDirectory: '.'
     arguments: 'run test'
-  continueOnError: true
+  continueOnError: false
 
 - task: PublishTestResults@2
   displayName: 'Publishing test result to Azure DevOps'
