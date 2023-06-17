@@ -57,35 +57,32 @@ export class Multi extends Base {
   constructor(message: string, uuid: string, options: MultiOptions);
   constructor(message: string, uuidOrOptions?: string | MultiOptions, options?: MultiOptions) {
     super(message, uuidOrOptions, options);
-    this._causes = this.extractCauses(uuidOrOptions, options);
+    this._causes = this.extractCauses(this._uuid, this._options);
     if (this.name === 'BaseError') {
       this.name = 'MultiError';
     }
   }
   /**
    * Extract the causes from the options
-   * @param uuidOrOptions - unique identifier for this particular occurrence of the problem or
+   * @param uuid - unique identifier for this particular occurrence of the problem
    * enhanced error options
    * @param options - enhanced error options
    * @returns
    */
-  private extractCauses(
-    uuidOrOptions?: string | MultiOptions,
-    options?: MultiOptions
-  ): Cause[] | undefined {
+  private extractCauses(uuid: string, options?: MultiOptions): Cause[] | undefined {
     if (!options || options['causes'] === undefined) {
       return;
     }
     const causes = options['causes'];
     if (!(causes instanceof Crash || causes instanceof Error) && !Array.isArray(causes)) {
-      throw new Base('Options[causes] must be an array of Error/Crash', uuidOrOptions);
+      throw new Base('Options[causes] must be an array of Error/Crash', uuid);
     }
     if (causes instanceof Crash || causes instanceof Error) {
       return [causes];
     }
     for (const cause of causes) {
       if (!(cause instanceof Crash || cause instanceof Error)) {
-        throw new Base('Options[causes] must be an array of Error/Crash', uuidOrOptions);
+        throw new Base('Options[causes] must be an array of Error/Crash', uuid);
       }
     }
     return causes;
