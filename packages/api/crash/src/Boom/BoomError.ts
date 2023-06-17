@@ -103,7 +103,7 @@ export class Boom extends Base {
    * @deprecated - `source` has been deprecated, use resource instead
    */
   get source(): APISource | undefined {
-    return this.resource;
+    return this._source;
   }
   /** Object with the key information of the requested resource in the REST API context */
   get resource(): APISource | undefined {

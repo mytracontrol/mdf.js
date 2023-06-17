@@ -41,11 +41,11 @@ export class Port extends Layer.Provider.Port<Client, Config> {
     return this.instance.connected;
   }
   /** Initialize the port instance */
-  public async start(): Promise<void> {
+  public start(): Promise<void> {
     if (this.instance.connected) {
       // Stryker disable next-line all
       this.logger.warn(`Port is already connected: ${this.config.host}:${this.config.port}`);
-      return;
+      return Promise.resolve();
     }
     return new Promise((resolve, reject) => {
       const onConnect = () => {
@@ -83,12 +83,12 @@ export class Port extends Layer.Provider.Port<Client, Config> {
     });
   }
   /** Stop the port instance */
-  public async stop(): Promise<void> {
+  public stop(): Promise<void> {
     this.eventsUnwrapping(this.instance);
     if (!this.instance.connected) {
       // Stryker disable next-line all
       this.logger.warn(`Port is not connected: ${this.config.host}:${this.config.port}`);
-      return;
+      return Promise.resolve();
     }
     return new Promise(resolve => {
       const onDisconnect = (reason: string) => {

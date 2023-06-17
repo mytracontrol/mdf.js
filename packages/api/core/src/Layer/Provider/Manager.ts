@@ -78,7 +78,7 @@ export class Manager<PortClient, PortConfig, T extends Port<PortClient, PortConf
    * @param options - Manager configuration options
    */
   constructor(
-    port: new (config: PortConfig, logger: LoggerInstance) => T,
+    port: new (portConfig: PortConfig, logger: LoggerInstance) => T,
     private readonly options: ProviderOptions<PortConfig>,
     config?: Partial<PortConfig>
   ) {

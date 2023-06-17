@@ -28,8 +28,6 @@ describe(`#Config #${CONFIG_PROVIDER_BASE_NAME.toLocaleUpperCase()} Receiver`, (
           rcv_settle_mode: 0,
         },
         reconnect: 5000,
-        rejectUnauthorized: false,
-        requestCert: false,
         transport: 'tcp',
         username: 'consumer',
       });

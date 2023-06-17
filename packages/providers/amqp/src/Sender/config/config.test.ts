@@ -27,8 +27,6 @@ describe(`#Config #${CONFIG_PROVIDER_BASE_NAME.toLocaleUpperCase()} Sender`, () 
           autosettle: true,
         },
         reconnect: 5000,
-        rejectUnauthorized: false,
-        requestCert: false,
         transport: 'tcp',
         username: 'producer',
       });

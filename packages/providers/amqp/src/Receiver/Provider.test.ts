@@ -31,8 +31,6 @@ const DEFAULT_CONFIG: Config = {
     },
   },
   reconnect: 5000,
-  rejectUnauthorized: false,
-  requestCert: false,
   transport: 'tcp',
   username: 'consumer',
 };

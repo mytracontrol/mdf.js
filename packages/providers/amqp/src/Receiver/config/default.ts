@@ -19,8 +19,6 @@ const CONFIG_AMQP_RECONNECT = 5000;
 const CONFIG_AMQP_INITIAL_RECONNECT_DELAY = 30000;
 const CONFIG_AMQP_MAX_RECONNECT_DELAY = 10000;
 const CONFIG_AMQP_NON_FATAL_ERRORS = ['amqp:connection:forced'];
-const CONFIG_AMQP_REQUEST_CERT = false;
-const CONFIG_AMQP_REJECT_UNAUTHORIZED = false;
 const CONFIG_AMQP_RECEIVER_SETTLE_MODE = 0;
 const CONFIG_AMQP_RECEIVER_CREDIT_WINDOW = 0;
 const CONFIG_AMQP_RECEIVER_AUTO_ACCEPT = false;
@@ -36,8 +34,6 @@ export const defaultConfig: Config = {
   initial_reconnect_delay: CONFIG_AMQP_INITIAL_RECONNECT_DELAY,
   max_reconnect_delay: CONFIG_AMQP_MAX_RECONNECT_DELAY,
   non_fatal_errors: CONFIG_AMQP_NON_FATAL_ERRORS,
-  requestCert: CONFIG_AMQP_REQUEST_CERT,
-  rejectUnauthorized: CONFIG_AMQP_REJECT_UNAUTHORIZED,
   receiver_options: {
     name: CONFIG_ARTIFACT_ID,
     rcv_settle_mode: CONFIG_AMQP_RECEIVER_SETTLE_MODE,

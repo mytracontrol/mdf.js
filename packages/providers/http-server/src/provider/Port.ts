@@ -42,11 +42,11 @@ export class Port extends Layer.Provider.Port<Server, Config> {
     return this.instance.listening;
   }
   /** Initialize the port instance */
-  public async start(): Promise<void> {
+  public start(): Promise<void> {
     if (this.instance.listening) {
       // Stryker disable next-line all
       this.logger.warn(`Port is already listening: ${this.config.host}:${this.config.port}`);
-      return;
+      return Promise.resolve();
     }
     return new Promise((resolve, reject) => {
       const onError = (error: Error) => {

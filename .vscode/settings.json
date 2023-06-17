@@ -60,7 +60,9 @@
     "openc2",
     "app-wrapper",
     "ci",
-    "doorkeeper"
+    "doorkeeper",
+    "faker",
+    "kafka-provider"
   ],
 
 }
