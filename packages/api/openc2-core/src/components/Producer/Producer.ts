@@ -227,39 +227,7 @@ export class Producer extends Component<AdapterWrapper, ProducerOptions> {
       this.logger.debug(`Timeout for responses to command ${requestId}: ${timeout} ms`);
       // *******************************************************************************************
       // #region Incoming response handler
-      const incomingResponseHandler = (incomingMessage: Control.Message): void => {
-        try {
-          const message = Checkers.isValidResponseSync(incomingMessage, this.componentId);
-          // Stryker disable next-line all
-          this.logger.debug(`New message from ${message.from} - ${message.request_id}`);
-          if (!Checkers.isResponseToInstance(message, command.from, requestId)) {
-            // Stryker disable next-line all
-            this.logger.debug(`${message.request_id} is not a response for this instance`);
-            return;
-          } else if (message.request_id === requestId) {
-            this.register.push(message);
-            if (message.status >= 200) {
-              // Stryker disable next-line all
-              this.logger.debug(`Response from: [${message.from}] received`);
-              responses.push(message);
-            } else {
-              // Stryker disable next-line all
-              this.logger.debug(`ACK from: [${message.from}] received`);
-              if (command.content.args?.response_requested === Control.ResponseType.ACK) {
-                responses.push(message);
-              }
-            }
-          }
-        } catch (rawError) {
-          const error = Crash.from(rawError);
-          const processingError = new Crash(
-            `Error processing incoming response message from control chanel: ${error.message}`,
-            this.componentId,
-            { cause: error }
-          );
-          this.onErrorHandler(processingError);
-        }
-      };
+      const broadcastResponseHandler = this.getBroadcastResponseHandler(command, responses);
       // #endregion
       // *******************************************************************************************
       // #region On timeout event handler
@@ -268,7 +236,7 @@ export class Producer extends Component<AdapterWrapper, ProducerOptions> {
         this.logger.debug(
           `Timeout complete for command: ${requestId}, all the responses will be resolved`
         );
-        this.adapter.off(requestId, incomingResponseHandler);
+        this.adapter.off(requestId, broadcastResponseHandler);
         resolve(responses);
       };
       // #endregion
@@ -280,9 +248,9 @@ export class Producer extends Component<AdapterWrapper, ProducerOptions> {
         if (result) {
           const directResponses = Array.isArray(result) ? result : [result];
           for (const response of directResponses) {
-            incomingResponseHandler(response);
+            broadcastResponseHandler(response);
           }
-          this.adapter.off(requestId, incomingResponseHandler);
+          this.adapter.off(requestId, broadcastResponseHandler);
           clearTimeout(timeoutTimer);
           resolve(directResponses);
         }
@@ -292,7 +260,7 @@ export class Producer extends Component<AdapterWrapper, ProducerOptions> {
       // #region On error on publish method
       const onPublishError = (rawError: unknown) => {
         clearTimeout(timeoutTimer);
-        this.adapter.off(requestId, incomingResponseHandler);
+        this.adapter.off(requestId, broadcastResponseHandler);
         const error = Crash.from(rawError);
         const publishingError = new Crash(
           `Error publishing command to control channel: ${error.message}`,
@@ -305,10 +273,48 @@ export class Producer extends Component<AdapterWrapper, ProducerOptions> {
       // #endregion
       // *******************************************************************************************
       // #region Subscription to responses
-      this.adapter.on(requestId, incomingResponseHandler);
+      this.adapter.on(requestId, broadcastResponseHandler);
       const timeoutTimer = setTimeout(onTimeout, timeout);
       this.adapter.publish(command).then(onDirectResponse).catch(onPublishError);
     });
+  }
+  /**
+   * Wait for the response of several consumers during the defined duration in the command
+   * @param command - issued command
+   * @param responses - responses array
+   */
+  private getBroadcastResponseHandler(
+    command: Control.CommandMessage,
+    responses: Control.ResponseMessage[]
+  ): (incomingMessage: Control.Message) => void {
+    const requestId = command.request_id;
+    return (incomingMessage: Control.Message) => {
+      try {
+        const message = Checkers.isValidResponseSync(incomingMessage, this.componentId);
+        // Stryker disable next-line all
+        this.logger.debug(`New message from ${message.from} - ${message.request_id}`);
+        if (!Checkers.isResponseToInstance(message, command.from, requestId)) {
+          // Stryker disable next-line all
+          this.logger.debug(`${message.request_id} is not a response for this instance`);
+          return;
+        } else if (message.request_id === requestId) {
+          this.register.push(message);
+          if (message.status >= 200) {
+            // Stryker disable next-line all
+            this.logger.debug(`Response from: [${message.from}] received`);
+            responses.push(message);
+          } else {
+            // Stryker disable next-line all
+            this.logger.debug(`ACK from: [${message.from}] received`);
+            if (command.content.args?.response_requested === Control.ResponseType.ACK) {
+              responses.push(message);
+            }
+          }
+        }
+      } catch (rawError) {
+        this.onProcessingMessageError(rawError);
+      }
+    };
   }
   /**
    * Wait for the response to an issued command from one consumer
@@ -321,10 +327,10 @@ export class Producer extends Component<AdapterWrapper, ProducerOptions> {
       const requestId = command.request_id;
       const timeout = Accessors.getDelayFromCommandMessage(command);
       // Stryker disable next-line all
-      this.logger.debug(`Timeout for responses: ${timeout} ms`);
+      this.logger.debug(`Timeout for responses to command ${requestId}: ${timeout} ms`);
       // *******************************************************************************************
       // #region Incoming response handler
-      const incomingResponseHandler = (incomingMessage: Control.Message): void => {
+      const consumerResponseHandler = (incomingMessage: Control.Message): void => {
         try {
           const message = Checkers.isValidResponseSync(incomingMessage, this.componentId);
           // Stryker disable next-line all
@@ -333,42 +339,21 @@ export class Producer extends Component<AdapterWrapper, ProducerOptions> {
             // Stryker disable next-line all
             this.logger.debug(`${message.request_id} is not a response for this instance`);
           } else if (message.request_id === requestId) {
-            this.register.push(message);
-            if (message.status >= 200 && message.status < 300) {
-              clearTimeout(timeoutTimer);
-              this.adapter.off(requestId, incomingResponseHandler);
-              // Stryker disable next-line all
-              this.logger.debug(`Response from: [${message.from}] received - Fulfilled`);
-              resolve(message);
-            } else if (message.status >= 300) {
-              clearTimeout(timeoutTimer);
-              this.adapter.off(requestId, incomingResponseHandler);
-              // Stryker disable next-line all
-              this.logger.warn(`Response from: [${message.from}] received - Not fulfilled`);
-              reject(
-                new Crash(
-                  `Command was not fulfilled: [status ${message.status}]`,
-                  message.request_id
-                )
-              );
-            } else {
-              // Stryker disable next-line all
-              this.logger.debug(`ACK from: [${message.from}] received`);
-              if (command.content.args?.response_requested === Control.ResponseType.ACK) {
+            try {
+              const result = this.handlerMessage(message, command);
+              if (result) {
                 clearTimeout(timeoutTimer);
-                this.adapter.off(requestId, incomingResponseHandler);
-                resolve(message);
+                this.adapter.off(requestId, consumerResponseHandler);
+                resolve(result);
               }
+            } catch (rawError) {
+              clearTimeout(timeoutTimer);
+              this.adapter.off(requestId, consumerResponseHandler);
+              reject(rawError);
             }
           }
         } catch (rawError) {
-          const error = Crash.from(rawError);
-          const processingError = new Crash(
-            `Error processing incoming response message from control chanel: ${error.message}`,
-            this.componentId,
-            { cause: error }
-          );
-          this.onErrorHandler(processingError);
+          this.onProcessingMessageError(rawError);
         }
       };
       // #endregion
@@ -380,7 +365,7 @@ export class Producer extends Component<AdapterWrapper, ProducerOptions> {
           requestId
         );
         this.logger.debug(timeOutError.message);
-        this.adapter.off(requestId, incomingResponseHandler);
+        this.adapter.off(requestId, consumerResponseHandler);
         reject(timeOutError);
       };
       // #endregion
@@ -391,7 +376,7 @@ export class Producer extends Component<AdapterWrapper, ProducerOptions> {
       ) => {
         if (Array.isArray(result)) {
           clearTimeout(timeoutTimer);
-          this.adapter.off(requestId, incomingResponseHandler);
+          this.adapter.off(requestId, consumerResponseHandler);
           reject(
             new Crash(
               `Command to a single destination was resolved with multiple responses: ${result.length}`,
@@ -400,7 +385,7 @@ export class Producer extends Component<AdapterWrapper, ProducerOptions> {
             )
           );
         } else if (result) {
-          incomingResponseHandler(result);
+          consumerResponseHandler(result);
         }
       };
       // #endregion
@@ -408,7 +393,7 @@ export class Producer extends Component<AdapterWrapper, ProducerOptions> {
       // #region On error on publish method
       const onPublishError = (rawError: unknown) => {
         clearTimeout(timeoutTimer);
-        this.adapter.off(requestId, incomingResponseHandler);
+        this.adapter.off(requestId, consumerResponseHandler);
         const error = Crash.from(rawError);
         const publishingError = new Crash(
           `Error publishing command to control channel: ${error.message}`,
@@ -419,9 +404,44 @@ export class Producer extends Component<AdapterWrapper, ProducerOptions> {
         reject(publishingError);
       };
       // #endregion
-      this.adapter.on(requestId, incomingResponseHandler);
+      this.adapter.on(requestId, consumerResponseHandler);
       const timeoutTimer = setTimeout(onTimeout, timeout);
       this.adapter.publish(command).then(onDirectResponse).catch(onPublishError);
     });
   }
+  private handlerMessage(
+    message: Control.ResponseMessage,
+    command: Control.CommandMessage
+  ): Control.ResponseMessage | undefined {
+    this.register.push(message);
+    if (message.status >= 200 && message.status < 300) {
+      // Stryker disable next-line all
+      this.logger.debug(`Response from: [${message.from}] received - Fulfilled`);
+      return message;
+    } else if (message.status >= 300) {
+      // Stryker disable next-line all
+      this.logger.warn(`Response from: [${message.from}] received - Not fulfilled`);
+      throw new Crash(`Command was not fulfilled: [status ${message.status}]`, message.request_id);
+    } else {
+      // Stryker disable next-line all
+      this.logger.debug(`ACK from: [${message.from}] received`);
+      if (command.content.args?.response_requested === Control.ResponseType.ACK) {
+        return message;
+      }
+      return undefined;
+    }
+  }
+  /**
+   * Handle errors processing incoming messages
+   * @param rawError - raw error
+   */
+  private readonly onProcessingMessageError = (rawError: unknown) => {
+    const error = Crash.from(rawError);
+    const processingError = new Crash(
+      `Error processing incoming response message from control chanel: ${error.message}`,
+      this.componentId,
+      { cause: error }
+    );
+    this.onErrorHandler(processingError);
+  };
 }

@@ -43,17 +43,14 @@ export class Port extends Layer.Provider.Port<Client, Config> {
   public async start(): Promise<void> {
     // Stryker disable next-line all
     this.logger.debug(`Starting HTTP Client port: ${this.uuid}`);
-    return;
   }
   /** Stop the port instance */
   public async stop(): Promise<void> {
     // Stryker disable next-line all
     this.logger.debug(`Stopping HTTP Client port: ${this.uuid}`);
-    return;
   }
   /** Close the port instance */
   public async close(): Promise<void> {
     await this.stop();
-    return;
   }
 }

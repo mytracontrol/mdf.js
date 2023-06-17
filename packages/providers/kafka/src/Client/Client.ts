@@ -11,13 +11,12 @@ import { EventEmitter } from 'events';
 import {
   Admin,
   GroupDescription,
-  InstrumentationEvent,
   ITopicMetadata,
+  InstrumentationEvent,
   Kafka,
   KafkaConfig,
-  logCreator,
   LogEntry,
-  logLevel,
+  logCreator,
 } from 'kafkajs';
 import { inspect } from 'util';
 import { v4 } from 'uuid';
@@ -93,7 +92,7 @@ export abstract class Client extends EventEmitter {
    * @param level - configured log level
    * @returns
    */
-  private readonly defaultLogCreator: logCreator = (logLevel: logLevel) => (entry: LogEntry) => {
+  private readonly defaultLogCreator: logCreator = () => (entry: LogEntry) => {
     const { logger, message, ...others } = entry.log;
     const logMessage = `${logger} - ${entry.label} - ${entry.namespace} - ${message}`;
     this.logger.debug(logMessage);

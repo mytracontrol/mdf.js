@@ -40,37 +40,48 @@ export function deCycle(object: any, replacer?: (value: any) => any) {
 }
 export function retroCycle($: any) {
   const px = /^\$(?:\[(?:\d+|"(?:[^\\"\u0000-\u001f]|\\(?:[\\"\/bfnrt]|u[0-9a-zA-Z]{4}))*")\])*$/;
-
-  (function rez(value) {
-    if (value && typeof value === 'object') {
-      if (Array.isArray(value)) {
-        value.forEach(function (element, i) {
-          if (typeof element === 'object' && element !== null) {
-            const path = element.$ref;
-            if (typeof path === 'string' && px.test(path)) {
-              value[i] = eval(path);
-            } else {
-              rez(element);
-            }
+  function processArray(value: any[]) {
+    value.forEach((item, i) => {
+      if (typeof item === 'object' && item !== null) {
+        const path = item.$ref;
+        if (typeof path === 'string' && px.test(path)) {
+          value[i] = eval(path);
+        } else {
+          rez(item);
+        }
+      }
+    });
+  }
+  function processObject(object: any) {
+    for (const key in object) {
+      if (object.hasOwnProperty(key)) {
+        const item = object[key];
+        if (typeof item === 'object' && item !== null) {
+          const path = item.$ref;
+          if (typeof path === 'string' && px.test(path)) {
+            object[key] = eval(path);
+          } else {
+            rez(item);
           }
-        });
-      } else {
-        Object.keys(value).forEach(function (name) {
-          const item = value[name];
-          if (typeof item === 'object' && item !== null) {
-            const path = item.$ref;
-            if (typeof path === 'string' && px.test(path)) {
-              value[name] = eval(path);
-            } else {
-              rez(item);
-            }
-          }
-        });
+        }
       }
     }
-  })($);
+  }
+
+  function rez(value: any) {
+    if (value && typeof value === 'object') {
+      if (Array.isArray(value)) {
+        processArray(value);
+      } else {
+        processObject(value);
+      }
+    }
+  }
+
+  rez($);
   return $;
 }
+
 /**
  * Check if a value is valid object
  * @param value - The value to be checked

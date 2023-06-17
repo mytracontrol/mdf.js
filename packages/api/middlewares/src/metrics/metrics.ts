@@ -147,7 +147,7 @@ export class Metrics {
     response: Response
   ): { request: number; response: number } {
     const reqHeaderContentLength = request.headers[CONTENT_LENGTH_HEADER]
-      ? parseInt(request.headers[CONTENT_LENGTH_HEADER] as string)
+      ? parseInt(request.headers[CONTENT_LENGTH_HEADER])
       : 0;
     const resHeaderContentLength = response.getHeader(CONTENT_LENGTH_HEADER);
     let responseLength: number;

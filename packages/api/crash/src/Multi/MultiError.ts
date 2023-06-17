@@ -55,28 +55,40 @@ export class Multi extends Base {
    * @param options - enhanced error options
    */
   constructor(message: string, uuid: string, options: MultiOptions);
-  constructor(message: string, uuid?: string | MultiOptions, options?: MultiOptions) {
-    super(message, uuid, options);
-    // *****************************************************************************************
-    // #region causes type safe
-    if (this._options && this._options['causes'] !== undefined) {
-      if (this._options['causes'] instanceof Crash || this._options['causes'] instanceof Error) {
-        this._causes = [this._options['causes']];
-      } else if (!Array.isArray(this._options['causes'])) {
-        throw new Base('Options[causes] must be an array of Error/Crash', uuid);
-      } else {
-        for (const cause of this._options['causes']) {
-          if (!(cause instanceof Crash || cause instanceof Error)) {
-            throw new Base('Options[causes] must be an array of Error/Crash', uuid);
-          }
-        }
-        this._causes = this._options['causes'];
-      }
-    }
-    // #endregion
+  constructor(message: string, uuidOrOptions?: string | MultiOptions, options?: MultiOptions) {
+    super(message, uuidOrOptions, options);
+    this._causes = this.extractCauses(uuidOrOptions, options);
     if (this.name === 'BaseError') {
       this.name = 'MultiError';
     }
+  }
+  /**
+   * Extract the causes from the options
+   * @param uuidOrOptions - unique identifier for this particular occurrence of the problem or
+   * enhanced error options
+   * @param options - enhanced error options
+   * @returns
+   */
+  private extractCauses(
+    uuidOrOptions?: string | MultiOptions,
+    options?: MultiOptions
+  ): Cause[] | undefined {
+    if (!options || options['causes'] === undefined) {
+      return;
+    }
+    const causes = options['causes'];
+    if (!(causes instanceof Crash || causes instanceof Error) && !Array.isArray(causes)) {
+      throw new Base('Options[causes] must be an array of Error/Crash', uuidOrOptions);
+    }
+    if (causes instanceof Crash || causes instanceof Error) {
+      return [causes];
+    }
+    for (const cause of causes) {
+      if (!(cause instanceof Crash || cause instanceof Error)) {
+        throw new Base('Options[causes] must be an array of Error/Crash', uuidOrOptions);
+      }
+    }
+    return causes;
   }
   /** Determine if this instance is a Multi error */
   get isMulti(): boolean {

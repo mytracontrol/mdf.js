@@ -267,15 +267,14 @@ export class DoorKeeper<T = void> {
       this.checkSchema(schema, data, uuid);
     } catch (rawError) {
       error = Crash.from(rawError);
-    } finally {
-      if (callback) {
-        callback(error, data);
+    }
+    if (callback) {
+      callback(error, data);
+    } else {
+      if (error) {
+        return Promise.reject(error);
       } else {
-        if (error) {
-          return Promise.reject(error);
-        } else {
-          return Promise.resolve(data);
-        }
+        return Promise.resolve(data);
       }
     }
   }

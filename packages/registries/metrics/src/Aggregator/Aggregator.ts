@@ -127,8 +127,7 @@ export class Aggregator {
   ): Promise<MetricObjectWithValues<MetricValue<string>> | undefined> {
     const metrics = (await this.metricsJSON()).metrics;
     if (Array.isArray(metrics)) {
-      const founded = metrics.find(entry => entry.name === name);
-      return founded;
+      return metrics.find(entry => entry.name === name);
     } else {
       return undefined;
     }
