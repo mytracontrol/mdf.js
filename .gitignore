@@ -40,7 +40,6 @@ testem.log
 /typings
 **/reports
 **/mutations
-docs
 .dccache
 
 # System Files

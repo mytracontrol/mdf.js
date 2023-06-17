@@ -21,7 +21,8 @@
     "prettier": "prettier --config .prettierrc.js --write **/src/**/*.ts",
     "snyk": "yarn run @:snyk:test && yarn run @:snyk:report",
     "sort": "sort-package-json \"packages/*/*/package.json\" package.json",
-    "test": "turbo run test licenses --concurrency=1"
+    "test": "turbo run test licenses --concurrency=1",
+    "docs": "typedoc --options typedoc.json"
   },
   "devDependencies": {
     "@mdf.js/repo-config": "*",

@@ -1,0 +1,8 @@
+{
+  "entryPoints": [
+    "packages/**/*"
+  ],
+  "entryPointStrategy": "packages",
+  "name": "@mdf.js",
+  "includeVersion": false
+}

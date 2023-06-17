@@ -57,6 +57,7 @@ The complete framework is composed of the following packages:
   - [**@mdf.js/core**](https://www.npmjs.com/package/@mdf.js/core): Package for internal interfaces and classes used by the rest of the packages.
   - [**@mdf.js/crash**](https://www.npmjs.com/package/@mdf.js/crash): Package for improving the error handling of the applications.
   - [**@mdf.js/doorkeeper**](https://www.npmjs.com/package/@mdf.js/doorkeeper): Package for managing the validation of json schemas, based on [**ajv**](https://ajv.js.org).
+  - [**@mdf.js/faker**](https://www.npmjs.com/package/@mdf.js/faker): Package for generating fake data for testing.
   - [**@mdf.js/firehose**](https://www.npmjs.com/package/@mdf.js/firehose): Package for data ETL pipelines creation and management. Works together with the providers.
   - [**@mdf.js/logger**](https://www.npmjs.com/package/@mdf.js/logger): Package for logging management.
   - [**@mdf.js/middlewares**](https://www.npmjs.com/package/@mdf.js/middlewares): Package with a set of middlewares for express applications.
