@@ -10,7 +10,7 @@
  */
 import { Crash } from '@mdf.js/crash';
 import { Chance } from 'chance';
-import _ from 'lodash';
+import _, { merge } from 'lodash';
 
 /** Type for attribute dependencies */
 export type Dependencies<T, K extends keyof T> = (K | string)[];
@@ -56,7 +56,7 @@ export class Factory<
     [K in keyof T]?: number;
   };
   /** Callback function array */
-  private readonly _callbacks: ((object: T, options: { [key: string]: any }) => T | void)[];
+  private readonly _callbacks: ((object: T, options: R) => T)[];
   /** Chance object for probabilistic wrong value generation */
   private readonly _chance;
   /** Create a new factory instance */
@@ -268,7 +268,7 @@ export class Factory<
    * });
    * ```
    */
-  public after(callback: (object: T, options: { [key: string]: any }) => T | void): Factory<T, R> {
+  public after(callback: (object: T, options: R) => T): Factory<T, R> {
     this._callbacks.push(callback);
     return this;
   }
@@ -330,7 +330,7 @@ export class Factory<
       }
     }
     for (const callback of this._callbacks) {
-      const obj = callback(returnableObject as T, resolvedOptions);
+      const obj = callback(returnableObject as T, resolvedOptions as R);
       if (obj !== undefined) {
         returnableObject = obj;
       }
@@ -368,16 +368,28 @@ export class Factory<
    * overwritten.
    * @param factory - Factory to extend this factory with
    */
-  public extend<P extends T, H extends R>(factory: Factory<T, R>): Factory<P, H> {
+  public extend<P extends T, H extends R>(factory: Factory<P, H>): Factory<T, R> {
     Object.assign(this._attrs, factory._attrs);
     Object.assign(this._opts, factory._opts);
-    this._callbacks.push(...factory._callbacks);
-    return this as unknown as Factory<P, H>;
+    this._callbacks.push(...factory._callbacks.map(this.wrapCallback));
+    return this;
   }
   /** Reset all the sequences of this factory */
   public reset(): void {
     this._seques = {};
   }
+  /**
+   * Wrap a callback function to add type safety and avoid lost of data of extended factories
+   * @param callback - Callback function
+   */
+  private wrapCallback = <P extends T, H extends R>(
+    callback: (object: P, options: H) => P
+  ): ((object: T, options: R) => T) => {
+    return (object: T, options: R) => {
+      const result = callback(object as P, options as H);
+      return merge(object, result) as T;
+    };
+  };
   /**
    * Create an object with standard Options from a key-value pairs object
    * @param options - object containing option key value pairs
