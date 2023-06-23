@@ -5,8 +5,8 @@
  * or at https://opensource.org/licenses/MIT.
  */
 
-import { Bottleneck } from '../Bottleneck';
-import { BottleneckError } from '../BottleneckError';
+import { Bottleneck } from '../bottleneck/Bottleneck';
+import { BottleneckError } from '../bottleneckError/BottleneckError';
 import { Events } from '../events/Events';
 import { load } from '../parser/Parser';
 import { States } from '../states/States';
@@ -174,7 +174,7 @@ export class Job {
 
   public async doExpire(
     clearGlobalState: () => boolean,
-    run: (...args: any[]) => Promise<any>,
+    run: (...args: any[]) => any,
     free: (jobOptions: JobOptionsComplete, eventInfo: JobEventInfo) => Promise<void>
   ): Promise<void> {
     if (this._states.jobStatus(this._options.id) === 'RUNNING') {

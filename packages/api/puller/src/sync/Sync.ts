@@ -1,10 +1,9 @@
 import { DLList } from '../dlList/DLList';
-import { RejectType, ResolveType, TaskItem } from './Sync.interfaces';
+import { TaskItem } from './Sync.interfaces';
 
 export class Sync {
-  private name: string;
+  private _name: string;
   private _running = 0;
-  // TODO: Check, error bc in original DLList is created without args
   private _queue = new DLList<TaskItem>(
     () => {
       return;
@@ -15,7 +14,7 @@ export class Sync {
   );
 
   constructor(name: string) {
-    this.name = name;
+    this._name = name;
   }
 
   public isEmpty(): boolean {
@@ -26,11 +25,13 @@ export class Sync {
     if (this._running < 1 && this._queue.length > 0) {
       this._running++;
       const taskItem: TaskItem | null = this._queue.shift();
-      const cb = async (): Promise<void> => {
+      const cb = async () => {
         try {
           const returned = await taskItem?.task(...taskItem?.args);
+          // return () => taskItem?.resolve?.(returned);
           taskItem?.resolve?.(returned);
         } catch (error) {
+          // return () => taskItem?.reject?.(error);
           taskItem?.reject?.(error);
         }
       };
@@ -42,9 +43,9 @@ export class Sync {
   }
 
   public schedule(task: (...args: any[]) => any, ...args: any[]): Promise<any> {
-    let resolve: ResolveType = null;
-    let reject: RejectType = null;
-    const promise = new Promise<any>((_resolve, _reject) => {
+    let resolve: ((value: any) => void) | null = null;
+    let reject: ((reason: any) => void) | null = null;
+    const promise = new Promise((_resolve, _reject) => {
       resolve = _resolve;
       reject = _reject;
     });
@@ -52,5 +53,11 @@ export class Sync {
     this._queue.push(taskItem);
     this._tryToRun();
     return promise;
+  }
+
+  // ------------------ GETTERS ------------------
+
+  public get name(): string {
+    return this._name;
   }
 }

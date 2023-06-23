@@ -5,7 +5,7 @@
  * or at https://opensource.org/licenses/MIT.
  */
 
-import { BottleneckError } from '../BottleneckError';
+import { BottleneckError } from '../bottleneckError/BottleneckError';
 
 export interface DropOptions {
   error?: Error | BottleneckError;

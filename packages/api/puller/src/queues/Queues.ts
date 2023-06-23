@@ -25,7 +25,7 @@ export class Queues {
 
     for (let i = 1; i <= num_priorities; i++) {
       this._lists.push(
-        new DLList(
+        new DLList<Job>(
           () => {
             return this.incr();
           },
@@ -76,9 +76,14 @@ export class Queues {
     return [];
   }
 
-  public shiftLastFrom(priority: number): Job | null | undefined {
+  public shiftLastFrom(priority: number): Job | null {
     const reversedListsFromPriority = this._lists.slice(priority).reverse();
-    return this.getFirst(reversedListsFromPriority).shift();
+    const shifted = this.getFirst(reversedListsFromPriority).shift();
+    if (shifted) {
+      return shifted;
+    } else {
+      return null;
+    }
   }
 
   // ------------------ GETTERS ------------------

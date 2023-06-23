@@ -2,7 +2,7 @@
  * In this file we implement the unit tests
  * for the Queues class in typescript using jest.
  */
-import { Bottleneck } from '../Bottleneck';
+import { Bottleneck } from '../bottleneck/Bottleneck';
 import { Events } from '../events/Events';
 import { Job } from '../job/Job';
 import { States } from '../states/States';

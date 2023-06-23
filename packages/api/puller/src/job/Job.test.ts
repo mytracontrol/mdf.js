@@ -13,13 +13,8 @@ import { JobEventInfo, JobOptions, JobOptionsComplete } from './Job.interfaces';
 
 describe('#Puller #Job', () => {
   class BottleneckMock extends Bottleneck {
-    _events: Events;
     constructor() {
       super();
-      this._events = new Events(this);
-    }
-    public get events(): Events {
-      return this._events;
     }
     override schedule(): Promise<void> {
       return Promise.resolve();
