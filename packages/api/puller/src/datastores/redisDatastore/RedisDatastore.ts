@@ -1,10 +1,10 @@
+/**
+ * Copyright 2022 Mytra Control S.L. All rights reserved.
+ *
+ * Use of this source code is governed by an MIT-style license that can be found in the LICENSE file
+ * or at https://opensource.org/licenses/MIT.
+ */
 import { Redis } from 'ioredis';
-import { Bottleneck } from '../../bottleneck/Bottleneck';
-import { BOTTLENECK_VERSION } from '../../bottleneck/Bottleneck.constants';
-import { BottleneckError } from '../../bottleneckError/BottleneckError';
-import { IORedisConnection } from '../../ioRedisConnection/IORedisConnection';
-import { IORedisClients } from '../../ioRedisConnection/IORedisConnection.interfaces';
-import { overwrite } from '../../parser/Parser';
 import {
   FreeResult,
   RedisStoreOptionsComplete,
@@ -12,30 +12,58 @@ import {
   StoreOptions,
   StoreOptionsComplete,
   SubmissionResult,
-} from '../DataStores.interfaces';
+} from '..';
+import { BOTTLENECK_VERSION, Bottleneck } from '../../bottleneck';
+import { BottleneckError } from '../../bottleneckError';
+import { IORedisClients, IORedisConnection } from '../../ioRedisConnection';
+import { overwrite } from '../../parser';
 
+/**
+ * Represents a Redis datastore for rate limiting using the Bottleneck library.
+ */
 export class RedisDatastore {
+  /** The instance of Bottleneck associated with the datastore */
   private _instance: Bottleneck;
+
+  // General store options
+  /** The complete store options for the datastore */
   private _storeOptions: StoreOptionsComplete;
 
   // Store instance options (Redis)
+  /** The timeout duration for the limiter in the datastore */
   private _timeout: number | null;
+  /** The interval for the heartbeat of the datastore in milliseconds */
   private _heartbeatInterval: number;
+  /** The timeout duration for a Redis client to be considered valid */
   private _clientTimeout: number;
+  /** The Redis client to use for the datastore */
   private _client: Redis | null;
+  /** Whether to clear the datastore when the limiter is closed */
   private _clearDatastore: boolean;
+  /** The connection to use for the datastore */
   private _connection: IORedisConnection | null;
 
+  /** The client ID associated with the datastore */
   private _clientId: string;
+  /** The ID of the instance of Bottleneck associated with the datastore */
   private _originalId: string;
+  /** The clients associated with the datastore (client and subscriber) */
   private _clients: IORedisClients | object;
+  /** The counters for the capacity priority of the datastore */
   private _capacityPriorityCounters: Record<string, NodeJS.Timeout>;
+  /** Whether the datastore is using a shared connection */
   private _sharedConnection: boolean;
+  /** A promise that resolves when the datastore is ready for use */
   private _ready: Promise<IORedisClients>;
+  /** The timer for the datastore heartbeat, to run Redis heartbeat script*/
   private _heartbeat: NodeJS.Timer | undefined;
 
-  // private clientOptions: any;
-
+  /**
+   * Creates a new instance of the RedisDatastore class.
+   * @param instance - The instance of Bottleneck associated with the datastore.
+   * @param storeOptions - The complete store options for the datastore.
+   * @param storeInstanceOptions - The specific options for the redis store instance.
+   */
   constructor(
     instance: Bottleneck,
     storeOptions: StoreOptionsComplete,
@@ -98,11 +126,22 @@ export class RedisDatastore {
       });
   }
 
+  /**
+   * Publishes a message to the Redis channel associated with the instance.
+   * @param message - The message to publish.
+   * @returns A promise that resolves with the number of subscribers that received the message.
+   */
   public async __publish__(message: any): Promise<number> {
     const clients = await this._ready;
     return clients.client.publish(this._instance.channel(), `message:${message.toString()}`);
   }
 
+  /**
+   * Handles incoming messages on the Redis channel.
+   * @param channel - The channel on which the message was received.
+   * @param message - The received message.
+   * @returns A Promise that resolves to the number of processed messages, or void.
+   */
   public async onMessage(channel: string, message: string): Promise<number | void> {
     try {
       const pos = message.indexOf(':');
@@ -145,6 +184,12 @@ export class RedisDatastore {
     }
   }
 
+  /**
+   * Disconnects from the Redis server.
+   * @param flush - Specifies whether to flush pending commands before disconnecting.
+   * @returns A Promise that resolves to void or an array of strings representing the replies
+   * from the server.
+   */
   public __disconnect__(flush: boolean): Promise<void | string[]> {
     clearInterval(this.heartbeat!);
     if (this._sharedConnection) {
@@ -154,6 +199,12 @@ export class RedisDatastore {
     }
   }
 
+  /**
+   * Runs a Redis script with the specified name and arguments.
+   * @param name - The name of the Redis script to run.
+   * @param args - The arguments to pass to the Redis script.
+   * @returns A Promise that resolves to the result of the Redis script execution.
+   */
   public async runScript(name: string, args: any[]): Promise<any> {
     if (!(name == 'init' || name == 'register_client')) {
       await this.ready;
@@ -193,6 +244,11 @@ export class RedisDatastore {
     });
   }
 
+  /**
+   * Prepares an array for use in Redis scripts.
+   * @param arr - The array to prepare.
+   * @returns The prepared array.
+   */
   private _prepareArray(arr: any[]): string[] {
     const results = arr.map(item => {
       return item != null ? item.toString() : '';
@@ -200,6 +256,11 @@ export class RedisDatastore {
     return results;
   }
 
+  /**
+   * Prepares an object for use in Redis scripts.
+   * @param obj - The object to prepare.
+   * @returns The prepared object as an array of key-value pairs.
+   */
   private _prepareObject(obj: any): string[] {
     const arr: string[] = [];
     for (const [key, value] of Object.entries(obj)) {
@@ -209,6 +270,11 @@ export class RedisDatastore {
     return arr;
   }
 
+  /**
+   * Prepares the initial settings for the Redis store (to be used in init script).
+   * @param clear - Indicates whether to clear the datastore.
+   * @returns An array of prepared settings.
+   */
   private _prepareInitSettings(clear: boolean): any[] {
     const initSettings = {
       id: this._originalId,
@@ -222,45 +288,94 @@ export class RedisDatastore {
     return args;
   }
 
+  /**
+   * Converts a value to a boolean.
+   * @param b - The value to convert.
+   * @returns The converted boolean value.
+   */
   private convertBool(b: any): boolean {
     return !!b;
   }
 
+  /**
+   * Updates the settings of the Redis store.
+   * @param options - The new store options.
+   * @returns A Promise that resolves when the settings are updated.
+   */
   public async __updateSettings__(options: StoreOptions): Promise<void> {
     await this.runScript('update_settings', this._prepareObject(options));
     overwrite(options, options, this._storeOptions);
   }
 
+  /**
+   * Retrieves the number of running jobs.
+   * @returns A Promise that resolves to the number of running jobs.
+   */
   public __running__(): Promise<any> {
     return this.runScript('running', []);
   }
 
+  /**
+   * Retrieves the number of queued jobs.
+   * @returns A Promise that resolves to the number of queued jobs.
+   */
   public __queued__(): Promise<any> {
     return this.runScript('queued', []);
   }
 
+  /**
+   * Retrieves the number of completed jobs.
+   * @returns A Promise that resolves to the number of completed jobs.
+   */
   public __done__(): Promise<any> {
     return this.runScript('done', []);
   }
 
+  /**
+   * Checks if the next request on group can be processed.
+   * @returns A promise that resolves with a boolean indicating if the next request
+   * can be processed.
+   */
   public async __groupCheck__(): Promise<boolean> {
     const result = await this.runScript('group_check', []);
     return this.convertBool(result);
   }
 
+  /**
+   * Increments the reservoir value.
+   * @param incr - The increment value.
+   * @returns A Promise that resolves to the updated reservoir value.
+   */
   public __incrementReservoir__(incr: any): Promise<any> {
     return this.runScript('increment_reservoir', [incr]);
   }
 
+  /**
+   * Retrieves the current reservoir value.
+   * @returns A Promise that resolves to the current reservoir value.
+   */
   public __currentReservoir__(): Promise<any> {
     return this.runScript('current_reservoir', []);
   }
 
+  /**
+   * Checks if a job with the specified weight can be executed.
+   * @param weight - The weight of the job.
+   * @returns A Promise that resolves to a boolean indicating whether the job can be executed.
+   */
   public async __check__(weight: any): Promise<any> {
     const result = await this.runScript('check', this._prepareArray([weight]));
     return this.convertBool(result);
   }
 
+  /**
+   * Registers a job with the specified index, weight, and expiration in the limiter.
+   * @param index - The index of the job.
+   * @param weight - The weight of the request.
+   * @param expiration - The expiration time of the job.
+   * @returns A promise that resolves with a RegistrationResult object indicating the status
+   * of the registration.
+   */
   public async __register__(
     index: string,
     weight: number,
@@ -279,6 +394,13 @@ export class RedisDatastore {
     return result;
   }
 
+  /**
+   * Submits a job to the limiter if it can be submitted.
+   * @param queueLength - The length of the queue in the limiter.
+   * @param weight - The weight of the job.
+   * @returns A promise that resolves with a SubmissionResult object indicating the status
+   * of the submission.
+   */
   public async __submit__(queueLength: number, weight: number): Promise<SubmissionResult> {
     try {
       const [reachedHWM, blocked, strategy] = await this.runScript(
@@ -303,24 +425,36 @@ export class RedisDatastore {
     }
   }
 
+  /**
+   * Frees resources associated with a completed job in the limiter.
+   * @param index - The index of the completed job.
+   * @param weight - The weight of the completed job.
+   * @returns A promise that resolves with a FreeResult object indicating the status
+   * of freeing the resources.
+   */
   public async __free__(index: string, weight: any): Promise<FreeResult> {
     const running = await this.runScript('free', this._prepareArray([index]));
     return { running };
   }
 
-  //-------------------- GETTERS --------------------
+  /*
+   * ---------------------------------------------------------------------------------------------
+   * GETTERS
+   * ---------------------------------------------------------------------------------------------
+   */
+  /** Gets a promise that resolves when the datastore is ready for use */
   public get ready(): Promise<IORedisClients> {
     return this._ready;
   }
-
+  /** Gets the clients associated with the datastore */
   public get clients(): IORedisClients | object {
     return this._clients;
   }
-
+  /** Gets the client ID associated with the datastore */
   public get clientId(): string {
     return this._clientId;
   }
-
+  /** Gets the timer for the datastore heartbeat, or undefined if the timer is not set */
   public get heartbeat(): NodeJS.Timer | undefined {
     return this._heartbeat;
   }

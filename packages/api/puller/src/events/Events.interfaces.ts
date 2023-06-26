@@ -5,13 +5,16 @@
  * or at https://opensource.org/licenses/MIT.
  */
 
+/** Events listener status */
 export type Status = 'none' | 'once' | 'many';
 
+/** Listener managed by Events class*/
 export interface Listener {
   cb: any;
   status: Status;
 }
 
+/** Events listeners mapped by event name*/
 export interface EventsListeners {
   [event: string]: Listener[];
 }

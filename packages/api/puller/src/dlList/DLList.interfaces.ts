@@ -5,6 +5,7 @@
  * or at https://opensource.org/licenses/MIT.
  */
 
+/** Representation of a node in the doubly linked list */
 export interface DLNode<T> {
   value: T;
   prev: DLNode<T> | null;

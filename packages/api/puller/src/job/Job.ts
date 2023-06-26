@@ -4,28 +4,49 @@
  * Use of this source code is governed by an MIT-style license that can be found in the LICENSE file
  * or at https://opensource.org/licenses/MIT.
  */
+import { DropOptions, JobEventInfo, JobOptions, JobOptionsComplete } from '.';
+import { Bottleneck, DEFAULT_PRIORITY, NUM_PRIORITIES } from '../bottleneck';
+import { BottleneckError } from '../bottleneckError';
+import { Events } from '../events';
+import { load } from '../parser';
+import { States } from '../states';
 
-import { Bottleneck } from '../bottleneck/Bottleneck';
-import { BottleneckError } from '../bottleneckError/BottleneckError';
-import { Events } from '../events/Events';
-import { load } from '../parser/Parser';
-import { States } from '../states/States';
-import { DEFAULT_PRIORITY, NUM_PRIORITIES } from './Job.constants';
-import { DropOptions, JobEventInfo, JobOptions, JobOptionsComplete } from './Job.interfaces';
-
+/**
+ * Represents a job in the Bottleneck job queue.
+ */
 export class Job {
+  /** The underlying task function to be executed */
   private _task: any;
+  /** The arguments to be passed to the task function */
   private _args: any;
+  /** Flag indicating whether to reject the job promise when it is dropped */
   private _rejectOnDrop: boolean;
+  /** The events object for triggering job events */
   private _events: Events;
+  /** The states object for managing job states */
   private _states: States;
+  /** The options for the job */
   private _options: JobOptionsComplete;
+  /** he number of times the job has been retried */
   private _retryCount: number;
 
+  /** The promise representing the completion of the job */
   public promise: any;
+  /** The resolve function for the job promise */
   public resolve: any;
+  /** The reject function for the job promise */
   public reject: any;
 
+  /**
+   * Creates a new instance of the Job class.
+   * @param task - The task function to be executed.
+   * @param args - The arguments to be passed to the task function.
+   * @param options - The options for the job.
+   * @param jobDefaults - The default options for the job.
+   * @param rejectOnDrop - Flag indicating whether to reject the job promise when it is dropped.
+   * @param events - The events object for triggering job events.
+   * @param states - The states object for managing job states.
+   */
   constructor(
     task: any,
     args: any,
@@ -55,6 +76,11 @@ export class Job {
     this._retryCount = 0;
   }
 
+  /**
+   * Sanitizes the priority value by ensuring it falls within the valid range.
+   * @param priority - The priority value to be sanitized.
+   * @returns The sanitized priority value.
+   */
   private _sanitizePriority(priority: number): number {
     const sProperty = ~~priority !== priority ? DEFAULT_PRIORITY : priority;
 
@@ -67,10 +93,19 @@ export class Job {
     }
   }
 
+  /**
+   * Generates a random index string.
+   * @returns The generated random index string.
+   */
   private _randomIndex(): string {
     return Math.random().toString(36).slice(2);
   }
 
+  /**
+   * Drops the job and triggers the 'dropped' event.
+   * @param options - The options for dropping the job.
+   * @returns True if the job was successfully dropped, false otherwise.
+   */
   public doDrop(options: DropOptions = {}): boolean {
     const message = options.message ?? 'This job has been dropped by Bottleneck';
     if (this._states.remove(this._options.id)) {
@@ -90,6 +125,10 @@ export class Job {
     }
   }
 
+  /**
+   * Asserts that the job has the expected status, throwing an error if not.
+   * @param expected - The expected status of the job.
+   */
   private _assertStatus(expected: string): void {
     const status = this._states.jobStatus(this._options.id);
 
@@ -101,6 +140,7 @@ export class Job {
     }
   }
 
+  /** Marks the job as received and triggers the 'received' event */
   public doReceive(): void {
     this._states.start(this._options.id);
     this._events.trigger('received', {
@@ -109,6 +149,11 @@ export class Job {
     });
   }
 
+  /**
+   * Queues the job and triggers the 'queued' event.
+   * @param reachedHWM - Flag indicating whether the the queue high-water mark was reached.
+   * @param blocked - Flag indicating whether the queue is blocked.
+   */
   public doQueue(reachedHWM: boolean, blocked: boolean): void {
     this._assertStatus('RECEIVED');
     this._states.next(this._options.id);
@@ -120,6 +165,7 @@ export class Job {
     });
   }
 
+  /** Runs the job and triggers the 'scheduled' event */
   public doRun(): void {
     if (this._retryCount === 0) {
       this._assertStatus('QUEUED');
@@ -134,6 +180,14 @@ export class Job {
     });
   }
 
+  /**
+   * Executes the job and handles the result or failure.
+   * @param chained - The chained Bottleneck instance, if any.
+   * @param clearGlobalState - A function to clear the global state.
+   * @param run - A function to run the job.
+   * @param free - A function to free resources after the job is done.
+   * @returns The result of the job execution.
+   */
   public async doExecute(
     chained: Bottleneck | null,
     clearGlobalState: () => boolean,
@@ -172,6 +226,13 @@ export class Job {
     }
   }
 
+  /**
+   * Handles job expiration and failure.
+   * @param clearGlobalState - A function to clear the global state.
+   * @param run - A function to run the job.
+   * @param free - A function to free resources after the job is done.
+   * @returns A promise representing the job expiration handling.
+   */
   public async doExpire(
     clearGlobalState: () => boolean,
     run: (...args: any[]) => any,
@@ -192,6 +253,15 @@ export class Job {
     return this._onFailure(error, eventInfo, clearGlobalState, run, free);
   }
 
+  /**
+   * Handles job failure.
+   * @param error - The error that caused the job failure.
+   * @param eventInfo - The event information for the failure event.
+   * @param clearGlobalState - A function to clear the global state.
+   * @param run - A function to run the job.
+   * @param free - A function to free resources after the job is done.
+   * @returns A promise representing the job failure handling.
+   */
   private async _onFailure(
     error: any,
     eventInfo: JobEventInfo,
@@ -228,17 +298,27 @@ export class Job {
     }
   }
 
+  /**
+   * Handles job completion and triggers the 'done' event.
+   * @param eventInfo - The event information for the completion event.
+   * @returns A promise representing the job completion handling.
+   */
   private doDone(eventInfo: any): Promise<void> {
     this._assertStatus('EXECUTING');
     this._states.next(this.options.id);
     return this._events.trigger('done', eventInfo);
   }
 
-  // ------------------ GETTERS ------------------
+  /*
+   * ---------------------------------------------------------------------------------------------
+   * GETTERS
+   * ---------------------------------------------------------------------------------------------
+   */
+  /**  Gets the options for the job */
   public get options(): JobOptionsComplete {
     return this._options;
   }
-
+  /** Gets the arguments for the job */
   public get args(): any[] {
     return this._args;
   }

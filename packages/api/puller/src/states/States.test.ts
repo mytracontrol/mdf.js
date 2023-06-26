@@ -5,7 +5,7 @@
  * or at https://opensource.org/licenses/MIT.
  */
 
-import { States } from './States';
+import { States } from '.';
 
 describe('#Puller #States', () => {
   const status = ['INIT', 'RUNNING', 'DONE'];

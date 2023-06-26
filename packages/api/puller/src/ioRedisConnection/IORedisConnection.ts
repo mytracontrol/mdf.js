@@ -1,30 +1,48 @@
+/**
+ * Copyright 2022 Mytra Control S.L. All rights reserved.
+ *
+ * Use of this source code is governed by an MIT-style license that can be found in the LICENSE file
+ * or at https://opensource.org/licenses/MIT.
+ */
 import { Redis } from 'ioredis';
-import { Bottleneck } from '../bottleneck/Bottleneck';
-import { RedisDatastore } from '../datastores/redisDatastore/RedisDatastore';
-import { Events } from '../events/Events';
-import { load } from '../parser/Parser';
-import { getTemplateKeys, getTemplatePayload, names } from '../scripts/Scripts';
-import { IO_REDIS_CONNECTION_DEFAULTS } from './IORedisConnection.constants';
 import {
   IORedisClients,
   IORedisConnectionOptions,
   IORedisConnectionOptionsComplete,
-} from './IORedisConnection.interfaces';
+  IO_REDIS_CONNECTION_DEFAULTS,
+} from '.';
+import { Bottleneck } from '../bottleneck';
+import { RedisDatastore } from '../datastores';
+import { Events } from '../events';
+import { load } from '../parser';
+import { getTemplateKeys, getTemplatePayload, names } from '../scripts';
 
+/**
+ * Represents a connection to a Redis server using the ioredis library.
+ */
 export class IORedisConnection {
+  /** The datastore associated with the connection */
   private _datastore = 'ioredis';
-
-  // IO Redis options
+  /** The complete options for the IORedisConnection instance */
   private _options: IORedisConnectionOptionsComplete;
+  /** The Redis client instance used for executing commands */
   private _client: Redis | null;
+  /** The events handler for the IORedisConnection instance */
   private _events: Events | null;
-
+  /** The Redis subscriber instance used for listening to messages */
   private _subscriber: Redis;
+  /** Indicates whether the connection has been terminated */
   private _terminated: boolean;
+  /** The limiters associated with the connection */
   private _limiters: Record<string, Bottleneck>;
+  /** A promise that resolves when the connection is ready for use */
   private _ready: Promise<IORedisClients>;
 
   // TODO: DONE: Now options is not optional bc Redis client must be passed
+  /**
+   * Creates a new instance of the IORedisConnection class.
+   * @param options - The options for the IORedisConnection.
+   */
   constructor(options: IORedisConnectionOptions) {
     this._options = load(
       options,
@@ -59,6 +77,12 @@ export class IORedisConnection {
     });
   }
 
+  /**
+   * Sets up the Redis client or subscriber instance with the necessary event listeners.
+   * @param client - The Redis client or subscriber instance.
+   * @param isSubscriber - Indicates whether the instance is a subscriber.
+   * @returns A promise that resolves when the instance is ready.
+   */
   private async _setup(client: Redis, isSubscriber: boolean): Promise<void> {
     client.setMaxListeners(0);
     return new Promise((resolve, reject) => {
@@ -79,12 +103,20 @@ export class IORedisConnection {
     });
   }
 
+  /**
+   * Loads the Lua scripts associated with the IORedisConnection instance.
+   */
   private _loadScripts(): void {
     names.forEach((name: string) => {
       (this._client as Redis).defineCommand(name, { lua: getTemplatePayload(name) });
     });
   }
 
+  /**
+   * Executes a Redis command through the connection.
+   * @param cmd - The Redis command to execute.
+   * @returns A promise that resolves with the result of the command.
+   */
   public async __runCommand__(cmd: unknown[]): Promise<any> {
     await this._ready;
     console.log('it is ready');
@@ -93,13 +125,17 @@ export class IORedisConnection {
 
     // TODO: Check
     const commandRes = await (this._client as Redis).pipeline([cmd]).exec();
-    console.log('commandRes', commandRes);
     if (commandRes == null) {
       return null;
     }
     return commandRes[0][1];
   }
 
+  /**
+   * Adds a limiter instance to the connection for rate limiting.
+   * @param instance - The Bottleneck instance to add as a limiter.
+   * @returns An array of promises that resolve when the limiter is added.
+   */
   public async __addLimiter__(instance: Bottleneck): Promise<void[]> {
     const channels = [instance.channel(), instance.channel_client()];
     const promises = channels.map((chanel: string) => {
@@ -114,6 +150,11 @@ export class IORedisConnection {
     return Promise.all(promises);
   }
 
+  /**
+   * Removes a limiter instance from the connection.
+   * @param instance - The Bottleneck instance to remove as a limiter.
+   * @returns A promise that resolves when the limiter is removed.
+   */
   public async __removeLimiter__(instance: Bottleneck): Promise<void> {
     const channels = [instance.channel(), instance.channel_client()];
     channels.forEach(async channel => {
@@ -124,18 +165,37 @@ export class IORedisConnection {
     });
   }
 
+  /**
+   * Formats the arguments for a Lua script execution.
+   * @param name - The name of the Lua script.
+   * @param id - The identifier of the limiter.
+   * @param args - The arguments for the script.
+   * @param cb - The callback function to execute within the script.
+   * @returns An array of formatted script arguments.
+   */
   public __scriptArgs__(name: string, id: string, args: any[], cb: any): any[] {
     const keys = getTemplateKeys(name, id);
     const scriptArgs = [keys.length, ...keys, ...args, cb];
     return scriptArgs;
   }
 
+  /**
+   * Retrieves a bound function for executing a Redis command by name.
+   * @param name - The name of the Redis command.
+   * @returns The bound function for executing the Redis command.
+   */
   public __scriptFn__(name: string): any {
     // TODO: Check
     return (this._client as any)[name].bind(this._client);
   }
 
-  disconnect(flush = true): Promise<string[] | void> {
+  /**
+   * Disconnects from the Redis server.
+   * @param flush - Indicates whether to flush pending commands before
+   * disconnecting (default: true).
+   * @returns A promise that resolves when the disconnection is complete.
+   */
+  public disconnect(flush = true): Promise<string[] | void> {
     Object.values(this._limiters).forEach(limiter => {
       clearInterval(limiter.store.heartbeat);
     });
@@ -151,11 +211,16 @@ export class IORedisConnection {
     }
   }
 
-  // ------------------ GETTERS ------------------
+  /*
+   * ---------------------------------------------------------------------------------------------
+   * GETTERS
+   * ---------------------------------------------------------------------------------------------
+   */
+  /** Gets a promise that resolves when the connection is ready for use */
   public get ready(): Promise<IORedisClients> {
     return this._ready;
   }
-
+  /** Gets the datastore associated with the connection */
   public get datastore(): string {
     return this._datastore;
   }

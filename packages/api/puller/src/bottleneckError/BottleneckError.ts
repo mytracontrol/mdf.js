@@ -5,5 +5,6 @@
  * or at https://opensource.org/licenses/MIT.
  */
 
+/** Class BottleneckError, represents errors in Bottleneck module */
 export class BottleneckError extends Error {}
 export default BottleneckError;

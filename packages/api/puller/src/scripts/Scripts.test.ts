@@ -1,9 +1,10 @@
 /**
- * In this file we implement the unit tests
- * for the Scripts file in typescript using jest.
+ * Copyright 2022 Mytra Control S.L. All rights reserved.
+ *
+ * Use of this source code is governed by an MIT-style license that can be found in the LICENSE file
+ * or at https://opensource.org/licenses/MIT.
  */
-
-import { getAllKeys, getTemplateKeys, getTemplatePayload } from './Scripts';
+import { getAllKeys, getTemplateKeys, getTemplatePayload } from '.';
 import lua from './lua.json';
 describe('#Puller #Scripts', () => {
   afterEach(() => {

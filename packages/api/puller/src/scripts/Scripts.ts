@@ -4,10 +4,10 @@
  * Use of this source code is governed by an MIT-style license that can be found in the LICENSE file
  * or at https://opensource.org/licenses/MIT.
  */
-
+import { Headers, Template } from '.';
 import lua from './lua.json';
-import { Headers, Template } from './Scripts.interfaces';
 
+/** The headers object containing Lua scripts */
 export const headers: Headers = {
   refs: lua['refs.lua'],
   validate_keys: lua['validate_keys.lua'],
@@ -18,6 +18,11 @@ export const headers: Headers = {
   get_time: lua['get_time.lua'],
 };
 
+/**
+ * Retrieves all the keys associated with a specific limiter ID.
+ * @param id - The ID of the limiter.
+ * @returns An array of keys associated with the limiter.
+ */
 export const getAllKeys = function (id: string): string[] {
   return [
     /*
@@ -62,6 +67,7 @@ export const getAllKeys = function (id: string): string[] {
   ];
 };
 
+/** The templates object containing Lua script templates */
 export const templates: Record<string, Template> = {
   init: {
     keys: getAllKeys,
@@ -155,12 +161,24 @@ export const templates: Record<string, Template> = {
   },
 };
 
+/** The names of all available templates */
 export const names = Object.keys(templates);
 
+/**
+ * Retrieves the keys associated with a specific template and limiter ID.
+ * @param name - The name of the template.
+ * @param id - The ID of the limiter.
+ * @returns An array of keys associated with the template and limiter.
+ */
 export const getTemplateKeys = function (name: string, id: string): string[] {
   return templates[name].keys(id);
 };
 
+/**
+ * Retrieves the payload of a specific template.
+ * @param name - The name of the template.
+ * @returns The payload of the template.
+ */
 export const getTemplatePayload = function (name: string): string {
   const template = templates[name];
   return [

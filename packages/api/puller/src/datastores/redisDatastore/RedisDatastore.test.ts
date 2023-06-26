@@ -1,14 +1,20 @@
 /**
- * In this file we implement the unit tests
- * for the RedisDatastore class in typescript using jest.
+ * Copyright 2022 Mytra Control S.L. All rights reserved.
+ *
+ * Use of this source code is governed by an MIT-style license that can be found in the LICENSE file
+ * or at https://opensource.org/licenses/MIT.
  */
 import { Redis } from 'ioredis';
-import { Bottleneck } from '../../bottleneck/Bottleneck';
-import { BottleneckError } from '../../bottleneckError/BottleneckError';
-import { IORedisConnection } from '../../ioRedisConnection/IORedisConnection';
-import { REDIS_STORE_DEFAULTS, STORE_DEFAULTS } from '../DataStores.constants';
-import { RedisStoreOptionsComplete, StoreOptionsComplete } from '../DataStores.interfaces';
-import { RedisDatastore } from './RedisDatastore';
+import {
+  REDIS_STORE_DEFAULTS,
+  RedisDatastore,
+  RedisStoreOptionsComplete,
+  STORE_DEFAULTS,
+  StoreOptionsComplete,
+} from '..';
+import { Bottleneck } from '../../bottleneck';
+import { BottleneckError } from '../../bottleneckError';
+import { IORedisConnection } from '../../ioRedisConnection';
 
 describe('#Puller #RedisDatastore', () => {
   let ioRedisClient: Redis;

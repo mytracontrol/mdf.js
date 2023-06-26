@@ -5,6 +5,7 @@
  * or at https://opensource.org/licenses/MIT.
  */
 
+/** Template interface */
 export interface Template {
   keys: (id: string) => string[];
   headers: string[];
@@ -12,6 +13,7 @@ export interface Template {
   code: string;
 }
 
+/** Available Template headers */
 export interface Headers {
   refs: string;
   validate_keys: string;

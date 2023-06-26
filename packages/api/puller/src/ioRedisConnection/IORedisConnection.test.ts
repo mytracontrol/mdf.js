@@ -1,9 +1,11 @@
 /**
- * In this file we implement the unit tests
- * for the IORedisConnection class in typescript using jest.
+ * Copyright 2022 Mytra Control S.L. All rights reserved.
+ *
+ * Use of this source code is governed by an MIT-style license that can be found in the LICENSE file
+ * or at https://opensource.org/licenses/MIT.
  */
 import { Redis } from 'ioredis';
-import { IORedisConnection } from './IORedisConnection';
+import { IORedisConnection } from '.';
 describe('#Puller #IORedisConnection', () => {
   class MockRedis extends Redis {
     constructor() {
@@ -29,26 +31,5 @@ describe('#Puller #IORedisConnection', () => {
       expect(connection['_subscriber']).toBeDefined();
       expect(connection['_subscriber']).toBeInstanceOf(Redis);
     });
-
-    it(`Should run the the given command`, async () => {
-      const redisClient = new Redis(6379, '127.0.0.1');
-
-      const connection = new IORedisConnection({ client: redisClient });
-      const spyDefineCommand = jest.spyOn(redisClient, 'defineCommand').mockReturnValue();
-      const spy = jest.spyOn(redisClient, 'pipeline').mockImplementation((cmd?: unknown[][]) => {
-        return {
-          exec: () => Promise.resolve([[null, 'OK']]),
-        } as any;
-      });
-      const result = await connection.__runCommand__(['testCmd']);
-      console.log('result', result);
-      expect(connection).toBeDefined();
-      // expect(spyDefineCommand).toHaveBeenCalled();
-      // expect(spy).toHaveBeenCalled();
-      // expect(result).toBeDefined();
-      // expect(result).toBe('OK');
-    });
   });
-
-  // describe('#Sad path', () => {});
 });

@@ -4,15 +4,32 @@
  * Use of this source code is governed by an MIT-style license that can be found in the LICENSE file
  * or at https://opensource.org/licenses/MIT.
  */
+import { DLNode } from '.';
 
-import { DLNode } from './DLList.interfaces';
-
+/**
+ * Represents a doubly linked list.
+ * @remarks
+ * This class provides functionality to push, shift, and iterate over
+ * values in a doubly linked list.
+ * @typeparam T - The type of elements stored in the list.
+ */
 export class DLList<T> {
+  /** The function to increment the list counter. */
   private incr: () => void;
+  /** The function to decrement the list counter. */
   private decr: () => void;
+  /** The first node of the list */
   private _first: DLNode<T> | null;
+  /** The last node of the list */
   private _last: DLNode<T> | null;
+  /** The number of elements in the list */
   private _length: number;
+
+  /**
+   * Creates a new instance of the DLList class that represents a doubly linked list.
+   * @param incr - The function to increment the list counter.
+   * @param decr - The function to decrement the list counter.
+   */
   constructor(incr: () => void, decr: () => void) {
     this.incr = incr;
     this.decr = decr;
@@ -20,6 +37,11 @@ export class DLList<T> {
     this._last = null;
     this._length = 0;
   }
+
+  /**
+   * Adds a value to the end of the list.
+   * @param value - The value to add to the list.
+   */
   public push(value: T): void {
     this._length++;
 
@@ -38,6 +60,11 @@ export class DLList<T> {
       this._first = this._last = node;
     }
   }
+
+  /**
+   * Removes and returns the first value from the list.
+   * @returns The first value in the list, or null if the list is empty.
+   */
   public shift(): T | null {
     if (this._first == null) {
       return null;
@@ -61,6 +88,10 @@ export class DLList<T> {
     }
   }
 
+  /**
+   * Returns the first value in the list without removing it.
+   * @returns The first value in the list, or null if the list is empty.
+   */
   public first(): T | null {
     if (this._first != null) {
       return this._first.value;
@@ -68,6 +99,10 @@ export class DLList<T> {
     return null;
   }
 
+  /**
+   * Returns an array containing all the values in the list.
+   * @returns An array of values in the list.
+   */
   public getArray(): T[] {
     let node: DLNode<T> | null = this._first;
     const results: T[] = [];
@@ -78,6 +113,10 @@ export class DLList<T> {
     return results;
   }
 
+  /**
+   * Iterates over each value in the list, removing and invoking a callback function for each value.
+   * @param cb - The callback function to invoke for each value.
+   */
   public forEachShift(cb: (value: T) => void): void {
     let nodeValue: T | null = this.shift();
     while (nodeValue != null) {
@@ -86,6 +125,11 @@ export class DLList<T> {
     }
   }
 
+  /**
+   * Returns a debug representation of the list.
+   * @returns An array of objects containing the value, previous value, and next value for each
+   * node in the list.
+   */
   public debug(): { value: T; prev: T | null; next: T | null }[] {
     let node: DLNode<T> | null = this._first;
     const results: { value: T; prev: T | null; next: T | null }[] = [];
@@ -100,7 +144,12 @@ export class DLList<T> {
     return results;
   }
 
-  // -------------- GETTERS --------------------
+  /*
+   * ---------------------------------------------------------------------------------------------
+   * GETTERS
+   * ---------------------------------------------------------------------------------------------
+   */
+  /** Return the length of the list */
   public get length(): number {
     return this._length;
   }

@@ -1,8 +1,14 @@
+/**
+ * Copyright 2022 Mytra Control S.L. All rights reserved.
+ *
+ * Use of this source code is governed by an MIT-style license that can be found in the LICENSE file
+ * or at https://opensource.org/licenses/MIT.
+ */
 import { Redis } from 'ioredis';
-import { Bottleneck } from '../bottleneck/Bottleneck';
-import { LocalDatastore } from '../datastores/localDatastore/LocalDatastore';
-import { IORedisConnection } from '../ioRedisConnection/IORedisConnection';
-import { Group } from './Group';
+import { Group } from '.';
+import { Bottleneck } from '../bottleneck';
+import { LocalDatastore } from '../datastores';
+import { IORedisConnection } from '../ioRedisConnection';
 
 /**
  * In this file we implement the unit tests

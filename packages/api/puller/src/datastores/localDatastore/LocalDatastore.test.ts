@@ -1,13 +1,12 @@
 /**
- * In this file we implement the unit tests
- * for the LocalDatastore class in typescript using jest.
+ * Copyright 2022 Mytra Control S.L. All rights reserved.
+ *
+ * Use of this source code is governed by an MIT-style license that can be found in the LICENSE file
+ * or at https://opensource.org/licenses/MIT.
  */
-
-import { Bottleneck } from '../../bottleneck/Bottleneck';
-import { STRATEGY } from '../../bottleneck/Bottleneck.constants';
-import { BottleneckError } from '../../bottleneckError/BottleneckError';
-import { LOCAL_STORE_DEFAULTS, STORE_DEFAULTS } from '../DataStores.constants';
-import { LocalDatastore } from './LocalDatastore';
+import { LOCAL_STORE_DEFAULTS, LocalDatastore, STORE_DEFAULTS } from '..';
+import { Bottleneck, STRATEGY } from '../../bottleneck';
+import { BottleneckError } from '../../bottleneckError';
 
 describe('#Puller #LocalDatastore', () => {
   const storeOptions = STORE_DEFAULTS;

@@ -1,16 +1,32 @@
-import { InstanceOptions, StopOptions } from './Bottleneck.interfaces';
+/**
+ * Copyright 2022 Mytra Control S.L. All rights reserved.
+ *
+ * Use of this source code is governed by an MIT-style license that can be found in the LICENSE file
+ * or at https://opensource.org/licenses/MIT.
+ */
+import { InstanceOptions, StopOptions } from '.';
 
+/** Default version of the bottleneck library */
 export const BOTTLENECK_VERSION = '2.19.5';
 
+/* Default number of priorities */
 export const NUM_PRIORITIES = 10;
+
+/* Default priority for jobs*/
 export const DEFAULT_PRIORITY = 5;
+
+/* Default states names for jobs */
 export const STATES_NAMES = ['RECEIVED', 'QUEUED', 'RUNNING', 'EXECUTING'];
+
+/** Strategies to execute when high-water mark is reached */
 export const enum STRATEGY {
   LEAK = 1,
   OVERFLOW = 2,
   BLOCK = 3,
   OVERFLOW_PRIORITY = 4,
 }
+
+/** Default values for the Bottleneck Instance options */
 export const INSTANCE_DEFAULTS: InstanceOptions = {
   datastore: 'local',
   connection: null,
@@ -19,6 +35,7 @@ export const INSTANCE_DEFAULTS: InstanceOptions = {
   trackDoneStatus: false,
 };
 
+/** Default values for the Bottleneck Stop options */
 export const STOP_DEFAULTS: StopOptions = {
   enqueueErrorMessage: 'This limiter has been stopped and cannot accept new jobs.',
   dropWaitingJobs: true,

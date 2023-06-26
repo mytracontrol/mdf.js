@@ -1,12 +1,14 @@
 /**
- * In this file we implement the unit tests
- * for the Queues class in typescript using jest.
+ * Copyright 2022 Mytra Control S.L. All rights reserved.
+ *
+ * Use of this source code is governed by an MIT-style license that can be found in the LICENSE file
+ * or at https://opensource.org/licenses/MIT.
  */
-import { Bottleneck } from '../bottleneck/Bottleneck';
-import { Events } from '../events/Events';
+import { Queues } from '.';
+import { Bottleneck } from '../bottleneck';
+import { Events } from '../events';
 import { Job } from '../job/Job';
-import { States } from '../states/States';
-import { Queues } from './Queues';
+import { States } from '../states';
 
 describe('#Puller #Queues', () => {
   const jobDefaults = {
@@ -147,12 +149,12 @@ describe('#Puller #Queues', () => {
       expect(result).toEqual(job1);
     });
 
-    it(`Should return undefined when all lists from the priority given onwards are empty`, () => {
+    it(`Should return null when all lists from the priority given onwards are empty`, () => {
       const queues = new Queues(5); // priorities from 0 to 4
       queues.push(job1);
       queues.push(job2);
       const result = queues.shiftLastFrom(2);
-      expect(result).toBeUndefined();
+      expect(result).toBeNull();
     });
   });
 });

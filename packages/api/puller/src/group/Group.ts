@@ -1,14 +1,23 @@
-import { Bottleneck } from '../bottleneck/Bottleneck';
-import { BottleneckOptions } from '../bottleneck/Bottleneck.interfaces';
-import { Events } from '../events/Events';
-import { IORedisConnection } from '../ioRedisConnection/IORedisConnection';
-import { IO_REDIS_CONNECTION_DEFAULTS } from '../ioRedisConnection/IORedisConnection.constants';
-import { IORedisConnectionOptions } from '../ioRedisConnection/IORedisConnection.interfaces';
-import { load, overwrite } from '../parser/Parser';
-import { getAllKeys } from '../scripts/Scripts';
-import { GROUP_DEFAULTS } from './Group.constants';
-import { GroupOptions, GroupOptionsComplete, Limiter } from './Group.interfaces';
+/**
+ * Copyright 2022 Mytra Control S.L. All rights reserved.
+ *
+ * Use of this source code is governed by an MIT-style license that can be found in the LICENSE file
+ * or at https://opensource.org/licenses/MIT.
+ */
+import { GROUP_DEFAULTS, GroupOptions, GroupOptionsComplete, Limiter } from '.';
+import { Bottleneck, BottleneckOptions } from '../bottleneck';
+import { Events } from '../events';
+import {
+  IORedisConnection,
+  IORedisConnectionOptions,
+  IO_REDIS_CONNECTION_DEFAULTS,
+} from '../ioRedisConnection';
+import { load, overwrite } from '../parser';
+import { getAllKeys } from '../scripts';
 
+/**
+ * Represents a group of limiters, i.e. Bottleneck instances.
+ */
 export class Group {
   private _limiterOptions: BottleneckOptions;
   private _instances: Record<string, Bottleneck> = {};
@@ -26,6 +35,10 @@ export class Group {
   public once: any;
   public removeAllListeners: any;
 
+  /**
+   * Creates a new Group instance.
+   * @param limiterOptions - The options to configure the underlying Bottleneck instances.
+   */
   constructor(limiterOptions: BottleneckOptions = {}) {
     this._limiterOptions = limiterOptions;
     const loadedOptions = load(this._limiterOptions, GROUP_DEFAULTS) as GroupOptionsComplete;
@@ -52,6 +65,12 @@ export class Group {
   // TODO:
   // - It does not check if the key is already in use
   // - It works also for key is ''
+  /**
+   * Retrieves a Bottleneck instance associated with the specified key.
+   *
+   * @param key - The key to retrieve the Bottleneck instance for.
+   * @returns The Bottleneck instance associated with the key.
+   */
   public key(key = ''): Bottleneck {
     if (!this._instances[key]) {
       const groupOptions: GroupOptions = {
@@ -66,6 +85,12 @@ export class Group {
     return this._instances[key];
   }
 
+  /**
+   * Deletes the Bottleneck instance associated with the specified key.
+   * @param key - The key to delete the Bottleneck instance for.
+   * @returns  A promise that resolves to `true` if the Bottleneck instance
+   * was deleted, or `false` otherwise.
+   */
   public async deleteKey(key = ''): Promise<boolean> {
     let deleted = 0;
     const instance = this._instances[key];
@@ -79,14 +104,27 @@ export class Group {
     return instance != null || deleted > 0;
   }
 
+  /**
+   * Retrieves an array of Limiter objects representing the key-limiter pairs in the group.
+   * @returns An array of Limiter objects.
+   */
   public limiters(): Limiter[] {
     return Object.keys(this._instances).map(key => ({ key, limiter: this._instances[key] }));
   }
 
+  /**
+   * Retrieves an array of keys associated with the Bottleneck instances in the group.
+   * @returns An array of keys.
+   */
   public keys(): string[] {
     return Object.keys(this._instances);
   }
 
+  /**
+   * Retrieves an array of keys associated with the Bottleneck instances in the group
+   *  using cluster mode.
+   * @returns A promise that resolves to an array of keys.
+   */
   public async clusterKeys(): Promise<string[]> {
     if (this._connection == null) {
       return Promise.resolve(this.keys());
@@ -112,6 +150,10 @@ export class Group {
     return keys;
   }
 
+  /**
+   * Starts the automatic cleanup process for the Group instance.
+   * @returns A timer reference or `void`.
+   */
   private _startAutoCleanup(): NodeJS.Timeout | void {
     clearInterval(this._interval);
     this._interval = setInterval(async () => {
@@ -133,6 +175,11 @@ export class Group {
     }
   }
 
+  /**
+   * Updates the settings of the Group instance.
+   * @param options- The options to update the Group settings.
+   * @returns A timer reference or `void`.
+   */
   public updateSettings(options: BottleneckOptions = {}): NodeJS.Timeout | void {
     const newOptions = overwrite(options, GROUP_DEFAULTS);
     this._timeout = newOptions['timeout'] || this._timeout;
@@ -145,6 +192,11 @@ export class Group {
   }
 
   // TODO: Return always a promise, not undefined when connection is null (local datastore)
+  /**
+   * Disconnects the Group instance from the Redis server.
+   * @param lush - Whether to flush the Redis database upon disconnection
+   * @returns A promise that resolves when the disconnection is complete.
+   */
   public disconnect(flush = true): Promise<any> {
     if (!this._sharedConnection && this._connection) {
       return this._connection.disconnect(flush);
