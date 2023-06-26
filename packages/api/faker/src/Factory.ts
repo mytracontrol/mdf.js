@@ -368,7 +368,7 @@ export class Factory<
    * overwritten.
    * @param factory - Factory to extend this factory with
    */
-  public extend<P extends T, H extends R>(factory: Factory<P, H>): Factory<T, R> {
+  public extend<P extends Partial<T>, J extends Partial<R>>(factory: Factory<P, J>): Factory<T, R> {
     Object.assign(this._attrs, factory._attrs);
     Object.assign(this._opts, factory._opts);
     this._callbacks.push(...factory._callbacks.map(this.wrapCallback));
@@ -382,11 +382,11 @@ export class Factory<
    * Wrap a callback function to add type safety and avoid lost of data of extended factories
    * @param callback - Callback function
    */
-  private wrapCallback = <P extends T, H extends R>(
-    callback: (object: P, options: H) => P
+  private wrapCallback = <P extends Partial<T>, J extends Partial<R>>(
+    callback: (object: P, options: J) => P
   ): ((object: T, options: R) => T) => {
     return (object: T, options: R) => {
-      const result = callback(object as P, options as H);
+      const result = callback(object as unknown as P, options as unknown as J);
       return merge(object, result) as T;
     };
   };
