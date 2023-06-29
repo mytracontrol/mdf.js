@@ -134,7 +134,7 @@ export class Group {
     const start = `b_${this._id}-`.length;
     const end = '_settings'.length;
     while (cursor !== 0) {
-      const [next, found] = await this._connection.__runCommand__([
+      const [next, found]: any[] = await this._connection.__runCommand__([
         'scan',
         cursor || 0,
         'match',
