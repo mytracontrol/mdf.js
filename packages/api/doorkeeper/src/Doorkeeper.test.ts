@@ -315,10 +315,10 @@ describe('#DoorKeeper #package', () => {
         }
         const trace = (error as Multi).trace();
         expect(trace).toEqual([
-          "ValidationError: must have required property 'id'",
-          "ValidationError: must have required property 'processId'",
-          "ValidationError: must have required property 'release'",
-          "ValidationError: must have required property 'version'",
+          "ValidationError: must have required property 'id' - Value: [{}]",
+          "ValidationError: must have required property 'processId' - Value: [{}]",
+          "ValidationError: must have required property 'release' - Value: [{}]",
+          "ValidationError: must have required property 'version' - Value: [{}]",
         ]);
         expect(result).toEqual({});
         done();
@@ -337,10 +337,10 @@ describe('#DoorKeeper #package', () => {
         }
         const trace = (error as Multi).trace();
         expect(trace).toEqual([
-          "ValidationError: must have required property 'id'",
-          "ValidationError: must have required property 'processId'",
-          "ValidationError: must have required property 'release'",
-          "ValidationError: must have required property 'version'",
+          "ValidationError: must have required property 'id' - Value: [{}]",
+          "ValidationError: must have required property 'processId' - Value: [{}]",
+          "ValidationError: must have required property 'release' - Value: [{}]",
+          "ValidationError: must have required property 'version' - Value: [{}]",
         ]);
         expect(result).toEqual({});
         done();
@@ -525,11 +525,11 @@ describe('#DoorKeeper #package', () => {
         }
         const trace = (error as Multi).trace();
         expect(trace).toEqual([
-          "ValidationError: must have required property 'id'",
-          "ValidationError: must have required property 'processId'",
-          "ValidationError: must have required property 'release'",
-          "ValidationError: must have required property 'version'",
-          'ValidationError: must NOT have additional properties - Property: [numHosts]',
+          'ValidationError: must have required property \'id\' - Value: [{"numHosts":"badProperty"}]',
+          'ValidationError: must have required property \'processId\' - Value: [{"numHosts":"badProperty"}]',
+          'ValidationError: must have required property \'release\' - Value: [{"numHosts":"badProperty"}]',
+          'ValidationError: must have required property \'version\' - Value: [{"numHosts":"badProperty"}]',
+          'ValidationError: must NOT have additional properties - Property: [numHosts] - Value: [{"numHosts":"badProperty"}]',
         ]);
       }
     });

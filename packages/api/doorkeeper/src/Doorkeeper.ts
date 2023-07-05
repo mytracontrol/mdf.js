@@ -34,6 +34,7 @@ type ValidatedOutput<T, K> = K extends keyof T ? T[K] : any;
 
 /** AJV options but all errors must be true */
 export type DoorkeeperOptions = Options;
+export { JSONSchemaType } from 'ajv';
 
 /** Callback function for the validation process */
 export type ResultCallback<T, K> = (error?: Crash | Multi, result?: ValidatedOutput<T, K>) => void;
@@ -139,22 +140,25 @@ export class DoorKeeper<T = void> {
         error.params.additionalProperties || error.params.additionalProperty
       }]`;
     }
+    let value;
     if (error.instancePath) {
       message += ` - Path: [${error.instancePath}]`;
-      const value = get(data, error.instancePath);
-      switch (typeof value) {
-        case 'undefined':
-          message += ` - no value`;
-          break;
-        case 'symbol':
-          message += ` - Value: [${value.toString()}]`;
-          break;
-        case 'object':
-          message += ` - Value: [${JSON.stringify(value)}]`;
-          break;
-        default:
-          message += ` - Value: [${value}]`;
-      }
+      value = get(data, error.instancePath);
+    } else {
+      value = data;
+    }
+    switch (typeof value) {
+      case 'undefined':
+        message += ` - no value`;
+        break;
+      case 'symbol':
+        message += ` - Value: [${value.toString()}]`;
+        break;
+      case 'object':
+        message += ` - Value: [${JSON.stringify(value)}]`;
+        break;
+      default:
+        message += ` - Value: [${value}]`;
     }
     return message;
   }

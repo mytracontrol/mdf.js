@@ -7,6 +7,7 @@
 
 import { v4 } from 'uuid';
 import { Crash } from '../Crash/CrashError';
+import { CONFIG_MAX_ERROR_MESSAGE_LENGTH } from '../const';
 import { Multi } from './MultiError';
 const uuidTest = v4();
 const causes: Array<Crash | Error> = [];
@@ -159,9 +160,9 @@ describe('In #Multi class the ', () => {
       };
       expect(test).toThrowError('Message parameter must be a string');
     });
-    it('Should truncate the message if message is to large (>240)', () => {
-      const error = new Crash('o'.padEnd(241, 'o'), uuidTest);
-      expect(error.message.length).toEqual(240);
+    it(`Should truncate the message if message is to large (>${CONFIG_MAX_ERROR_MESSAGE_LENGTH})`, () => {
+      const error = new Crash('o'.padEnd(CONFIG_MAX_ERROR_MESSAGE_LENGTH + 1, 'o'), uuidTest);
+      expect(error.message.length).toEqual(CONFIG_MAX_ERROR_MESSAGE_LENGTH);
       expect(error.message).toContain('...too long error');
     });
     it('Should throw a Crash error if name!=string', () => {
