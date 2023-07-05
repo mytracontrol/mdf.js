@@ -382,7 +382,7 @@ export class Factory<
    * Wrap a callback function to add type safety and avoid lost of data of extended factories
    * @param callback - Callback function
    */
-  private wrapCallback = <P extends Partial<T>, J extends Partial<R>>(
+  private readonly wrapCallback = <P extends Partial<T>, J extends Partial<R>>(
     callback: (object: P, options: J) => P
   ): ((object: T, options: R) => T) => {
     return (object: T, options: R) => {
