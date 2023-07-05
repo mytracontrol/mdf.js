@@ -7,7 +7,7 @@
 
 import { HTTPCode } from '../types';
 
-export const CONFIG_MAX_ERROR_MESSAGE_LENGTH = 240;
+export const CONFIG_MAX_ERROR_MESSAGE_LENGTH = 800;
 export const HTTP_CODES = new Map([
   [HTTPCode.CONTINUE, 'Continue'],
   [HTTPCode.SWITCHING_PROTOCOLS, 'Switching Protocols'],

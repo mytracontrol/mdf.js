@@ -9,14 +9,32 @@ import AJV, { AnySchema, ErrorObject, Options, SchemaObject } from 'ajv';
 import AJVError from 'ajv-errors';
 import AJVFormats from 'ajv-formats';
 import AJVKeyWords from 'ajv-keywords';
+import { AnyValidateFunction } from 'ajv/dist/core';
 import { get } from 'jsonpointer';
+import { cloneDeep, forOwn, omit } from 'lodash';
 import { v4 } from 'uuid';
+
+const DEFAULT_SNIPPET_META_SCHEMA = {
+  title: 'Default snippets',
+  type: 'array',
+  items: {
+    title: 'VSCode snippet',
+    type: 'object',
+    properties: {
+      label: { type: 'string' },
+      description: { type: 'string' },
+      body: {},
+    },
+    required: ['label', 'body'],
+  },
+};
 
 type SchemaSelector<T> = T extends void ? string : keyof T & string;
 type ValidatedOutput<T, K> = K extends keyof T ? T[K] : any;
 
 /** AJV options but all errors must be true */
 export type DoorkeeperOptions = Options;
+export { JSONSchemaType } from 'ajv';
 
 /** Callback function for the validation process */
 export type ResultCallback<T, K> = (error?: Crash | Multi, result?: ValidatedOutput<T, K>) => void;
@@ -33,8 +51,12 @@ export class DoorKeeper<T = void> {
   constructor(public readonly options?: DoorkeeperOptions) {
     this.options = options ? { ...options, allErrors: true } : { allErrors: true };
     this.ajv = AJVFormats(AJVKeyWords(AJVError(new AJV(this.options))));
-    this.ajv.addKeyword({ keyword: 'markdownDescription' });
-    this.ajv.addKeyword({ keyword: 'defaultSnippets' });
+    this.ajv.addKeyword({ keyword: 'markdownDescription', schemaType: 'string', valid: true });
+    this.ajv.addKeyword({
+      keyword: 'defaultSnippets',
+      metaSchema: DEFAULT_SNIPPET_META_SCHEMA,
+      valid: true,
+    });
   }
   /**
    * Add a new schema to the ajv collection
@@ -91,6 +113,9 @@ export class DoorKeeper<T = void> {
           info: { data, schema },
         });
     for (const error of errors) {
+      if ('emUsed' in error && error.emUsed) {
+        continue;
+      }
       const message = this.errorFormatter(error, data);
       validationError.push(new Crash(message, uuid, { name: 'ValidationError', info: error }));
       if (error.params && error.params['errors']) {
@@ -115,48 +140,64 @@ export class DoorKeeper<T = void> {
         error.params.additionalProperties || error.params.additionalProperty
       }]`;
     }
+    let value;
     if (error.instancePath) {
       message += ` - Path: [${error.instancePath}]`;
-      const value = get(data, error.instancePath);
-      switch (typeof value) {
-        case 'undefined':
-          message += ` - no value`;
-          break;
-        case 'symbol':
-          message += ` - Value: [${value.toString()}]`;
-          break;
-        case 'object':
-          message += ` - Value: [${JSON.stringify(value)}]`;
-          break;
-        default:
-          message += ` - Value: [${value}]`;
-      }
+      value = get(data, error.instancePath);
+    } else {
+      value = data;
+    }
+    switch (typeof value) {
+      case 'undefined':
+        message += ` - no value`;
+        break;
+      case 'symbol':
+        message += ` - Value: [${value.toString()}]`;
+        break;
+      case 'object':
+        message += ` - Value: [${JSON.stringify(value)}]`;
+        break;
+      default:
+        message += ` - Value: [${value}]`;
     }
     return message;
   }
   /**
-   *
+   * Get a schema from the ajv collection
+   * @param schema - schema to be retrieved
+   * @param uuid - uuid string
+   * @returns the schema validator
+   * @throws Crash if the schema is not registered
+   */
+  private getSchema<K extends SchemaSelector<T>>(
+    schema: K,
+    uuid: string
+  ): AnyValidateFunction<unknown> {
+    const validator = this.ajv.getSchema(schema);
+    if (validator === undefined) {
+      throw new Crash(`${schema} is not registered in the collection.`, uuid, {
+        name: 'ValidationError',
+        info: { schema },
+      });
+    }
+    return validator;
+  }
+  /**
+   * Validates a JSON against a schema
    * @param schema - The schema we want to validate
    * @param data - Object to be validated
    * @param uuid - unique identifier for this operation
    */
   private checkSchema<K extends SchemaSelector<T>>(schema: K, data: any, uuid = v4()): void {
-    const validator = this.ajv.getSchema(schema);
-    if (validator === undefined) {
-      throw new Crash(`${schema} is not registered in the collection.`, uuid, {
-        name: 'ValidationError',
-        info: { schema, data },
-      });
-    } else {
-      if (!validator(data)) {
-        if (validator.errors) {
-          throw this.multify(validator.errors, schema, uuid, data);
-        } else {
-          throw new Crash(`Unexpected error in JSON schema validation process`, uuid, {
-            name: 'ValidationError',
-            info: { schema, data },
-          });
-        }
+    const validator = this.getSchema(schema, uuid);
+    if (!validator(data)) {
+      if (validator.errors) {
+        throw this.multify(validator.errors, schema, uuid, data);
+      } else {
+        throw new Crash(`Unexpected error in JSON schema validation process`, uuid, {
+          name: 'ValidationError',
+          info: { schema, data },
+        });
       }
     }
   }
@@ -323,5 +364,39 @@ export class DoorKeeper<T = void> {
     } catch (error) {
       return false;
     }
+  }
+  /**
+   * Return a dereferenced schema with all the $ref resolved
+   * @param schema - The schema we want to dereference
+   * @param uuid - unique identifier for this operation
+   * @returns A dereferenced schema with all the $ref resolved
+   * @experimental This method is experimental and might change in the future without notice or be
+   * removed from a future release. Use it at your own risk.
+   */
+  public dereference<K extends SchemaSelector<T>>(schema: K, uuid = v4()): AnySchema {
+    const validatorSchema = this.getSchema(schema, uuid);
+    if (typeof validatorSchema.schema === 'boolean') {
+      throw new Crash('Invalid schema, no schema will be dereferenced', uuid, {
+        name: 'ValidationError',
+        info: { schema },
+      });
+    }
+    const _schema = cloneDeep(validatorSchema.schema);
+    const iterator = (
+      entry: Record<string, any>,
+      key: string,
+      parentSchema: Record<string, any>
+    ) => {
+      if (entry['$ref']) {
+        const refSchema = this.getSchema(entry['$ref'], uuid);
+        parentSchema[key] = forOwn(
+          omit(cloneDeep(refSchema.schema) as object, ['$id', '$schema']),
+          iterator
+        );
+      } else if (typeof entry === 'object') {
+        parentSchema[key] = forOwn(entry, iterator);
+      }
+    };
+    return forOwn(_schema, iterator);
   }
 }

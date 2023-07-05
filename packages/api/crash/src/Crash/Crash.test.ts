@@ -8,6 +8,7 @@
 // #region Arrange
 import { v4 as uuidV4, v4 } from 'uuid';
 import { Multi } from '../Multi';
+import { CONFIG_MAX_ERROR_MESSAGE_LENGTH } from '../const';
 import { Crash } from './CrashError';
 const uuidTest = uuidV4();
 const query = { query: 'fake' };
@@ -214,9 +215,9 @@ describe('#Crash error', () => {
       expect(errorTest.cause?.message).toEqual('Cause');
       expect(errorTest.info).toEqual(objectTest);
     });
-    it('Should truncate the message if message is to large (>240)', () => {
-      const error = new Crash('o'.padEnd(241, 'o'), uuidTest);
-      expect(error.message.length).toEqual(240);
+    it(`Should truncate the message if message is to large (>${CONFIG_MAX_ERROR_MESSAGE_LENGTH})`, () => {
+      const error = new Crash('o'.padEnd(CONFIG_MAX_ERROR_MESSAGE_LENGTH + 1, 'o'), uuidTest);
+      expect(error.message.length).toEqual(CONFIG_MAX_ERROR_MESSAGE_LENGTH);
       expect(error.message).toContain('...too long error');
     });
     it('isCrash method should return true', () => {

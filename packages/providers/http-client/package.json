@@ -37,7 +37,7 @@
     "axios": "^1.4.0",
     "debug": "^4.3.4",
     "joi": "^17.9.2",
-    "tslib": "^2.5.2"
+    "tslib": "^2.6.0"
   },
   "devDependencies": {
     "@mdf.js/repo-config": "*",

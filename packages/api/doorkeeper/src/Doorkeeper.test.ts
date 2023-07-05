@@ -56,12 +56,77 @@ const schema4 = {
   type: 'number',
   errorMessage: 'Schema 4 must be a number',
 };
+const schemaDeep = {
+  $schema: 'http://json-schema.org/draft-07/schema',
+  $id: 'schemaDeep.schema.json',
+  title: 'Schema Deep',
+  description: 'Schema Deep',
+  type: 'object',
+  properties: {
+    schema3: { $ref: 'schema3.schema.json#' },
+    schema4: { $ref: 'schema4.schema.json#' },
+  },
+  required: ['schema3', 'schema4'],
+  additionalProperties: false,
+};
+const schema5 = {
+  $schema: 'http://json-schema.org/draft-07/schema',
+  $id: 'schema5.schema.json',
+  title: 'Schema 5',
+  description: 'Schema 5',
+  type: 'object',
+  properties: {
+    schema1: { $ref: 'schema1.schema.json#' },
+    schema2: { $ref: 'schema2.schema.json#' },
+    schemaDeep: { $ref: 'schemaDeep.schema.json#' },
+  },
+  required: ['schema1', 'schema2', 'schemaDeep'],
+  additionalProperties: false,
+};
+
+const schema6 = {
+  $schema: 'http://json-schema.org/draft-07/schema',
+  $id: 'schema6.schema.json',
+  title: 'Schema ',
+  description: 'Schema 6',
+  markdownDescription: 'Schema 6',
+  defaultSnippets: [
+    {
+      label: 'Schema 6',
+      description: 'Schema 6',
+      body: {
+        schema1: 1,
+        schema2: 2,
+        schema3: 3,
+        schema4: 4,
+        schema5: {
+          schema1: 1,
+          schema2: 2,
+          schemaDeep: {
+            schema3: 3,
+            schema4: 4,
+          },
+        },
+      },
+    },
+  ],
+  type: 'object',
+  properties: {
+    schema1: { $ref: 'schema1.schema.json#' },
+    schema2: { $ref: 'schema2.schema.json#' },
+    schema3: { $ref: 'schema3.schema.json#' },
+    schema4: { $ref: 'schema4.schema.json#' },
+    schema5: { $ref: 'schema5.schema.json#' },
+  },
+  required: ['schema1', 'schema2', 'schema3', 'schema4', 'schema5'],
+  additionalProperties: false,
+};
 
 const schemas = {
   Schema1: schema1,
   Schema2: schema2,
 };
-const schemasArray = [schema3, schema4];
+const schemasArray = [schema3, schema4, schemaDeep];
 
 const artifact = {
   id: 'myArtifact',
@@ -85,6 +150,101 @@ const artifactSchema = {
   additionalProperties: false,
 };
 dk.register('Config.Artifact', artifactSchema);
+const result = {
+  $schema: 'http://json-schema.org/draft-07/schema',
+  $id: 'schema6.schema.json',
+  title: 'Schema ',
+  description: 'Schema 6',
+  markdownDescription: 'Schema 6',
+  defaultSnippets: [
+    {
+      label: 'Schema 6',
+      description: 'Schema 6',
+      body: {
+        schema1: 1,
+        schema2: 2,
+        schema3: 3,
+        schema4: 4,
+        schema5: {
+          schema1: 1,
+          schema2: 2,
+          schemaDeep: { schema3: 3, schema4: 4 },
+        },
+      },
+    },
+  ],
+  type: 'object',
+  properties: {
+    schema1: {
+      title: 'Schema 1',
+      description: 'Schema 1',
+      type: 'number',
+      errorMessage: 'Schema 1 must be a number',
+    },
+    schema2: {
+      title: 'Schema 2',
+      description: 'Schema 2',
+      type: 'number',
+      errorMessage: 'Schema 2 must be a number',
+    },
+    schema3: {
+      title: 'Schema 3',
+      description: 'Schema 3',
+      type: 'number',
+      errorMessage: 'Schema 3 must be a number',
+    },
+    schema4: {
+      title: 'Schema 4',
+      description: 'Schema 4',
+      type: 'number',
+      errorMessage: 'Schema 4 must be a number',
+    },
+    schema5: {
+      title: 'Schema 5',
+      description: 'Schema 5',
+      type: 'object',
+      properties: {
+        schema1: {
+          title: 'Schema 1',
+          description: 'Schema 1',
+          type: 'number',
+          errorMessage: 'Schema 1 must be a number',
+        },
+        schema2: {
+          title: 'Schema 2',
+          description: 'Schema 2',
+          type: 'number',
+          errorMessage: 'Schema 2 must be a number',
+        },
+        schemaDeep: {
+          title: 'Schema Deep',
+          description: 'Schema Deep',
+          type: 'object',
+          properties: {
+            schema3: {
+              title: 'Schema 3',
+              description: 'Schema 3',
+              type: 'number',
+              errorMessage: 'Schema 3 must be a number',
+            },
+            schema4: {
+              title: 'Schema 4',
+              description: 'Schema 4',
+              type: 'number',
+              errorMessage: 'Schema 4 must be a number',
+            },
+          },
+          required: ['schema3', 'schema4'],
+          additionalProperties: false,
+        },
+      },
+      required: ['schema1', 'schema2', 'schemaDeep'],
+      additionalProperties: false,
+    },
+  },
+  required: ['schema1', 'schema2', 'schema3', 'schema4', 'schema5'],
+  additionalProperties: false,
+};
 // #endregion
 // *************************************************************************************************
 // #region Test Schemas
@@ -112,10 +272,15 @@ describe('#DoorKeeper #package', () => {
         dk.register(schemasArray);
         dk.register(schemas);
         dk.register('other', entity);
+        dk.register('Schema5', schema5);
+        dk.register('Schema6', schema6);
         expect(dk.isSchemaRegistered('other')).toBeTruthy();
         expect(dk.isSchemaRegistered('Config.Artifact')).toBeTruthy();
         expect(dk.isSchemaRegistered('Schema1')).toBeTruthy();
         expect(dk.isSchemaRegistered('Schema2')).toBeTruthy();
+        expect(dk.isSchemaRegistered('schema3.schema.json#')).toBeTruthy();
+        expect(dk.isSchemaRegistered('schema4.schema.json#')).toBeTruthy();
+        expect(dk.dereference('Schema6')).toEqual(result);
       };
       expect(test).not.toThrow();
     });
@@ -150,10 +315,10 @@ describe('#DoorKeeper #package', () => {
         }
         const trace = (error as Multi).trace();
         expect(trace).toEqual([
-          "ValidationError: must have required property 'id'",
-          "ValidationError: must have required property 'processId'",
-          "ValidationError: must have required property 'release'",
-          "ValidationError: must have required property 'version'",
+          "ValidationError: must have required property 'id' - Value: [{}]",
+          "ValidationError: must have required property 'processId' - Value: [{}]",
+          "ValidationError: must have required property 'release' - Value: [{}]",
+          "ValidationError: must have required property 'version' - Value: [{}]",
         ]);
         expect(result).toEqual({});
         done();
@@ -172,10 +337,10 @@ describe('#DoorKeeper #package', () => {
         }
         const trace = (error as Multi).trace();
         expect(trace).toEqual([
-          "ValidationError: must have required property 'id'",
-          "ValidationError: must have required property 'processId'",
-          "ValidationError: must have required property 'release'",
-          "ValidationError: must have required property 'version'",
+          "ValidationError: must have required property 'id' - Value: [{}]",
+          "ValidationError: must have required property 'processId' - Value: [{}]",
+          "ValidationError: must have required property 'release' - Value: [{}]",
+          "ValidationError: must have required property 'version' - Value: [{}]",
         ]);
         expect(result).toEqual({});
         done();
@@ -267,7 +432,6 @@ describe('#DoorKeeper #package', () => {
         );
         expect((error as Crash).name).toEqual('ValidationError');
         expect((error as Crash).info).toHaveProperty('schema');
-        expect((error as Crash).info).toHaveProperty('data');
       }
     });
     it(`Should call the callback with a Crash error when we try to validate a schema that is not in the scope`, done => {
@@ -278,7 +442,6 @@ describe('#DoorKeeper #package', () => {
         );
         expect((error as Crash).name).toEqual('ValidationError');
         expect((error as Crash).info).toHaveProperty('schema');
-        expect((error as Crash).info).toHaveProperty('data');
         done();
       };
       const myDK = new DoorKeeper();
@@ -343,7 +506,6 @@ describe('#DoorKeeper #package', () => {
         );
         expect((error as Crash).name).toEqual('ValidationError');
         expect((error as Crash).info).toHaveProperty('schema');
-        expect((error as Crash).info).toHaveProperty('data');
         done();
       }
     });
@@ -363,11 +525,11 @@ describe('#DoorKeeper #package', () => {
         }
         const trace = (error as Multi).trace();
         expect(trace).toEqual([
-          "ValidationError: must have required property 'id'",
-          "ValidationError: must have required property 'processId'",
-          "ValidationError: must have required property 'release'",
-          "ValidationError: must have required property 'version'",
-          'ValidationError: must NOT have additional properties - Property: [numHosts]',
+          'ValidationError: must have required property \'id\' - Value: [{"numHosts":"badProperty"}]',
+          'ValidationError: must have required property \'processId\' - Value: [{"numHosts":"badProperty"}]',
+          'ValidationError: must have required property \'release\' - Value: [{"numHosts":"badProperty"}]',
+          'ValidationError: must have required property \'version\' - Value: [{"numHosts":"badProperty"}]',
+          'ValidationError: must NOT have additional properties - Property: [numHosts] - Value: [{"numHosts":"badProperty"}]',
         ]);
       }
     });

@@ -36,7 +36,7 @@
     "@mdf.js/metrics-registry": "*",
     "@mdf.js/utils": "*",
     "lodash": "^4.17.21",
-    "tslib": "^2.5.2",
+    "tslib": "^2.6.0",
     "uuid": "^9.0.0"
   },
   "devDependencies": {
