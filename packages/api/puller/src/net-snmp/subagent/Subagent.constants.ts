@@ -1,0 +1,8 @@
+export const DEFAULT_SUBAGENT_MASTER = 'localhost';
+export const DEFAULT_SUBAGENT_PORT = 705;
+export const DEFAULT_SUBAGENT_TIMEOUT = 0;
+export const DEFAULT_SUBAGENT_DESCRIPTION = 'Node net-snmp AgentX sub-agent';
+export const DEFAULT_SUBAGENT_SESSION_ID = 0;
+export const DEFAULT_SUBAGENT_TRANSACTION_ID = 0;
+
+export const DEFAULT_SUBAGENT_REGISTER_PROVIDER_AGENTXPDU_TIMEOUT = 5;
