@@ -34,8 +34,8 @@
     "@mdf.js/crash": "*",
     "@mdf.js/logger": "*",
     "@mdf.js/utils": "*",
-    "joi": "^17.9.2",
-    "socket.io-client": "^4.7.1",
+    "joi": "^17.12.0",
+    "socket.io-client": "^4.7.4",
     "tslib": "^2.6.0"
   },
   "devDependencies": {

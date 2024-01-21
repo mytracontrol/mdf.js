@@ -1,5 +1,5 @@
 /**
- * Copyright 2022 Mytra Control S.L. All rights reserved.
+ * Copyright 2024 Mytra Control S.L. All rights reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be found in the LICENSE file
  * or at https://opensource.org/licenses/MIT.
@@ -19,7 +19,7 @@ export class Port extends Layer.Provider.Port<Client, Config> {
   /** Event wrapping flags */
   private isWrapped: boolean;
   /** Time interval for status check */
-  private timeInterval: NodeJS.Timer | null;
+  private timeInterval: NodeJS.Timeout | null;
   /** Is the first check */
   private isFirstCheck: boolean;
   /** Redis healthy state */

@@ -1,5 +1,5 @@
 /**
- * Copyright 2022 Mytra Control S.L. All rights reserved.
+ * Copyright 2024 Mytra Control S.L. All rights reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be found in the LICENSE file
  * or at https://opensource.org/licenses/MIT.
@@ -21,7 +21,10 @@ export class HealthWrapper extends EventEmitter implements Health.Component {
    * @param name - Component name used as node identifier for OpenC2
    * @param components - Health components to be monitored
    */
-  constructor(public readonly name: string, private readonly components: Health.Component[]) {
+  constructor(
+    public readonly name: string,
+    private readonly components: Health.Component[]
+  ) {
     super();
     for (const component of this.components) {
       component.on('status', this.emitStatus);

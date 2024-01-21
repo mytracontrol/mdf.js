@@ -1,5 +1,5 @@
 /**
- * Copyright 2022 Mytra Control S.L. All rights reserved.
+ * Copyright 2024 Mytra Control S.L. All rights reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be found in the LICENSE file
  * or at https://opensource.org/licenses/MIT.
@@ -50,7 +50,7 @@ export const envBasedConfig: Config = {
   requestTimeout: CONFIG_ELASTIC_REQUEST_TIMEOUT,
   pingTimeout: CONFIG_ELASTIC_PING_TIMEOUT,
   resurrectStrategy: CONFIG_ELASTIC_RESURRECT_STRATEGY,
-  ssl: {
+  tls: {
     ca: CONFIG_ELASTIC_CA,
     cert: CONFIG_ELASTIC_CLIENT_CERT,
     key: CONFIG_ELASTIC_CLIENT_KEY,

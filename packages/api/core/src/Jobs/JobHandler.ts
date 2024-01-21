@@ -1,5 +1,5 @@
 /**
- * Copyright 2022 Mytra Control S.L. All rights reserved.
+ * Copyright 2024 Mytra Control S.L. All rights reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be found in the LICENSE file
  * or at https://opensource.org/licenses/MIT.
@@ -22,7 +22,7 @@ export declare interface JobHandler<Type, Data> {
 export class JobHandler<
     Type extends string = string,
     Data = any,
-    CustomHeaders extends Record<string, any> = Record<string, any>
+    CustomHeaders extends Record<string, any> = Record<string, any>,
   >
   extends EventEmitter
   implements JobObject<Type, Data, CustomHeaders>

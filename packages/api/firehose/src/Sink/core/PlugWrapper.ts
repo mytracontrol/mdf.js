@@ -1,5 +1,5 @@
 /**
- * Copyright 2022 Mytra Control S.L. All rights reserved.
+ * Copyright 2024 Mytra Control S.L. All rights reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be found in the LICENSE file
  * or at https://opensource.org/licenses/MIT.
@@ -7,7 +7,7 @@
 
 import { Health, Jobs } from '@mdf.js/core';
 import { Crash, Multi } from '@mdf.js/crash';
-import { retryBind, RetryOptions } from '@mdf.js/utils';
+import { RetryOptions, retryBind } from '@mdf.js/utils';
 import EventEmitter from 'events';
 import { merge } from 'lodash';
 import { WrappableSinkPlug } from '../../types';
@@ -15,7 +15,7 @@ import { WrappableSinkPlug } from '../../types';
 export class PlugWrapper<
     Type extends string = string,
     Data = any,
-    CustomHeaders extends Record<string, any> = Record<string, any>
+    CustomHeaders extends Record<string, any> = Record<string, any>,
   >
   extends EventEmitter
   implements Health.Component

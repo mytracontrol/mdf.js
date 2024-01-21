@@ -1,5 +1,5 @@
 /**
- * Copyright 2022 Mytra Control S.L. All rights reserved.
+ * Copyright 2024 Mytra Control S.L. All rights reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be found in the LICENSE file
  * or at https://opensource.org/licenses/MIT.
@@ -20,7 +20,7 @@ import { FirehoseOptions, Sinks, Sources } from './types';
 export declare interface Firehose<
   Type extends string = string,
   Data = any,
-  CustomHeaders extends Record<string, any> = Record<string, any>
+  CustomHeaders extends Record<string, any> = Record<string, any>,
 > {
   /** Due to the implementation of consumer classes, this event will never emitted */
   on(event: 'error', listener: (error: Error | Crash) => void): this;
@@ -35,7 +35,7 @@ export declare interface Firehose<
 export class Firehose<
     Type extends string = string,
     Data = any,
-    CustomHeaders extends Record<string, any> = Record<string, any>
+    CustomHeaders extends Record<string, any> = Record<string, any>,
   >
   extends EventEmitter
   implements Health.Component

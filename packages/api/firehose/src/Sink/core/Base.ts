@@ -1,5 +1,5 @@
 /**
- * Copyright 2022 Mytra Control S.L. All rights reserved.
+ * Copyright 2024 Mytra Control S.L. All rights reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be found in the LICENSE file
  * or at https://opensource.org/licenses/MIT.
@@ -19,7 +19,7 @@ export declare interface Base<
   T extends Plugs.Sink.Any<Type, Data, CustomHeaders>,
   Type extends string = string,
   Data = any,
-  CustomHeaders extends Record<string, any> = Record<string, any>
+  CustomHeaders extends Record<string, any> = Record<string, any>,
 > {
   /** Emitted when the stream have been closed */
   on(event: 'close', listener: () => void): this;
@@ -56,7 +56,7 @@ export abstract class Base<
     T extends Plugs.Sink.Any<Type, Data, CustomHeaders>,
     Type extends string = string,
     Data = any,
-    CustomHeaders extends Record<string, any> = Record<string, any>
+    CustomHeaders extends Record<string, any> = Record<string, any>,
   >
   extends Writable
   implements Health.Component
@@ -74,7 +74,10 @@ export abstract class Base<
    * @param plug - sink plug instance
    * @param options - sink options
    */
-  constructor(protected readonly plug: T, options?: SinkOptions) {
+  constructor(
+    protected readonly plug: T,
+    options?: SinkOptions
+  ) {
     super(merge(DEFAULT_WRITABLE_OPTIONS, options?.writableOptions));
     // Stryker disable next-line all
     this.logger = SetContext(

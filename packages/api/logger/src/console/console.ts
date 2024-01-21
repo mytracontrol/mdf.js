@@ -1,5 +1,5 @@
 /**
- * Copyright 2022 Mytra Control S.L. All rights reserved.
+ * Copyright 2024 Mytra Control S.L. All rights reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be found in the LICENSE file
  * or at https://opensource.org/licenses/MIT.
@@ -8,7 +8,7 @@ import Debug, { Debugger } from 'debug';
 import Joi from 'joi';
 import { transports } from 'winston';
 import { stringFormat } from '../formats';
-import { LogLevel, LOG_LEVELS } from '../types';
+import { LOG_LEVELS, LogLevel } from '../types';
 const { Console } = transports;
 
 const DEFAULT_ENABLED_STATE = false;

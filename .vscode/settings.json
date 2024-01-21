@@ -5,8 +5,8 @@
   },
   "files.eol": "\r\n",
   "editor.codeActionsOnSave": {
-    "source.organizeImports": true,
-    "source.fixAll.eslint": true
+    "source.organizeImports": "explicit",
+    "source.fixAll.eslint": "explicit"
   },
   "eslint.validate": [
     "typescript",
@@ -62,7 +62,8 @@
     "ci",
     "doorkeeper",
     "faker",
-    "kafka-provider"
+    "kafka-provider",
+    "mqtt-provider"
   ],
 
 }

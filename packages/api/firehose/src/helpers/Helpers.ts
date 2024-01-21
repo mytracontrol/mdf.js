@@ -1,5 +1,5 @@
 /**
- * Copyright 2022 Mytra Control S.L. All rights reserved.
+ * Copyright 2024 Mytra Control S.L. All rights reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be found in the LICENSE file
  * or at https://opensource.org/licenses/MIT.
@@ -26,7 +26,7 @@ export class Helpers {
   public static IsFlowSource<
     Type extends string = string,
     Data = any,
-    CustomHeaders extends Record<string, any> = Record<string, any>
+    CustomHeaders extends Record<string, any> = Record<string, any>,
   >(
     source: WrappableSourcePlug<Type, Data, CustomHeaders>
   ): source is Plugs.Source.Flow<Type, Data, CustomHeaders> {
@@ -45,7 +45,7 @@ export class Helpers {
   public static IsSequenceSource<
     Type extends string = string,
     Data = any,
-    CustomHeaders extends Record<string, any> = Record<string, any>
+    CustomHeaders extends Record<string, any> = Record<string, any>,
   >(
     source: WrappableSourcePlug<Type, Data, CustomHeaders>
   ): source is Plugs.Source.Sequence<Type, Data, CustomHeaders> {
@@ -59,7 +59,7 @@ export class Helpers {
   public static IsCreditsFlowSource<
     Type extends string = string,
     Data = any,
-    CustomHeaders extends Record<string, any> = Record<string, any>
+    CustomHeaders extends Record<string, any> = Record<string, any>,
   >(
     source: WrappableSourcePlug<Type, Data, CustomHeaders>
   ): source is Plugs.Source.CreditsFlow<Type, Data, CustomHeaders> {
@@ -73,7 +73,7 @@ export class Helpers {
   public static IsTapSink<
     Type extends string = string,
     Data = any,
-    CustomHeaders extends Record<string, any> = Record<string, any>
+    CustomHeaders extends Record<string, any> = Record<string, any>,
   >(
     sink: WrappableSinkPlug<Type, Data, CustomHeaders>
   ): sink is Plugs.Sink.Tap<Type, Data, CustomHeaders> {
@@ -87,7 +87,7 @@ export class Helpers {
   public static IsJetSink<
     Type extends string = string,
     Data = any,
-    CustomHeaders extends Record<string, any> = Record<string, any>
+    CustomHeaders extends Record<string, any> = Record<string, any>,
   >(
     sink: WrappableSinkPlug<Type, Data, CustomHeaders>
   ): sink is Plugs.Sink.Jet<Type, Data, CustomHeaders> {
@@ -103,7 +103,7 @@ export class Helpers {
   public static GetSourceStreamsFromPlugs<
     Type extends string = string,
     Data = any,
-    CustomHeaders extends Record<string, any> = Record<string, any>
+    CustomHeaders extends Record<string, any> = Record<string, any>,
   >(
     sources: Plugs.Source.Any<Type, Data, CustomHeaders>[],
     options: FirehoseOptions<Type, Data, CustomHeaders>,
@@ -155,7 +155,7 @@ export class Helpers {
   public static GetSinkStreamsFromPlugs<
     Type extends string = string,
     Data = any,
-    CustomHeaders extends Record<string, any> = Record<string, any>
+    CustomHeaders extends Record<string, any> = Record<string, any>,
   >(
     sinks: Plugs.Sink.Any<Type, Data, CustomHeaders>[],
     options: FirehoseOptions<Type, Data, CustomHeaders>

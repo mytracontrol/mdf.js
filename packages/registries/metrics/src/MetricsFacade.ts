@@ -1,5 +1,5 @@
 /**
- * Copyright 2022 Mytra Control S.L. All rights reserved.
+ * Copyright 2024 Mytra Control S.L. All rights reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be found in the LICENSE file
  * or at https://opensource.org/licenses/MIT.
@@ -79,7 +79,7 @@ export class MetricsFacade extends EventEmitter implements Layer.Service.Registr
    */
   public setMetrics<
     T extends Record<string, Metric> | void = void,
-    K extends Record<string, MetricConfig> = Record<string, MetricConfig>
+    K extends Record<string, MetricConfig> = Record<string, MetricConfig>,
   >(metrics: K): MetricInstancesObject<T, K> {
     return this.aggregator.setMetrics(metrics);
   }

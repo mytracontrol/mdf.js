@@ -1,5 +1,5 @@
 /**
- * Copyright 2022 Mytra Control S.L. All rights reserved.
+ * Copyright 2024 Mytra Control S.L. All rights reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be found in the LICENSE file
  * or at https://opensource.org/licenses/MIT.
@@ -71,7 +71,10 @@ export abstract class Client extends EventEmitter {
    * @param options - Kafka client configuration options
    * @param interval - Period of health check interval
    */
-  constructor(options: KafkaConfig, private readonly interval = DEFAULT_CHECK_INTERVAL) {
+  constructor(
+    options: KafkaConfig,
+    private readonly interval = DEFAULT_CHECK_INTERVAL
+  ) {
     super();
     this.logger = SetContext(new DebugLogger('mdf:client:kafka'), 'kafka', this.componentId);
     // Stryker disable next-line all

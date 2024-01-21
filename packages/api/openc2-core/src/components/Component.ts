@@ -1,5 +1,5 @@
 /**
- * Copyright 2022 Mytra Control S.L. All rights reserved.
+ * Copyright 2024 Mytra Control S.L. All rights reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be found in the LICENSE file
  * or at https://opensource.org/licenses/MIT.
@@ -42,7 +42,10 @@ export abstract class Component<T extends ComponentAdapter, K extends ComponentO
    * @param adapter - transport adapter
    * @param options - configuration options
    */
-  constructor(protected readonly adapter: T, protected options: K) {
+  constructor(
+    protected readonly adapter: T,
+    protected options: K
+  ) {
     super();
     this.logger = SetContext(
       this.options.logger ?? new DebugLogger(`mdf:oc2:component:${this.name}`),

@@ -1,5 +1,5 @@
 /**
- * Copyright 2022 Mytra Control S.L. All rights reserved.
+ * Copyright 2024 Mytra Control S.L. All rights reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be found in the LICENSE file
  * or at https://opensource.org/licenses/MIT.
@@ -7,7 +7,7 @@
 import { LoggerInstance } from '@mdf.js/logger';
 import { Sender } from '../Client';
 import { BasePort } from '../Common';
-import { AwaitableSender as RheaSender, Config } from './types';
+import { Config, AwaitableSender as RheaSender } from './types';
 
 export class Port extends BasePort<RheaSender> {
   /**

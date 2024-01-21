@@ -1,5 +1,5 @@
 /**
- * Copyright 2022 Mytra Control S.L. All rights reserved.
+ * Copyright 2024 Mytra Control S.L. All rights reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be found in the LICENSE file
  * or at https://opensource.org/licenses/MIT.
@@ -11,14 +11,14 @@ import { DebugLogger, LoggerInstance, SetContext } from '@mdf.js/logger';
 import { merge } from 'lodash';
 import { Readable } from 'stream';
 import { Plugs, SourceOptions } from '../../types';
-import { DEFAULT_READABLE_OPTIONS } from './const';
 import { PlugWrapper } from './PlugWrapper';
+import { DEFAULT_READABLE_OPTIONS } from './const';
 
 export declare interface Base<
   T extends Plugs.Source.Any<Type, Data, CustomHeaders>,
   Type extends string = string,
   Data = any,
-  CustomHeaders extends Record<string, any> = Record<string, any>
+  CustomHeaders extends Record<string, any> = Record<string, any>,
 > {
   /** Emitted when stream.resume() is called and readableFlowing is not true*/
   on(event: 'resume', listener: () => void): this;
@@ -50,7 +50,7 @@ export abstract class Base<
     T extends Plugs.Source.Any<Type, Data, CustomHeaders>,
     Type extends string = string,
     Data = any,
-    CustomHeaders extends Record<string, any> = Record<string, any>
+    CustomHeaders extends Record<string, any> = Record<string, any>,
   >
   extends Readable
   implements Health.Component
@@ -73,7 +73,10 @@ export abstract class Base<
    * @param plug - source plug instance
    * @param options - source options
    */
-  constructor(protected readonly plug: T, options?: SourceOptions) {
+  constructor(
+    protected readonly plug: T,
+    options?: SourceOptions
+  ) {
     super(merge(DEFAULT_READABLE_OPTIONS, options?.readableOptions));
     this.numberOfHandlers = options?.qos ?? this.numberOfHandlers;
     // Stryker disable next-line all

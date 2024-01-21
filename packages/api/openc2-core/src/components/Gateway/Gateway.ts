@@ -1,5 +1,5 @@
 /**
- * Copyright 2022 Mytra Control S.L. All rights reserved.
+ * Copyright 2024 Mytra Control S.L. All rights reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be found in the LICENSE file
  * or at https://opensource.org/licenses/MIT.
@@ -12,9 +12,9 @@ import EventEmitter from 'events';
 import express from 'express';
 import { cloneDeep } from 'lodash';
 import { v4 } from 'uuid';
+import { Router } from '../../Router';
 import { Accessors } from '../../helpers';
 import { HealthWrapper, Registry } from '../../modules';
-import { Router } from '../../Router';
 import {
   CommandJobHandler,
   ConsumerAdapter,

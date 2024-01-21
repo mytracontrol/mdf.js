@@ -1,5 +1,5 @@
 /**
- * Copyright 2022 Mytra Control S.L. All rights reserved.
+ * Copyright 2024 Mytra Control S.L. All rights reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be found in the LICENSE file
  * or at https://opensource.org/licenses/MIT.
@@ -27,7 +27,10 @@ export class Router {
    * @param manager - Registry used by this component
    * @param path - prefix path for all the routes
    */
-  constructor(private readonly manager: ConfigManager, path = PREFIX_PATH) {
+  constructor(
+    private readonly manager: ConfigManager,
+    path = PREFIX_PATH
+  ) {
     this.manager = manager;
     this.model = new Model(this.manager);
     this.service = new Service(this.model);

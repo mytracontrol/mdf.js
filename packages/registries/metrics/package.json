@@ -33,17 +33,17 @@
     "@mdf.js/crash": "*",
     "@mdf.js/utils": "*",
     "express": "^4.18.2",
-    "prom-client": "^14.2.0",
+    "prom-client": "^15.1.0",
     "tslib": "^2.6.0",
     "uuid": "^9.0.0"
   },
   "devDependencies": {
     "@mdf.js/repo-config": "*",
     "@types/express": "^4.17.17",
-    "@types/spdy": "^3.4.5",
-    "@types/supertest": "^2.0.12",
+    "@types/spdy": "^3.4.9",
+    "@types/supertest": "^6.0.2",
     "@types/uuid": "^9.0.1",
-    "supertest": "^6.3.2"
+    "supertest": "^6.3.4"
   },
   "engines": {
     "node": ">=16.14.2"

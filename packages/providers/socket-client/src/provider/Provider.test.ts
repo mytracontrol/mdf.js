@@ -1,5 +1,5 @@
 /**
- * Copyright 2022 Mytra Control S.L. All rights reserved.
+ * Copyright 2024 Mytra Control S.L. All rights reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be found in the LICENSE file
  * or at https://opensource.org/licenses/MIT.
@@ -124,12 +124,20 @@ describe('#Port #Socket.IO #Client', () => {
     }, 300);
   });
   describe('#Sad path', () => {
-    it('Should reject with an error if try to connect and fails too much times', () => {
+    it('Should reject with an error if try to connect and fails too much times', async () => {
       const port = new Port(
         { url: 'http://localhost:9999', reconnectionAttempts: 1, reconnectionDelay: 100 },
         new FakeLogger() as LoggerInstance
       );
       expect(port).toBeDefined();
+      try {
+        await port.start();
+        fail('Should fail');
+      } catch (error) {
+        expect(error).toBeDefined();
+        //@ts-ignore - Test environment
+        expect(error.message).toEqual('Socket.IO Client connection error');
+      }
       return port.start().catch(error => {
         expect(error).toBeDefined();
         expect(error.message).toEqual('Socket.IO Client connection error');

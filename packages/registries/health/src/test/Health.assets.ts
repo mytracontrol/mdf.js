@@ -1,6 +1,6 @@
 /* istanbul ignore file */
 /**
- * Copyright 2022 Mytra Control S.L. All rights reserved.
+ * Copyright 2024 Mytra Control S.L. All rights reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be found in the LICENSE file
  * or at https://opensource.org/licenses/MIT.
@@ -14,7 +14,10 @@ export class OurProvider extends EventEmitter implements Health.Component {
   actualStateDate: string;
   componentId: string = v4();
   _status: Health.Status;
-  constructor(public name: string, status: Health.Status) {
+  constructor(
+    public name: string,
+    status: Health.Status
+  ) {
     super();
     this._status = status;
     this.actualStateDate = new Date().toISOString();

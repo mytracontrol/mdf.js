@@ -1,5 +1,5 @@
 /**
- * Copyright 2022 Mytra Control S.L. All rights reserved.
+ * Copyright 2024 Mytra Control S.L. All rights reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be found in the LICENSE file
  * or at https://opensource.org/licenses/MIT.
@@ -37,7 +37,7 @@ function logLevelPerStatus(status: number): string {
  */
 function expressLogger<
   Request extends IncomingMessage = IncomingMessage,
-  Response extends ServerResponse = ServerResponse
+  Response extends ServerResponse = ServerResponse,
 >(logger: Logger): Handler<Request, Response> {
   return morgan<Request, Response>(
     (tokens: morgan.TokenIndexer<Request, Response>, req: Request, res: Response) => {

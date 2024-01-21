@@ -1,5 +1,5 @@
 /**
- * Copyright 2022 Mytra Control S.L. All rights reserved.
+ * Copyright 2024 Mytra Control S.L. All rights reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be found in the LICENSE file
  * or at https://opensource.org/licenses/MIT.
@@ -16,6 +16,7 @@ import {
   Metric,
   MetricObjectWithValues,
   MetricValue,
+  PrometheusContentType,
   Registry,
   Summary,
   SummaryConfiguration,
@@ -29,18 +30,18 @@ export class Aggregator {
   /** Instance unique identifier for trace purposes */
   private readonly uuid: string = v4();
   /** Registry used to store the metrics */
-  private readonly registry: Registry | ClusterRegistry;
+  private readonly registry: Registry | ClusterRegistry<PrometheusContentType>;
   /**
    * This is a cluster register used due to a failure in the prom-client library
    * https://github.com/siimon/prom-client/issues/501
    */
-  private readonly clusterRegistryForWorkerMode?: ClusterRegistry;
+  private readonly clusterRegistryForWorkerMode?: ClusterRegistry<PrometheusContentType>;
   /**
    * Create a new instance of MetricsAggregator
    * @param registry - registry used to store the metrics
    * @param isWorker - flag to indicate if the instance is a worker
    */
-  constructor(registry: Registry | ClusterRegistry, isWorker = false) {
+  constructor(registry: Registry | ClusterRegistry<PrometheusContentType>, isWorker = false) {
     if (isWorker) {
       this.clusterRegistryForWorkerMode = new ClusterRegistry();
     }
@@ -80,7 +81,7 @@ export class Aggregator {
    */
   public setMetrics<
     T extends Record<string, Metric> | void = void,
-    K extends Record<string, MetricConfig> = Record<string, MetricConfig>
+    K extends Record<string, MetricConfig> = Record<string, MetricConfig>,
   >(metrics: K): MetricInstancesObject<T, K> {
     const result: Record<string, Metric> = {};
     try {

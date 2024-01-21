@@ -33,7 +33,7 @@
     "@mdf.js/crash": "*",
     "@mdf.js/logger": "*",
     "@mdf.js/utils": "*",
-    "joi": "^17.9.2",
+    "joi": "^17.12.0",
     "kafkajs": "^2.2.4",
     "lodash": "^4.17.21",
     "tslib": "^2.6.0",
@@ -41,7 +41,7 @@
   },
   "devDependencies": {
     "@mdf.js/repo-config": "*",
-    "@types/lodash": "^4.14.195",
+    "@types/lodash": "^4.14.202",
     "@types/uuid": "^9.0.1"
   },
   "engines": {

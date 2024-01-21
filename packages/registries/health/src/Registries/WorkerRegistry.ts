@@ -1,5 +1,5 @@
 /**
- * Copyright 2022 Mytra Control S.L. All rights reserved.
+ * Copyright 2024 Mytra Control S.L. All rights reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be found in the LICENSE file
  * or at https://opensource.org/licenses/MIT.
@@ -16,7 +16,10 @@ export class WorkerRegistry extends Registry {
    * @param metadata - application metadata
    * @param aggregator - components aggregator
    */
-  constructor(metadata: Layer.App.Metadata, private readonly aggregator: Aggregator) {
+  constructor(
+    metadata: Layer.App.Metadata,
+    private readonly aggregator: Aggregator
+  ) {
     super(metadata);
     process.on('message', this.onHealthRequestHandler);
   }

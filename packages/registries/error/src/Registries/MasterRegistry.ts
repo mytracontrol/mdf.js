@@ -1,5 +1,5 @@
 /**
- * Copyright 2022 Mytra Control S.L. All rights reserved.
+ * Copyright 2024 Mytra Control S.L. All rights reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be found in the LICENSE file
  * or at https://opensource.org/licenses/MIT.
@@ -14,7 +14,7 @@ export class MasterRegistry extends Registry {
   /** Request sequence number */
   private requestId: number;
   /** Timeout interval handler for master polling */
-  private timeInterval?: NodeJS.Timer;
+  private timeInterval?: NodeJS.Timeout;
   /** Array of errors registered in the workers */
   private workersErrors: ErrorRecord[] = [];
   /**
