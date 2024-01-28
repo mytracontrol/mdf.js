@@ -8,7 +8,6 @@
 import { Crash } from '@mdf.js/crash';
 import logger from '@mdf.js/logger';
 import { Redis } from '@mdf.js/redis-provider';
-import { coerce } from '@mdf.js/utils';
 import cryto from 'crypto';
 import { NextFunction, Request, RequestHandler, Response } from 'express';
 import { OutgoingHttpHeaders } from 'http';
@@ -23,45 +22,17 @@ const DEFAULT_CONFIG_CACHE_HEADERS_BLACK_LIST: string[] = [];
 const DEFAULT_CONFIG_STATUS_CODES_EXCLUDED: number[] = [];
 const DEFAULT_CONFIG_STATUS_CODES_INCLUDED: number[] = [200];
 const DEFAULT_CONFIG_CACHE_PREFIX = 'api:cache:';
-// *************************************************************************************************
-// #region Cache configuration environment variables
-const CONFIG_CACHE_DURATION = coerce(
-  process.env['CONFIG_CACHE_DURATION'],
-  DEFAULT_CONFIG_CACHE_DURATION
-);
-const CONFIG_CACHE_ENABLED = coerce(
-  process.env['CONFIG_CACHE_ENABLED'],
-  DEFAULT_CONFIG_CACHE_ENABLED
-);
-let CONFIG_STATUS_CODES_EXCLUDED: number[] = DEFAULT_CONFIG_STATUS_CODES_EXCLUDED;
-let CONFIG_CACHE_HEADERS_BLACK_LIST: string[] = DEFAULT_CONFIG_CACHE_HEADERS_BLACK_LIST;
-if (process.env['CONFIG_CACHE_HEADERS_BLACK_LIST']) {
-  CONFIG_CACHE_HEADERS_BLACK_LIST = process.env['CONFIG_CACHE_HEADERS_BLACK_LIST'].split(',');
-}
-if (process.env['CONFIG_CACHE_STATUS_CODES_EXCLUDED']) {
-  CONFIG_STATUS_CODES_EXCLUDED = process.env['CONFIG_CACHE_STATUS_CODES_EXCLUDED']
-    .split(',')
-    .map(entry => coerce(entry, 0));
-}
-let CONFIG_STATUS_CODES_INCLUDED: number[] = DEFAULT_CONFIG_STATUS_CODES_INCLUDED;
-if (process.env['CONFIG_CACHE_STATUS_CODES_INCLUDED']) {
-  CONFIG_STATUS_CODES_INCLUDED = process.env['CONFIG_CACHE_STATUS_CODES_INCLUDED']
-    .split(',')
-    .map(entry => coerce(entry, 0));
-}
-const CONFIG_CACHE_PREFIX = process.env['CONFIG_CACHE_PREFIX'] || DEFAULT_CONFIG_CACHE_PREFIX;
-// #endregion
 
 const DEFAULT_CONFIG_CACHE: CacheConfig = {
-  duration: CONFIG_CACHE_DURATION,
-  enabled: CONFIG_CACHE_ENABLED,
-  headersBlacklist: CONFIG_CACHE_HEADERS_BLACK_LIST,
+  duration: DEFAULT_CONFIG_CACHE_DURATION,
+  enabled: DEFAULT_CONFIG_CACHE_ENABLED,
+  headersBlacklist: DEFAULT_CONFIG_CACHE_HEADERS_BLACK_LIST,
   statusCodes: {
-    exclude: CONFIG_STATUS_CODES_EXCLUDED,
-    include: CONFIG_STATUS_CODES_INCLUDED,
+    exclude: DEFAULT_CONFIG_STATUS_CODES_EXCLUDED,
+    include: DEFAULT_CONFIG_STATUS_CODES_INCLUDED,
   },
   useBody: false,
-  prefixKey: CONFIG_CACHE_PREFIX,
+  prefixKey: DEFAULT_CONFIG_CACHE_PREFIX,
   toggle: () => true,
 };
 

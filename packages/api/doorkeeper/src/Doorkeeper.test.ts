@@ -18,7 +18,7 @@ const entity = {
   $schema: 'http://json-schema.org/draft-07/schema',
   $id: 'other.schema.json',
   title: 'Entity ID',
-  description: 'HW or SW Netin entity ID',
+  description: 'HW or SW entity ID',
   type: 'string',
   format: 'uuid',
   errorMessage: 'Entity must be a valid RFC4122 UUID',

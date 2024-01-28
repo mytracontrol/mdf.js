@@ -9,7 +9,7 @@ import { Health, Layer } from '@mdf.js/core';
 import cluster, { Worker } from 'cluster';
 import { merge } from 'lodash';
 import { Aggregator } from '../Aggregator';
-import { CONFIG_HEALTH_CLUSTER_UPDATE_INTERVAL } from '../const';
+import { DEFAULT_CONFIG_HEALTH_CLUSTER_UPDATE_INTERVAL } from '../const';
 import { HealthMessage, HealthMessageType } from '../types';
 import { Registry } from './Registry';
 
@@ -30,7 +30,7 @@ export class MasterRegistry extends Registry {
   constructor(
     metadata: Layer.App.Metadata,
     private readonly aggregator: Aggregator,
-    private readonly interval: number = CONFIG_HEALTH_CLUSTER_UPDATE_INTERVAL
+    private readonly interval: number = DEFAULT_CONFIG_HEALTH_CLUSTER_UPDATE_INTERVAL
   ) {
     super(metadata);
     this.requestId = 0;

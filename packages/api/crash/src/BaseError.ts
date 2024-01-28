@@ -8,7 +8,7 @@
 import { v4, validate } from 'uuid';
 import { CONFIG_MAX_ERROR_MESSAGE_LENGTH } from './const';
 import { BaseObject, BaseOptions } from './types';
-/** Class Base, manages errors in Netin Systems */
+/** Class Base, manages errors in MDF Systems */
 export class Base extends Error {
   /** Base error options */
   protected _options?: BaseOptions;

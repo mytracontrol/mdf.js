@@ -8,7 +8,10 @@ import { Crash } from '@mdf.js/crash';
 import { ErrorRecord, HandleableError } from '../types';
 
 import { DebugLogger, LoggerInstance } from '@mdf.js/logger';
-import { CONFIG_REGISTER_INCLUDE_STACK, CONFIG_REGISTER_MAX_LIST_SIZE } from '../const';
+import {
+  DEFAULT_CONFIG_REGISTER_INCLUDE_STACK,
+  DEFAULT_CONFIG_REGISTER_MAX_LIST_SIZE,
+} from '../const';
 
 export abstract class Registry {
   /** Array of errors registered in this registry */
@@ -20,12 +23,16 @@ export abstract class Registry {
   /**
    * Create an instance of Registry class
    * @param maxSize - Maximum number of errors to be registered in this registry
+   * @param includeStack - Indicates if the stack trace should be included in the error record
    */
-  constructor(protected readonly maxSize: number = CONFIG_REGISTER_MAX_LIST_SIZE) {
+  constructor(
+    protected readonly maxSize: number = DEFAULT_CONFIG_REGISTER_MAX_LIST_SIZE,
+    protected readonly includeStack: boolean = DEFAULT_CONFIG_REGISTER_INCLUDE_STACK
+  ) {
     // Stryker disable next-line all
     this.logger = new DebugLogger(`mdf:register`);
     if (maxSize < 1) {
-      this.maxSize = CONFIG_REGISTER_MAX_LIST_SIZE;
+      this.maxSize = DEFAULT_CONFIG_REGISTER_MAX_LIST_SIZE;
     }
   }
   /**
@@ -35,7 +42,7 @@ export abstract class Registry {
   public push(error: HandleableError): void {
     const validatedError = Crash.from(error);
     let errorRecord: ErrorRecord;
-    if (CONFIG_REGISTER_INCLUDE_STACK) {
+    if (this.includeStack) {
       errorRecord = {
         ...validatedError.toJSON(),
         stack: validatedError.fullStack(),

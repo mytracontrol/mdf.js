@@ -6,7 +6,7 @@
  */
 
 import cluster, { Worker } from 'cluster';
-import { CONFIG_REGISTER_CLUSTER_UPDATE_INTERVAL } from '../const';
+import { DEFAULT_CONFIG_REGISTER_CLUSTER_UPDATE_INTERVAL } from '../const';
 import { ErrorRecord, RegisterMessage, RegisterMessageType } from '../types';
 import { Registry } from './Registry';
 
@@ -24,7 +24,7 @@ export class MasterRegistry extends Registry {
    */
   constructor(
     maxSize?: number,
-    private readonly interval: number = CONFIG_REGISTER_CLUSTER_UPDATE_INTERVAL
+    private readonly interval: number = DEFAULT_CONFIG_REGISTER_CLUSTER_UPDATE_INTERVAL
   ) {
     super(maxSize);
     this.requestId = 0;

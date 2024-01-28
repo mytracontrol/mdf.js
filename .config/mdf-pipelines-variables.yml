@@ -1,7 +1,5 @@
 variables:
   - group: NPM-Secrets
-  #- group: Netin-Signing
-  #- group: Netin-Release
   - name: isMaster
     value: ${{ eq(variables['Build.SourceBranch'], 'refs/heads/master') }}
   - name: isDevelop

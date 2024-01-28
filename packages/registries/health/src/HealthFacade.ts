@@ -7,7 +7,6 @@
 
 import { Health, Layer } from '@mdf.js/core';
 import { Crash } from '@mdf.js/crash';
-import { coerce } from '@mdf.js/utils';
 import cluster from 'cluster';
 import { EventEmitter } from 'events';
 import express from 'express';
@@ -16,11 +15,6 @@ import { MasterRegistry, Registry, StandaloneRegistry, WorkerRegistry } from './
 import { Router } from './Router';
 
 const DEFAULT_CONFIG_MMS_CLUSTER_MODE = false;
-
-export const CONFIG_MMS_CLUSTER_MODE = coerce(
-  process.env['CONFIG_MMS_CLUSTER_MODE'],
-  DEFAULT_CONFIG_MMS_CLUSTER_MODE
-);
 
 export class HealthFacade extends EventEmitter implements Layer.Service.Registry {
   /** Health aggregator */
@@ -37,7 +31,7 @@ export class HealthFacade extends EventEmitter implements Layer.Service.Registry
    */
   public static create(
     metadata: Layer.App.Metadata,
-    isCluster = CONFIG_MMS_CLUSTER_MODE,
+    isCluster = DEFAULT_CONFIG_MMS_CLUSTER_MODE,
     interval?: number
   ): HealthFacade {
     const aggregator = new Aggregator();

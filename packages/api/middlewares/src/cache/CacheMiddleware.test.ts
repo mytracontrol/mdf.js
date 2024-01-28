@@ -6,9 +6,6 @@
  */
 // *************************************************************************************************
 // #region Mocha, chai and sinon imports (Testing engine)
-process.env['CONFIG_CACHE_HEADERS_BLACK_LIST'] = 'test,test2';
-process.env['CONFIG_CACHE_STATUS_CODES_EXCLUDED'] = '10,20';
-process.env['CONFIG_CACHE_STATUS_CODES_INCLUDED'] = '30,40';
 import { Crash } from '@mdf.js/crash';
 import logger from '@mdf.js/logger';
 import { Redis } from '@mdf.js/redis-provider';
@@ -36,6 +33,7 @@ app.get(
   Middleware.NoCache.handler(),
   instance.handler({
     duration: 10,
+    headersBlacklist: ['test', 'test2'],
     statusCodes: { include: [200], exclude: [201] },
   }),
   (req, res) => {
@@ -48,6 +46,8 @@ app.post(
   instance.handler({
     duration: 10,
     useBody: true,
+    headersBlacklist: ['test', 'test2'],
+    statusCodes: { include: [30, 40], exclude: [10, 20] },
   }),
   (req, res) => {
     res.status(200).send({ respond: 'fresh' });
@@ -55,7 +55,11 @@ app.post(
 );
 app.get(
   '/no_cached_for_toggle',
-  Middleware.Cache.handler(cache.client, { toggle: () => false }),
+  Middleware.Cache.handler(cache.client, {
+    headersBlacklist: ['test', 'test2'],
+    statusCodes: { include: [30, 40], exclude: [10, 20] },
+    toggle: () => false,
+  }),
   (req, res) => {
     res.status(200).send({ respond: 'fresh' });
   }

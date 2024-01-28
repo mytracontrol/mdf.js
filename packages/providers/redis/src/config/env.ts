@@ -35,11 +35,11 @@ const CONFIG_REDIS_CHECK_INTERVAL = coerce<number>(process.env['CONFIG_REDIS_CHE
 const CONFIG_REDIS_DISABLE_CHECKS = coerce<boolean>(process.env['CONFIG_REDIS_DISABLE_CHECKS']);
 
 export const envBasedConfig: Config = {
-  /** Default Netin Redis instance port */
+  /** Default Redis instance port */
   port: CONFIG_REDIS_PORT,
-  /** Default Netin Redis instance host address */
+  /** Default Redis instance host address */
   host: CONFIG_REDIS_HOST,
-  /** Default Netin Redis instance DB */
+  /** Default Redis instance DB */
   db: CONFIG_REDIS_DB,
   /** If set, client will send AUTH command with the value of this option when connected */
   password: CONFIG_REDIS_PASSWORD,

@@ -6,7 +6,6 @@
  */
 
 import { Layer } from '@mdf.js/core';
-import { coerce } from '@mdf.js/utils';
 import cluster from 'cluster';
 import EventEmitter from 'events';
 import express from 'express';
@@ -15,11 +14,6 @@ import { Router } from './Router';
 import { ErrorRecord, HandleableError } from './types';
 
 const DEFAULT_CONFIG_MMS_CLUSTER_MODE = false;
-
-export const CONFIG_MMS_CLUSTER_MODE = coerce(
-  process.env['CONFIG_MMS_CLUSTER_MODE'],
-  DEFAULT_CONFIG_MMS_CLUSTER_MODE
-);
 
 export class RegisterFacade extends EventEmitter implements Layer.Service.Registry {
   /** Errors registry */
@@ -35,7 +29,7 @@ export class RegisterFacade extends EventEmitter implements Layer.Service.Regist
    */
   public static create(
     maxSize?: number,
-    isCluster = CONFIG_MMS_CLUSTER_MODE,
+    isCluster = DEFAULT_CONFIG_MMS_CLUSTER_MODE,
     interval?: number
   ): RegisterFacade {
     if (!isCluster) {

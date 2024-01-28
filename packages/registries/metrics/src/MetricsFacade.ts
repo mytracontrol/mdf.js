@@ -5,7 +5,6 @@
  * or at https://opensource.org/licenses/MIT.
  */
 import { Layer } from '@mdf.js/core';
-import { coerce } from '@mdf.js/utils';
 import cluster from 'cluster';
 import EventEmitter from 'events';
 import express from 'express';
@@ -23,11 +22,6 @@ import { MetricConfig, MetricInstancesObject, MetricsResponse } from './types';
 
 const DEFAULT_CONFIG_MMS_CLUSTER_MODE = false;
 
-export const CONFIG_MMS_CLUSTER_MODE = coerce(
-  process.env['CONFIG_MMS_CLUSTER_MODE'],
-  DEFAULT_CONFIG_MMS_CLUSTER_MODE
-);
-
 export class MetricsFacade extends EventEmitter implements Layer.Service.Registry {
   /** Metrics aggregator */
   private readonly aggregator: Aggregator;
@@ -37,7 +31,7 @@ export class MetricsFacade extends EventEmitter implements Layer.Service.Registr
    * Create an instance of metrics manager
    * @param isCluster - indicates that the instance of this metrics service is running in a cluster
    */
-  public static create(isCluster = CONFIG_MMS_CLUSTER_MODE): MetricsFacade {
+  public static create(isCluster = DEFAULT_CONFIG_MMS_CLUSTER_MODE): MetricsFacade {
     if (!isCluster) {
       const aggregator = new Aggregator(new StandAloneRegistry());
       return new MetricsFacade(aggregator, new Router(aggregator, isCluster));

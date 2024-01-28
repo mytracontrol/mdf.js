@@ -1,28 +1,16 @@
 /**
- * Copyright 2020 Netin System S.L. All rights reserved.
- * Note: All information contained herein is, and remains the property of Netin System S.L. and its
- * suppliers, if any. The intellectual and technical concepts contained herein are property of
- * Netin System S.L. and its suppliers and may be covered by European and Foreign patents, patents
- * in process, and are protected by trade secret or copyright.
+ * Copyright 2024 Mytra Control S.L. All rights reserved.
  *
- * Dissemination of this information or the reproduction of this material is strictly forbidden
- * unless prior written permission is obtained from Netin System S.L.
+ * Use of this source code is governed by an MIT-style license that can be found in the LICENSE file
+ * or at https://opensource.org/licenses/MIT.
  */
 import { Crash } from '@mdf.js/crash';
 import logger from '@mdf.js/logger';
 import { Redis } from '@mdf.js/redis-provider';
-import { coerce } from '@mdf.js/utils';
 import { CacheEntry } from './CacheEntry.t';
 
 const RETRIEVING_ERROR = 'Error retrieving the information from the cache';
 const DEFAULT_CONFIG_CACHE_EXPIRATION = 60;
-// *************************************************************************************************
-// #region Cache configuration environment variables
-const CONFIG_CACHE_EXPIRATION = coerce(
-  process.env['CONFIG_CACHE_EXPIRATION'],
-  DEFAULT_CONFIG_CACHE_EXPIRATION
-);
-// #endregion
 
 /** CacheRepository, cache repository management interface */
 export class CacheRepository {
@@ -79,12 +67,12 @@ export class CacheRepository {
     }
     return new Promise((resolve, reject) => {
       this.redis
-        .setex(path, response.duration || CONFIG_CACHE_EXPIRATION, JSON.stringify(response))
+        .setex(path, response.duration || DEFAULT_CONFIG_CACHE_EXPIRATION, JSON.stringify(response))
         .then((result: 'OK') => {
           // Stryker disable all
           logger.debug(
             `Path ${path} stored in cache with delay of ${
-              response.duration || CONFIG_CACHE_EXPIRATION
+              response.duration || DEFAULT_CONFIG_CACHE_EXPIRATION
             } seconds`,
             uuid,
             this.context

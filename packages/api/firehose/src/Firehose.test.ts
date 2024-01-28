@@ -4,8 +4,6 @@
  * Use of this source code is governed by an MIT-style license that can be found in the LICENSE file
  * or at https://opensource.org/licenses/MIT.
  */
-process.env['CONFIG_SOURCE_PLUG_CHECK_UNCLEANED_INTERVAL'] = '1000';
-
 import { Health, Jobs } from '@mdf.js/core';
 import { Crash } from '@mdf.js/crash';
 import { Observability, ObservabilityOptions } from '@mdf.js/observability';
