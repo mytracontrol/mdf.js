@@ -7,9 +7,10 @@
 
 import { Boom } from '@mdf.js/crash';
 import jwt, { JwtPayload } from 'jsonwebtoken';
+import { v4 } from 'uuid';
 import { AuthZ } from './authz';
 
-const secret = process.env['CONFIG_JWT_TOKEN_SECRET'] as string;
+const secret = v4();
 const TOKEN = jwt.sign({ user: 'myUser', role: 'myRole' }, secret);
 
 describe('#Authz #middleware', () => {
@@ -33,7 +34,7 @@ describe('#Authz #middleware', () => {
         done();
       };
       //@ts-ignore - We are testing the middleware
-      expect(AuthZ.handler({ onAuthorization })(socket, next)).toBeUndefined();
+      expect(AuthZ.handler({ onAuthorization, secret })(socket, next)).toBeUndefined();
     });
     it(`Should return an error if the token is a bad token`, done => {
       const socket = {

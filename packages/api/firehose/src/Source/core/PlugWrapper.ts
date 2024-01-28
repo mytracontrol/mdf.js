@@ -12,8 +12,8 @@ import EventEmitter from 'events';
 import { merge } from 'lodash';
 import { PostConsumeOptions, WrappableSourcePlug } from '../../types';
 import {
-  CONFIG_SOURCE_PLUG_CHECK_UNCLEANED_INTERVAL,
-  CONFIG_SOURCE_PLUG_MAX_UNKNOWN_JOBS,
+  DEFAULT_CONFIG_SOURCE_PLUG_CHECK_UNCLEANED_INTERVAL,
+  DEFAULT_CONFIG_SOURCE_PLUG_MAX_UNKNOWN_JOBS,
 } from './const';
 
 export class PlugWrapper<
@@ -69,8 +69,8 @@ export class PlugWrapper<
     this.retryOptions = merge({ logger: this.onOperationError }, retryOptions);
     this.postConsumeOptions = merge(
       {
-        maxUnknownJobs: CONFIG_SOURCE_PLUG_MAX_UNKNOWN_JOBS,
-        checkUncleanedInterval: CONFIG_SOURCE_PLUG_CHECK_UNCLEANED_INTERVAL,
+        maxUnknownJobs: DEFAULT_CONFIG_SOURCE_PLUG_MAX_UNKNOWN_JOBS,
+        checkUncleanedInterval: DEFAULT_CONFIG_SOURCE_PLUG_CHECK_UNCLEANED_INTERVAL,
       },
       postConsumeOptions
     );

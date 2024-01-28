@@ -7,6 +7,8 @@
 export interface ObservabilityServiceOptions {
   /** Port to listen for incoming requests */
   port?: number;
+  /** Primary port to listen for incoming requests on cluster mode */
+  primaryPort?: number;
   /** Host IP Addresses to be attached */
   host?: string;
   /** Max size of the registry */

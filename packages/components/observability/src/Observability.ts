@@ -12,16 +12,12 @@ import { HealthRegistry } from '@mdf.js/health-registry';
 import { HTTP } from '@mdf.js/http-server-provider';
 import { MetricsRegistry } from '@mdf.js/metrics-registry';
 import { Middleware } from '@mdf.js/middlewares';
-import { coerce } from '@mdf.js/utils';
 import cluster from 'cluster';
 import express, { Express, NextFunction, Request, Response } from 'express';
 import { createProxyMiddleware } from 'http-proxy-middleware';
 import { merge } from 'lodash';
 import { ObservabilityOptions } from './types';
 
-const CONFIG_OBSERVABILITY_MASTER_PORT = coerce<number>(
-  process.env['CONFIG_OBSERVABILITY_MASTER_PORT']
-);
 const DEFAULT_PRIMARY_PORT = 9080;
 
 export class Observability {
@@ -178,8 +174,8 @@ export class Observability {
   }
   /** Define the port used offer the api */
   private getPrimaryPort(): number | undefined {
-    if (CONFIG_OBSERVABILITY_MASTER_PORT) {
-      return CONFIG_OBSERVABILITY_MASTER_PORT;
+    if (this.options.primaryPort) {
+      return this.options.primaryPort;
     }
     let primaryPort = this.options.port ? this.options.port : DEFAULT_PRIMARY_PORT;
     primaryPort = primaryPort > 1024 ? primaryPort : DEFAULT_PRIMARY_PORT;
