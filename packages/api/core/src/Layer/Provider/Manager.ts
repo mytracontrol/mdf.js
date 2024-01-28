@@ -37,7 +37,9 @@ export declare interface Manager<PortClient, PortConfig, T extends Port<PortClie
  *
  * - The state of the provider, represented by the {@link Manager.state} property, and managed by
  * the {@link Manager.start}, {@link Manager.stop} and {@link Manager.fail} methods.
- * ![class diagram](../media/Provider-States-Methods.png)
+ *
+ * ![class diagram](media/Provider-States-Methods.png)
+ *
  * - Merge and validate the configuration of the provider represented by the generic type
  * _**PortConfig**_. The manager configuration object {@link ProviderOptions} has a _**validation**_
  * property that represent a structure of type {@link PortConfigValidationStruct} where default

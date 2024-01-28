@@ -1,7 +1,7 @@
 {
   "name": "@mdf.js/app-wrapper",
   "version": "0.0.1",
-  "description": "MMS - API - Application",
+  "description": "MMS - API - AppWrapper",
   "keywords": [
     "NodeJS",
     "MMS",
@@ -11,7 +11,7 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/mytracontrol/mdf.js.git",
-    "directory": "packages/components/application"
+    "directory": "packages/components/app-wrapper"
   },
   "license": "MIT",
   "author": "Mytra Control S.L.",

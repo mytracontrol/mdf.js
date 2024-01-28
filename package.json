@@ -17,12 +17,14 @@
     "clean:node_modules": "find . -name \"node_modules\" -type d -prune -exec rm -rf {} +",
     "compile": "tsc --build --clean && tsc --build",
     "dev": "turbo run dev",
+    "docs:media": ".config/copyMedia.sh",
+    "docs:typedoc": "typedoc --options typedoc.json",
+    "docs": "yarn run docs:typedoc && yarn run docs:media",
     "lint": "turbo run lint",
     "prettier": "prettier --config .prettierrc.js --write **/src/**/*.ts",
     "snyk": "yarn run @:snyk:test && yarn run @:snyk:report",
     "sort": "sort-package-json \"packages/*/*/package.json\" package.json",
-    "test": "turbo run test licenses --concurrency=1",
-    "docs": "typedoc --options typedoc.json"
+    "test": "turbo run test licenses --concurrency=1"
   },
   "devDependencies": {
     "@mdf.js/repo-config": "*",

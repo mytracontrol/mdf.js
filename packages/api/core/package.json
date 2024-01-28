@@ -25,9 +25,9 @@
   ],
   "scripts": {
     "build": "yarn clean && tsc -p tsconfig.build.json",
-    "doc": "typedoc --options typedoc.json",
     "check-dependencies": "npm-check",
     "clean": "rimraf \"{tsconfig.build.tsbuildinfo,dist}\"",
+    "doc": "typedoc --options typedoc.json",
     "licenses": "license-checker --start ./ --production --csv --out ../../../licenses/api/core/licenses.csv --customPath ../../../.config/customFormat.json",
     "mutants": "stryker run stryker.conf.js",
     "test": "jest --detectOpenHandles --config ./jest.config.js"

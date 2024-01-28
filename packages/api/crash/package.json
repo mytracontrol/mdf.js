@@ -47,11 +47,5 @@
   },
   "publishConfig": {
     "access": "public"
-  },
-  "typedoc": {
-    "entryPoint": "./src/index.ts",
-    "readmeFile": "./README.md",
-    "displayName": "@mdf.js/crash",
-    "tsconfig": "./tsconfig.build.json"
   }
 }
