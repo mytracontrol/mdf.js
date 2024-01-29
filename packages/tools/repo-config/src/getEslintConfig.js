@@ -38,6 +38,7 @@ const config = {
         minimumDescriptionLength: 10,
       },
     ],
+    '@typescript-eslint/no-unsafe-declaration-merging': 'off',
   },
   overrides: [
     {

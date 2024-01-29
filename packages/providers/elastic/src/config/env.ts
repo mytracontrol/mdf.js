@@ -16,9 +16,7 @@ const CONFIG_ELASTIC_NODES = nodeToNodes(
   process.env['CONFIG_ELASTIC_NODE'],
   process.env['CONFIG_ELASTIC_NODES']
 );
-const CONFIG_ELASTIC_MAX_RETRIES = coerce<number>(
-  process.env['DEFAULT_CONFIG_ELASTIC_MAX_RETRIES']
-);
+const CONFIG_ELASTIC_MAX_RETRIES = coerce<number>(process.env['CONFIG_ELASTIC_MAX_RETRIES']);
 const CONFIG_ELASTIC_REQUEST_TIMEOUT = coerce<number>(
   process.env['CONFIG_ELASTIC_REQUEST_TIMEOUT']
 );

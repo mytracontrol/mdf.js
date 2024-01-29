@@ -29,17 +29,26 @@ const DEFAULT_SNIPPET_META_SCHEMA = {
   },
 };
 
-type SchemaSelector<T> = T extends void ? string : keyof T & string;
-type ValidatedOutput<T, K> = K extends keyof T ? T[K] : any;
+export type SchemaSelector<T> = T extends void ? string : keyof T & string;
+export type ValidatedOutput<T, K> = K extends keyof T ? T[K] : any;
 
-/** AJV options but all errors must be true */
+/**
+ * AJV options but all errors must be true
+ *
+ * See {@link Options} for more information
+ */
 export type DoorkeeperOptions = Options;
 export { JSONSchemaType } from 'ajv';
 
 /** Callback function for the validation process */
 export type ResultCallback<T, K> = (error?: Crash | Multi, result?: ValidatedOutput<T, K>) => void;
 
-/** Wrapping class for AJV */
+/**
+ * Doorkeeper is a wrapper for AJV that allows us to validate JSONs against schemas.
+ * It also allows us to register schemas and retrieve them later.
+ * @category Doorkeeper
+ * @public
+ */
 export class DoorKeeper<T = void> {
   readonly uuid = v4();
   /** AJV instance*/
@@ -289,7 +298,6 @@ export class DoorKeeper<T = void> {
    * Validate an Object against the input schema
    * @param schema - The schema we want to validate
    * @param data - Object to be validated
-   * @param uuid - unique identifier for this operation
    */
   public validate<K extends SchemaSelector<T>>(
     schema: K,

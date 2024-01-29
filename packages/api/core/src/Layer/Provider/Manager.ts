@@ -43,13 +43,15 @@ export declare interface Manager<PortClient, PortConfig, T extends Port<PortClie
  * - Merge and validate the configuration of the provider represented by the generic type
  * _**PortConfig**_. The manager configuration object {@link ProviderOptions} has a _**validation**_
  * property that represent a structure of type {@link PortConfigValidationStruct} where default
- * values, environment based and a [Joi validation object](https://joi.dev/api/?v=17.7.0) is be
- * defined. During the initialization process, the manager will merge specific configuration of the
- * provider passed as parameter in the constructor with environment based and the default values.
- * Then the manager will validate the configuration using the Joi validation object. If the
- * validation fails, the manager will use the default values and emit an error that will be managed
- * by the observability layer.
+ * values, environment based and a [Joi validation object](https://joi.dev/api/?v=17.7.0) are
+ * defined. During the initialization process, the manager will merge all the sources of
+ * configuration (default, environment and specific) and validate the result against the Joi schema.
+ * So, the order of priority of the configuration sources is: specific, environment and default.
+ * If the validation fails, the manager will use the default values and emit an error that will be
+ * managed by the observability layer.
+ *
  * @category Provider
+ *
  * @param PortClient - Underlying client type, this is, the real client of the wrapped provider
  * @param PortConfig - Port configuration object, could be an extended version of the client config
  * @param T - Port class, this is, the class that extends the {@link Port} abstract class
@@ -304,7 +306,7 @@ export class Manager<PortClient, PortConfig, T extends Port<PortClient, PortConf
     if (this.options.useEnvironment) {
       envConfig = this.options.validation.envBasedConfig;
       if (typeof this.options.useEnvironment === 'string') {
-        envConfig = { ...formatEnv(this.options.useEnvironment), ...envConfig };
+        envConfig = merge(formatEnv(this.options.useEnvironment), envConfig);
       }
     }
     return merge(defaultConfig, envConfig, config);

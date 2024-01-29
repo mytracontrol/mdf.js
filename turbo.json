@@ -21,6 +21,9 @@
     "doc": {
       "outputs": []
     },
+    "envDoc": {
+      "outputs": []
+    },
     "check-dependencies": {
       "outputs": []
     }

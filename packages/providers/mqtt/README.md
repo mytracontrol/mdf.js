@@ -1,10 +1,11 @@
 # **@mdf.js**
 
-[![Node Version](https://img.shields.io/static/v1?style=flat&logo=node.js&logoColor=green&label=node&message=%3E=16%20||%2018&color=blue)](https://nodejs.org/en/)
-[![Typescript Version](https://img.shields.io/static/v1?style=flat&logo=typescript&label=Typescript&message=4.8&color=blue)](https://www.typescriptlang.org/)
-[![Known Vulnerabilities](https://img.shields.io/static/v1?style=flat&logo=snyk&label=Vulnerabilities&message=0&color=300A98F)](https://snyk.io/package/npm/snyk)
+[![Node Version](https://img.shields.io/static/v1?style=flat\&logo=node.js\&logoColor=green\&label=node\&message=%3E=16%20||%2018\&color=blue)](https://nodejs.org/en/)
+[![Typescript Version](https://img.shields.io/static/v1?style=flat\&logo=typescript\&label=Typescript\&message=4.8\&color=blue)](https://www.typescriptlang.org/)
+[![Known Vulnerabilities](https://img.shields.io/static/v1?style=flat\&logo=snyk\&label=Vulnerabilities\&message=0\&color=300A98F)](https://snyk.io/package/npm/snyk)
 
 <!-- markdownlint-disable MD033 MD041 -->
+
 <p align="center">
   <div style="text-align:center;background-image:radial-gradient(circle farthest-corner at 50% 50%, #104c60, #0c0c13);">
     <img src="https://assets.website-files.com/626a3ef32d23835d9b2e4532/6290ab1e2d3e0d922913a6e3_digitalizacion_ENG.svg"alt="netin"width="500">
@@ -16,7 +17,7 @@
 
 <!-- markdownlint-enable MD033 -->
 
-___
+***
 
 ## **Table of contents**
 
@@ -36,8 +37,21 @@ ___
 
 ## **Use**
 
+## **Environment variables**
+
+- **CONFIG\_ARTIFACT\_ID**: undefined
+- **CONFIG\_MQTT\_URL**: undefined
+- **CONFIG\_MQTT\_PROTOCOL**: undefined
+- **CONFIG\_MQTT\_USERNAME**: undefined
+- **CONFIG\_MQTT\_PASSWORD**: undefined
+- **CONFIG\_MQTT\_CLIENT\_ID**: undefined
+- **CONFIG\_MQTT\_KEEPALIVE**: undefined
+- **CONFIG\_MQTT\_CLIENT\_CA\_PATH**: undefined
+- **CONFIG\_MQTT\_CLIENT\_CLIENT\_CERT\_PATH**: undefined
+- **CONFIG\_MQTT\_CLIENT\_CLIENT\_KEY\_PATH**: undefined
+
 ## **License**
 
 Copyright 2024 Mytra Control S.L. All rights reserved.
 
-Use of this source code is governed by an MIT-style license that can be found in the LICENSE file or at https://opensource.org/licenses/MIT.
+Use of this source code is governed by an MIT-style license that can be found in the LICENSE file or at <https://opensource.org/licenses/MIT>.

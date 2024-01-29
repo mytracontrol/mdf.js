@@ -1,10 +1,11 @@
 # **@mdf.js/crash**
 
-[![Node Version](https://img.shields.io/static/v1?style=flat&logo=node.js&logoColor=green&label=node&message=%3E=16%20||%2018&color=blue)](https://nodejs.org/en/)
-[![Typescript Version](https://img.shields.io/static/v1?style=flat&logo=typescript&label=Typescript&message=4.8&color=blue)](https://www.typescriptlang.org/)
-[![Known Vulnerabilities](https://img.shields.io/static/v1?style=flat&logo=snyk&label=Vulnerabilities&message=0&color=300A98F)](https://snyk.io/package/npm/snyk)
+[![Node Version](https://img.shields.io/static/v1?style=flat\&logo=node.js\&logoColor=green\&label=node\&message=%3E=16%20||%2018\&color=blue)](https://nodejs.org/en/)
+[![Typescript Version](https://img.shields.io/static/v1?style=flat\&logo=typescript\&label=Typescript\&message=4.8\&color=blue)](https://www.typescriptlang.org/)
+[![Known Vulnerabilities](https://img.shields.io/static/v1?style=flat\&logo=snyk\&label=Vulnerabilities\&message=0\&color=300A98F)](https://snyk.io/package/npm/snyk)
 
 <!-- markdownlint-disable MD033 MD041 -->
+
 <p align="center">
   <div style="text-align:center;background-image:radial-gradient(circle farthest-corner at 50% 50%, #104c60, #0c0c13);">
     <img src="https://assets.website-files.com/626a3ef32d23835d9b2e4532/6290ab1e2d3e0d922913a6e3_digitalizacion_ENG.svg"alt="netin"width="500">
@@ -16,7 +17,7 @@
 
 <!-- markdownlint-enable MD033 -->
 
-___
+***
 
 ## **Table of contents**
 
@@ -58,7 +59,7 @@ This library provides us with 3 different types of errors to use depending on th
 
 - **Crash**: it is the main type of error, it does not allow adding metadata to the error, which will be specially treated by the logging libraries, as well as relating errors to their causes.
 - **Multi**: it is the type of error mainly used in validation processes in which we can have more than one error that prevents an information input or a group of parameters from being validated. This type of error is the one returned to us by the @ netin-js / doorkeeper validation libraries.
-- **Boom**: this type of error standardizes errors in RESTful environments by providing _helpers_ that allow the easy creation of standardized responses to frontend applications.
+- **Boom**: this type of error standardizes errors in RESTful environments by providing *helpers* that allow the easy creation of standardized responses to frontend applications.
 
 ## **Use**
 
@@ -78,7 +79,7 @@ One of the main and common parameters of the three types of error is the message
 
 ### **Traceability identifier**
 
-According to the standard [RFC 4122](https://es.wikipedia.org/wiki/Identificador_%C3%BAnico_universal), it allows us to associate an identifier of operation or request to the error. This is especially useful for tracing errors in requests or transactions that occur between different systems or libraries. The identifier should be created by the process or system that initiates the operation (Frontend, Service ...), being included in all processes and registers (logging with @mdf.js/logger) so that this can be used in troubleshooting processes. identifier as _filter_, allowing easy extraction.
+According to the standard [RFC 4122](https://es.wikipedia.org/wiki/Identificador_%C3%BAnico_universal), it allows us to associate an identifier of operation or request to the error. This is especially useful for tracing errors in requests or transactions that occur between different systems or libraries. The identifier should be created by the process or system that initiates the operation (Frontend, Service ...), being included in all processes and registers (logging with @mdf.js/logger) so that this can be used in troubleshooting processes. identifier as *filter*, allowing easy extraction.
 
 ![Logging example](media/logging-capture.png)
 
@@ -316,4 +317,4 @@ Any request to the previous endpoint will return the following result:
 
 Copyright 2024 Mytra Control S.L. All rights reserved.
 
-Use of this source code is governed by an MIT-style license that can be found in the LICENSE file or at https://opensource.org/licenses/MIT.
+Use of this source code is governed by an MIT-style license that can be found in the LICENSE file or at <https://opensource.org/licenses/MIT>.

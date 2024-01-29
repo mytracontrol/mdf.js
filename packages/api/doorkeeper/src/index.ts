@@ -5,4 +5,11 @@
  * or at https://opensource.org/licenses/MIT.
  */
 
-export * from './Doorkeeper';
+export {
+  DoorKeeper,
+  DoorkeeperOptions,
+  JSONSchemaType,
+  ResultCallback,
+  SchemaSelector,
+  ValidatedOutput,
+} from './Doorkeeper';
