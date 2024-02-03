@@ -6,7 +6,7 @@
  */
 // *************************************************************************************************
 import { Crash, Multi } from '@mdf.js/crash';
-import { v4 } from 'uuid';
+import { v4, validate } from 'uuid';
 import { DoorKeeper } from '.';
 // #endregion
 // *************************************************************************************************
@@ -149,6 +149,21 @@ const artifactSchema = {
   required: ['id', 'processId', 'release', 'version'],
   additionalProperties: false,
 };
+const myDynamicDefaultsSchema = {
+  $schema: 'http://json-schema.org/draft-07/schema',
+  $id: 'dynamicDefaults.schema.json',
+  title: 'Dynamic Defaults',
+  description: 'Dynamic Defaults',
+  type: 'object',
+  dynamicDefaults: {
+    id: 'uuid',
+  },
+  properties: {
+    id: { type: 'string', format: 'uuid' },
+    test: { type: 'string', default: 'myTest' },
+  },
+  additionalProperties: false,
+};
 dk.register('Config.Artifact', artifactSchema);
 const result = {
   $schema: 'http://json-schema.org/draft-07/schema',
@@ -266,7 +281,7 @@ describe('#DoorKeeper #package', () => {
       expect(myDK.ajv.getKeyword('markdownDescription')).toBeDefined();
       //@ts-ignore - Test environment
       expect(myDK.ajv.getKeyword('defaultSnippets')).toBeDefined();
-    });
+    }, 300);
     it(`Should register all the schemas properly`, () => {
       const test = () => {
         dk.register(schemasArray);
@@ -283,25 +298,25 @@ describe('#DoorKeeper #package', () => {
         expect(dk.dereference('Schema6')).toEqual(result);
       };
       expect(test).not.toThrow();
-    });
+    }, 300);
     it(`Should resolve a correct JSON object when try to validate a schema that is in the scope and is CORRECT`, async () => {
       await expect(dk.validate('Config.Artifact', artifact, v4())).resolves.toBe(artifact);
       await expect(dk.validate('Config.Artifact', artifact)).resolves.toBe(artifact);
-    });
+    }, 300);
     it(`Should invoke the callback a correct JSON object when try to validate a schema that is in the scope and is CORRECT`, done => {
       dk.validate('Config.Artifact', artifact, (error, result) => {
         expect(error).toBeUndefined();
         expect(result).toEqual(artifact);
         done();
       });
-    });
+    }, 300);
     it(`Should invoke the callback a correct JSON object when try to validate a schema that is in the scope and is CORRECT using external uuid`, done => {
       dk.validate('Config.Artifact', artifact, v4(), (error, result) => {
         expect(error).toBeUndefined();
         expect(result).toEqual(artifact);
         done();
       });
-    });
+    }, 300);
     it(`Should invoke the callback with an error when try to validate a schema that is in the scope and is INCORRECT`, done => {
       dk.validate('Config.Artifact', {}, (error, result) => {
         expect(error).toBeInstanceOf(Multi);
@@ -323,7 +338,7 @@ describe('#DoorKeeper #package', () => {
         expect(result).toEqual({});
         done();
       });
-    });
+    }, 300);
     it(`Should invoke the callback with an error when try to validate a schema that is in the scope and is INCORRECT using external uuid`, done => {
       dk.validate('Config.Artifact', {}, v4(), (error, result) => {
         expect(error).toBeInstanceOf(Multi);
@@ -345,18 +360,38 @@ describe('#DoorKeeper #package', () => {
         expect(result).toEqual({});
         done();
       });
-    });
+    }, 300);
     it(`Should resolve a correct JSON object when attempt to validate a schema that is in the scope and is CORRECT`, () => {
       expect(dk.attempt('Config.Artifact', artifact, v4())).toBe(artifact);
       expect(dk.attempt('Config.Artifact', artifact)).toBe(artifact);
-    });
+    }, 300);
     it(`Should return a TRUE value when try to check a schema that is in the scope and is CORRECT`, () => {
       expect(dk.check('Config.Artifact', artifact)).toBeTruthy();
       expect(dk.check('Config.Artifact', artifact, v4())).toBeTruthy();
-    });
+    }, 300);
     it(`Should return a FALSE value when try to check a schema that is in the scope and is INCORRECT`, () => {
       expect(dk.check('Config.Artifact', {})).toBeFalsy();
       expect(dk.check('Config.Artifact', {}, v4())).toBeFalsy();
+    }, 300);
+    it(`Should be able to use default and dynamic default properly`, () => {
+      const myDK = new DoorKeeper({
+        $data: true,
+        verbose: true,
+        coerceTypes: true,
+        useDefaults: true,
+        dynamicDefaults: {
+          uuid: () => v4,
+        },
+      });
+      myDK.register('Test', myDynamicDefaultsSchema);
+      try {
+        const result = myDK.attempt('Test', {});
+        expect(result).toHaveProperty('id');
+        expect(validate(result.id)).toBeTruthy();
+        expect(result).toHaveProperty('test', 'myTest');
+      } catch (error) {
+        throw error;
+      }
     });
   });
   describe('#Sad path', () => {
@@ -378,7 +413,7 @@ describe('#DoorKeeper #package', () => {
         );
         done();
       }
-    });
+    }, 300);
     it(`Should throw with a Crash error when we attempt to register an schema a ajv throw`, done => {
       try {
         const myDK = new DoorKeeper();
@@ -396,7 +431,7 @@ describe('#DoorKeeper #package', () => {
         expect((error as Crash).cause?.message).toEqual('Error');
         done();
       }
-    });
+    }, 300);
     it(`Should throw with a Crash error when we attempt to compile an schema a ajv throw`, done => {
       try {
         const myDK = new DoorKeeper();
@@ -414,14 +449,14 @@ describe('#DoorKeeper #package', () => {
         expect((error as Crash).cause?.message).toEqual('Error');
         done();
       }
-    });
+    }, 300);
     it(`Should throw with a Crash error when we attempt to compile an invalid schema`, () => {
       const test = () => {
         const myDK = new DoorKeeper();
         myDK.register([{ type: 'value' }]);
       };
       expect(test).toThrow();
-    });
+    }, 300);
     it(`Should reject with a Crash error when we try to validate a schema that is not in the scope`, async () => {
       try {
         await dk.validate('noRealSchema', {}, v4());
@@ -433,7 +468,7 @@ describe('#DoorKeeper #package', () => {
         expect((error as Crash).name).toEqual('ValidationError');
         expect((error as Crash).info).toHaveProperty('schema');
       }
-    });
+    }, 300);
     it(`Should call the callback with a Crash error when we try to validate a schema that is not in the scope`, done => {
       const callback = (error?: Crash | Multi, data?: any) => {
         expect(error).toBeInstanceOf(Crash);
@@ -447,7 +482,7 @@ describe('#DoorKeeper #package', () => {
       const myDK = new DoorKeeper();
       myDK.register(schemas);
       myDK.validate('noRealSchema', {}, v4(), callback);
-    });
+    }, 300);
     it(`Should call the callback with a Crash error when a unexpected problems occurs with ajv validation in a validation process`, () => {
       const callback = (error?: Crash | Multi, data?: any) => {
         expect(error).toBeInstanceOf(Crash);
@@ -470,7 +505,7 @@ describe('#DoorKeeper #package', () => {
       //@ts-ignore - Test environment
       jest.spyOn(myDK.ajv, 'getSchema').mockReturnValue(validator);
       myDK.validate('Schema1', {}, v4(), callback);
-    });
+    }, 300);
     it(`Should call the callback with a Crash error when a unexpected problems occurs with ajv validation in an attempt process`, done => {
       const myDK = new DoorKeeper();
       myDK.register(schemas);
@@ -495,7 +530,7 @@ describe('#DoorKeeper #package', () => {
         expect((error as Crash).info).toHaveProperty('data');
         done();
       }
-    });
+    }, 300);
     it(`Should throw with a Crash error when we attempt to validate a schema that is not in the scope`, done => {
       try {
         dk.attempt('noRealSchema', {}, v4());
@@ -508,7 +543,7 @@ describe('#DoorKeeper #package', () => {
         expect((error as Crash).info).toHaveProperty('schema');
         done();
       }
-    });
+    }, 300);
     it(`Should reject the validation process when try to validate a schema that is in the scope but is INCORRECT`, async () => {
       try {
         await dk.validate('Config.Artifact', { numHosts: 'badProperty' }, v4());
@@ -532,7 +567,7 @@ describe('#DoorKeeper #package', () => {
           'ValidationError: must NOT have additional properties - Property: [numHosts] - Value: [{"numHosts":"badProperty"}]',
         ]);
       }
-    });
+    }, 300);
     it(`Should throw the validation process when attempt to validate a schema that is in the scope but is INCORRECT`, done => {
       try {
         dk.attempt(
@@ -554,7 +589,7 @@ describe('#DoorKeeper #package', () => {
         expect((error as Multi).causes).toBeDefined();
         done();
       }
-    });
+    }, 300);
   });
 });
 // #endregion

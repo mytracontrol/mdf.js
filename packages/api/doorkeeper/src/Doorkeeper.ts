@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /**
  * Copyright 2024 Mytra Control S.L. All rights reserved.
  *
@@ -13,6 +14,8 @@ import { AnyValidateFunction } from 'ajv/dist/core';
 import { get } from 'jsonpointer';
 import { cloneDeep, forOwn, omit } from 'lodash';
 import { v4 } from 'uuid';
+
+import DynamicDefaults, { DynamicDefaultFunc } from 'ajv-keywords/dist/definitions/dynamicDefaults';
 
 const DEFAULT_SNIPPET_META_SCHEMA = {
   title: 'Default snippets',
@@ -33,11 +36,14 @@ export type SchemaSelector<T> = T extends void ? string : keyof T & string;
 export type ValidatedOutput<T, K> = K extends keyof T ? T[K] : any;
 
 /**
- * AJV options but all errors must be true
+ * This is the AJV Options object, but `allErrors` property is always true by default
  *
- * See {@link Options} for more information
+ * See [AJV Options](https://ajv.js.org/options.html) for more information
  */
-export type DoorkeeperOptions = Options;
+export interface DoorkeeperOptions extends Omit<Options, 'allErrors'> {
+  /** Dynamic defaults to be used in the schemas */
+  dynamicDefaults?: Record<string, DynamicDefaultFunc>;
+}
 export { JSONSchemaType } from 'ajv';
 
 /** Callback function for the validation process */
@@ -58,8 +64,15 @@ export class DoorKeeper<T = void> {
    * @param options - Doorkeeper options
    */
   constructor(public readonly options?: DoorkeeperOptions) {
-    this.options = options ? { ...options, allErrors: true } : { allErrors: true };
-    this.ajv = AJVFormats(AJVKeyWords(AJVError(new AJV(this.options))));
+    const AJVOptions: Options = this.options
+      ? { ...this.options, allErrors: true }
+      : { allErrors: true };
+    if (this.options?.dynamicDefaults) {
+      for (const [key, func] of Object.entries(this.options.dynamicDefaults)) {
+        DynamicDefaults.DEFAULTS[key] = func;
+      }
+    }
+    this.ajv = AJVFormats(AJVKeyWords(AJVError(new AJV(AJVOptions))));
     this.ajv.addKeyword({ keyword: 'markdownDescription', schemaType: 'string', valid: true });
     this.ajv.addKeyword({
       keyword: 'defaultSnippets',
