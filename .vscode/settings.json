@@ -63,7 +63,8 @@
     "doorkeeper",
     "faker",
     "kafka-provider",
-    "mqtt-provider"
+    "mqtt-provider",
+    "utils"
   ],
 
 }

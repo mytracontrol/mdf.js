@@ -6,35 +6,55 @@
  */
 
 import { Boom, Crash, Multi } from '@mdf.js/crash';
+import timers from 'timers/promises';
 
 export const WAIT_TIME = 100;
 export const MAX_WAIT_TIME = 15000;
 export type LoggerFunction = (error: Crash | Multi | Boom) => void;
-const DEFAULT_RETRY_OPTIONS = {
+
+/** Represents the options for retrying an operation */
+export interface RetryOptions {
+  /** The logger function used for logging retry attempts */
+  logger?: LoggerFunction;
+  /** The time to wait between retry attempts, in milliseconds */
+  waitTime?: number;
+  /** The maximum time to wait between retry attempts, in milliseconds */
+  maxWaitTime?: number;
+  /**
+   * A function that determines whether to interrupt the retry process
+   * Should return true to interrupt, false otherwise.
+   */
+  interrupt?: () => boolean;
+  /** The maximum number of retry attempts. */
+  attempts?: number;
+  /** Timeout for each try */
+  timeout?: number;
+}
+
+/** Represents the parameters for retrying an operation */
+interface RetryParameters extends Required<Omit<RetryOptions, 'logger' | 'interrupt' | 'timeout'>> {
+  /** The logger function used for logging retry attempts */
+  logger?: LoggerFunction;
+  /**
+   * A function that determines whether to interrupt the retry process
+   * Should return true to interrupt, false otherwise.
+   */
+  interrupt?: () => boolean;
+  /** The actual number of retry attempts. */
+  actualAttempt: number;
+  /** Timeout for each try */
+  timeout?: number;
+}
+
+const DEFAULT_RETRY_OPTIONS: RetryParameters = {
   logger: undefined,
   waitTime: WAIT_TIME,
   maxWaitTime: MAX_WAIT_TIME,
   interrupt: undefined,
   attempts: Number.MAX_SAFE_INTEGER,
   actualAttempt: 1,
+  timeout: undefined,
 };
-
-export interface RetryOptions {
-  logger?: LoggerFunction;
-  waitTime?: number;
-  maxWaitTime?: number;
-  interrupt?: () => boolean;
-  attempts?: number;
-}
-
-interface RetryParameters {
-  logger?: LoggerFunction;
-  waitTime: number;
-  maxWaitTime: number;
-  interrupt?: () => boolean;
-  attempts: number;
-  actualAttempt: number;
-}
 
 /**
  * Auxiliar function to perform the wait process
@@ -54,7 +74,24 @@ const logging = (error: Crash | Multi | Boom, loggerFunc?: LoggerFunction) => {
     loggerFunc(error);
   }
 };
-
+/**
+ * Auxiliar function to create the watchdog promise for the timeout
+ * @param signal - signal to be used for the timeout
+ * @param attempts - actual function call attempts
+ * @param timeout - time in milliseconds to wait for retry
+ */
+const watchdog = (signal: AbortSignal, attempts: number, timeout?: number) => {
+  if (timeout === undefined) {
+    return null;
+  } else {
+    return timers.setTimeout(timeout, undefined, { signal }).then(() => {
+      throw new Crash(`The execution of the try number ${attempts} has timed out`, {
+        name: 'TimeoutError',
+        info: { timeout },
+      });
+    });
+  }
+};
 /**
  * Calculate the new wait time for the next call
  * @param actualWaitTime - Actual wait time
@@ -123,9 +160,18 @@ export const retryBind = async <T, U>(
   options: RetryOptions = {}
 ): Promise<T> => {
   const parameters = { ...DEFAULT_RETRY_OPTIONS, ...options };
+  const controller = new AbortController();
   try {
-    return await task.bind(bindTo).apply(task, funcArgs);
+    const result = await Promise.race(
+      [
+        task.bind(bindTo).apply(task, funcArgs),
+        watchdog(controller.signal, parameters.actualAttempt, parameters.timeout),
+      ].filter(Boolean)
+    );
+    controller.abort();
+    return result as T;
   } catch (error) {
+    controller.abort();
     return retryBind(task, bindTo, funcArgs, await errorManagement(error, parameters));
   }
 };
@@ -143,9 +189,18 @@ export const retry = async <T>(
   options: RetryOptions = {}
 ): Promise<T> => {
   const parameters = { ...DEFAULT_RETRY_OPTIONS, ...options };
+  const controller = new AbortController();
   try {
-    return await task.apply(task, funcArgs);
+    const result = await Promise.race(
+      [
+        task.apply(task, funcArgs),
+        watchdog(controller.signal, parameters.actualAttempt, parameters.timeout),
+      ].filter(Boolean)
+    );
+    controller.abort();
+    return result as T;
   } catch (error: unknown) {
+    controller.abort();
     return retry(task, funcArgs, await errorManagement(error, parameters));
   }
 };

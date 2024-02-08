@@ -8,7 +8,7 @@
 // #region Component imports
 import { Boom, Crash, Multi } from '@mdf.js/crash';
 import { v4 } from 'uuid';
-import { retry, retryBind } from './retry';
+import { RetryOptions, retry, retryBind } from './retry';
 // #endregion
 // ************************************************************************************************
 // #region Test
@@ -235,5 +235,80 @@ describe('#Retry', () => {
         return;
       }
     }, 300);
+    it(`Should interrupt each try if the timeout for the try is reached`, async () => {
+      let called = false;
+      let tries = 0;
+      function logger(error: Crash | Multi | Boom): void {
+        expect((error as Crash).message).toEqual(
+          `The execution of the try number ${tries + 1} has timed out`
+        );
+        tries += 1;
+        called = true;
+      }
+      const options: RetryOptions = {
+        waitTime: 100,
+        maxWaitTime: 100,
+        attempts: 3,
+        timeout: 50,
+        logger,
+      };
+      function myPromise(): Promise<number> {
+        return new Promise((resolve, reject) => {
+          setTimeout(() => {
+            reject(new Crash('myError', v4()));
+          }, 100);
+        });
+      }
+      try {
+        await retry(myPromise, [], options);
+        throw new Error(`Should throw an error`);
+      } catch (error: unknown) {
+        expect(called).toBe(true);
+        expect(tries).toBe(3);
+        expect((error as Crash).message).toEqual(
+          'Too much attempts [3], the promise will not be retried'
+        );
+        return;
+      }
+    }, 500);
+    it(`Should interrupt each try if the timeout for the try is reached, binded`, async () => {
+      let called = false;
+      let tries = 0;
+      function logger(error: Crash | Multi | Boom): void {
+        expect((error as Crash).message).toEqual(
+          `The execution of the try number ${tries + 1} has timed out`
+        );
+        tries += 1;
+        called = true;
+      }
+      const options: RetryOptions = {
+        waitTime: 100,
+        maxWaitTime: 100,
+        attempts: 3,
+        timeout: 50,
+        logger,
+      };
+      class MyClass {
+        public myPromise(): Promise<number> {
+          return new Promise((resolve, reject) => {
+            setTimeout(() => {
+              reject(new Crash('myError', v4()));
+            }, 100);
+          });
+        }
+      }
+      const myClass = new MyClass();
+      try {
+        await retryBind(myClass.myPromise, myClass, [], options);
+        throw new Error(`Should throw an error`);
+      } catch (error: unknown) {
+        expect(called).toBe(true);
+        expect(tries).toBe(3);
+        expect((error as Crash).message).toEqual(
+          'Too much attempts [3], the promise will not be retried'
+        );
+        return;
+      }
+    }, 500);
   });
 });
