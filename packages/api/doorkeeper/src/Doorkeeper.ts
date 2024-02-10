@@ -79,6 +79,7 @@ export class DoorKeeper<T = void> {
       metaSchema: DEFAULT_SNIPPET_META_SCHEMA,
       valid: true,
     });
+    this.options = AJVOptions;
   }
   /**
    * Add a new schema to the ajv collection

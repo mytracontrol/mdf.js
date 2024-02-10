@@ -66,7 +66,7 @@ export class RunningState implements State {
   }
   /** Clean event handlers for error state */
   private cleanEventHandlers() {
-    this.instance.off('disconnected', this.errorEventHandler);
+    this.instance.off('closed', this.errorEventHandler);
     this.instance.off('unhealthy', this.errorEventHandler);
   }
 }

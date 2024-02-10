@@ -13,6 +13,8 @@ import { Client, Config } from './types';
 
 const DEFAULT_PING_CHECK_INTERVAL = 10000;
 
+export { IClientPublishOptions, IPublishPacket } from 'mqtt';
+
 /** MQTT port implementation */
 export class Port extends Layer.Provider.Port<Client, Config> {
   /** MQTT connection handler */

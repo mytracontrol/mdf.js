@@ -100,7 +100,10 @@ export class Manager<PortClient, PortConfig, T extends Port<PortClient, PortConf
     this.componentId = this.port.uuid;
     this.logger = SetContext(this.logger, this.options.name, this.componentId);
     this._date = new Date().toISOString();
-    this.port.on('error', this.manageError);
+    this.port.on('error', error => {
+      this.logger.error(`New error event from port: ${error.message}`, this.componentId);
+      this.manageError(error);
+    });
     if (this._error) {
       this._state = this.changeState(new ErrorState(this.port, this.changeState, this.manageError));
     } else {
@@ -196,37 +199,34 @@ export class Manager<PortClient, PortConfig, T extends Port<PortClient, PortConf
    * @returns
    */
   private formatError(error: unknown): Multi | Crash {
-    let formatError: ProviderError;
+    let formattedError: ProviderError;
     if (error instanceof ValidationError) {
       if (
         this._error &&
         this._error instanceof Multi &&
         this._error.findCauseByName('ValidationError')
       ) {
-        formatError = this._error;
+        formattedError = this._error;
       } else {
-        formatError = new Multi(`Error in the provider configuration process`, this.componentId);
+        formattedError = new Multi(`Error in the provider configuration process`, this.componentId);
       }
-      formatError.Multify(error);
+      formattedError.Multify(error);
     } else if (error instanceof Crash || error instanceof Multi) {
-      formatError = error;
+      formattedError = error;
     } else if (error instanceof Error) {
-      formatError = new Crash(error.message, this.componentId);
+      formattedError = new Crash(error.message, this.componentId);
     } else if (typeof error === 'string') {
-      formatError = new Crash(error, this.componentId);
+      formattedError = new Crash(error, this.componentId);
     } else if (
       error &&
       typeof error === 'object' &&
       typeof (error as Record<string, any>)['message'] === 'string'
     ) {
-      formatError = new Crash((error as Record<string, any>)['message']);
+      formattedError = new Crash((error as Record<string, any>)['message']);
     } else {
-      formatError = new Crash(
-        `Unknown error in port ${this.options.name}, triggered during configuration process`,
-        this.componentId
-      );
+      formattedError = new Crash(`Unknown error in port ${this.options.name}`, this.componentId);
     }
-    return formatError;
+    return formattedError;
   }
   /**
    * Manage the errors in the provider (logging, emitting, last error ...)

@@ -1260,9 +1260,7 @@ describe('#Provider #API', () => {
           { myParam: 'myValue', fail: true, empty: true }
         );
       };
-      expect(test).toThrowError(
-        'Unknown error in port myProvider, triggered during configuration process'
-      );
+      expect(test).toThrow('Unknown error in port myProvider');
     }, 300);
   });
 });
