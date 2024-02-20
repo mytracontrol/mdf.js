@@ -4,7 +4,7 @@
  * Use of this source code is governed by an MIT-style license that can be found in the LICENSE file
  * or at https://opensource.org/licenses/MIT.
  */
-import { Logger } from '@mdf.js/logger';
+import { LoggerInstance } from '@mdf.js/logger';
 import { RequestHandler } from 'express';
 import { IncomingMessage, ServerResponse } from 'http';
 import morgan from 'morgan';
@@ -38,7 +38,7 @@ function logLevelPerStatus(status: number): string {
 function expressLogger<
   Request extends IncomingMessage = IncomingMessage,
   Response extends ServerResponse = ServerResponse,
->(logger: Logger): Handler<Request, Response> {
+>(logger: LoggerInstance): Handler<Request, Response> {
   return morgan<Request, Response>(
     (tokens: morgan.TokenIndexer<Request, Response>, req: Request, res: Response) => {
       const status = tokens['status'](req, res) || '-';
@@ -65,7 +65,7 @@ function expressLogger<
 
 export class LoggerMiddleware {
   /** Request logger middleware handler */
-  public static handler(logger: Logger): RequestHandler {
+  public static handler(logger: LoggerInstance): RequestHandler {
     return expressLogger(logger);
   }
 }

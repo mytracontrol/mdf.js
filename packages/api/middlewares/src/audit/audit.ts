@@ -4,7 +4,7 @@
  * Use of this source code is governed by an MIT-style license that can be found in the LICENSE file
  * or at https://opensource.org/licenses/MIT.
  */
-import { Logger } from '@mdf.js/logger';
+import { LoggerInstance } from '@mdf.js/logger';
 import { NextFunction, Request, RequestHandler, Response } from 'express';
 import { AuditConfig } from './AuditConfig.i';
 
@@ -12,7 +12,7 @@ import { AuditConfig } from './AuditConfig.i';
  * Audit logger function
  * @param options - audit options
  */
-function log(options: AuditConfig, logger: Logger): RequestHandler {
+function log(options: AuditConfig, logger: LoggerInstance): RequestHandler {
   return (req: Request, res: Response, next: NextFunction) => {
     const metadata = {
       actor: req.user,
@@ -36,13 +36,13 @@ function log(options: AuditConfig, logger: Logger): RequestHandler {
 
 export class Audit {
   /** Logger middleware */
-  private readonly logger: Logger;
+  private readonly logger: LoggerInstance;
   /**
    * Audit logger middleware instance
    * @param logger - logger instance to be used for audit
    * @returns
    */
-  public static instance(logger: Logger): Audit {
+  public static instance(logger: LoggerInstance): Audit {
     return new Audit(logger);
   }
   /**
@@ -51,14 +51,14 @@ export class Audit {
    * @param auditOptions - audit options
    * @returns
    */
-  public static handler(logger: Logger, auditOptions: AuditConfig): RequestHandler {
+  public static handler(logger: LoggerInstance, auditOptions: AuditConfig): RequestHandler {
     return log(auditOptions, logger);
   }
   /**
    * Create a new instance of AuditLogger
    * @param logger - logger instance to be used for audit
    */
-  private constructor(logger: Logger) {
+  private constructor(logger: LoggerInstance) {
     this.logger = logger;
   }
   /**

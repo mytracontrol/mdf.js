@@ -13,6 +13,9 @@ export type LoggerFunction = (
   context?: string,
   ...meta: any[]
 ) => void;
+/**
+ * Represents a logger instance with different log levels and functions.
+ */
 export interface LoggerInstance {
   /**
    * Log events in the SILLY level: all the information in a very detailed way.
@@ -76,4 +79,10 @@ export interface LoggerInstance {
    * @param context - context (class/function) where this logger is logging
    */
   crash: (error: Crash | Boom | Multi, context?: string) => void;
+  /**
+   * Logs events in the stream.
+   */
+  stream: {
+    write: (message: string) => void;
+  };
 }

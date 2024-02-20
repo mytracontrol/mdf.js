@@ -97,6 +97,13 @@ class WrapperLogger {
   crash = (rawError: Crash | Boom | Multi, context?: string) => {
     this.logger.crash(rawError, context || this.context);
   };
+  /** Stream logger */
+  stream: { write: (message: string) => void } = {
+    write: (message: string) => {
+      const data = JSON.parse(message);
+      this.logger.stream.write(data);
+    },
+  };
 }
 /**
  * Create a wrapped version of the logger where the context and uuid are already set

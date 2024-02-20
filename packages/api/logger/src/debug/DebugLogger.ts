@@ -103,4 +103,11 @@ export class DebugLogger implements LoggerInstance {
       this.logger.extend('error')(entry);
     }
   };
+  /** Stream logger */
+  stream: { write: (message: string) => void } = {
+    write: (message: string) => {
+      const data = JSON.parse(message);
+      this.logger.extend(data.level)(data.message);
+    },
+  };
 }

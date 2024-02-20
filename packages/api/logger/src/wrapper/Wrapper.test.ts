@@ -31,6 +31,7 @@ class MyLogger implements LoggerInstance {
   crash = (raw: Crash | Boom | Multi, context?: string) => {
     this.value = raw.message + ': ' + context;
   };
+  stream = { write: (message: string) => {} };
 }
 
 describe('#Wrapper', () => {

@@ -23,7 +23,8 @@
     "Middlewares",
     "openc2",
     "OpenC2",
-    "OPENC2"
+    "OPENC2",
+    "RESTAPI"
   ],
   "sonarlint.connectedMode.project": {
     "projectKey": "Mytra-Development-Framework-NDF-TypeScript"
