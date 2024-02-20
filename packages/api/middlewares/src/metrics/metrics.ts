@@ -9,78 +9,80 @@ import { Counter, Gauge, Histogram, MetricConfig, MetricsRegistry } from '@mdf.j
 import { NextFunction, Request, RequestHandler, Response } from 'express';
 
 /** Global metric for API */
-const METRICS_DEFINITIONS: Record<string, MetricConfig> = {
-  api_all_request_total: {
-    type: 'Counter',
-    name: 'api_all_request_total',
-    help: 'The total number of all API requests received',
-  },
-  api_all_info_total: {
-    type: 'Counter',
-    name: 'api_all_info_total',
-    help: 'The total number of all API requests with informative response',
-  },
-  api_all_success_total: {
-    type: 'Counter',
-    name: 'api_all_success_total',
-    help: 'The total number of all API requests with success response',
-  },
-  api_all_redirect_total: {
-    type: 'Counter',
-    name: 'api_all_redirect_total',
-    help: 'The total number of all API requests with redirect response',
-  },
-  api_all_errors_total: {
-    type: 'Counter',
-    name: 'api_all_errors_total',
-    help: 'The total number of all API requests with error response',
-  },
-  api_all_client_error_total: {
-    type: 'Counter',
-    name: 'api_all_client_error_total',
-    help: 'The total number of all API requests with client error response',
-  },
-  api_all_server_error_total: {
-    type: 'Counter',
-    name: 'api_all_server_error_total',
-    help: 'The total number of all API requests with server error response',
-  },
-  api_all_request_in_processing_total: {
-    type: 'Gauge',
-    name: 'api_all_request_in_processing_total',
-    help: 'The total number of all API requests currently in processing (no response yet)',
-  },
-  /** API Operation counters, labeled with method, path and code */
-  api_request_total: {
-    type: 'Counter',
-    name: 'api_request_total',
-    help: 'The total number of all API requests',
-    labelNames: ['method', 'path', 'code'],
-  },
-  /** API request duration histogram, labeled with method, path and code */
-  api_request_duration_milliseconds: {
-    type: 'Histogram',
-    name: 'api_request_duration_milliseconds',
-    help: 'API requests duration',
-    labelNames: ['method', 'path', 'code'],
-    buckets: [5, 10, 25, 50, 100, 250, 500, 1000, 2500, 5000, 10000],
-  },
-  /** API request size histogram, labeled with method, path and code */
-  api_request_size_bytes: {
-    type: 'Histogram',
-    name: 'api_request_size_bytes',
-    help: 'API requests size',
-    labelNames: ['method', 'path', 'code'],
-    buckets: [5, 10, 25, 50, 100, 250, 500, 1000, 2500, 5000, 10000],
-  },
-  /** API response size histogram, labeled with method, path and code */
-  api_response_size_bytes: {
-    type: 'Histogram',
-    name: 'api_response_size_bytes',
-    help: 'API requests size',
-    labelNames: ['method', 'path', 'code'],
-    buckets: [5, 10, 25, 50, 100, 250, 500, 1000, 2500, 5000, 10000],
-  },
+const METRICS_DEFINITIONS = (prefix: string = ''): Record<string, MetricConfig> => {
+  return {
+    api_all_request_total: {
+      type: 'Counter',
+      name: `${prefix}api_all_request_total`,
+      help: 'The total number of all API requests received',
+    },
+    api_all_info_total: {
+      type: 'Counter',
+      name: `${prefix}api_all_info_total`,
+      help: 'The total number of all API requests with informative response',
+    },
+    api_all_success_total: {
+      type: 'Counter',
+      name: `${prefix}api_all_success_total`,
+      help: 'The total number of all API requests with success response',
+    },
+    api_all_redirect_total: {
+      type: 'Counter',
+      name: `${prefix}api_all_redirect_total`,
+      help: 'The total number of all API requests with redirect response',
+    },
+    api_all_errors_total: {
+      type: 'Counter',
+      name: `${prefix}api_all_errors_total`,
+      help: 'The total number of all API requests with error response',
+    },
+    api_all_client_error_total: {
+      type: 'Counter',
+      name: `${prefix}api_all_client_error_total`,
+      help: 'The total number of all API requests with client error response',
+    },
+    api_all_server_error_total: {
+      type: 'Counter',
+      name: `${prefix}api_all_server_error_total`,
+      help: 'The total number of all API requests with server error response',
+    },
+    api_all_request_in_processing_total: {
+      type: 'Gauge',
+      name: `${prefix}api_all_request_in_processing_total`,
+      help: 'The total number of all API requests currently in processing (no response yet)',
+    },
+    /** API Operation counters, labeled with method, path and code */
+    api_request_total: {
+      type: 'Counter',
+      name: `${prefix}api_request_total`,
+      help: 'The total number of all API requests',
+      labelNames: ['method', 'path', 'code'],
+    },
+    /** API request duration histogram, labeled with method, path and code */
+    api_request_duration_milliseconds: {
+      type: 'Histogram',
+      name: `${prefix}api_request_duration_milliseconds`,
+      help: 'API requests duration',
+      labelNames: ['method', 'path', 'code'],
+      buckets: [5, 10, 25, 50, 100, 250, 500, 1000, 2500, 5000, 10000],
+    },
+    /** API request size histogram, labeled with method, path and code */
+    api_request_size_bytes: {
+      type: 'Histogram',
+      name: `${prefix}api_request_size_bytes`,
+      help: 'API requests size',
+      labelNames: ['method', 'path', 'code'],
+      buckets: [5, 10, 25, 50, 100, 250, 500, 1000, 2500, 5000, 10000],
+    },
+    /** API response size histogram, labeled with method, path and code */
+    api_response_size_bytes: {
+      type: 'Histogram',
+      name: `${prefix}api_response_size_bytes`,
+      help: 'API requests size',
+      labelNames: ['method', 'path', 'code'],
+      buckets: [5, 10, 25, 50, 100, 250, 500, 1000, 2500, 5000, 10000],
+    },
+  };
 };
 /** Metric types */
 type MetricInstances = {
@@ -107,17 +109,19 @@ export class Metrics {
   /**
    * Return a metrics middleware instance
    * @param service - Metrics registry interface
+   * @param prefix - Metrics prefix
    */
-  public static handler(service: MetricsRegistry): RequestHandler {
-    return new Metrics(service).handler;
+  public static handler(service: MetricsRegistry, prefix?: string): RequestHandler {
+    return new Metrics(service, prefix).handler;
   }
   /**
    * Create a new instance of metrics express middleware class
    * @param service - Metrics registry interface
+   * @param prefix - Metrics prefix
    */
-  private constructor(service: MetricsRegistry) {
+  private constructor(service: MetricsRegistry, prefix?: string) {
     this.service = service;
-    this.metrics = this.service.setMetrics<MetricInstances>(METRICS_DEFINITIONS);
+    this.metrics = this.service.setMetrics<MetricInstances>(METRICS_DEFINITIONS(prefix));
   }
   /** Return response status code class */
   private increaseCounterMetricByCode(code: number): void {

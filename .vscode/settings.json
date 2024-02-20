@@ -65,7 +65,9 @@
     "faker",
     "kafka-provider",
     "mqtt-provider",
-    "utils"
+    "utils",
+    "logger",
+    "middlewares"
   ],
 
 }

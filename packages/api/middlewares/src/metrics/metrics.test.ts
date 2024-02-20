@@ -17,12 +17,13 @@ import { Middleware } from '..';
 const app = express();
 const service = MetricsRegistry.create();
 
+const prefix = `api_`;
 app.use(Middleware.RequestId.handler());
 app.use(Middleware.BodyParser.JSONParserHandler());
 app.use(Middleware.BodyParser.TextParserHandler());
 app.use(Middleware.BodyParser.RawParserHandler());
 app.use(Middleware.BodyParser.URLEncodedParserHandler());
-app.use(Middleware.Metrics.handler(service));
+app.use(Middleware.Metrics.handler(service, prefix));
 app.use(Middleware.ErrorHandler.handler());
 app.get('/example', (req, res) => {
   res.status(200).json({ result: 'test' });
@@ -46,18 +47,18 @@ app.get('/example500', (req, res) => {
 describe('#Middleware #metrics', () => {
   describe('#Happy path', () => {
     it(`Should response 200 and increase the metrics counter when a request is performed over a regular endpoint`, async () => {
-      const previous = await service.getMetricAsJSON('api_all_request_total');
-      const previousInfo = await service.getMetricAsJSON('api_all_success_total');
+      const previous = await service.getMetricAsJSON(`${prefix}api_all_request_total`);
+      const previousInfo = await service.getMetricAsJSON(`${prefix}api_all_success_total`);
       expect(previous).toEqual({
         help: 'The total number of all API requests received',
-        name: 'api_all_request_total',
+        name: `${prefix}api_all_request_total`,
         type: 'counter',
         values: [{ value: 0, labels: {} }],
         aggregator: 'sum',
       });
       expect(previousInfo).toEqual({
         help: 'The total number of all API requests with success response',
-        name: 'api_all_success_total',
+        name: `${prefix}api_all_success_total`,
         type: 'counter',
         values: [{ value: 0, labels: {} }],
         aggregator: 'sum',
@@ -68,18 +69,18 @@ describe('#Middleware #metrics', () => {
         .set('Accept', '*/*')
         .then(async response => {
           expect(response.status).toEqual(200);
-          const post = await service.getMetricAsJSON('api_all_request_total');
-          const postInfo = await service.getMetricAsJSON('api_all_success_total');
+          const post = await service.getMetricAsJSON(`${prefix}api_all_request_total`);
+          const postInfo = await service.getMetricAsJSON(`${prefix}api_all_success_total`);
           expect(post).toEqual({
             help: 'The total number of all API requests received',
-            name: 'api_all_request_total',
+            name: `${prefix}api_all_request_total`,
             type: 'counter',
             values: [{ value: 1, labels: {} }],
             aggregator: 'sum',
           });
           expect(postInfo).toEqual({
             help: 'The total number of all API requests with success response',
-            name: 'api_all_success_total',
+            name: `${prefix}api_all_success_total`,
             type: 'counter',
             values: [{ value: 1, labels: {} }],
             aggregator: 'sum',
@@ -90,10 +91,10 @@ describe('#Middleware #metrics', () => {
         });
     }, 300);
     it(`Should response 101 and increase the metrics counter when a request is performed over a regular endpoint`, async () => {
-      const previous = await service.getMetricAsJSON('api_all_info_total');
+      const previous = await service.getMetricAsJSON(`${prefix}api_all_info_total`);
       expect(previous).toEqual({
         help: 'The total number of all API requests with informative response',
-        name: 'api_all_info_total',
+        name: `${prefix}api_all_info_total`,
         type: 'counter',
         values: [{ value: 0, labels: {} }],
         aggregator: 'sum',
@@ -104,10 +105,10 @@ describe('#Middleware #metrics', () => {
       //   .set('Accept', '*/*')
       //   .then(async response => {
       //     expect(response.status).toEqual(100);
-      //     const post = await service.getMetricAsJSON('api_all_info_total');
+      //     const post = await service.getMetricAsJSON(`${prefix}api_all_info_total`);
       //     expect(post).toEqual({
       //       help: 'The total number of all API requests with informative response',
-      //       name: 'api_all_info_total',
+      //       name: `${prefix}api_all_info_total`,
       //       type: 'counter',
       //       values: [{ value: 1, labels: {} }],
       //       aggregator: 'sum',
@@ -118,10 +119,10 @@ describe('#Middleware #metrics', () => {
       //   });
     }, 300);
     it(`Should response 300 and increase the metrics counter when a request is performed over a regular endpoint`, async () => {
-      const previous = await service.getMetricAsJSON('api_all_redirect_total');
+      const previous = await service.getMetricAsJSON(`${prefix}api_all_redirect_total`);
       expect(previous).toEqual({
         help: 'The total number of all API requests with redirect response',
-        name: 'api_all_redirect_total',
+        name: `${prefix}api_all_redirect_total`,
         type: 'counter',
         values: [{ value: 0, labels: {} }],
         aggregator: 'sum',
@@ -132,10 +133,10 @@ describe('#Middleware #metrics', () => {
         .set('Accept', '*/*')
         .then(async response => {
           expect(response.status).toEqual(300);
-          const post = await service.getMetricAsJSON('api_all_redirect_total');
+          const post = await service.getMetricAsJSON(`${prefix}api_all_redirect_total`);
           expect(post).toEqual({
             help: 'The total number of all API requests with redirect response',
-            name: 'api_all_redirect_total',
+            name: `${prefix}api_all_redirect_total`,
             type: 'counter',
             values: [{ value: 1, labels: {} }],
             aggregator: 'sum',
@@ -146,10 +147,10 @@ describe('#Middleware #metrics', () => {
         });
     }, 300);
     it(`Should response 400 and increase the metrics counter when a request is performed over a regular endpoint`, async () => {
-      const previous = await service.getMetricAsJSON('api_all_client_error_total');
+      const previous = await service.getMetricAsJSON(`${prefix}api_all_client_error_total`);
       expect(previous).toEqual({
         help: 'The total number of all API requests with client error response',
-        name: 'api_all_client_error_total',
+        name: `${prefix}api_all_client_error_total`,
         type: 'counter',
         values: [{ value: 0, labels: {} }],
         aggregator: 'sum',
@@ -160,10 +161,10 @@ describe('#Middleware #metrics', () => {
         .set('Accept', '*/*')
         .then(async response => {
           expect(response.status).toEqual(400);
-          const post = await service.getMetricAsJSON('api_all_client_error_total');
+          const post = await service.getMetricAsJSON(`${prefix}api_all_client_error_total`);
           expect(post).toEqual({
             help: 'The total number of all API requests with client error response',
-            name: 'api_all_client_error_total',
+            name: `${prefix}api_all_client_error_total`,
             type: 'counter',
             values: [{ value: 1, labels: {} }],
             aggregator: 'sum',
@@ -174,10 +175,10 @@ describe('#Middleware #metrics', () => {
         });
     }, 300);
     it(`Should response 500 and increase the metrics counter when a request is performed over a regular endpoint`, async () => {
-      const previous = await service.getMetricAsJSON('api_all_server_error_total');
+      const previous = await service.getMetricAsJSON(`${prefix}api_all_server_error_total`);
       expect(previous).toEqual({
         help: 'The total number of all API requests with server error response',
-        name: 'api_all_server_error_total',
+        name: `${prefix}api_all_server_error_total`,
         type: 'counter',
         values: [{ value: 0, labels: {} }],
         aggregator: 'sum',
@@ -188,10 +189,10 @@ describe('#Middleware #metrics', () => {
         .set('Accept', '*/*')
         .then(async response => {
           expect(response.status).toEqual(500);
-          const post = await service.getMetricAsJSON('api_all_server_error_total');
+          const post = await service.getMetricAsJSON(`${prefix}api_all_server_error_total`);
           expect(post).toEqual({
             help: 'The total number of all API requests with server error response',
-            name: 'api_all_server_error_total',
+            name: `${prefix}api_all_server_error_total`,
             type: 'counter',
             values: [{ value: 1, labels: {} }],
             aggregator: 'sum',
