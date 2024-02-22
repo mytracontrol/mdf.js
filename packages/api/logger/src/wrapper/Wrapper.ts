@@ -100,8 +100,7 @@ class WrapperLogger {
   /** Stream logger */
   stream: { write: (message: string) => void } = {
     write: (message: string) => {
-      const data = JSON.parse(message);
-      this.logger.stream.write(data);
+      this.logger.stream.write(message);
     },
   };
 }

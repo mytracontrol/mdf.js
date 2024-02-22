@@ -20,6 +20,21 @@ import { NoCache } from './nocache';
 import { RateLimiter } from './rateLimiter';
 import { RequestId } from './requestId';
 
+export type { Audit } from './audit';
+export type { AuthZ } from './authz';
+export type { BodyParser } from './bodyParser';
+export type { Cache } from './cache';
+export type { Cors } from './cors';
+export type { Default } from './default';
+export type { ErrorHandler } from './errorHandler';
+export type { Security } from './helmet';
+export type { Logger } from './logger';
+export type { Metrics } from './metrics';
+export type { Multer } from './multer';
+export type { NoCache } from './nocache';
+export type { RateLimiter } from './rateLimiter';
+export type { RequestId } from './requestId';
+
 export const Middleware = {
   Audit,
   AuthZ,
