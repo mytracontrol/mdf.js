@@ -18,6 +18,12 @@ import { MergeWithCustomizer, cloneDeep, merge, mergeWith } from 'lodash';
 import { v4 } from 'uuid';
 import { ApplicationWrapperOptions, ConsumerAdapterOptions } from './types';
 
+/**
+ * Customizer function used for merging objects with `MergeWith` function.
+ * @param objValue - The value from the destination object.
+ * @param srcValue - The value from the source object.
+ * @returns The merged value or `undefined` if no merge is needed.
+ */
 const customizer: MergeWithCustomizer = (objValue, srcValue) => {
   if (Array.isArray(objValue)) {
     return Array.from(new Set(objValue.concat(srcValue)).values());
@@ -63,7 +69,7 @@ export class AppWrapper<AppConfig extends Record<string, any> = Record<string, a
    */
   constructor(
     private readonly options: ApplicationWrapperOptions = {},
-    private readonly resources: Layer.App.Resource[] = []
+    private readonly resources: (Layer.App.Resource | Layer.Provider.Manager<any, any, any>)[] = []
   ) {
     this.setupProvider = Setup.Factory.create({
       name: this.options.name,
@@ -244,7 +250,9 @@ export class AppWrapper<AppConfig extends Record<string, any> = Record<string, a
    * Wrap the start method of the resource to avoid errors
    * @param resource - the resource to be wrapped
    */
-  private readonly wrappedStart = async (resource: Layer.App.Resource): Promise<void> => {
+  private readonly wrappedStart = async (
+    resource: Layer.App.Resource | Layer.Provider.Manager<any, any, any>
+  ): Promise<void> => {
     if (typeof resource.start === 'function') {
       await retryBind(resource.start, resource, [], this.retryOptions);
     } else {
@@ -258,7 +266,9 @@ export class AppWrapper<AppConfig extends Record<string, any> = Record<string, a
    * @param resource - the resource to be wrapped
    * @returns
    */
-  private readonly wrappedStop = async (resource: Layer.App.Resource): Promise<void> => {
+  private readonly wrappedStop = async (
+    resource: Layer.App.Resource | Layer.Provider.Manager<any, any, any>
+  ): Promise<void> => {
     if (typeof resource.stop === 'function') {
       await retryBind(resource.stop, resource, [], this.retryOptions);
     } else {
