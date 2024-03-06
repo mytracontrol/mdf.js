@@ -24,7 +24,8 @@
     "openc2",
     "OpenC2",
     "OPENC2",
-    "RESTAPI"
+    "RESTAPI",
+    "Retryable"
   ],
   "sonarlint.connectedMode.project": {
     "projectKey": "Mytra-Development-Framework-NDF-TypeScript"
@@ -67,7 +68,8 @@
     "mqtt-provider",
     "utils",
     "logger",
-    "middlewares"
+    "middlewares",
+    "limiter"
   ],
 
 }

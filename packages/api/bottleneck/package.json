@@ -1,0 +1,54 @@
+{
+  "name": "@mdf.js/bottleneck",
+  "version": "0.0.1",
+  "description": "MMS - API Core - Bottleneck",
+  "keywords": [
+    "NodeJS",
+    "MMS",
+    "API",
+    "Bottleneck"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mytracontrol/mdf.js.git",
+    "directory": "packages/api/bottleneck"
+  },
+  "license": "MIT",
+  "author": "Mytra Control S.L.",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist/**/*"
+  ],
+  "scripts": {
+    "build": "yarn clean && tsc -p tsconfig.build.json",
+    "check-dependencies": "npm-check",
+    "clean": "rimraf \"{tsconfig.build.tsbuildinfo,dist}\"",
+    "envDoc": "node ../../../.config/envDoc.mjs",
+    "doc": "typedoc --options typedoc.json",
+    "licenses": "license-checker --start ./ --production --csv --out ../../../licenses/api/core/licenses.csv --customPath ../../../.config/customFormat.json",
+    "mutants": "stryker run stryker.conf.js",
+    "test": "jest --detectOpenHandles --config ./jest.config.js"
+  },
+  "dependencies": {
+    "@mdf.js/core": "*",
+    "@mdf.js/crash": "*",
+    "@mdf.js/logger": "*",
+    "@mdf.js/utils": "*",
+    "lodash": "^4.17.21",
+    "tslib": "^2.6.0",
+    "uuid": "^9.0.0"
+  },
+  "devDependencies": {
+    "@mdf.js/repo-config": "*",
+    "@types/lodash": "^4.14.202",
+    "@types/uuid": "^9.0.1",
+    "random-int": "^3.0.0"
+  },
+  "engines": {
+    "node": ">=16.14.2"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

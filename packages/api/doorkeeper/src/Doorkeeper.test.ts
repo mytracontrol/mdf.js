@@ -4,13 +4,11 @@
  * Use of this source code is governed by an MIT-style license that can be found in the LICENSE file
  * or at https://opensource.org/licenses/MIT.
  */
-// *************************************************************************************************
+
 import { Crash, Multi } from '@mdf.js/crash';
 import { v4, validate } from 'uuid';
 import { DoorKeeper } from '.';
-// #endregion
-// *************************************************************************************************
-// #region Arrange
+
 const dk = new DoorKeeper({ $data: true, strict: false });
 const FAKE_UUID = '213d630f-7517-4370-baae-d0a5862799f5';
 
@@ -260,9 +258,7 @@ const result = {
   required: ['schema1', 'schema2', 'schema3', 'schema4', 'schema5'],
   additionalProperties: false,
 };
-// #endregion
-// *************************************************************************************************
-// #region Test Schemas
+
 describe('#DoorKeeper #package', () => {
   describe('#Happy path', () => {
     it(`Should create a valid instances with default config`, () => {
@@ -368,10 +364,12 @@ describe('#DoorKeeper #package', () => {
     it(`Should return a TRUE value when try to check a schema that is in the scope and is CORRECT`, () => {
       expect(dk.check('Config.Artifact', artifact)).toBeTruthy();
       expect(dk.check('Config.Artifact', artifact, v4())).toBeTruthy();
+      expect(dk.is('Config.Artifact', artifact)).toBeTruthy();
     }, 300);
     it(`Should return a FALSE value when try to check a schema that is in the scope and is INCORRECT`, () => {
       expect(dk.check('Config.Artifact', {})).toBeFalsy();
       expect(dk.check('Config.Artifact', {}, v4())).toBeFalsy();
+      expect(dk.is('Config.Artifact', {})).toBeFalsy();
     }, 300);
     it(`Should be able to use default and dynamic default properly`, () => {
       const myDK = new DoorKeeper({
@@ -592,4 +590,3 @@ describe('#DoorKeeper #package', () => {
     }, 300);
   });
 });
-// #endregion

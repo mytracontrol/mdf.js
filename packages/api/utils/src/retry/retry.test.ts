@@ -8,7 +8,7 @@
 // #region Component imports
 import { Boom, Crash, Multi } from '@mdf.js/crash';
 import { v4 } from 'uuid';
-import { RetryOptions, retry, retryBind } from './retry';
+import { RetryOptions, retry, retryBind, wrapOnRetry } from './retry';
 // #endregion
 // ************************************************************************************************
 // #region Test
@@ -75,6 +75,72 @@ describe('#Retry', () => {
         return;
       }
     }, 300);
+    it(`Should interrupt the retries when the task is cancelled externally`, async () => {
+      let called = false;
+      function myPromise(value: number, otherValue: number): Promise<number> {
+        return new Promise((resolve, reject) => {
+          setTimeout(() => {
+            reject(new Crash('myError', v4()));
+          }, 20);
+        });
+      }
+      function logger(error: Crash | Multi | Boom): void {
+        called = true;
+        console.log(error.message);
+      }
+      try {
+        const controller = new AbortController();
+        setTimeout(() => {
+          controller.abort();
+        }, 100);
+        await retry(myPromise, [2, 2], {
+          logger,
+          abortSignal: controller.signal,
+          waitTime: 200,
+          maxWaitTime: 800,
+        });
+        throw new Error(`Should throw an error`);
+      } catch (error: unknown) {
+        expect(called).toBe(true);
+        expect((error as Crash).message).toEqual(
+          'The task was aborted externally in attempt number: 1'
+        );
+        return;
+      }
+    });
+    it(`Should interrupt the retries when the task is cancelled externally, binded`, async () => {
+      let called = false;
+      function myPromise(value: number, otherValue: number): Promise<number> {
+        return new Promise((resolve, reject) => {
+          setTimeout(() => {
+            reject(new Crash('myError', v4()));
+          }, 20);
+        });
+      }
+      function logger(error: Crash | Multi | Boom): void {
+        called = true;
+        console.log(error.message);
+      }
+      try {
+        const controller = new AbortController();
+        setTimeout(() => {
+          controller.abort();
+        }, 100);
+        await retryBind(myPromise, null, [2, 2], {
+          logger,
+          abortSignal: controller.signal,
+          waitTime: 200,
+          maxWaitTime: 800,
+        });
+        throw new Error(`Should throw an error`);
+      } catch (error: unknown) {
+        expect(called).toBe(true);
+        expect((error as Crash).message).toEqual(
+          'The task was aborted externally in attempt number: 1'
+        );
+        return;
+      }
+    });
     it('Should interrupt the retries when max number of attempts has been reached', async () => {
       jest.setTimeout(5000);
       let called = false;
@@ -240,7 +306,7 @@ describe('#Retry', () => {
       let tries = 0;
       function logger(error: Crash | Multi | Boom): void {
         expect((error as Crash).message).toEqual(
-          `The execution of the try number ${tries + 1} has timed out`
+          `The execution of the try number ${tries + 1} has timed out: 50 ms`
         );
         tries += 1;
         called = true;
@@ -276,7 +342,7 @@ describe('#Retry', () => {
       let tries = 0;
       function logger(error: Crash | Multi | Boom): void {
         expect((error as Crash).message).toEqual(
-          `The execution of the try number ${tries + 1} has timed out`
+          `The execution of the try number ${tries + 1} has timed out: 50 ms`
         );
         tries += 1;
         called = true;
@@ -310,5 +376,37 @@ describe('#Retry', () => {
         return;
       }
     }, 500);
+    it(`Should wrap a promise and transform it into a retryable promise`, async () => {
+      let called = false;
+      let tries = 0;
+      function logger(error: Crash | Multi | Boom): void {
+        expect((error as Crash).message).toEqual('myError');
+        tries += 1;
+        called = true;
+      }
+      const options: RetryOptions = {
+        waitTime: 100,
+        maxWaitTime: 100,
+        attempts: 3,
+        timeout: 50,
+        logger,
+      };
+      function myPromise(): Promise<number> {
+        return Promise.reject(new Crash('myError', v4()));
+      }
+      const retryable = wrapOnRetry(myPromise, [], options);
+      try {
+        expect(called).toBe(false);
+        await retryable();
+        throw new Error(`Should throw an error`);
+      } catch (error: unknown) {
+        expect(called).toBe(true);
+        expect(tries).toBe(3);
+        expect((error as Crash).message).toEqual(
+          'Too much attempts [3], the promise will not be retried'
+        );
+        return;
+      }
+    });
   });
 });

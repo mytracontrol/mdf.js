@@ -388,6 +388,15 @@ export class DoorKeeper<T = void> {
     }
   }
   /**
+   * Checks if the given data matches the specified schema.
+   * @param schema - The schema to check against.
+   * @param data - The data to validate.
+   * @returns A boolean indicating whether the data matches the schema.
+   */
+  public is<K extends SchemaSelector<T>>(schema: K, data: any): data is ValidatedOutput<T, K> {
+    return this.check(schema, data);
+  }
+  /**
    * Return a dereferenced schema with all the $ref resolved
    * @param schema - The schema we want to dereference
    * @param uuid - unique identifier for this operation
