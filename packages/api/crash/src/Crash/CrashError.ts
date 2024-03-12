@@ -96,11 +96,11 @@ export class Crash extends Base {
     }
   }
   /** Determine if this instance is a Crash error */
-  get isCrash(): boolean {
+  public get isCrash(): boolean {
     return this._isCrash;
   }
   /** Cause source of error */
-  get cause(): Cause | undefined {
+  public override get cause(): Cause | undefined {
     return this._cause;
   }
   /** Get the trace of this hierarchy of errors */

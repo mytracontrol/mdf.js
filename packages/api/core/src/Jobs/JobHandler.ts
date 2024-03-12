@@ -10,15 +10,15 @@ import { v4, v5 } from 'uuid';
 import { MDF_NAMESPACE_OID } from '../const';
 import { JobObject, JobRequest, Options, Result, Status } from './types';
 
-/**
- * JobHandler events
- * @category @mdf.js/core
- */
 export declare interface JobHandler<Type, Data> {
   /** Emitted when a job has ended */
   on(event: 'done', listener: (uuid: string, result: Result<Type>, error?: Multi) => void): this;
 }
 
+/**
+ * JobHandler class
+ * @category @mdf.js/core
+ */
 export class JobHandler<
     Type extends string = string,
     Data = any,
