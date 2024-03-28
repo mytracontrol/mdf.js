@@ -5,20 +5,5 @@
  * or at https://opensource.org/licenses/MIT.
  */
 
-export {
-  Counter,
-  Gauge,
-  Histogram,
-  Metric,
-  MetricObjectWithValues,
-  MetricValue,
-  Summary,
-} from 'prom-client';
+export { Metrics } from '@mdf.js/core';
 export { MetricsFacade as MetricsRegistry } from './MetricsFacade';
-export {
-  METRIC_TYPES,
-  MetricConfig,
-  MetricInstancesObject,
-  MetricType,
-  MetricsResponse,
-} from './types';

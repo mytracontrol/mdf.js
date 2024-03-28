@@ -45,7 +45,7 @@ export declare interface Gateway {
   on(event: 'status', listener: (status: Health.Status) => void): this;
 }
 
-export class Gateway extends EventEmitter implements Health.Component, Layer.Service.Registry {
+export class Gateway extends EventEmitter implements Health.Component, Layer.Service.Observable {
   /** Component identification */
   public readonly componentId: string = v4();
   /** Component commands and message register */

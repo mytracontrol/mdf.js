@@ -4,6 +4,7 @@
  * Use of this source code is governed by an MIT-style license that can be found in the LICENSE file
  * or at https://opensource.org/licenses/MIT.
  */
+import { Metrics } from '@mdf.js/core';
 import { Crash } from '@mdf.js/crash';
 import {
   AggregatorRegistry as ClusterRegistry,
@@ -23,7 +24,6 @@ import {
   collectDefaultMetrics,
 } from 'prom-client';
 import { v4 } from 'uuid';
-import { METRIC_TYPES, MetricConfig, MetricInstancesObject, MetricsResponse } from '../types';
 
 /** MetricsAggregator, management of all the metrics for this artifact */
 export class Aggregator {
@@ -51,7 +51,7 @@ export class Aggregator {
     });
   }
   /** Return the metrics in text/plain format */
-  public async metrics(): Promise<MetricsResponse> {
+  public async metrics(): Promise<Metrics.Response> {
     const contentType = this.registry.contentType;
     let metrics: string | MetricValue<string>[];
     if (this.registry instanceof ClusterRegistry) {
@@ -65,7 +65,7 @@ export class Aggregator {
     };
   }
   /** Return the actual metrics in JSON format */
-  public async metricsJSON(): Promise<MetricsResponse> {
+  public async metricsJSON(): Promise<Metrics.Response> {
     const contentType = 'application/json';
     const metrics = await this.registry.getMetricsAsJSON();
     return Promise.resolve({
@@ -81,14 +81,14 @@ export class Aggregator {
    */
   public setMetrics<
     T extends Record<string, Metric> | void = void,
-    K extends Record<string, MetricConfig> = Record<string, MetricConfig>,
-  >(metrics: K): MetricInstancesObject<T, K> {
+    K extends Record<string, Metrics.Config> = Record<string, Metrics.Config>,
+  >(metrics: K): Metrics.InstancesObject<T, K> {
     const result: Record<string, Metric> = {};
     try {
       for (const [name, config] of Object.entries(metrics)) {
         result[name] = this.setMetric(config);
       }
-      return result as MetricInstancesObject<T, K>;
+      return result as Metrics.InstancesObject<T, K>;
     } catch (rawError) {
       const error = Crash.from(rawError);
       throw new Crash(
@@ -167,7 +167,7 @@ export class Aggregator {
    * @param config - Configuration for creating a metric. Name, help and type are mandatory
    * @returns
    */
-  private setMetric<T extends MetricConfig>(config: T): Metric {
+  private setMetric<T extends Metrics.Config>(config: T): Metric {
     let result: Metric | undefined;
     if (typeof config.name !== 'string' || config.name.length === 0) {
       throw new Crash('Metric name is required', this.uuid);
@@ -175,8 +175,8 @@ export class Aggregator {
     if (typeof config.help !== 'string' || config.help.length === 0) {
       throw new Crash('Metric help is required', this.uuid);
     }
-    if (typeof config.type !== 'string' || !METRIC_TYPES.includes(config.type)) {
-      throw new Crash(`Metric type is required, and should be one of: ${METRIC_TYPES}`, this.uuid);
+    if (typeof config.type !== 'string' || !Metrics.TYPES.includes(config.type)) {
+      throw new Crash(`Metric type is required, and should be one of: ${Metrics.TYPES}`, this.uuid);
     }
     switch (config.type) {
       case 'Counter':

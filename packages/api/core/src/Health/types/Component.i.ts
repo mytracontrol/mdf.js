@@ -7,6 +7,7 @@
 
 import { Crash } from '@mdf.js/crash';
 import { EventEmitter } from 'events';
+import { Registry } from '../../Metrics';
 import { Checks } from './Checks.t';
 import { Status } from './Status.t';
 
@@ -21,4 +22,6 @@ export interface Component extends EventEmitter {
   componentId: string;
   /** Checks performed over this component to achieve the resulted status */
   checks: Checks;
+  /** Set the metric registry */
+  setMetricRegistry?: (registry: Registry) => void;
 }

@@ -5,4 +5,5 @@
  * or at https://opensource.org/licenses/MIT.
  */
 
+export * from './default';
 export * from './utils';

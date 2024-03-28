@@ -29,7 +29,7 @@ describe(`#Config #${CONFIG_PROVIDER_BASE_NAME.toLocaleUpperCase()} Receiver`, (
         },
         reconnect: 5000,
         transport: 'tcp',
-        username: 'consumer',
+        username: 'mdf-amqp',
       });
     }, 300);
   });

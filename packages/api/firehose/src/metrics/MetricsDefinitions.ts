@@ -5,10 +5,10 @@
  * or at https://opensource.org/licenses/MIT.
  */
 
-import { MetricConfig } from '@mdf.js/metrics-registry';
+import { Metrics } from '@mdf.js/core';
 
 /** Jobs metrics for API */
-export const JOBS_METRICS_DEFINITIONS: Record<string, MetricConfig> = {
+export const JOBS_METRICS_DEFINITIONS: Record<string, Metrics.Config> = {
   /** The total number of all jobs processed */
   api_all_job_processed_total: {
     type: 'Counter',

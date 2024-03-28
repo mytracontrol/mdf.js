@@ -108,6 +108,37 @@ describe('#Retry', () => {
         return;
       }
     });
+    it(`Should abort the execution from the begging it the signal of abort is executed previous to execution`, async () => {
+      let called = false;
+      function myPromise(value: number, otherValue: number): Promise<number> {
+        return new Promise((resolve, reject) => {
+          setTimeout(() => {
+            reject(new Crash('myError', v4()));
+          }, 20);
+        });
+      }
+      function logger(error: Crash | Multi | Boom): void {
+        called = true;
+        console.log(error.message);
+      }
+      try {
+        const controller = new AbortController();
+        controller.abort();
+        await retry(myPromise, [2, 2], {
+          logger,
+          abortSignal: controller.signal,
+          waitTime: 200,
+          maxWaitTime: 800,
+        });
+        throw new Error(`Should throw an error`);
+      } catch (error: unknown) {
+        expect(called).toBe(true);
+        expect((error as Crash).message).toEqual(
+          'The task was aborted externally in attempt number: 0'
+        );
+        return;
+      }
+    });
     it(`Should interrupt the retries when the task is cancelled externally, binded`, async () => {
       let called = false;
       function myPromise(value: number, otherValue: number): Promise<number> {
@@ -137,6 +168,37 @@ describe('#Retry', () => {
         expect(called).toBe(true);
         expect((error as Crash).message).toEqual(
           'The task was aborted externally in attempt number: 1'
+        );
+        return;
+      }
+    });
+    it(`Should abort the execution from the begging it the signal of abort is executed previous to execution, binded`, async () => {
+      let called = false;
+      function myPromise(value: number, otherValue: number): Promise<number> {
+        return new Promise((resolve, reject) => {
+          setTimeout(() => {
+            reject(new Crash('myError', v4()));
+          }, 20);
+        });
+      }
+      function logger(error: Crash | Multi | Boom): void {
+        called = true;
+        console.log(error.message);
+      }
+      try {
+        const controller = new AbortController();
+        controller.abort();
+        await retryBind(myPromise, null, [2, 2], {
+          logger,
+          abortSignal: controller.signal,
+          waitTime: 200,
+          maxWaitTime: 800,
+        });
+        throw new Error(`Should throw an error`);
+      } catch (error: unknown) {
+        expect(called).toBe(true);
+        expect((error as Crash).message).toEqual(
+          'The task was aborted externally in attempt number: 0'
         );
         return;
       }
@@ -406,6 +468,59 @@ describe('#Retry', () => {
           'Too much attempts [3], the promise will not be retried'
         );
         return;
+      }
+    });
+  });
+  describe('#Sad path', () => {
+    it(`Should throw an error in the task is not a function`, async () => {
+      try {
+        await retry(null as never);
+        throw new Error(`Should throw an error`);
+      } catch (error: unknown) {
+        expect((error as Error).message).toEqual('The task must be a function');
+      }
+      try {
+        await retryBind(null as never, null);
+        throw new Error(`Should throw an error`);
+      } catch (error: unknown) {
+        expect((error as Error).message).toEqual('The task must be a function');
+      }
+    });
+    it(`Should throw an error in the arguments are not an array`, async () => {
+      try {
+        await retry(() => null as never, null as never);
+        throw new Error(`Should throw an error`);
+      } catch (error: unknown) {
+        expect((error as Error).message).toEqual('The arguments must be an array');
+      }
+      try {
+        await retryBind(() => null as never, null, null as never);
+        throw new Error(`Should throw an error`);
+      } catch (error: unknown) {
+        expect((error as Error).message).toEqual('The arguments must be an array');
+      }
+    });
+    it(`Should throw an error if the interrupt and abortSignal are defined`, async () => {
+      try {
+        // @ts-expect-error - Testing purposes
+        await retry(() => null as never, [], { interrupt: () => true, abortSignal: 3 });
+        throw new Error(`Should throw an error`);
+      } catch (error: unknown) {
+        expect((error as Error).message).toEqual(
+          'The options `interrupt` and `abortSignal` are mutually exclusive, use only one of them'
+        );
+      }
+      try {
+        await retryBind(() => null as never, null, [], {
+          interrupt: () => true,
+          // @ts-expect-error - Testing purposes
+          abortSignal: 3,
+        });
+        throw new Error(`Should throw an error`);
+      } catch (error: unknown) {
+        expect((error as Error).message).toEqual(
+          'The options `interrupt` and `abortSignal` are mutually exclusive, use only one of them'
+        );
       }
     });
   });

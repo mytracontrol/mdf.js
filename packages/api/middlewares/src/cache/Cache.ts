@@ -126,7 +126,7 @@ export class Cache {
       ).toFixed(0)}`,
     });
     response.set(headers);
-    // file deep code ignore XSS: <This is cached response>
+    // file deepcode ignore XSS: <Is a Cache response>
     response.status(cachedResponse.status).send(cachedResponse.body);
   }
   /**

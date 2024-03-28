@@ -1,7 +1,7 @@
 # **@mdf.js**
 
-[![Node Version](https://img.shields.io/static/v1?style=flat\&logo=node.js\&logoColor=green\&label=node\&message=%3E=16%20||%2018\&color=blue)](https://nodejs.org/en/)
-[![Typescript Version](https://img.shields.io/static/v1?style=flat\&logo=typescript\&label=Typescript\&message=4.8\&color=blue)](https://www.typescriptlang.org/)
+[![Node Version](https://img.shields.io/static/v1?style=flat\&logo=node.js\&logoColor=green\&label=node\&message=%3E=20\&color=blue)](https://nodejs.org/en/)
+[![Typescript Version](https://img.shields.io/static/v1?style=flat\&logo=typescript\&label=Typescript\&message=5.4\&color=blue)](https://www.typescriptlang.org/)
 [![Known Vulnerabilities](https://img.shields.io/static/v1?style=flat\&logo=snyk\&label=Vulnerabilities\&message=0\&color=300A98F)](https://snyk.io/package/npm/snyk)
 
 <!-- markdownlint-disable MD033 MD041 -->
@@ -39,7 +39,7 @@
 
 ## **Environment variables**
 
-- **CONFIG\_ARTIFACT\_ID**: undefined
+- **CONFIG\_ARTIFACT\_ID**: Artifact identifier for the configuration provider
 - **CONFIG\_REDIS\_HOST**: Default REDIS connection host
 - **CONFIG\_REDIS\_PORT**: Default REDIS connection port
 - **CONFIG\_REDIS\_DB**: Default REDIS connection database
@@ -48,8 +48,8 @@
 - **CONFIG\_REDIS\_RETRY\_DELAY\_MAX**: Default REDIS connection retry delay max
 - **CONFIG\_REDIS\_KEEPALIVE**: Default REDIS connection keepAlive
 - **CONFIG\_REDIS\_CONNECTION\_TIMEOUT**: Default REDIS connection keepAlive
-- **CONFIG\_REDIS\_CHECK\_INTERVAL**: undefined
-- **CONFIG\_REDIS\_DISABLE\_CHECKS**: undefined
+- **CONFIG\_REDIS\_CHECK\_INTERVAL**: Default REDIS status check interval
+- **CONFIG\_REDIS\_DISABLE\_CHECKS**: Disable Redis checks
 
 ## **License**
 

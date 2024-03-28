@@ -5,9 +5,15 @@
  * or at https://opensource.org/licenses/MIT.
  */
 import { DebugLogger } from '@mdf.js/logger';
+/** Base name for the elastic provider */
 export const CONFIG_PROVIDER_BASE_NAME = 'elastic';
+/**
+ * Artifact identifier for the configuration provider
+ * @defaultValue `mdf-elastic`
+ */
 export const CONFIG_ARTIFACT_ID =
   process.env['CONFIG_ARTIFACT_ID'] || `mdf-${CONFIG_PROVIDER_BASE_NAME}`;
+/** Default Logger for the configuration provider */
 export const logger = new DebugLogger(`mdf:${CONFIG_PROVIDER_BASE_NAME}:config`);
 
 /**

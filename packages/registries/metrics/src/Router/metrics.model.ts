@@ -5,8 +5,8 @@
  * or at https://opensource.org/licenses/MIT.
  */
 
+import { Metrics } from '@mdf.js/core';
 import { Aggregator } from '../Aggregator';
-import { MetricsResponse } from '../types';
 
 /** Model class */
 export class Model {
@@ -20,7 +20,7 @@ export class Model {
     this.#metricsAggregator = aggregator;
   }
   /** Return all the actual metrics of this artifact  */
-  public async metrics(jsonFormat: boolean): Promise<MetricsResponse> {
+  public async metrics(jsonFormat: boolean): Promise<Metrics.Response> {
     if (jsonFormat) {
       return this.#metricsAggregator.metricsJSON();
     } else {

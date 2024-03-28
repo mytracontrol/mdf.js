@@ -5,13 +5,13 @@
  * or at https://opensource.org/licenses/MIT.
  */
 
-import { Counter, Gauge, Histogram } from '@mdf.js/metrics-registry';
+import { Metrics } from '@mdf.js/core';
 
 /** Metric types */
 export type MetricInstances = {
-  api_all_job_processed_total: Counter;
-  api_all_errors_job_processing_total: Counter;
-  api_all_job_in_processing_total: Gauge;
-  api_publishing_job_duration_milliseconds: Histogram;
-  api_publishing_job_throughput: Histogram;
+  api_all_job_processed_total: Metrics.Counter;
+  api_all_errors_job_processing_total: Metrics.Counter;
+  api_all_job_in_processing_total: Metrics.Gauge;
+  api_publishing_job_duration_milliseconds: Metrics.Histogram;
+  api_publishing_job_throughput: Metrics.Histogram;
 };

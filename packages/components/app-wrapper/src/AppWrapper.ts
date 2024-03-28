@@ -5,11 +5,10 @@
  * or at https://opensource.org/licenses/MIT.
  */
 
-import { Health, Layer } from '@mdf.js/core';
+import { Health, Layer, Metrics } from '@mdf.js/core';
 import { Crash } from '@mdf.js/crash';
 import { ErrorRecord } from '@mdf.js/error-registry';
 import { Logger, LoggerConfig, LoggerInstance, SetContext } from '@mdf.js/logger';
-import { MetricsResponse } from '@mdf.js/metrics-registry';
 import { Observability, ObservabilityOptions } from '@mdf.js/observability';
 import { Consumer, ConsumerOptions, Control, Factory, ResolverMap } from '@mdf.js/openc2';
 import { ConfigManager, Setup } from '@mdf.js/service-setup-provider';
@@ -69,7 +68,7 @@ export class AppWrapper<AppConfig extends Record<string, any> = Record<string, a
    */
   constructor(
     private readonly options: ApplicationWrapperOptions = {},
-    private readonly resources: (Layer.App.Resource | Layer.Provider.Manager<any, any, any>)[] = []
+    private readonly resources: (Layer.App.Resource | Layer.Provider.Manager)[] = []
   ) {
     this.setupProvider = Setup.Factory.create({
       name: this.options.name,
@@ -239,7 +238,7 @@ export class AppWrapper<AppConfig extends Record<string, any> = Record<string, a
     return Promise.resolve(this.observability.healthRegistry.health);
   };
   /** Return the application stats from the observability instance */
-  private readonly stats = async (): Promise<MetricsResponse> => {
+  private readonly stats = async (): Promise<Metrics.Response> => {
     return this.observability.metricsRegistry.metricsJSON();
   };
   /** Return the error registry from the observability instance */
@@ -251,7 +250,7 @@ export class AppWrapper<AppConfig extends Record<string, any> = Record<string, a
    * @param resource - the resource to be wrapped
    */
   private readonly wrappedStart = async (
-    resource: Layer.App.Resource | Layer.Provider.Manager<any, any, any>
+    resource: Layer.App.Resource | Layer.Provider.Manager
   ): Promise<void> => {
     if (typeof resource.start === 'function') {
       await retryBind(resource.start, resource, [], this.retryOptions);
@@ -267,7 +266,7 @@ export class AppWrapper<AppConfig extends Record<string, any> = Record<string, a
    * @returns
    */
   private readonly wrappedStop = async (
-    resource: Layer.App.Resource | Layer.Provider.Manager<any, any, any>
+    resource: Layer.App.Resource | Layer.Provider.Manager
   ): Promise<void> => {
     if (typeof resource.stop === 'function') {
       await retryBind(resource.stop, resource, [], this.retryOptions);
@@ -288,6 +287,10 @@ export class AppWrapper<AppConfig extends Record<string, any> = Record<string, a
       // Stryker disable next-line all
       this.logger.debug(`Registering resource: ${entry.name}`);
       this.observability.healthRegistry.register(entry);
+      //Check if the resource has a setMetricRegistry method and use it
+      if (typeof entry.setMetricRegistry === 'function') {
+        entry.setMetricRegistry.bind(entry)(this.observability.metricsRegistry);
+      }
     }
   }
   /** Application release */

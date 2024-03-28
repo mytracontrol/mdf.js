@@ -34,7 +34,7 @@
     "@mdf.js/crash": "*",
     "@mdf.js/logger": "*",
     "@mdf.js/utils": "*",
-    "express": "^4.18.2",
+    "express": "^4.19.2",
     "tslib": "^2.6.0"
   },
   "devDependencies": {

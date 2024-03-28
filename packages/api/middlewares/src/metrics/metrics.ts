@@ -5,11 +5,11 @@
  * or at https://opensource.org/licenses/MIT.
  */
 
-import { Counter, Gauge, Histogram, MetricConfig, MetricsRegistry } from '@mdf.js/metrics-registry';
+import { Metrics } from '@mdf.js/core';
 import { NextFunction, Request, RequestHandler, Response } from 'express';
 
 /** Global metric for API */
-const METRICS_DEFINITIONS = (prefix: string = ''): Record<string, MetricConfig> => {
+const METRICS_DEFINITIONS = (prefix: string = ''): Record<string, Metrics.Config> => {
   return {
     api_all_request_total: {
       type: 'Counter',
@@ -86,24 +86,24 @@ const METRICS_DEFINITIONS = (prefix: string = ''): Record<string, MetricConfig> 
 };
 /** Metric types */
 type MetricInstances = {
-  api_all_request_total: Counter;
-  api_all_info_total: Counter;
-  api_all_success_total: Counter;
-  api_all_redirect_total: Counter;
-  api_all_errors_total: Counter;
-  api_all_client_error_total: Counter;
-  api_all_server_error_total: Counter;
-  api_all_request_in_processing_total: Gauge;
-  api_request_total: Counter;
-  api_request_duration_milliseconds: Histogram;
-  api_request_size_bytes: Histogram;
-  api_response_size_bytes: Histogram;
+  api_all_request_total: Metrics.Counter;
+  api_all_info_total: Metrics.Counter;
+  api_all_success_total: Metrics.Counter;
+  api_all_redirect_total: Metrics.Counter;
+  api_all_errors_total: Metrics.Counter;
+  api_all_client_error_total: Metrics.Counter;
+  api_all_server_error_total: Metrics.Counter;
+  api_all_request_in_processing_total: Metrics.Gauge;
+  api_request_total: Metrics.Counter;
+  api_request_duration_milliseconds: Metrics.Histogram;
+  api_request_size_bytes: Metrics.Histogram;
+  api_response_size_bytes: Metrics.Histogram;
 };
 const CONTENT_LENGTH_HEADER = 'content-length';
 /** MetricsExpressMiddleware middleware */
-export class Metrics {
+export class MetricsMiddleware {
   /** Metrics registry */
-  private readonly service: MetricsRegistry;
+  private readonly service: Metrics.Registry;
   /** Core and API metrics */
   private readonly metrics: MetricInstances;
   /**
@@ -111,15 +111,15 @@ export class Metrics {
    * @param service - Metrics registry interface
    * @param prefix - Metrics prefix
    */
-  public static handler(service: MetricsRegistry, prefix?: string): RequestHandler {
-    return new Metrics(service, prefix).handler;
+  public static handler(service: Metrics.Registry, prefix?: string): RequestHandler {
+    return new MetricsMiddleware(service, prefix).handler;
   }
   /**
    * Create a new instance of metrics express middleware class
    * @param service - Metrics registry interface
    * @param prefix - Metrics prefix
    */
-  private constructor(service: MetricsRegistry, prefix?: string) {
+  private constructor(service: Metrics.Registry, prefix?: string) {
     this.service = service;
     this.metrics = this.service.setMetrics<MetricInstances>(METRICS_DEFINITIONS(prefix));
   }

@@ -15,7 +15,7 @@ import { ErrorRecord, HandleableError } from './types';
 
 const DEFAULT_CONFIG_MMS_CLUSTER_MODE = false;
 
-export class RegisterFacade extends EventEmitter implements Layer.Service.Registry {
+export class RegisterFacade extends EventEmitter implements Layer.Service.Observable {
   /** Errors registry */
   private readonly registry: Registry;
   /** Register router */

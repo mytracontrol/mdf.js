@@ -26,7 +26,7 @@ export class Observability {
   /** Observability server */
   private server?: HTTP.Provider;
   /** Registries offered under observability instance */
-  private readonly registries: Layer.Service.Registry[];
+  private readonly registries: Layer.Service.Observable[];
   /** Error registry */
   public readonly errorsRegistry: ErrorRegistry;
   /** Metrics registry */
@@ -88,7 +88,7 @@ export class Observability {
    * Attach a new registry in the observability
    * @param registry - registry to be attached
    */
-  public attach(registry: Layer.Service.Registry): void {
+  public attach(registry: Layer.Service.Observable): void {
     this.registries.push(registry);
   }
   /** Start the observability service */

@@ -17,7 +17,7 @@ import { Observability, ObservabilityOptions } from '.';
 // *************************************************************************************************
 // #region Our tests
 
-class MyService extends EventEmitter implements Layer.Service.Registry {
+class MyService extends EventEmitter implements Layer.Service.Observable {
   name = 'myService';
   links = {
     openc2: {

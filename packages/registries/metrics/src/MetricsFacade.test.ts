@@ -13,7 +13,7 @@ import {
   Registry as StandAloneRegistry,
   register,
 } from 'prom-client';
-import { Counter, Gauge, Histogram, MetricsRegistry, Summary } from '.';
+import { Metrics, MetricsRegistry } from '.';
 // #endregion
 // *************************************************************************************************
 // #region Our tests
@@ -30,7 +30,6 @@ describe('#Metrics #Service', () => {
       expect(service.links).toEqual({
         metrics: '/metrics',
       });
-      expect(await service.start()).toBeUndefined();
       service.setMetrics({
         counter: { name: 'counter', type: 'Counter', help: 'counter' },
         gauge: { name: 'gauge', type: 'Gauge', help: 'gauge' },
@@ -48,17 +47,16 @@ describe('#Metrics #Service', () => {
         type: 'counter',
         values: [{ labels: {}, value: 0 }],
       });
-      expect(service.getMetric('counter')).toBeInstanceOf(Counter);
-      expect(service.getMetric('gauge')).toBeInstanceOf(Gauge);
-      expect(service.getMetric('histogram')).toBeInstanceOf(Histogram);
-      expect(service.getMetric('summary')).toBeInstanceOf(Summary);
+      expect(service.getMetric('counter')).toBeInstanceOf(Metrics.Counter);
+      expect(service.getMetric('gauge')).toBeInstanceOf(Metrics.Gauge);
+      expect(service.getMetric('histogram')).toBeInstanceOf(Metrics.Histogram);
+      expect(service.getMetric('summary')).toBeInstanceOf(Metrics.Summary);
       service.removeMetric('gauge');
       expect(typeof (await service.getMetric('gauge'))).toEqual('undefined');
       expect(await service.metricsJSON()).toBeDefined();
       expect((await service.metrics()).contentType).toEqual(
         'text/plain; version=0.0.4; charset=utf-8'
       );
-      expect(await service.stop()).toBeUndefined();
     }, 300);
     it(`Should return a correct metrics service in cluster mode`, async () => {
       const service = MetricsRegistry.create(true);
@@ -84,10 +82,10 @@ describe('#Metrics #Service', () => {
         type: 'counter',
         values: [{ labels: {}, value: 0 }],
       });
-      expect(service.getMetric('counter')).toBeInstanceOf(Counter);
-      expect(service.getMetric('gauge')).toBeInstanceOf(Gauge);
-      expect(service.getMetric('histogram')).toBeInstanceOf(Histogram);
-      expect(service.getMetric('summary')).toBeInstanceOf(Summary);
+      expect(service.getMetric('counter')).toBeInstanceOf(Metrics.Counter);
+      expect(service.getMetric('gauge')).toBeInstanceOf(Metrics.Gauge);
+      expect(service.getMetric('histogram')).toBeInstanceOf(Metrics.Histogram);
+      expect(service.getMetric('summary')).toBeInstanceOf(Metrics.Summary);
       service.removeMetric('gauge');
       expect(typeof (await service.getMetric('gauge'))).toEqual('undefined');
       expect(await service.metricsJSON()).toBeDefined();
@@ -121,10 +119,10 @@ describe('#Metrics #Service', () => {
         type: 'counter',
         values: [{ labels: {}, value: 0 }],
       });
-      expect(service.getMetric('counter')).toBeInstanceOf(Counter);
-      expect(service.getMetric('gauge')).toBeInstanceOf(Gauge);
-      expect(service.getMetric('histogram')).toBeInstanceOf(Histogram);
-      expect(service.getMetric('summary')).toBeInstanceOf(Summary);
+      expect(service.getMetric('counter')).toBeInstanceOf(Metrics.Counter);
+      expect(service.getMetric('gauge')).toBeInstanceOf(Metrics.Gauge);
+      expect(service.getMetric('histogram')).toBeInstanceOf(Metrics.Histogram);
+      expect(service.getMetric('summary')).toBeInstanceOf(Metrics.Summary);
       service.removeMetric('gauge');
       expect(typeof (await service.getMetric('gauge'))).toEqual('undefined');
       expect(await service.metricsJSON()).toBeDefined();

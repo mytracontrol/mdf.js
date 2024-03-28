@@ -5,4 +5,4 @@
  * or at https://opensource.org/licenses/MIT.
  */
 
-export * from './Registry.i';
+export * from './Observable.i';

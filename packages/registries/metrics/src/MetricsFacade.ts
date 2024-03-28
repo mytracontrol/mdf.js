@@ -4,7 +4,7 @@
  * Use of this source code is governed by an MIT-style license that can be found in the LICENSE file
  * or at https://opensource.org/licenses/MIT.
  */
-import { Layer } from '@mdf.js/core';
+import { Layer, Metrics } from '@mdf.js/core';
 import cluster from 'cluster';
 import EventEmitter from 'events';
 import express from 'express';
@@ -18,11 +18,13 @@ import {
 } from 'prom-client';
 import { Aggregator } from './Aggregator';
 import { Router } from './Router';
-import { MetricConfig, MetricInstancesObject, MetricsResponse } from './types';
 
 const DEFAULT_CONFIG_MMS_CLUSTER_MODE = false;
 
-export class MetricsFacade extends EventEmitter implements Layer.Service.Registry {
+export class MetricsFacade
+  extends EventEmitter
+  implements Layer.Service.Observable, Metrics.Registry
+{
   /** Metrics aggregator */
   private readonly aggregator: Aggregator;
   /** Metrics router */
@@ -73,16 +75,16 @@ export class MetricsFacade extends EventEmitter implements Layer.Service.Registr
    */
   public setMetrics<
     T extends Record<string, Metric> | void = void,
-    K extends Record<string, MetricConfig> = Record<string, MetricConfig>,
-  >(metrics: K): MetricInstancesObject<T, K> {
+    K extends Record<string, Metrics.Config> = Record<string, Metrics.Config>,
+  >(metrics: K): Metrics.InstancesObject<T, K> {
     return this.aggregator.setMetrics(metrics);
   }
   /** Return the metrics in text/plain format */
-  public async metrics(): Promise<MetricsResponse> {
+  public async metrics(): Promise<Metrics.Response> {
     return this.aggregator.metrics();
   }
   /** Return the actual metrics in JSON format */
-  public async metricsJSON(): Promise<MetricsResponse> {
+  public async metricsJSON(): Promise<Metrics.Response> {
     return this.aggregator.metricsJSON();
   }
   /**
@@ -111,13 +113,5 @@ export class MetricsFacade extends EventEmitter implements Layer.Service.Registr
     name: string
   ): Promise<MetricObjectWithValues<MetricValue<string>> | undefined> {
     return this.aggregator.getMetricAsJSON(name);
-  }
-  /** Start service function */
-  public async start(): Promise<void> {
-    return;
-  }
-  /** Stop service function */
-  public async stop(): Promise<void> {
-    return;
   }
 }

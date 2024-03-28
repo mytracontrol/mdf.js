@@ -23,7 +23,7 @@ export declare interface Component<T, K> {
 
 export abstract class Component<T extends ComponentAdapter, K extends ComponentOptions>
   extends EventEmitter
-  implements Health.Component, Layer.Service.Registry
+  implements Health.Component, Layer.Service.Observable
 {
   /** Component identification */
   public readonly componentId: string = v4();

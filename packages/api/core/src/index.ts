@@ -8,3 +8,4 @@
 export * as Health from './Health';
 export * as Jobs from './Jobs';
 export * as Layer from './Layer';
+export * as Metrics from './Metrics';

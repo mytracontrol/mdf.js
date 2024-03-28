@@ -5,18 +5,18 @@
  * or at https://opensource.org/licenses/MIT.
  */
 
-import { Jobs } from '@mdf.js/core';
-import { MetricsRegistry } from '@mdf.js/metrics-registry';
+import { Jobs, Metrics } from '@mdf.js/core';
 import { Sources } from '../types';
 import { JOBS_METRICS_DEFINITIONS } from './MetricsDefinitions';
 import { MetricInstances } from './MetricsInstances';
+
 export class MetricsHandler {
   /**
    * Create metrics handler and enroll the firehose metrics over the metrics service
    * @param service - Metrics service interface
    * @returns
    */
-  public static enroll(service: MetricsRegistry): MetricsHandler {
+  public static enroll(service: Metrics.Registry): MetricsHandler {
     return new MetricsHandler(service.setMetrics<MetricInstances>(JOBS_METRICS_DEFINITIONS));
   }
   /**

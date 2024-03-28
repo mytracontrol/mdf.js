@@ -1,7 +1,7 @@
-# **@mdf.js**
+# **@mdf.js/http-client-provider**
 
-[![Node Version](https://img.shields.io/static/v1?style=flat\&logo=node.js\&logoColor=green\&label=node\&message=%3E=16%20||%2018\&color=blue)](https://nodejs.org/en/)
-[![Typescript Version](https://img.shields.io/static/v1?style=flat\&logo=typescript\&label=Typescript\&message=4.8\&color=blue)](https://www.typescriptlang.org/)
+[![Node Version](https://img.shields.io/static/v1?style=flat\&logo=node.js\&logoColor=green\&label=node\&message=%3E=20\&color=blue)](https://nodejs.org/en/)
+[![Typescript Version](https://img.shields.io/static/v1?style=flat\&logo=typescript\&label=Typescript\&message=5.4\&color=blue)](https://www.typescriptlang.org/)
 [![Known Vulnerabilities](https://img.shields.io/static/v1?style=flat\&logo=snyk\&label=Vulnerabilities\&message=0\&color=300A98F)](https://snyk.io/package/npm/snyk)
 
 <!-- markdownlint-disable MD033 MD041 -->
@@ -12,7 +12,7 @@
   </div>
 </p>
 
-<h1 style="text-align:center;margin-bottom:0">Mytra Development Framework - @mdf.js </h1>
+<h1 style="text-align:center;margin-bottom:0">Mytra Development Framework - @mdf.js/http-client-provider </h1>
 <h5 style="text-align:center;margin-top:0">Typescript tools for development</h5>
 
 <!-- markdownlint-enable MD033 -->
@@ -21,7 +21,7 @@
 
 ## **Table of contents**
 
-- [**@mdf.js**](#mdfjs)
+- [**@mdf.js/http-client-provider**](#mdfjshttp-client-provider)
   - [**Table of contents**](#table-of-contents)
   - [**Introduction**](#introduction)
   - [**Installation**](#installation)
@@ -32,29 +32,52 @@
 
 ## **Introduction**
 
+HTTP client provider for [@mdf.js](https://mytracontrol.github.io/mdf.js/) based on [axios](https://www.npmjs.com/package/axios).
+
 ## **Installation**
+
+Using npm:
+
+```bash
+npm install @mdf.js/http-client-provider
+```
+
+Using yarn:
+
+```bash
+yarn add @mdf.js/http-client-provider
+```
 
 ## **Information**
 
+Check information about **@mdf.js** providers in the documentation of the core module [**@mdf.js/core**](https://mytracontrol.github.io/mdf.js/modules/_mdf_js_core.html).
+
 ## **Use**
+
+Checks included in the provider:
+
+- **status**: Due to the nature of the HTTP client, the status check is not implemented. The provider is always in `running` state.
+  - **observedValue**: `running`.
+  - **status**: `pass`.
+  - **output**: `undefined`.
 
 ## **Environment variables**
 
-- **CONFIG\_ARTIFACT\_ID**: undefined
-- **CONFIG\_HTTP\_CLIENT\_BASE\_URL**: undefined
-- **CONFIG\_HTTP\_CLIENT\_TIMEOUT**: undefined
-- **CONFIG\_HTTP\_CLIENT\_AUTH\_USERNAME**: undefined
-- **CONFIG\_HTTP\_CLIENT\_AUTH\_PASSWORD**: undefined
-- **CONFIG\_HTTP\_CLIENT\_KEEPALIVE**: undefined
-- **CONFIG\_HTTP\_CLIENT\_KEEPALIVE\_INITIAL\_DELAY**: undefined
-- **CONFIG\_HTTP\_CLIENT\_KEEPALIVE\_MSECS**: undefined
-- **CONFIG\_HTTP\_CLIENT\_MAX\_SOCKETS**: undefined
-- **CONFIG\_HTTP\_CLIENT\_MAX\_SOCKETS\_TOTAL**: undefined
-- **CONFIG\_HTTP\_CLIENT\_MAX\_SOCKETS\_FREE**: undefined
-- **CONFIG\_HTTP\_CLIENT\_REJECT\_UNAUTHORIZED**: undefined
-- **CONFIG\_HTTP\_CLIENT\_CA\_PATH**: undefined
-- **CONFIG\_HTTP\_CLIENT\_CLIENT\_CERT\_PATH**: undefined
-- **CONFIG\_HTTP\_CLIENT\_CLIENT\_KEY\_PATH**: undefined
+- **CONFIG\_ARTIFACT\_ID** (default: `` `mdf-http-client` ``): Artifact identifier for the configuration provider
+- **CONFIG\_HTTP\_CLIENT\_BASE\_URL** (default: `undefined`): Base URL for the HTTP client requests.
+- **CONFIG\_HTTP\_CLIENT\_TIMEOUT** (default: `undefined`): Time in milliseconds before the request is considered a timeout.
+- **CONFIG\_HTTP\_CLIENT\_AUTH\_USERNAME** (default: `undefined`): Username for the HTTP client authentication, if username is set, password must be set too.
+- **CONFIG\_HTTP\_CLIENT\_AUTH\_PASSWORD** (default: `undefined`): Password for the HTTP client authentication if password is set, username must be set too.
+- **CONFIG\_HTTP\_CLIENT\_KEEPALIVE** (default: `false`): Keep sockets around in a pool to be used by other requests in the future.
+- **CONFIG\_HTTP\_CLIENT\_KEEPALIVE\_INITIAL\_DELAY** (default: `undefined`): Time in milliseconds before the keep alive feature is enabled.
+- **CONFIG\_HTTP\_CLIENT\_KEEPALIVE\_MSECS** (default: `1000`): When using HTTP KeepAlive, how often to send TCP KeepAlive packets over sockets being kept alive. Only relevant if keepAlive is set to true.
+- **CONFIG\_HTTP\_CLIENT\_MAX\_SOCKETS** (default: `Infinity`): Maximum number of sockets to allow per host. Default for Node 0.10 is 5, default for Node 0.12 is Infinity.
+- **CONFIG\_HTTP\_CLIENT\_MAX\_SOCKETS\_TOTAL** (default: `Infinity`): Maximum number of sockets allowed for all hosts in total. Each request will use a new socket until the maximum is reached. Default: Infinity.
+- **CONFIG\_HTTP\_CLIENT\_MAX\_SOCKETS\_FREE** (default: `256`): Maximum number of sockets to leave open in a free state. Only relevant if keepAlive is set to true.
+- **CONFIG\_HTTP\_CLIENT\_REJECT\_UNAUTHORIZED** (default: `true`): Reject unauthorized TLS certificates.
+- **CONFIG\_HTTP\_CLIENT\_CA\_PATH** (default: `undefined`): Path to the CA certificate file.
+- **CONFIG\_HTTP\_CLIENT\_CLIENT\_CERT\_PATH** (default: `undefined`): Path to the client certificate file.
+- **CONFIG\_HTTP\_CLIENT\_CLIENT\_KEY\_PATH** (default: `undefined`): Path to the client key file.
 
 ## **License**
 

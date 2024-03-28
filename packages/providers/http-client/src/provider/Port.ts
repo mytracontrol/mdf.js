@@ -11,6 +11,7 @@ import { Agent as HTTPAgent } from 'http';
 import { Agent as HTTPSAgent } from 'https';
 import { CONFIG_PROVIDER_BASE_NAME } from '../config';
 import { Client, Config } from './types';
+
 export class Port extends Layer.Provider.Port<Client, Config> {
   /** Client handler */
   private readonly instance: Client;

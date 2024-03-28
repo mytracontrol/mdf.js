@@ -138,7 +138,7 @@ const abortCancelSignal = (attempts: number, signal: AbortSignal): Promise<never
         const cause = signal.reason ? Crash.from(signal.reason) : undefined;
         reject(
           new Crash(`The task was aborted externally in attempt number: ${attempts}`, {
-            name: 'InterruptionError',
+            name: 'AbortError',
             cause,
           })
         );
@@ -172,7 +172,7 @@ async function errorManagement(
 ): Promise<RetryParameters> {
   const error = Crash.from(rawError);
   logging(error, parameters.logger);
-  if (error.name === 'InterruptionError') {
+  if (error.name === 'InterruptionError' || error.name === 'AbortError') {
     throw error;
   }
   if (parameters.interrupt && parameters.interrupt()) {
@@ -218,17 +218,38 @@ export const retryBind = async <T, U>(
   funcArgs: TaskArguments = [],
   options: RetryOptions = {}
 ): Promise<T> => {
+  if (typeof task !== 'function') {
+    throw new Crash('The task must be a function', { name: 'TypeError' });
+  }
+  if (!Array.isArray(funcArgs)) {
+    throw new Crash('The arguments must be an array', { name: 'TypeError' });
+  }
+  if (options.interrupt && options.abortSignal) {
+    throw new Crash(
+      'The options `interrupt` and `abortSignal` are mutually exclusive, use only one of them',
+      { name: 'ArgumentError' }
+    );
+  }
   const parameters = { ...DEFAULT_RETRY_OPTIONS, ...options };
   if (options.abortSignal && !parameters.abortPromise) {
-    parameters.abortPromise = abortCancelSignal(parameters.actualAttempt, options.abortSignal);
+    if (!options.abortSignal.aborted) {
+      parameters.abortPromise = abortCancelSignal(parameters.actualAttempt, options.abortSignal);
+    } else {
+      parameters.abortPromise = Promise.reject(
+        new Crash(
+          `The task was aborted externally in attempt number: ${parameters.actualAttempt - 1}`,
+          { name: 'AbortError' }
+        )
+      );
+    }
   }
   const controller = new AbortController();
   try {
     const result = await Promise.race(
       [
-        task.bind(bindTo).apply(task, funcArgs),
-        watchdog(controller.signal, parameters.actualAttempt, parameters.timeout),
         parameters.abortPromise,
+        watchdog(controller.signal, parameters.actualAttempt, parameters.timeout),
+        task.bind(bindTo).apply(task, funcArgs),
       ].filter(Boolean)
     );
     controller.abort();
@@ -251,17 +272,38 @@ export const retry = async <T>(
   funcArgs: TaskArguments = [],
   options: RetryOptions = {}
 ): Promise<T> => {
+  if (typeof task !== 'function') {
+    throw new Crash('The task must be a function', { name: 'TypeError' });
+  }
+  if (!Array.isArray(funcArgs)) {
+    throw new Crash('The arguments must be an array', { name: 'TypeError' });
+  }
+  if (options.interrupt && options.abortSignal) {
+    throw new Crash(
+      'The options `interrupt` and `abortSignal` are mutually exclusive, use only one of them',
+      { name: 'ArgumentError' }
+    );
+  }
   const parameters = { ...DEFAULT_RETRY_OPTIONS, ...options };
   if (options.abortSignal && !parameters.abortPromise) {
-    parameters.abortPromise = abortCancelSignal(parameters.actualAttempt, options.abortSignal);
+    if (!options.abortSignal.aborted) {
+      parameters.abortPromise = abortCancelSignal(parameters.actualAttempt, options.abortSignal);
+    } else {
+      parameters.abortPromise = Promise.reject(
+        new Crash(
+          `The task was aborted externally in attempt number: ${parameters.actualAttempt - 1}`,
+          { name: 'AbortError' }
+        )
+      );
+    }
   }
   const controller = new AbortController();
   try {
     const result = await Promise.race(
       [
-        task.apply(task, funcArgs),
-        watchdog(controller.signal, parameters.actualAttempt, parameters.timeout),
         parameters.abortPromise,
+        watchdog(controller.signal, parameters.actualAttempt, parameters.timeout),
+        task.apply(task, funcArgs),
       ].filter(Boolean)
     );
     controller.abort();

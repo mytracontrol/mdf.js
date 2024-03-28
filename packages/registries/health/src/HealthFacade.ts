@@ -16,7 +16,7 @@ import { Router } from './Router';
 
 const DEFAULT_CONFIG_MMS_CLUSTER_MODE = false;
 
-export class HealthFacade extends EventEmitter implements Layer.Service.Registry {
+export class HealthFacade extends EventEmitter implements Layer.Service.Observable {
   /** Health aggregator */
   private readonly aggregator: Aggregator;
   /** Health registry */

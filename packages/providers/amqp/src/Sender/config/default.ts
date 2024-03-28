@@ -5,39 +5,22 @@
  * or at https://opensource.org/licenses/MIT.
  */
 
-import { CONFIG_ARTIFACT_ID } from '../../Common';
+import { CONFIG_ARTIFACT_ID, defaultConfig as commonDefaultConfig } from '../../Common';
 import { Config } from '../types';
 
 // *************************************************************************************************
 // #region Default values
-const CONFIG_AMQP_USER_NAME = 'producer';
-const CONFIG_AMQP_HOST = '127.0.0.1';
-const CONFIG_AMQP_PORT = 5672;
-const CONFIG_AMQP_TRANSPORT = 'tcp';
-const CONFIG_AMQP_CONTAINER_ID = `${CONFIG_ARTIFACT_ID}`;
-const CONFIG_AMQP_RECONNECT = 5000;
-const CONFIG_AMQP_INITIAL_RECONNECT_DELAY = 30000;
-const CONFIG_AMQP_MAX_RECONNECT_DELAY = 10000;
-const CONFIG_AMQP_NON_FATAL_ERRORS = ['amqp:connection:forced'];
-const CONFIG_AMQP_SENDER_SETTLE_MODE = 2;
-const CONFIG_AMQP_SENDER_AUTO_SETTLE = true;
-const CONFIG_AMQP_SENDER_TARGET = {};
+const AMQP_SENDER_SETTLE_MODE = 2;
+const AMQP_SENDER_AUTO_SETTLE = true;
+const AMQP_SENDER_TARGET = {};
 
 export const defaultConfig: Config = {
-  username: CONFIG_AMQP_USER_NAME,
-  host: CONFIG_AMQP_HOST,
-  port: CONFIG_AMQP_PORT,
-  transport: CONFIG_AMQP_TRANSPORT,
-  container_id: CONFIG_AMQP_CONTAINER_ID,
-  reconnect: CONFIG_AMQP_RECONNECT,
-  initial_reconnect_delay: CONFIG_AMQP_INITIAL_RECONNECT_DELAY,
-  max_reconnect_delay: CONFIG_AMQP_MAX_RECONNECT_DELAY,
-  non_fatal_errors: CONFIG_AMQP_NON_FATAL_ERRORS,
+  ...commonDefaultConfig,
   sender_options: {
     name: CONFIG_ARTIFACT_ID,
-    snd_settle_mode: CONFIG_AMQP_SENDER_SETTLE_MODE,
-    autosettle: CONFIG_AMQP_SENDER_AUTO_SETTLE,
-    target: CONFIG_AMQP_SENDER_TARGET,
+    snd_settle_mode: AMQP_SENDER_SETTLE_MODE,
+    autosettle: AMQP_SENDER_AUTO_SETTLE,
+    target: AMQP_SENDER_TARGET,
   },
 };
 // #endregion

@@ -126,7 +126,7 @@ export abstract class Port<PortClient, PortConfig> extends EventEmitter {
    */
   protected addCheck(measure: string, check: Health.Check): boolean {
     if (
-      (check.status && !Health.STATUS.includes(check.status)) ||
+      (check.status && !Health.STATUSES.includes(check.status)) ||
       typeof check.componentId !== 'string' ||
       this.checksMap.size >= 100
     ) {

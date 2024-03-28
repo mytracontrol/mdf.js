@@ -31,7 +31,7 @@ type FileEntry = [string, string];
 /** Class responsible of file management, both configuration file as validator files  */
 export class ConfigManager<Config extends Record<string, any> = Record<string, any>>
   extends EventEmitter
-  implements Layer.Service.Registry
+  implements Layer.Service.Observable
 {
   /** Unique identifier */
   private readonly uuid: string = v4();

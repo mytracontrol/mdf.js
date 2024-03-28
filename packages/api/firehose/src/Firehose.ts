@@ -5,7 +5,7 @@
  * or at https://opensource.org/licenses/MIT.
  */
 
-import { Health, Jobs } from '@mdf.js/core';
+import { Health, Jobs, Layer, Metrics } from '@mdf.js/core';
 import { Crash } from '@mdf.js/crash';
 import { ErrorRegistry } from '@mdf.js/error-registry';
 import { DebugLogger, LoggerInstance, SetContext } from '@mdf.js/logger';
@@ -38,7 +38,7 @@ export class Firehose<
     CustomHeaders extends Record<string, any> = Record<string, any>,
   >
   extends EventEmitter
-  implements Health.Component
+  implements Layer.App.Resource
 {
   /** Debug logger for development and deep troubleshooting */
   private readonly logger: LoggerInstance;
@@ -51,7 +51,7 @@ export class Firehose<
   /** Source streams */
   private readonly sources: Sources<Type, Data, CustomHeaders>[] = [];
   /** Metrics handler */
-  private readonly metricsHandler?: MetricsHandler;
+  private metricsHandler?: MetricsHandler;
   /** Error registry handler */
   private readonly errorRegisterHandler?: ErrorRegistry;
   /** Flag to indicate that an stop request has been received */
@@ -85,7 +85,7 @@ export class Firehose<
     });
     this.errorRegisterHandler = this.options.errorsRegistry;
     if (this.options.metricsRegistry) {
-      this.metricsHandler = MetricsHandler.enroll(this.options.metricsRegistry);
+      this.setMetricRegistry(this.options.metricsRegistry);
     }
     this.stopping = false;
   }
@@ -192,6 +192,16 @@ export class Firehose<
       overallChecks = { ...sink.checks, ...overallChecks };
     }
     return { ...this.engine.checks, ...overallChecks };
+  }
+  /** Set the metrics registry for the firehose */
+  public setMetricRegistry(registry: Metrics.Registry): void {
+    if (this.metricsHandler) {
+      this.logger.debug(`The metric handler is already configured, maybe with other registry`);
+    }
+    this.metricsHandler = MetricsHandler.enroll(registry);
+    for (const source of this.sources) {
+      this.metricsHandler.register(source);
+    }
   }
   /** Perform the piping of all the streams */
   public async start(): Promise<void> {

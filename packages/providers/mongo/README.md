@@ -1,7 +1,7 @@
 # **@mdf.js**
 
-[![Node Version](https://img.shields.io/static/v1?style=flat\&logo=node.js\&logoColor=green\&label=node\&message=%3E=16%20||%2018\&color=blue)](https://nodejs.org/en/)
-[![Typescript Version](https://img.shields.io/static/v1?style=flat\&logo=typescript\&label=Typescript\&message=4.8\&color=blue)](https://www.typescriptlang.org/)
+[![Node Version](https://img.shields.io/static/v1?style=flat\&logo=node.js\&logoColor=green\&label=node\&message=%3E=20\&color=blue)](https://nodejs.org/en/)
+[![Typescript Version](https://img.shields.io/static/v1?style=flat\&logo=typescript\&label=Typescript\&message=5.4\&color=blue)](https://www.typescriptlang.org/)
 [![Known Vulnerabilities](https://img.shields.io/static/v1?style=flat\&logo=snyk\&label=Vulnerabilities\&message=0\&color=300A98F)](https://snyk.io/package/npm/snyk)
 
 <!-- markdownlint-disable MD033 MD041 -->
@@ -53,11 +53,11 @@ yarn add @mdf.js/mongo-provider
 
 ## **Environment variables**
 
-- **CONFIG\_ARTIFACT\_ID**: undefined
-- **CONFIG\_MONGO\_URL**: undefined
-- **CONFIG\_MONGO\_CA\_PATH**: undefined
-- **CONFIG\_MONGO\_CERT\_PATH**: undefined
-- **CONFIG\_MONGO\_KEY\_PATH**: undefined
+- **CONFIG\_ARTIFACT\_ID**: Artifact identifier for the configuration provider
+- **CONFIG\_MONGO\_URL** (default: `` `mongodb://127.0.0.1:27017/mdf` ``): URL for the mongo database
+- **CONFIG\_MONGO\_CA\_PATH** (default: `undefined`): Path to the CA for the mongo database
+- **CONFIG\_MONGO\_CERT\_PATH** (default: `undefined`): Path to the cert for the mongo database
+- **CONFIG\_MONGO\_KEY\_PATH** (default: `undefined`): Path to the key for the mongo database
 
 ## **License**
 

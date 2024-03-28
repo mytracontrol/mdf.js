@@ -11,15 +11,13 @@ import { Config } from '../provider';
 
 // *************************************************************************************************
 // #region Default values
-const CONFIG_SERVER_PORT = 8080;
-const CONFIG_SERVER_HOST = 'localhost';
-export const CONFIG_SERVER_DEFAULT_APP = express().use(
-  express.static(path.join(__dirname, 'public'))
-);
+const SERVER_PORT = 8080;
+const SERVER_HOST = 'localhost';
+export const SERVER_DEFAULT_APP = express().use(express.static(path.join(__dirname, 'public')));
 
 export const defaultConfig: Config = {
-  port: CONFIG_SERVER_PORT,
-  host: CONFIG_SERVER_HOST,
-  app: CONFIG_SERVER_DEFAULT_APP,
+  port: SERVER_PORT,
+  host: SERVER_HOST,
+  app: SERVER_DEFAULT_APP,
 };
 // #endregion

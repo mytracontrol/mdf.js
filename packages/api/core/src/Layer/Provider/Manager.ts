@@ -57,7 +57,11 @@ export declare interface Manager<PortClient, PortConfig, T extends Port<PortClie
  * @param T - Port class, this is, the class that extends the {@link Port} abstract class
  * @public
  */
-export class Manager<PortClient, PortConfig, T extends Port<PortClient, PortConfig>>
+export class Manager<
+    PortClient = any,
+    PortConfig = any,
+    T extends Port<PortClient, PortConfig> = any,
+  >
   extends EventEmitter
   implements Health.Component
 {

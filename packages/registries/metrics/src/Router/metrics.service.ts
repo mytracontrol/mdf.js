@@ -5,7 +5,7 @@
  * or at https://opensource.org/licenses/MIT.
  */
 
-import { MetricsResponse } from '../types';
+import { Metrics } from '@mdf.js/core';
 import { Model } from './metrics.model';
 
 /** Service class */
@@ -20,7 +20,7 @@ export class Service {
     this.#model = model;
   }
   /** Return all the actual metrics of this artifact */
-  public metrics(jsonFormat: boolean): Promise<MetricsResponse> {
+  public metrics(jsonFormat: boolean): Promise<Metrics.Response> {
     return this.#model.metrics(jsonFormat);
   }
 }

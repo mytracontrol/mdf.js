@@ -31,7 +31,9 @@ const CONFIG_REDIS_KEEPALIVE = coerce<number>(process.env['CONFIG_REDIS_KEEPALIV
 const CONFIG_REDIS_CONNECTION_TIMEOUT = coerce<number>(
   process.env['CONFIG_REDIS_CONNECTION_TIMEOUT']
 );
+/** Default REDIS status check interval */
 const CONFIG_REDIS_CHECK_INTERVAL = coerce<number>(process.env['CONFIG_REDIS_CHECK_INTERVAL']);
+/** Disable Redis checks */
 const CONFIG_REDIS_DISABLE_CHECKS = coerce<boolean>(process.env['CONFIG_REDIS_DISABLE_CHECKS']);
 
 export const envBasedConfig: Config = {

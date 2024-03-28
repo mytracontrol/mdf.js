@@ -1,7 +1,7 @@
-# **@mdf.js**
+# **@mdf.js/kafka-provider**
 
-[![Node Version](https://img.shields.io/static/v1?style=flat\&logo=node.js\&logoColor=green\&label=node\&message=%3E=16%20||%2018\&color=blue)](https://nodejs.org/en/)
-[![Typescript Version](https://img.shields.io/static/v1?style=flat\&logo=typescript\&label=Typescript\&message=4.8\&color=blue)](https://www.typescriptlang.org/)
+[![Node Version](https://img.shields.io/static/v1?style=flat\&logo=node.js\&logoColor=green\&label=node\&message=%3E=20\&color=blue)](https://nodejs.org/en/)
+[![Typescript Version](https://img.shields.io/static/v1?style=flat\&logo=typescript\&label=Typescript\&message=5.4\&color=blue)](https://www.typescriptlang.org/)
 [![Known Vulnerabilities](https://img.shields.io/static/v1?style=flat\&logo=snyk\&label=Vulnerabilities\&message=0\&color=300A98F)](https://snyk.io/package/npm/snyk)
 
 <!-- markdownlint-disable MD033 MD041 -->
@@ -12,7 +12,7 @@
   </div>
 </p>
 
-<h1 style="text-align:center;margin-bottom:0">Mytra Development Framework - @mdf.js </h1>
+<h1 style="text-align:center;margin-bottom:0">Mytra Development Framework - @mdf.js/kafka-provider </h1>
 <h5 style="text-align:center;margin-top:0">Typescript tools for development</h5>
 
 <!-- markdownlint-enable MD033 -->
@@ -21,21 +21,50 @@
 
 ## **Table of contents**
 
-- [**@mdf.js**](#mdfjs)
+- [**@mdf.js/kafka-provider**](#mdfjskafka-provider)
   - [**Table of contents**](#table-of-contents)
   - [**Introduction**](#introduction)
   - [**Installation**](#installation)
   - [**Information**](#information)
   - [**Use**](#use)
+  - [**Environment variables**](#environment-variables)
   - [**License**](#license)
 
 ## **Introduction**
 
+Kafka provider for [@mdf.js](https://mytracontrol.github.io/mdf.js/) based on [kafkajs](https://www.npmjs.com/package/kafkajs).
+
 ## **Installation**
+
+Using npm:
+
+```bash
+npm install @mdf.js/kafka-provider
+```
+
+Using yarn:
+
+```bash
+yarn add @mdf.js/kafka-provider
+```
 
 ## **Information**
 
+Check information about **@mdf.js** providers in the documentation of the core module [**@mdf.js/core**](https://mytracontrol.github.io/mdf.js/modules/_mdf_js_core.html).
+
 ## **Use**
+
+Checks included in the provider:
+
+- **status**: Checks the status of the kafka nodes using the [**admin client**](https://kafka.js.org/docs/cluster) of the KafkaJS library, performing several requests about the status of the nodes and groups.
+  - **observedValue**: actual state of the consumer/producer provider instance \[`error`, `running`, `stopped`] based on the response, or not, to admin client requests. `error` if there is errors during the requests, `running` if the requests are successful, and `stopped` if the instance has been stopped or not initialized.
+  - **status**: `pass` if the status is `running`, `warn` if the status is `stopped`, `fail` if the status is `error`.
+  - **output**: Shows the error message in case of `error` state (status `fail`).
+- **topics**: Checks the topics available in the Kafka connection
+  - **observedValue**: List of topics available in the Kafka connection.
+  - **observedUnit**: `topics`.
+  - **status**: `pass` if the topics are available, `fail` in other cases.
+  - **output**: `No topics available` if the topics are not available.
 
 ## **Environment variables**
 
@@ -110,7 +139,7 @@
 - **CONFIG\_KAFKA\_CONSUMER\_\_READ\_UNCOMMITTED**: undefined
 - **CONFIG\_KAFKA\_CONSUMER\_\_MAX\_IN\_FLIGHT\_REQUEST**: undefined
 - **CONFIG\_KAFKA\_CONSUMER\_\_RACK\_ID**: undefined
-- **CONFIG\_ARTIFACT\_ID**: undefined
+- **CONFIG\_ARTIFACT\_ID**: Artifact identifier for the configuration provider
 - **CONFIG\_KAFKA\_LOG\_LEVEL**: undefined
 
 ## **License**

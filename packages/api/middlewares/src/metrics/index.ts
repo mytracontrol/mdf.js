@@ -5,4 +5,4 @@
  * or at https://opensource.org/licenses/MIT.
  */
 
-export * from './metrics';
+export { MetricsMiddleware as Metrics } from './metrics';
