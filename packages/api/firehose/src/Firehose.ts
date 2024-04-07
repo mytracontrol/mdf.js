@@ -5,11 +5,11 @@
  * or at https://opensource.org/licenses/MIT.
  */
 
-import { Health, Jobs, Layer, Metrics } from '@mdf.js/core';
-import { Crash } from '@mdf.js/crash';
-import { ErrorRegistry } from '@mdf.js/error-registry';
+import { Health, Jobs, Layer } from '@mdf.js/core';
+import { Crash, Multi } from '@mdf.js/crash';
 import { DebugLogger, LoggerInstance, SetContext } from '@mdf.js/logger';
 import EventEmitter from 'events';
+import { Registry } from 'prom-client';
 import { Writable } from 'stream';
 import { v4 } from 'uuid';
 import { Engine } from './Engine';
@@ -17,43 +17,146 @@ import { Helpers } from './helpers';
 import { MetricsHandler } from './metrics';
 import { FirehoseOptions, Sinks, Sources } from './types';
 
+/** Firehose `job` event handler */
+export type JobEventHandler<
+  Type extends string = string,
+  Data = any,
+  CustomHeaders extends Record<string, any> = Jobs.NoMoreHeaders,
+  CustomOptions extends Record<string, any> = Jobs.NoMoreOptions,
+> = (job: Jobs.JobObject<Type, Data, CustomHeaders, CustomOptions>) => void;
+
 export declare interface Firehose<
   Type extends string = string,
   Data = any,
-  CustomHeaders extends Record<string, any> = Record<string, any>,
+  CustomHeaders extends Record<string, any> = Jobs.NoMoreHeaders,
+  CustomOptions extends Record<string, any> = Jobs.NoMoreOptions,
 > {
-  /** Due to the implementation of consumer classes, this event will never emitted */
-  on(event: 'error', listener: (error: Error | Crash) => void): this;
-  /** Emitted on every state change */
+  /**
+   * Add a listener for the `error` event, emitted when the component detects an error.
+   * @param event - `error` event
+   * @param listener - Error event listener
+   * @event
+   */
+  on(event: 'error', listener: (error: Crash | Multi | Error) => void): this;
+  /**
+   * Add a listener for the status event, emitted when the component status changes.
+   * @param event - `status` event
+   * @param listener - Status event listener
+   * @event
+   */
   on(event: 'status', listener: (status: Health.Status) => void): this;
-  /** Emitted when a job is created */
-  on(event: 'job', listener: (job: Jobs.JobObject<Type, Data, CustomHeaders>) => void): this;
-  /** Emitted when a job has ended */
-  on(event: 'done', listener: (uuid: string, result: Jobs.Result, error?: Crash) => void): this;
+  /**
+   * Register an event listener over the `job` event, which is emitted when a new job is received
+   * from a source.
+   * @param event - `job` event
+   * @param job - Job object
+   * @event
+   */
+  on(event: 'job', listener: JobEventHandler<Type, Data, CustomHeaders, CustomOptions>): this;
+  /**
+   * Register an event listener over the `done` event, which is emitted when a job has ended, either
+   * due to completion or failure.
+   * @param event - `done` event
+   * @param uuid - Unique job processing identification
+   * @param result - Job {@link Result}
+   * @param error - Error raised during job processing, if any
+   * @event
+   */
+  on(event: 'done', listener: Jobs.DoneEventHandler<Type>): this;
+  /**
+   * Register an event listener over the `done` event, which is emitted when a job has ended, either
+   * due to completion or failure.
+   * @param event - `done` event
+   * @param uuid - Unique job processing identification
+   * @param result - Job {@link Result}
+   * @param error - Error raised during job processing, if any
+   * @event
+   */
+  addListener(event: 'done', listener: Jobs.DoneEventHandler<Type>): this;
+  /**
+   * Registers a event listener over the `done` event, at the beginning of the listeners array,
+   * which is emitted when a job has ended, either due to completion or failure.
+   * @param event - `done` event
+   * @param uuid - Unique job processing identification
+   * @param result - Job {@link Result}
+   * @param error - Error raised during job processing, if any
+   * @event
+   */
+  prependListener(event: 'done', listener: Jobs.DoneEventHandler<Type>): this;
+  /**
+   * Registers a one-time event listener over the `done` event, which is emitted when a job has
+   * ended, either due to completion or failure.
+   * @param event - `done` event
+   * @param uuid - Unique job processing identification
+   * @param result - Job {@link Result}
+   * @param error - Error raised during job processing, if any
+   * @event
+   */
+  once(event: 'done', listener: Jobs.DoneEventHandler<Type>): this;
+  /**
+   * Registers a one-time event listener over the `done` event, at the beginning of the listeners
+   * array, which is emitted when a job has ended, either due to completion or failure.
+   * @param event - `done` event
+   * @param uuid - Unique job processing identification
+   * @param result - Job {@link Result}
+   * @param error - Error raised during job processing, if any
+   * @event
+   */
+  prependOnceListener(event: 'done', listener: Jobs.DoneEventHandler<Type>): this;
+  /**
+   * Removes the specified listener from the listener array for the `done` event.
+   * @param event - `done` event
+   * @param listener - The listener function to remove
+   * @event
+   */
+  removeListener(event: 'done', listener: Jobs.DoneEventHandler<Type>): this;
+  /**
+   * Removes the specified listener from the listener array for the `done` event.
+   * @param event - `done` event
+   * @param listener - The listener function to remove
+   * @event
+   */
+  off(event: 'done', listener: Jobs.DoneEventHandler<Type>): this;
+  /**
+   * Removes all listeners, or those of the specified event.
+   * @param event - `done` event
+   * @event
+   */
+  removeAllListeners(event?: 'done'): this;
 }
 
+/**
+ * Firehose class
+ * Allows to create a firehose(DTL pipeline) instance to manage the flow of jobs between sources and
+ * sinks. Sinks are the final destination of the jobs, sources are the origin of the jobs and the
+ * engine is the processing unit that manages the flow of jobs between sources and sinks applying
+ * strategies to the jobs.
+ * @typeParam Type - Job type, used as selector for strategies in job processors
+ * @typeParam Data - Job payload
+ * @typeParam CustomHeaders - Custom headers, used to pass specific information for job processors
+ * @typeParam CustomOptions - Custom options, used to pass specific information for job processors
+ */
 export class Firehose<
     Type extends string = string,
     Data = any,
-    CustomHeaders extends Record<string, any> = Record<string, any>,
+    CustomHeaders extends Record<string, any> = Jobs.NoMoreHeaders,
+    CustomOptions extends Record<string, any> = Jobs.NoMoreOptions,
   >
   extends EventEmitter
-  implements Layer.App.Resource
+  implements Layer.App.Service
 {
   /** Debug logger for development and deep troubleshooting */
   private readonly logger: LoggerInstance;
   /** Provider unique identifier for trace purposes */
   readonly componentId: string = v4();
   /** Engine stream */
-  private readonly engine: Engine<Type, Data, CustomHeaders>;
+  private readonly engine: Engine;
   /** Sink streams */
-  private readonly sinks: Sinks<Type, Data, CustomHeaders>[] = [];
+  private readonly sinks: Sinks[] = [];
   /** Source streams */
-  private readonly sources: Sources<Type, Data, CustomHeaders>[] = [];
+  private readonly sources: Sources[] = [];
   /** Metrics handler */
-  private metricsHandler?: MetricsHandler;
-  /** Error registry handler */
-  private readonly errorRegisterHandler?: ErrorRegistry;
+  private metricsHandler = new MetricsHandler();
   /** Flag to indicate that an stop request has been received */
   private stopping: boolean;
   /**
@@ -63,7 +166,7 @@ export class Firehose<
    */
   constructor(
     public readonly name: string,
-    private readonly options: FirehoseOptions<Type, Data, CustomHeaders>
+    private readonly options: FirehoseOptions<Type, Data, CustomHeaders, CustomOptions>
   ) {
     super();
     // Stryker disable next-line all
@@ -78,24 +181,17 @@ export class Firehose<
     if (this.options.sources.length < 1) {
       throw new Crash(`Firehose must have at least one source`, this.componentId);
     }
-    this.engine = new Engine<Type, Data, CustomHeaders>(this.name, {
+    this.engine = new Engine(this.name, {
       strategies: this.options.strategies,
       transformOptions: { highWaterMark: this.options.bufferSize },
       logger: this.options.logger,
     });
-    this.errorRegisterHandler = this.options.errorsRegistry;
-    if (this.options.metricsRegistry) {
-      this.setMetricRegistry(this.options.metricsRegistry);
-    }
     this.stopping = false;
   }
   /** Sink/Source/Engine/Plug error event handler */
   private readonly onErrorEvent = (error: Error | Crash) => {
     // Stryker disable next-line all
     this.logger.error(`${error.message}`);
-    if (this.errorRegisterHandler) {
-      this.errorRegisterHandler.push(Crash.from(error));
-    }
     if (this.listenerCount('error') > 0) {
       this.emit('error', error);
     }
@@ -104,16 +200,18 @@ export class Firehose<
   private readonly onStatusEvent = (status: Health.Status) => {
     // Stryker disable next-line all
     this.logger.debug(`Status message received from underlayer streams ${status}`);
-    this.emit('status', this.overallStatus);
+    this.emit('status', this.status);
   };
   /** Source job create event handler */
-  private readonly onJobEvent = (job: Jobs.JobHandler<Type, Data>) => {
+  private readonly onJobEvent = (
+    job: Jobs.JobHandler<Type, Data, CustomHeaders, CustomOptions>
+  ) => {
     this.emit('job', job.toObject());
   };
   /** Source job done error event handler */
   private readonly onJobDoneEvent = (uuid: string, result: Jobs.Result, error?: Crash) => {
-    if (error && this.errorRegisterHandler) {
-      this.errorRegisterHandler.push(
+    if (error) {
+      this.onErrorEvent(
         new Crash(`Job finished with errors`, error.uuid, {
           cause: error,
           info: { subject: 'firehose' },
@@ -175,7 +273,7 @@ export class Firehose<
     this.engine.off('status', this.onStatusEvent);
   }
   /** Overall component status */
-  private get overallStatus(): Health.Status {
+  public get status(): Health.Status {
     return Health.overallStatus(this.checks);
   }
   /**
@@ -193,15 +291,9 @@ export class Firehose<
     }
     return { ...this.engine.checks, ...overallChecks };
   }
-  /** Set the metrics registry for the firehose */
-  public setMetricRegistry(registry: Metrics.Registry): void {
-    if (this.metricsHandler) {
-      this.logger.debug(`The metric handler is already configured, maybe with other registry`);
-    }
-    this.metricsHandler = MetricsHandler.enroll(registry);
-    for (const source of this.sources) {
-      this.metricsHandler.register(source);
-    }
+  /** Return the metrics registry */
+  public get metrics(): Registry {
+    return this.metricsHandler.registry;
   }
   /** Perform the piping of all the streams */
   public async start(): Promise<void> {
@@ -215,7 +307,7 @@ export class Firehose<
     );
     if (this.metricsHandler) {
       for (const source of this.sources) {
-        this.metricsHandler.register(source);
+        this.metricsHandler.enroll(source);
       }
     }
     this.wrappingEvents();
@@ -251,6 +343,7 @@ export class Firehose<
   /** Stop and close all the streams */
   public async close(): Promise<void> {
     await this.stop();
+    this.metricsHandler.registry.clear();
     this.engine.end();
     this.engine.destroy();
     this.engine.removeAllListeners();

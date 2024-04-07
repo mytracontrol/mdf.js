@@ -1,4 +1,4 @@
-# **@mdf.js**
+# **@mdf.js/socket-server-provider**
 
 [![Node Version](https://img.shields.io/static/v1?style=flat\&logo=node.js\&logoColor=green\&label=node\&message=%3E=20\&color=blue)](https://nodejs.org/en/)
 [![Typescript Version](https://img.shields.io/static/v1?style=flat\&logo=typescript\&label=Typescript\&message=5.4\&color=blue)](https://www.typescriptlang.org/)
@@ -12,7 +12,7 @@
   </div>
 </p>
 
-<h1 style="text-align:center;margin-bottom:0">Mytra Development Framework - @mdf.js </h1>
+<h1 style="text-align:center;margin-bottom:0">Mytra Development Framework - @mdf.js/socket-server-provider</h1>
 <h5 style="text-align:center;margin-top:0">Typescript tools for development</h5>
 
 <!-- markdownlint-enable MD033 -->
@@ -21,7 +21,7 @@
 
 ## **Table of contents**
 
-- [**@mdf.js**](#mdfjs)
+- [**@mdf.js/socket-server-provider**](#mdfjssocket-server-provider)
   - [**Table of contents**](#table-of-contents)
   - [**Introduction**](#introduction)
   - [**Installation**](#installation)
@@ -31,15 +31,36 @@
 
 ## **Introduction**
 
+Socket server provider for [@mdf.js](https://mytracontrol.github.io/mdf.js/) based on [socket.io](https://www.npmjs.com/package/socket.io).
+
 ## **Installation**
+
+Using npm:
+
+```bash
+npm install @mdf.js/socket-server-provider
+```
+
+Using yarn:
+
+```bash
+yarn add @mdf.js/socket-server-provider
+```
 
 ## **Information**
 
+Check information about **@mdf.js** providers in the documentation of the core module [**@mdf.js/core**](https://mytracontrol.github.io/mdf.js/modules/_mdf_js_core.html).
+
 ## **Use**
+
+Checks included in the provider:
+
+- **status**: Check the status of the server based in the status of the listening port and the error events from the socket-io server.
+  - **observedValue**: actual state of the consumer/producer provider instance \[`error`, `running`, `stopped`] based in the last ping event. `stopped` if the provider is stopped or has not been initialized yet, `running` if the provider is running and the server is listening and `error` if the provider is running but the server is not listening.
+  - **status**: `pass` if the status is `running`, `warn` if the status is `stopped`, `fail` if the status is `error`.
 
 ## **Environment variables**
 
-- **CONFIG\_ARTIFACT\_ID**: Artifact identifier for the configuration provider
 - **CONFIG\_SOCKET\_IO\_SERVER\_PORT**: undefined
 - **CONFIG\_SOCKET\_IO\_SERVER\_HOST**: undefined
 - **CONFIG\_SOCKET\_IO\_SERVER\_PATH**: undefined

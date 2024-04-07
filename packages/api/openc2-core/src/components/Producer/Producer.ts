@@ -16,11 +16,85 @@ import { AdapterWrapper } from './core';
 
 const DEFAULT_AGING_CHECK_INTERVAL = 1000 * 60; // 1 minute
 const DEFAULT_MAX_AGE = DEFAULT_AGING_CHECK_INTERVAL * 3; // 3 minutes
+
 export declare interface Producer {
-  /** Emitted when a producer's operation has some problem */
+  /**
+   * Add a listener for the `error` event, emitted when the component detects an error.
+   * @param event - `error` event
+   * @param listener - Error event listener
+   * @event
+   */
   on(event: 'error', listener: (error: Crash | Error) => void): this;
-  /** Emitted on every state change */
+  /**
+   * Add a listener for the `error` event, emitted when the component detects an error.
+   * @param event - `error` event
+   * @param listener - Error event listener
+   * @event
+   */
+  addListener(event: 'error', listener: (error: Crash | Error) => void): this;
+  /**
+   * Add a listener for the `error` event, emitted when the component detects an error. This is a
+   * one-time event, the listener will be removed after the first emission.
+   * @param event - `error` event
+   * @param listener - Error event listener
+   * @event
+   */
+  once(event: 'error', listener: (error: Crash | Error) => void): this;
+  /**
+   * Removes the specified listener from the listener array for the `error` event.
+   * @param event - `error` event
+   * @param listener - Error event listener
+   * @event
+   */
+  off(event: 'error', listener: (error: Crash | Error) => void): this;
+  /**
+   * Removes the specified listener from the listener array for the `error` event.
+   * @param event - `error` event
+   * @param listener - Error event listener
+   * @event
+   */
+  removeListener(event: 'error', listener: (error: Crash | Error) => void): this;
+  /**
+   * Removes all listeners, or those of the specified event.
+   * @param event - `error` event
+   */
+  removeAllListeners(event?: 'error'): this;
+  /**
+   * Add a listener for the `status` event, emitted when the component changes its status.
+   * @param event - `status` event
+   * @param listener - Status event listener
+   * @event
+   */
   on(event: 'status', listener: (status: Health.Status) => void): this;
+  /**
+   * Add a listener for the `status` event, emitted when the component changes its status.
+   * @param event - `status` event
+   * @param listener - Status event listener
+   * @event
+   */
+  addListener(event: 'status', listener: (status: Health.Status) => void): this;
+  /**
+   * Add a listener for the `status` event, emitted when the component changes its status. This is a
+   * one-time event, the listener will be removed after the first emission.
+   * @param event - `status` event
+   * @param listener - Status event listener
+   * @event
+   */
+  once(event: 'status', listener: (status: Health.Status) => void): this;
+  /**
+   * Removes the specified listener from the listener array for the `status` event.
+   * @param event - `status` event
+   * @param listener - Status event listener
+   * @event
+   */
+  off(event: 'status', listener: (status: Health.Status) => void): this;
+  /**
+   * Removes the specified listener from the listener array for the `status` event.
+   * @param event - `status` event
+   * @param listener - Status event listener
+   * @event
+   */
+  removeListener(event: 'status', listener: (status: Health.Status) => void): this;
 }
 
 export class Producer extends Component<AdapterWrapper, ProducerOptions> {

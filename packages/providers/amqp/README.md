@@ -27,7 +27,7 @@
   - [**Installation**](#installation)
   - [**Information**](#information)
   - [**Use**](#use)
-  - [**Environment variables**](#environment-variables)
+    - [**Health checks**](#health-checks)
   - [**License**](#license)
 
 ## **Introduction**
@@ -54,6 +54,136 @@ Check information about **@mdf.js** providers in the documentation of the core m
 
 ## **Use**
 
+In this module there are implemented two providers:
+
+- The consumer (`Receiver`), that wraps the [rhea-promise](https://www.npmjs.com/package/rhea-promise) `Receiver`, which wraps the [rhea](https://www.npmjs.com/package/rhea) `Receiver` class.
+
+  ```typescript
+  import { Receiver } from '@mdf.js/amqp-provider';
+
+  const ownReceiver = Receiver.Factory.create({
+    name: `myAMQPReceiverName`,
+    config: {...}, //rhea - AMQP CommonConnectionOptions
+    logger: myLoggerInstance,
+    useEnvironment: true,
+  });
+  ```
+
+  - **Defaults**:
+
+    ```typescript
+    {
+      // ... Common client options, see below
+      receiver_options: {
+        name: 'mdf-amqp',
+        rcv_settle_mode: 0,
+        credit_window: 0,
+        autoaccept: false,
+        autosettle: true,
+      }
+    }
+    ```
+
+  - **Environment**: remember to set the `useEnvironment` flag to `true` to use these environment variables.
+
+    ```typescript
+    {
+      // ... Common client options, see below
+      receiver_options: {
+        name: process.env['CONFIG_AMQP_RECEIVER_NAME'],
+        rcv_settle_mode: process.env['CONFIG_AMQP_RECEIVER_SETTLE_MODE'], // coerced to number
+        credit_window: process.env['CONFIG_AMQP_RECEIVER_CREDIT_WINDOW'], // coerced to number
+        autoaccept: process.env['CONFIG_AMQP_RECEIVER_AUTO_ACCEPT'], // coerced to boolean
+        autosettle: process.env['CONFIG_AMQP_RECEIVER_AUTO_SETTLE'], // coerced to boolean
+      }
+    }
+    ```
+
+- The producer (`Sender`) that wraps the [rhea-promise](https://www.npmjs.com/package/rhea-promise) `AwaitableSender` class.
+
+  ```typescript
+  import { Sender } from '@mdf.js/amqp-provider';
+
+  const ownSender = Sender.Factory.create({
+    name: `myAMQPSenderName`,
+    config: {...}, //rhea - AMQP CommonConnectionOptions
+    logger: myLoggerInstance,
+    useEnvironment: true,
+  });
+  ```
+
+  - **Defaults**:
+
+    ```typescript
+    {
+      // ... Common client options, see below
+      sender_options: {
+        name: 'mdf-amqp',
+        snd_settle_mode: 2,
+        autosettle: true,
+        target: {},
+      }
+    }
+    ```
+
+  - **Environment**: remember to set the `useEnvironment` flag to `true` to use these environment variables.
+
+    ```typescript
+    {
+      // ... Common client options, see below
+      sender_options: {
+        name: process.env['CONFIG_AMQP_SENDER_NAME'],
+        snd_settle_mode: process.env['CONFIG_AMQP_SENDER_SETTLE_MODE'], // coerced to number
+        autosettle: process.env['CONFIG_AMQP_SENDER_AUTO_SETTLE'], // coerced to boolean
+      }
+    }
+    ```
+
+- Common client options:
+  - **Defaults**:
+
+    ```typescript
+    {
+      username: 'mdf-amqp',
+      host: '127.0.0.1',
+      port: 5672,
+      transport: 'tcp',
+      container_id: 'mdf-amqp',
+      reconnect: 5000,
+      initial_reconnect_delay: 30000,
+      max_reconnect_delay: 10000,
+      non_fatal_errors: ['amqp:connection:forced'],
+    }
+    ```
+
+  - **Environment**: remember to set the `useEnvironment` flag to `true` to use these environment variables.
+
+    ```typescript
+    {
+      username: process.env['CONFIG_AMQP_USER_NAME'],
+      password: process.env['CONFIG_AMQP_PASSWORD'],
+      host: process.env['CONFIG_AMQP_HOST'],
+      hostname: process.env['CONFIG_AMQP_HOSTNAME'],
+      port: process.env['CONFIG_AMQP_PORT'], // coerced to number
+      transport: process.env['CONFIG_AMQP_TRANSPORT'],
+      container_id: process.env['CONFIG_AMQP_CONTAINER_ID'],
+      id: process.env['CONFIG_AMQP_ID'],
+      reconnect: process.env['CONFIG_AMQP_RECONNECT'], // coerced to number
+      reconnect_limit: process.env['CONFIG_AMQP_RECONNECT_LIMIT'], // coerced to number
+      initial_reconnect_delay: process.env['CONFIG_AMQP_INITIAL_RECONNECT_DELAY'], // coerced to number
+      max_reconnect_delay: process.env['CONFIG_AMQP_MAX_RECONNECT_DELAY'], // coerced to number
+      max_frame_size: process.env['CONFIG_AMQP_MAX_FRAME_SIZE'], // coerced to number
+      non_fatal_errors: process.env['CONFIG_AMQP_NON_FATAL_ERRORS'], // coerced to array from string separated by ','
+      key: process.env['CONFIG_AMQP_CLIENT_KEY_PATH'], // The file will be read and the content will be used as the key
+      cert: process.env['CONFIG_AMQP_CLIENT_CERT_PATH'], // The file will be read and the content will be used as the cert
+      ca: process.env['CONFIG_AMQP_CA_PATH'], // The file will be read and the content will be used as the CA
+      requestCert: process.env['CONFIG_AMQP_REQUEST_CERT'], // coerced to boolean
+      rejectUnauthorized: process.env['CONFIG_AMQP_REJECT_UNAUTHORIZED'], // coerced to boolean
+    };
+    ```
+
+### **Health checks**
+
 Checks included in the provider:
 
 - **status**: Checks the status of the AMQP connection
@@ -66,37 +196,59 @@ Checks included in the provider:
   - **status**: `pass` if the number of credits is greater than `0`, `warn` otherwise.
   - **output**: `No credits available` if the number of credits is `0`.
 
+```typescript
+{
+  "[mdf-amqp:status]": [
+    {
+      "status": "pass",
+      "componentId": "00000000-0000-0000-0000-000000000000",
+      "observedValue": "running",
+      "componentType": "service",
+      "output": undefined
+    }
+  ],
+  "[mdf-amqp:credits]": [
+    {
+      "status": "pass",
+      "componentId": "00000000-0000-0000-0000-000000000000",
+      "observedValue": 10,
+      "observedUnit": "credits",
+      "output": undefined
+    }
+  ]
+}
+```
+
 ## **Environment variables**
 
-- **CONFIG\_AMQP\_SENDER\_NAME** (default: `undefined`): Sender name for the AMQP connection
-- **CONFIG\_AMQP\_SENDER\_SETTLE\_MODE** (default: `` `2` ``): Sender settle mode for the AMQP connection
-- **CONFIG\_AMQP\_SENDER\_AUTO\_SETTLE** (default: `` `true` ``): Sender auto settle for the AMQP connection
-- **CONFIG\_AMQP\_RECEIVER\_NAME** (default: `` `${CONFIG_ARTIFACT_ID}` ``): Receiver name for the AMQP connection
-- **CONFIG\_AMQP\_RECEIVER\_SETTLE\_MODE** (default: `` `0` ``): Receiver settle mode for the AMQP connection
-- **CONFIG\_AMQP\_RECEIVER\_CREDIT\_WINDOW** (default: `` `0` ``): Receiver credit window for the AMQP connection
-- **CONFIG\_AMQP\_RECEIVER\_AUTO\_ACCEPT** (default: `` `false` ``): Receiver auto accept for the AMQP connection
-- **CONFIG\_AMQP\_RECEIVER\_AUTO\_SETTLE** (default: `` `true` ``): Receiver auto settle for the AMQP connection
-- **CONFIG\_ARTIFACT\_ID**: Artifact identifier for the configuration provider
-- **CONFIG\_AMQP\_USER\_NAME** (default: `` `mdf-amqp` ``): User name for the AMQP connection
-- **CONFIG\_AMQP\_PASSWORD** (default: `undefined`): Password for the AMQP connection
-- **CONFIG\_AMQP\_HOST** (default: `` `127.0.0.1` ``): Host for the AMQP connection
-- **CONFIG\_AMQP\_HOSTNAME** (default: `undefined`): Hostname for the AMQP connection
-- **CONFIG\_AMQP\_PORT** (default: `` `5672` ``): Port for the AMQP connection
-- **CONFIG\_AMQP\_TRANSPORT** (default: `` `tcp` ``): Transport for the AMQP connection
-- **CONFIG\_AMQP\_CONTAINER\_ID** (default: `` `${CONFIG_ARTIFACT_ID}` ``): Container ID for the AMQP connection
-- **CONFIG\_AMQP\_ID** (default: `undefined`): ID for the AMQP connection
-- **CONFIG\_AMQP\_RECONNECT** (default: `` `5000` ``): Reconnect time for the AMQP connection
-- **CONFIG\_AMQP\_RECONNECT\_LIMIT** (default: `undefined`): Reconnect limit for the AMQP connection
-- **CONFIG\_AMQP\_INITIAL\_RECONNECT\_DELAY** (default: `` `30000` ``): Initial reconnect delay for the AMQP connection
-- **CONFIG\_AMQP\_MAX\_RECONNECT\_DELAY** (default: `` `10000` ``): Maximum reconnect delay for the AMQP connection
-- **CONFIG\_AMQP\_MAX\_FRAME\_SIZE** (default: `undefined`): Maximum frame size for the AMQP connection
-- **CONFIG\_AMQP\_NON\_FATAL\_ERRORS** (default: `` `['amqp:connection:forced']` ``): Non-fatal errors for the AMQP connection
-- **CONFIG\_AMQP\_NON\_FATAL\_ERRORS** (default: `` `['amqp:connection:forced']` ``): Non-fatal errors for the AMQP connection
-- **CONFIG\_AMQP\_CA\_PATH** (default: `undefined`): Path to the CA Cert for the AMQP connection
-- **CONFIG\_AMQP\_CLIENT\_CERT\_PATH** (default: `undefined`): Path to the client cert for the AMQP connection
-- **CONFIG\_AMQP\_CLIENT\_KEY\_PATH** (default: `undefined`): Path to the client key for the AMQP connection
-- **CONFIG\_AMQP\_REQUEST\_CERT** (default: `` `false` ``): Request certificate for the AMQP connection
-- **CONFIG\_AMQP\_REJECT\_UNAUTHORIZED** (default: `` `false` ``): Reject unauthorized for the AMQP connection
+- **CONFIG\_AMQP\_SENDER\_NAME**: undefined
+- **CONFIG\_AMQP\_SENDER\_SETTLE\_MODE**: undefined
+- **CONFIG\_AMQP\_SENDER\_AUTO\_SETTLE**: undefined
+- **CONFIG\_AMQP\_RECEIVER\_NAME**: undefined
+- **CONFIG\_AMQP\_RECEIVER\_SETTLE\_MODE**: undefined
+- **CONFIG\_AMQP\_RECEIVER\_CREDIT\_WINDOW**: undefined
+- **CONFIG\_AMQP\_RECEIVER\_AUTO\_ACCEPT**: undefined
+- **CONFIG\_AMQP\_RECEIVER\_AUTO\_SETTLE**: undefined
+- **CONFIG\_AMQP\_USER\_NAME**: undefined
+- **CONFIG\_AMQP\_PASSWORD**: undefined
+- **CONFIG\_AMQP\_HOST**: undefined
+- **CONFIG\_AMQP\_HOSTNAME**: undefined
+- **CONFIG\_AMQP\_PORT**: undefined
+- **CONFIG\_AMQP\_TRANSPORT**: undefined
+- **CONFIG\_AMQP\_CONTAINER\_ID**: undefined
+- **CONFIG\_AMQP\_ID**: undefined
+- **CONFIG\_AMQP\_RECONNECT**: undefined
+- **CONFIG\_AMQP\_RECONNECT\_LIMIT**: undefined
+- **CONFIG\_AMQP\_INITIAL\_RECONNECT\_DELAY**: undefined
+- **CONFIG\_AMQP\_MAX\_RECONNECT\_DELAY**: undefined
+- **CONFIG\_AMQP\_MAX\_FRAME\_SIZE**: undefined
+- **CONFIG\_AMQP\_NON\_FATAL\_ERRORS**: undefined
+- **CONFIG\_AMQP\_NON\_FATAL\_ERRORS**: undefined
+- **CONFIG\_AMQP\_CA\_PATH**: undefined
+- **CONFIG\_AMQP\_CLIENT\_CERT\_PATH**: undefined
+- **CONFIG\_AMQP\_CLIENT\_KEY\_PATH**: undefined
+- **CONFIG\_AMQP\_REQUEST\_CERT**: undefined
+- **CONFIG\_AMQP\_REJECT\_UNAUTHORIZED**: undefined
 
 ## **License**
 

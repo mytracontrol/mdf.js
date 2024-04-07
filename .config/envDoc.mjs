@@ -137,7 +137,7 @@ function findUpperCommentInFile(lines, index) {
   endOfComment = index - 1;
   // Search for the start of the comment
   while (index >= 0) {
-    if (lines[index].includes('/*')) {
+    if (lines[index].includes('/**')) {
       break;
     }
     index--;

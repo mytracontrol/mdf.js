@@ -57,4 +57,10 @@ export class MyFlowPlug extends EventEmitter implements Plugs.Source.Flow {
     clearInterval(this.timeInterval);
     return Promise.resolve();
   }
+  public get status(): Health.Status {
+    return Health.STATUS.PASS;
+  }
+  public close(): Promise<void> {
+    return this.stop();
+  }
 }

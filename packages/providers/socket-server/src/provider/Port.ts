@@ -16,8 +16,11 @@ import { Socket as IOSocket } from 'socket.io';
 import { CONFIG_PROVIDER_BASE_NAME } from '../config';
 import { Config, ConnectionError, Server } from './types';
 
+/** Default Express app for the UI */
 let CONFIG_SERVER_DEFAULT_APP: Express | undefined = undefined;
+/** Default path for the UI */
 const DEFAULT_DIST_PATH = findNodeModule('@socket.io');
+/** Default configuration for the Socket.io server */
 if (DEFAULT_DIST_PATH && fs.existsSync(DEFAULT_DIST_PATH)) {
   CONFIG_SERVER_DEFAULT_APP = express().use('/ui', express.static(DEFAULT_DIST_PATH));
 }
@@ -81,40 +84,36 @@ export class Port extends Layer.Provider.Port<Server, Config> {
   }
   /**
    * Auxiliar function to log and emit events
-   * @param original - original event name
-   * @param wrapped - wrapped events name
-   * @param broadcasted - flag tp indicating that the event must be broadcasted
+   * @param event - original event name
    * @param args - arguments to be emitted with the event
    */
-  private onEvent(original: string, wrapped: string, broadcasted: boolean, ...args: Crash[]): void {
+  private onEvent(event: string, ...args: Crash[]): void {
     // Stryker disable next-line all
-    this.logger.debug(`Original event: ${original} was wrapped to ${wrapped}`);
+    this.logger.debug(`Event: ${event} was listened`);
     // Stryker enable all
     for (const arg of args) {
       // Stryker disable next-line all
-      this.logger.silly(`Event ${original} arg: ${arg}`);
-    }
-    if (broadcasted) {
-      this.emit(wrapped, ...args);
+      this.logger.silly(`Event ${event} arg: ${arg}`);
     }
   }
   /** Callback function for `error` event in the HTTP Provider */
-  private readonly onErrorEvent = (error: Crash | Error) =>
-    this.onEvent('error', 'error', true, Crash.from(error) as Crash);
+  private readonly onErrorEvent = (error: Crash | Error) => {
+    // Stryker disable next-line all
+    this.logger.error(`Error event: error was wrapped to error`);
+    this.emit('error', Crash.from(error));
+  };
   /** Callback function for `connection` event in socket.io server */
   private readonly onConnectionEvent = (socket: IOSocket) => {
     // Stryker disable next-line all
     this.logger.debug(`New connection from ${socket.id}`);
-    this.onEvent('connection', 'connection', false);
+    this.onEvent('connection');
   };
   /** Callback function for `connection_error` event in engine.io */
   private readonly onConnectionErrorEvent = (error: ConnectionError) => {
     // Stryker disable next-line all
     this.logger.debug(`Connection error: ${error.message}`);
-    this.onEvent(
-      'connection_error',
+    this.emit(
       'error',
-      true,
       new Crash(`Connection error: ${error.message}`, {
         info: { code: error.code, context: error.context },
       })

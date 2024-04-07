@@ -103,8 +103,11 @@ export class Port extends Layer.Provider.Port<Client, Config> {
     const shouldBeHealthy = this.isConnected && this.instance.pingResp;
     if (this.isHealthy === shouldBeHealthy) {
       return;
+    } else if (shouldBeHealthy) {
+      this.emit('healthy');
     } else {
-      this.emit(shouldBeHealthy ? 'healthy' : 'unhealthy');
+      // @ts-ignore - Test environment
+      this.emit('unhealthy', this.updateLastError(new Crash('Ping response not received')));
     }
     this.isHealthy = shouldBeHealthy;
   };
@@ -147,10 +150,11 @@ export class Port extends Layer.Provider.Port<Client, Config> {
     this.logger.debug(`Port offline`, this.uuid, this.name);
   };
   /**
-   * Manage the event of a new error in the MQTT connection.
+   * Update the last error in the port instance.
    * @param rawError - Error object
+   * @returns Crash or Multi object
    */
-  private readonly onError = (rawError: Error): Crash | Multi => {
+  private readonly updateLastError = (rawError: Error): Crash | Multi => {
     const cause = Crash.from(rawError, this.uuid);
     this.logger.crash(cause, this.name);
     this.addCheck('lastError', {
@@ -161,6 +165,14 @@ export class Port extends Layer.Provider.Port<Client, Config> {
       output: cause.message,
       time: new Date().toISOString(),
     });
+    return cause;
+  };
+  /**
+   * Manage the event of a new error in the MQTT connection.
+   * @param rawError - Error object
+   */
+  private readonly onError = (rawError: Error): Crash | Multi => {
+    const cause = this.updateLastError(rawError);
     if (this.isConnected) {
       this.emit('error', cause);
     }

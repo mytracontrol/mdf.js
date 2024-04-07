@@ -5,6 +5,11 @@
  * or at https://opensource.org/licenses/MIT.
  */
 
+import { Component, Resource, Service } from './App';
+import { Manager } from './Provider';
+
 export * as App from './App';
 export * as Provider from './Provider';
-export * as Service from './Service';
+
+/** Represents an observable entity that can be monitored. */
+export type Observable = Manager<any, any, any> | Component | Resource | Service;

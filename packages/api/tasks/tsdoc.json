@@ -13,6 +13,10 @@
       {
           "syntaxKind": "block",
           "tagName": "@category"
+      },
+      {
+          "syntaxKind": "block",
+          "tagName": "@template"
       }
   ]
 }

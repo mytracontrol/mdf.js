@@ -5,4 +5,5 @@
  * or at https://opensource.org/licenses/MIT.
  */
 
-export * from './ServiceSetupOptions';
+export * from './ConfigManagerOptions';
+export * from './KeyAccessor.t';

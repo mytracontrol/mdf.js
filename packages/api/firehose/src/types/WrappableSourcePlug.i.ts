@@ -5,15 +5,11 @@
  * or at https://opensource.org/licenses/MIT.
  */
 
-import { Health, Jobs } from '@mdf.js/core';
+import { Layer } from '@mdf.js/core';
 import { EventEmitter } from 'events';
+import { OpenJobRequest } from './OpenJobs.t';
 
-export interface WrappableSourcePlug<
-  Type extends string = string,
-  Data = any,
-  CustomHeaders extends Record<string, any> = Record<string, any>,
-> extends EventEmitter,
-    Health.Component {
+export interface WrappableSourcePlug extends EventEmitter, Layer.App.Resource {
   on(event: 'error' | 'data' | 'status', listener: (...args: any[]) => void): this;
   /**
    * Perform the task to clean the job registers after the job has been resolved
@@ -26,11 +22,7 @@ export interface WrappableSourcePlug<
    * Perform the ingestion of new jobs
    * @param size - Number of jobs to be ingested
    */
-  ingestData?: (
-    size: number
-  ) => Promise<
-    Jobs.JobRequest<Type, Data, CustomHeaders> | Jobs.JobRequest<Type, Data, CustomHeaders>[]
-  >;
+  ingestData?: (size: number) => Promise<OpenJobRequest | OpenJobRequest[]>;
   /**
    * Add new credits to the source
    * @param credits - Credits to be added to the source

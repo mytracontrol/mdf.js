@@ -48,7 +48,7 @@ export class PollingExecutor extends EventEmitter {
   constructor(
     private readonly options: PollingManagerOptions,
     private readonly limiter: Limiter,
-    metrics?: MetricsDefinitions
+    private readonly metrics: MetricsDefinitions
   ) {
     super();
     // Stryker disable next-line all
@@ -60,8 +60,7 @@ export class PollingExecutor extends EventEmitter {
       'PollingManager',
       this.options.componentId
     );
-    this.manager = new PollingManager(this.options, this.limiter, this.logger);
-    this.setMetrics(metrics);
+    this.manager = new PollingManager(this.options, this.limiter, this.logger, this.metrics);
     this.pollingPeriod = ms(this.options.pollingGroup);
   }
   /** Include all the task entries in the limiter */
@@ -127,13 +126,6 @@ export class PollingExecutor extends EventEmitter {
     this.manager.off('error', this.onError);
     this.manager.off('done', this.onDone);
     this.manager.off('endCycle', this.onEndCycle);
-  }
-  /**
-   * Set the metrics definitions for the polling manager
-   * @param metrics - Metrics registry
-   */
-  public setMetrics(metrics?: MetricsDefinitions): void {
-    this.manager.setMetrics(metrics);
   }
   /** Start the polling manager */
   public start(): void {

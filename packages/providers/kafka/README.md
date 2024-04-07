@@ -68,27 +68,6 @@ Checks included in the provider:
 
 ## **Environment variables**
 
-- **CONFIG\_KAFKA\_CLIENT\_\_CLIENT\_ID**: undefined
-- **CONFIG\_KAFKA\_CLIENT\_\_BROKERS**: undefined
-- **CONFIG\_KAFKA\_CLIENT\_\_BROKERS**: undefined
-- **CONFIG\_KAFKA\_CLIENT\_\_CONNECTION\_TIMEOUT**: undefined
-- **CONFIG\_KAFKA\_CLIENT\_\_AUTHENTICATION\_TIMEOUT**: undefined
-- **CONFIG\_KAFKA\_CLIENT\_\_REAUTHENTICATION\_THRESHOLD**: undefined
-- **CONFIG\_KAFKA\_CLIENT\_\_REQUEST\_TIMEOUT**: undefined
-- **CONFIG\_KAFKA\_CLIENT\_\_ENFORCE\_REQUEST\_TIMEOUT**: undefined
-- **CONFIG\_KAFKA\_MAX\_RETRY\_TIME**: undefined
-- **CONFIG\_KAFKA\_INITIAL\_RETRY\_TIME**: undefined
-- **CONFIG\_KAFKA\_RETRY\_FACTOR**: undefined
-- **CONFIG\_KAFKA\_RETRY\_MULTIPLIER**: undefined
-- **CONFIG\_KAFKA\_RETRIES**: undefined
-- **CONFIG\_KAFKA\_CLIENT\_SSL**: undefined
-- **CONFIG\_KAFKA\_CLIENT\_\_SSL\_\_REJECT\_UNAUTHORIZED**: undefined
-- **CONFIG\_KAFKA\_CLIENT\_\_SSL\_\_SERVER\_NAME**: undefined
-- **CONFIG\_KAFKA\_CLIENT\_\_SSL\_\_CA\_PATH**: undefined
-- **CONFIG\_KAFKA\_CLIENT\_\_SSL\_\_CERT\_PATH**: undefined
-- **CONFIG\_KAFKA\_CLIENT\_\_SSL\_\_KEY\_PATH**: undefined
-- **CONFIG\_KAFKA\_CLIENT\_\_SASL\_USERNAME**: undefined
-- **CONFIG\_KAFKA\_CLIENT\_\_SASL\_PASSWORD**: undefined
 - **CONFIG\_KAFKA\_PRODUCER\_\_METADATA\_MAX\_AGE**: undefined
 - **CONFIG\_KAFKA\_PRODUCER\_\_ALLOW\_AUTO\_TOPIC\_CREATION**: undefined
 - **CONFIG\_KAFKA\_PRODUCER\_\_TRANSACTION\_TIMEOUT**: undefined
@@ -100,27 +79,6 @@ Checks included in the provider:
 - **CONFIG\_KAFKA\_PRODUCER\_\_RETRY\_\_FACTOR**: undefined
 - **CONFIG\_KAFKA\_PRODUCER\_\_RETRY\_\_MULTIPLIER**: undefined
 - **CONFIG\_KAFKA\_PRODUCER\_\_RETRY\_\_RETRIES**: undefined
-- **CONFIG\_KAFKA\_CLIENT\_\_CLIENT\_ID**: undefined
-- **CONFIG\_KAFKA\_CLIENT\_\_BROKERS**: undefined
-- **CONFIG\_KAFKA\_CLIENT\_\_BROKERS**: undefined
-- **CONFIG\_KAFKA\_CLIENT\_\_CONNECTION\_TIMEOUT**: undefined
-- **CONFIG\_KAFKA\_CLIENT\_\_AUTHENTICATION\_TIMEOUT**: undefined
-- **CONFIG\_KAFKA\_CLIENT\_\_REAUTHENTICATION\_THRESHOLD**: undefined
-- **CONFIG\_KAFKA\_CLIENT\_\_REQUEST\_TIMEOUT**: undefined
-- **CONFIG\_KAFKA\_CLIENT\_\_ENFORCE\_REQUEST\_TIMEOUT**: undefined
-- **CONFIG\_KAFKA\_MAX\_RETRY\_TIME**: undefined
-- **CONFIG\_KAFKA\_INITIAL\_RETRY\_TIME**: undefined
-- **CONFIG\_KAFKA\_RETRY\_FACTOR**: undefined
-- **CONFIG\_KAFKA\_RETRY\_MULTIPLIER**: undefined
-- **CONFIG\_KAFKA\_RETRIES**: undefined
-- **CONFIG\_KAFKA\_CLIENT\_SSL**: undefined
-- **CONFIG\_KAFKA\_CLIENT\_\_SSL\_\_REJECT\_UNAUTHORIZED**: undefined
-- **CONFIG\_KAFKA\_CLIENT\_\_SSL\_\_SERVER\_NAME**: undefined
-- **CONFIG\_KAFKA\_CLIENT\_\_SSL\_\_CA\_PATH**: undefined
-- **CONFIG\_KAFKA\_CLIENT\_\_SSL\_\_CERT\_PATH**: undefined
-- **CONFIG\_KAFKA\_CLIENT\_\_SSL\_\_KEY\_PATH**: undefined
-- **CONFIG\_KAFKA\_CLIENT\_\_SASL\_USERNAME**: undefined
-- **CONFIG\_KAFKA\_CLIENT\_\_SASL\_PASSWORD**: undefined
 - **CONFIG\_KAFKA\_CONSUMER\_\_GROUP\_ID**: undefined
 - **CONFIG\_KAFKA\_CONSUMER\_\_SESSION\_TIMEOUT**: undefined
 - **CONFIG\_KAFKA\_CONSUMER\_\_REBALANCE\_TIMEOUT**: undefined
@@ -139,8 +97,28 @@ Checks included in the provider:
 - **CONFIG\_KAFKA\_CONSUMER\_\_READ\_UNCOMMITTED**: undefined
 - **CONFIG\_KAFKA\_CONSUMER\_\_MAX\_IN\_FLIGHT\_REQUEST**: undefined
 - **CONFIG\_KAFKA\_CONSUMER\_\_RACK\_ID**: undefined
-- **CONFIG\_ARTIFACT\_ID**: Artifact identifier for the configuration provider
-- **CONFIG\_KAFKA\_LOG\_LEVEL**: undefined
+- **CONFIG\_KAFKA\_LOG\_LEVEL** (default: `` `error` ``): Define the log level for the kafka provider, possible values are: - \`error\` - \`warn\` - \`info\` - \`debug\` - \`trace\`
+- **CONFIG\_KAFKA\_CLIENT\_\_CLIENT\_ID** (default: `hostname`): Client identifier
+- **CONFIG\_KAFKA\_CLIENT\_\_BROKERS** (default: `'127.0.0.1:9092'`): Kafka brokers
+- **CONFIG\_KAFKA\_CLIENT\_\_BROKERS** (default: `'127.0.0.1:9092'`): Kafka brokers
+- **CONFIG\_KAFKA\_CLIENT\_\_CONNECTION\_TIMEOUT** (default: `1000`): Time in milliseconds to wait for a successful connection
+- **CONFIG\_KAFKA\_CLIENT\_\_AUTHENTICATION\_TIMEOUT** (default: `1000`): Timeout in ms for authentication requests
+- **CONFIG\_KAFKA\_CLIENT\_\_REAUTHENTICATION\_THRESHOLD** (default: `1000`): When periodic reauthentication (connections.max.reauth.ms) is configured on the broker side, reauthenticate when \`reauthenticationThreshold\` milliseconds remain of session lifetime.
+- **CONFIG\_KAFKA\_CLIENT\_\_REQUEST\_TIMEOUT** (default: `30000`): Time in milliseconds to wait for a successful request
+- **CONFIG\_KAFKA\_CLIENT\_\_ENFORCE\_REQUEST\_TIMEOUT** (default: `true`): The request timeout can be disabled by setting this value to false.
+- **CONFIG\_KAFKA\_MAX\_RETRY\_TIME** (default: `30000`): Maximum time in milliseconds to wait for a successful retry
+- **CONFIG\_KAFKA\_INITIAL\_RETRY\_TIME** (default: `300`): Initial value used to calculate the retry in milliseconds (This is still randomized following the randomization factor)
+- **CONFIG\_KAFKA\_RETRY\_FACTOR** (default: `0.2`): Randomization factor
+- **CONFIG\_KAFKA\_RETRY\_MULTIPLIER** (default: `2`): Exponential factor
+- **CONFIG\_KAFKA\_RETRIES** (default: `5`): Maximum number of retries per call
+- **CONFIG\_KAFKA\_CLIENT\_SSL\_ENABLED** (default: `false`): Whether to use SSL
+- **CONFIG\_KAFKA\_CLIENT\_\_SSL\_\_REJECT\_UNAUTHORIZED** (default: `true`): Whether to verify the SSL certificate.
+- **CONFIG\_KAFKA\_CLIENT\_\_SSL\_\_SERVER\_NAME** (default: `undefined`): Server name for the TLS certificate.
+- **CONFIG\_KAFKA\_CLIENT\_SSL\_CA\_PATH** (default: `undefined`): Path to the CA certificate.
+- **CONFIG\_KAFKA\_CLIENT\_SSL\_CERT\_PATH** (default: `undefined`): Path to the client certificate.
+- **CONFIG\_KAFKA\_CLIENT\_SSL\_KEY\_PATH** (default: `undefined`): Path to the client key.
+- **CONFIG\_KAFKA\_CLIENT\_\_SASL\_USERNAME**: undefined
+- **CONFIG\_KAFKA\_CLIENT\_\_SASL\_PASSWORD**: undefined
 
 ## **License**
 

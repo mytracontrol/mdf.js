@@ -17,13 +17,11 @@ import {
   PollingStats,
 } from './types';
 
-export class PollingStatsManager {
+export class PollingMetricsHandler {
   /** Polling stats */
   private pollingStats: PollingStats = { ...DEFAULT_POLLING_STATS };
   /** Scan cycles duration in milliseconds */
   private readonly scanCyclesDuration: number[] = [];
-  /** Metrics instances */
-  private metrics?: MetricsDefinitions;
   /** Metrics labels */
   private readonly statsLabels: { resource: string; pollingGroup: string };
   /** Cycle timer */
@@ -35,22 +33,17 @@ export class PollingStatsManager {
    * @param pollingGroup - Polling group assigned to this manager
    * @param cyclesOnStats - Number of cycles on stats
    * @param logger - Logger instance
+   * @param metrics - Metrics instances
    */
   constructor(
     private readonly componentId: string,
     private readonly resource: string,
     private readonly pollingGroup: PollingGroup,
-    private readonly cyclesOnStats = DEFAULT_SCAN_CYCLES_ON_STATS
+    private readonly cyclesOnStats = DEFAULT_SCAN_CYCLES_ON_STATS,
+    private readonly metrics: MetricsDefinitions
   ) {
     this.statsLabels = { resource: this.resource, pollingGroup: this.pollingGroup };
-  }
-  /**
-   * Set the metrics definitions for the polling manager
-   * @param metrics - Metrics registry
-   */
-  public setMetrics(metrics?: MetricsDefinitions): void {
-    this.metrics = metrics;
-    this.metrics?.scan_cycles_on_stats.set(this.statsLabels, this.cyclesOnStats);
+    this.metrics.scan_cycles_on_stats.set(this.statsLabels, this.cyclesOnStats);
   }
   /** Set the initial point of a cycle */
   public initializeCycle(): void {
@@ -73,7 +66,7 @@ export class PollingStatsManager {
       const [seconds, nanoseconds] = process.hrtime(this.cycleTimer);
       this.pollingStats.lastCycleDuration = seconds * 1e3 + nanoseconds / 1e6;
       this.cycleTimer = undefined;
-      this.metrics?.scan_cycle_duration_milliseconds.observe(
+      this.metrics.scan_cycle_duration_milliseconds.observe(
         this.statsLabels,
         this.pollingStats.lastCycleDuration
       );
@@ -85,16 +78,16 @@ export class PollingStatsManager {
    * @param duration - Duration of the cycle
    */
   private checkOverruns(duration: number): void {
-    this.metrics?.scan_cycles_total.inc(this.statsLabels);
+    this.metrics.scan_cycles_total.inc(this.statsLabels);
     this.pollingStats.cycles++;
     if (duration > ms(this.pollingGroup)) {
       this.pollingStats.overruns++;
       this.pollingStats.consecutiveOverruns++;
-      this.metrics?.scan_overruns_total.inc(this.statsLabels);
-      this.metrics?.scan_overruns_consecutive.inc(this.statsLabels);
+      this.metrics.scan_overruns_total.inc(this.statsLabels);
+      this.metrics.scan_overruns_consecutive.inc(this.statsLabels);
     } else {
       this.pollingStats.consecutiveOverruns = 0;
-      this.metrics?.scan_overruns_consecutive.set(this.statsLabels, 0);
+      this.metrics.scan_overruns_consecutive.set(this.statsLabels, 0);
     }
   }
   /**
@@ -108,15 +101,15 @@ export class PollingStatsManager {
     }
     if (duration > this.pollingStats.maxCycleDuration) {
       this.pollingStats.maxCycleDuration = duration;
-      this.metrics?.scan_duration_max_milliseconds.set(this.statsLabels, duration);
+      this.metrics.scan_duration_max_milliseconds.set(this.statsLabels, duration);
     }
     if (duration < this.pollingStats.minCycleDuration) {
       this.pollingStats.minCycleDuration = duration;
-      this.metrics?.scan_duration_min_milliseconds.set(this.statsLabels, duration);
+      this.metrics.scan_duration_min_milliseconds.set(this.statsLabels, duration);
     }
     this.pollingStats.averageCycleDuration =
       this.scanCyclesDuration.reduce((acc, val) => acc + val, 0) / this.scanCyclesDuration.length;
-    this.metrics?.scan_duration_avg_milliseconds.set(
+    this.metrics.scan_duration_avg_milliseconds.set(
       this.statsLabels,
       this.pollingStats.averageCycleDuration
     );
@@ -126,7 +119,7 @@ export class PollingStatsManager {
    * @param taskId - Task identifier
    */
   public addTaskInProgress(taskId: string): void {
-    this.metrics?.task_in_progress.inc({ resource: this.resource, taskId });
+    this.metrics.task_in_progress.inc({ resource: this.resource, taskId });
   }
   /**
    * Remove a task from the in progress stats
@@ -136,12 +129,12 @@ export class PollingStatsManager {
    */
   public removeTaskInProgress(taskId: string, duration: number = 0, error?: Crash | Multi): void {
     const labels = { resource: this.resource, taskId };
-    this.metrics?.task_in_progress.dec(labels);
-    this.metrics?.task_total.inc(labels);
+    this.metrics.task_in_progress.dec(labels);
+    this.metrics.task_total.inc(labels);
     if (error) {
-      this.metrics?.task_errors_total.inc(labels);
+      this.metrics.task_errors_total.inc(labels);
     }
-    this.metrics?.task_duration_milliseconds.observe(labels, duration);
+    this.metrics.task_duration_milliseconds.observe(labels, duration);
   }
   /** Get health check of the component */
   public get check(): Health.Check {

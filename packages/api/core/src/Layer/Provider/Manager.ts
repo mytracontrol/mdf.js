@@ -13,24 +13,98 @@ import Joi, { ValidationError } from 'joi';
 import { cloneDeep, merge } from 'lodash';
 import { v4 } from 'uuid';
 import { Health } from '../..';
+import { overallStatus } from '../../Health';
+import { Resource } from '../App';
 import { Port } from './Port';
 import { ErrorState, State, StoppedState } from './states';
 import { ProviderOptions, ProviderState, ProviderStatus } from './types';
 
 type ProviderError = Multi | Crash | undefined;
 
-export declare interface Manager<PortClient, PortConfig, T extends Port<PortClient, PortConfig>> {
+export declare interface Manager<
+  PortClient,
+  PortConfig,
+  PortInstance extends Port<PortClient, PortConfig>,
+> {
   /**
-   * Emitted when the provider throw an error
+   * Add a listener for the `error` event, emitted when the component detects an error.
+   * @param event - `error` event
+   * @param listener - Error event listener
    * @event
    */
-  on(event: 'error', listener: (error: Crash | Error) => void): this;
+  on(event: 'error', listener: (error: Crash | Multi) => void): this;
   /**
-   * Emitted on every state change
+   * Add a listener for the `error` event, emitted when the component detects an error.
+   * @param event - `error` event
+   * @param listener - Error event listener
    * @event
    */
-  on(event: 'status', listener: (status: Health.Status) => void): this;
+  addListener(event: 'error', listener: (error: Crash | Multi) => void): this;
+  /**
+   * Add a listener for the `error` event, emitted when the component detects an error. This is a
+   * one-time event, the listener will be removed after the first emission.
+   * @param event - `error` event
+   * @param listener - Error event listener
+   * @event
+   */
+  once(event: 'error', listener: (error: Crash | Multi) => void): this;
+  /**
+   * Removes the specified listener from the listener array for the `error` event.
+   * @param event - `error` event
+   * @param listener - Error event listener
+   * @event
+   */
+  off(event: 'error', listener: (error: Crash | Multi) => void): this;
+  /**
+   * Removes the specified listener from the listener array for the `error` event.
+   * @param event - `error` event
+   * @param listener - Error event listener
+   * @event
+   */
+  removeListener(event: 'error', listener: (error: Crash | Multi) => void): this;
+  /**
+   * Removes all listeners, or those of the specified event.
+   * @param event - `error` event
+   */
+  removeAllListeners(event?: 'error'): this;
+  /**
+   * Add a listener for the `status` event, emitted when the component changes its status.
+   * @param event - `status` event
+   * @param listener - Status event listener
+   * @event
+   */
+  on(event: 'status', listener: (status: ProviderStatus) => void): this;
+  /**
+   * Add a listener for the `status` event, emitted when the component changes its status.
+   * @param event - `status` event
+   * @param listener - Status event listener
+   * @event
+   */
+  addListener(event: 'status', listener: (status: ProviderStatus) => void): this;
+  /**
+   * Add a listener for the `status` event, emitted when the component changes its status. This is a
+   * one-time event, the listener will be removed after the first emission.
+   * @param event - `status` event
+   * @param listener - Status event listener
+   * @event
+   */
+  once(event: 'status', listener: (status: ProviderStatus) => void): this;
+  /**
+   * Removes the specified listener from the listener array for the `status` event.
+   * @param event - `status` event
+   * @param listener - Status event listener
+   * @event
+   */
+  off(event: 'status', listener: (status: ProviderStatus) => void): this;
+  /**
+   * Removes the specified listener from the listener array for the `status` event.
+   * @param event - `status` event
+   * @param listener - Status event listener
+   * @event
+   */
+  removeListener(event: 'status', listener: (status: ProviderStatus) => void): this;
 }
+
 /**
  * Provider Manager wraps a specific port created by the extension of the {@link Port} abstract
  * class, instrumenting it with the necessary logic to manage:
@@ -57,13 +131,9 @@ export declare interface Manager<PortClient, PortConfig, T extends Port<PortClie
  * @param T - Port class, this is, the class that extends the {@link Port} abstract class
  * @public
  */
-export class Manager<
-    PortClient = any,
-    PortConfig = any,
-    T extends Port<PortClient, PortConfig> = any,
-  >
+export class Manager<PortClient, PortConfig, PortInstance extends Port<PortClient, PortConfig>>
   extends EventEmitter
-  implements Health.Component
+  implements Resource
 {
   /** Provider unique identifier for trace purposes */
   public readonly componentId: string;
@@ -76,9 +146,9 @@ export class Manager<
   /** Timestamp of actual state */
   private _date: string;
   /** Port instance */
-  private readonly port: T;
+  private readonly port: PortInstance;
   /** Port configuration */
-  private readonly config: PortConfig;
+  public readonly config: PortConfig;
   /**
    * Implementation of base functionalities of a provider manager
    * @param port - Port wrapper class
@@ -86,7 +156,7 @@ export class Manager<
    * @param options - Manager configuration options
    */
   constructor(
-    port: new (portConfig: PortConfig, logger: LoggerInstance) => T,
+    port: new (portConfig: PortConfig, logger: LoggerInstance, name: string) => PortInstance,
     private readonly options: ProviderOptions<PortConfig>,
     config?: Partial<PortConfig>
   ) {
@@ -94,7 +164,7 @@ export class Manager<
     this.logger = this.options.logger || new DebugLogger(this.options.name);
     this.config = this.validateConfig(config);
     try {
-      this.port = new port(this.config, this.logger);
+      this.port = new port(this.config, this.logger, this.options.name);
     } catch (error) {
       // Stryker disable next-line all
       this.logger.warn(`Error trying to create an instance of the port`, v4(), this.options.name);
@@ -140,11 +210,15 @@ export class Manager<
         componentId: this.componentId,
         componentType: this.options.type,
         observedValue: this.state,
-        time: this.actualStateDate,
+        time: this.date,
         output: this.detailedOutput(),
       },
     ];
     return checks;
+  }
+  /** Provider status */
+  public get status(): Health.Status {
+    return overallStatus(this.checks);
   }
   /** Port client */
   public get client(): PortClient {
@@ -154,6 +228,10 @@ export class Manager<
   public get name(): string {
     return this.options.name;
   }
+  /** Timestamp of actual state in ISO format, when the current state was reached */
+  public get date(): string {
+    return this._date;
+  }
   /** Initialize the process: internal jobs, external dependencies connections ... */
   public async start(): Promise<void> {
     return this._state.start();
@@ -162,6 +240,10 @@ export class Manager<
   public async stop(): Promise<void> {
     return this._state.stop();
   }
+  /** Close the provider: release resources, connections ... */
+  public async close(): Promise<void> {
+    return this.port.close();
+  }
   /**
    * Error state: wait for new state of to fix the actual degraded stated
    * @param error - Cause ot this fail transition
@@ -169,17 +251,6 @@ export class Manager<
    */
   public async fail(error: Crash | Error): Promise<void> {
     return this._state.fail(error);
-  }
-  /**
-   * Timestamp of actual state in ISO format, when the current state was reached
-   * @deprecated- Use {@link Manager.date} instead
-   */
-  public get actualStateDate(): string {
-    return this._date;
-  }
-  /** Timestamp of actual state in ISO format, when the current state was reached */
-  public get date(): string {
-    return this._date;
   }
   /**
    * Change the provider state
@@ -224,7 +295,7 @@ export class Manager<
     } else if (
       error &&
       typeof error === 'object' &&
-      typeof (error as Record<string, any>)['message'] === 'string'
+      typeof (error as Record<string, unknown>)['message'] === 'string'
     ) {
       formattedError = new Crash((error as Record<string, any>)['message']);
     } else {
@@ -306,12 +377,13 @@ export class Manager<
    */
   private mergeConfigSources(config?: Partial<PortConfig>): Partial<PortConfig> {
     const defaultConfig = cloneDeep(this.options.validation.defaultConfig);
-    let envConfig: Partial<PortConfig> | undefined = {};
-    if (this.options.useEnvironment) {
+    let envConfig: Partial<PortConfig>;
+    if (typeof this.options.useEnvironment === 'boolean' && this.options.useEnvironment) {
       envConfig = this.options.validation.envBasedConfig;
-      if (typeof this.options.useEnvironment === 'string') {
-        envConfig = merge(formatEnv(this.options.useEnvironment), envConfig);
-      }
+    } else if (typeof this.options.useEnvironment === 'string') {
+      envConfig = formatEnv(this.options.useEnvironment) as Partial<PortConfig>;
+    } else {
+      envConfig = {};
     }
     return merge(defaultConfig, envConfig, config);
   }

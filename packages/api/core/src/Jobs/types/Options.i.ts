@@ -5,9 +5,15 @@
  * or at https://opensource.org/licenses/MIT.
  */
 
-import { Headers } from './Headers.i';
+import { AnyHeaders, Headers } from './Headers.i';
 
-export interface Options<CustomHeaders extends Record<string, any> = Record<string, any>> {
+/** Any other extra option */
+export type AnyOptions = Record<string, any>;
+
+/** No more extra options information */
+export interface NoMoreOptions {}
+
+export interface DefaultOptions<CustomHeaders extends Record<string, any> = AnyHeaders> {
   /** Job meta information, used to pass specific information for jobs handlers */
   headers?: Headers<CustomHeaders>;
   /**
@@ -16,3 +22,9 @@ export interface Options<CustomHeaders extends Record<string, any> = Record<stri
    */
   numberOfHandlers?: number;
 }
+
+/** Job options */
+export type Options<
+  CustomHeaders extends Record<string, any> = AnyHeaders,
+  CustomOptions extends Record<string, any> = AnyOptions,
+> = DefaultOptions<CustomHeaders> & CustomOptions;

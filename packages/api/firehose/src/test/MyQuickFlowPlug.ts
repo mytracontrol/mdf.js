@@ -48,4 +48,10 @@ export class MyQuickFlowPlug extends EventEmitter implements Plugs.Source.Flow {
   public stop(): Promise<void> {
     return Promise.resolve();
   }
+  public get status(): Health.Status {
+    return Health.STATUS.PASS;
+  }
+  public close(): Promise<void> {
+    return this.stop();
+  }
 }

@@ -5,13 +5,13 @@
  * or at https://opensource.org/licenses/MIT.
  */
 
-import { Health } from '@mdf.js/core';
+import { Health, Layer } from '@mdf.js/core';
 import { Crash } from '@mdf.js/crash';
 import { SocketIOClient } from '@mdf.js/socket-client-provider';
 import { AdapterOptions, SocketIOClientOptions } from '../../types';
 import { Adapter } from '../Adapter';
 
-export abstract class SocketIOAdapter extends Adapter implements Health.Component {
+export abstract class SocketIOAdapter extends Adapter implements Layer.App.Resource {
   /** Socket.IO provider instance */
   protected readonly provider: SocketIOClient.Provider;
   /**
@@ -38,6 +38,10 @@ export abstract class SocketIOAdapter extends Adapter implements Health.Componen
       },
       name: adapterOptions.id,
     });
+  }
+  /** Adapter health status */
+  public get status(): Health.Status {
+    return this.provider.status;
   }
   /** Component checks */
   public get checks(): Health.Checks {
@@ -67,6 +71,17 @@ export abstract class SocketIOAdapter extends Adapter implements Health.Componen
         error.uuid,
         { cause: error }
       );
+    }
+  }
+  /** Close the OpenC2 Adapter to the underlayer transport system */
+  public async close(): Promise<void> {
+    try {
+      await this.provider.close();
+    } catch (rawError) {
+      const error = Crash.from(rawError);
+      throw new Crash(`Error closing the OpenC2 adapter: ${error.message}`, error.uuid, {
+        cause: error,
+      });
     }
   }
 }

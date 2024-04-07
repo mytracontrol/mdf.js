@@ -10,8 +10,9 @@ import { Base } from './Base.i';
 export interface Sequence<
   Type extends string = string,
   Data = any,
-  CustomHeaders extends Record<string, any> = Record<string, any>,
-> extends Base<Type, Data, CustomHeaders> {
+  CustomHeaders extends Record<string, any> = Jobs.AnyHeaders,
+  CustomOptions extends Record<string, any> = Jobs.AnyOptions,
+> extends Base<Type, Data, CustomHeaders, CustomOptions> {
   /**
    * Perform the ingestion of new jobs
    * @param size - Number of jobs to be ingested
@@ -19,6 +20,7 @@ export interface Sequence<
   ingestData(
     size: number
   ): Promise<
-    Jobs.JobRequest<Type, Data, CustomHeaders> | Jobs.JobRequest<Type, Data, CustomHeaders>[]
+    | Jobs.JobRequest<Type, Data, CustomHeaders, CustomOptions>
+    | Jobs.JobRequest<Type, Data, CustomHeaders, CustomOptions>[]
   >;
 }

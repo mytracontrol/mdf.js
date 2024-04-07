@@ -1,5 +1,8 @@
 @startuml Provider-States-Methods
 
+!define DARKGREEN
+!include ./styles/style.puml
+
 skinparam backgroundColor transparent
 
 !STOPPED_STATE = "1a66c2"
@@ -32,7 +35,7 @@ state ERROR {
     state ERROR #FAILED_STATE: Online, but in a degraded state,\n the access to resources is not\n possible
 }
 
-[*] -[#black]-> STOPPED
+[*] -[#black]-> STOPPED : "instance created"
 STOPPED -[#STOPPED_STATE]-> STOPPED : stop()
 STOPPED -[#RUNNING_STATE]-> RUNNING : start()
 STOPPED -[#FAILED_STATE]-> ERROR : fail()

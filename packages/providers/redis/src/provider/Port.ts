@@ -162,7 +162,7 @@ export class Port extends Layer.Provider.Port<Client, Config> {
     });
   }
   /** Check the server and memory status of the redis server instance  */
-  private readonly statusCheck = () => {
+  private readonly statusCheck = (): void => {
     this.getInfoStats()
       .then(result => {
         // Stryker disable next-line all
@@ -191,34 +191,38 @@ export class Port extends Layer.Provider.Port<Client, Config> {
     let message: string | undefined = undefined;
     let hasError = false;
     let observedValue = '- bytes / - bytes';
+    let usage = 0;
     const parsingError = result.memory.errorParsing || result.server.errorParsing;
     if (parsingError) {
       message = `Error parsing the Redis INFO stats: ${parsingError}, please contact with the developers`;
       hasError = true;
-    } else if (
-      parseInt(result.memory.used_memory) > parseInt(result.memory.maxmemory) &&
-      result.memory.maxmemory !== '0'
-    ) {
-      message = `The system is OOM - used ${result.memory.used_memory_human} - max ${result.memory.maxmemory_human}`;
-      hasError = true;
-      observedValue = `${result.memory.used_memory} / ${result.memory.maxmemory}`;
     } else {
+      usage =
+        result.memory.maxmemory !== '0'
+          ? parseFloat(result.memory.used_memory) / parseFloat(result.memory.maxmemory)
+          : 0;
+      if (usage >= 1) {
+        hasError = true;
+        message = `The system is OOM - used ${result.memory.used_memory_human} - max ${result.memory.maxmemory_human}`;
+      } else if (usage > 0.9) {
+        message = `The system is using more than 90% of the available memory`;
+      } else if (usage > 0.8) {
+        message = `The system is using more than 80% of the available memory`;
+      } else {
+        message = `The system is using ${usage * 100}% of the available memory`;
+      }
       observedValue = `${result.memory.used_memory} / ${result.memory.maxmemory}`;
     }
     this.addCheck('memory', {
       componentId: this.uuid,
       observedValue,
       observedUnit: 'used memory / max memory',
-      status: hasError ? 'fail' : 'pass',
+      status: hasError ? 'fail' : usage > 0.8 ? 'warn' : 'pass',
       output: message,
       time: new Date().toISOString(),
     });
     if (hasError && (this.healthy || this.isFirstCheck)) {
-      this.emit(
-        'unhealthy',
-        new Crash(message || 'Unexpected error in the evaluation', this.uuid),
-        result
-      );
+      this.emit('unhealthy', new Crash(message || 'Unexpected error in the evaluation', this.uuid));
       this.healthy = false;
     } else if (!this.healthy) {
       this.emit('healthy');
@@ -228,57 +232,50 @@ export class Port extends Layer.Provider.Port<Client, Config> {
   }
   /**
    * Auxiliar function to log and emit events
-   * @param original - original event name
-   * @param wrapped - wrapped events name
-   * @param broadcasted - flag tp indicating that the event must be broadcasted
+   * @param event - event name
    * @param args - arguments to be emitted with the event
    */
-  private onEvent(
-    original: string,
-    wrapped: string,
-    broadcasted: boolean,
-    ...args: (Crash | Status | number)[]
-  ): void {
+  private onEvent(event: string, ...args: (Crash | Status | number)[]): void {
     // Stryker disable next-line all
-    this.logger.debug(`Original event: ${original} was wrapped to ${wrapped}`);
+    this.logger.debug(`Event: ${event} was listened`);
     for (const arg of args) {
       // Stryker disable next-line all
-      this.logger.silly(`Event ${original} arg: ${arg}`);
-    }
-    if (broadcasted && this.listenerCount(wrapped) > 0) {
-      this.emit(wrapped, ...args);
+      this.logger.silly(`Event ${event} arg: ${arg}`);
     }
   }
   /** Callback function for `connect` event */
-  private readonly onConnectEvent = () => this.onEvent('connect', 'connect', false);
+  private readonly onConnectEvent = () => this.onEvent('connect');
   /** Callback function for `ready` event */
-  private readonly onReadyEvent = () => this.onEvent('ready', 'healthy', true);
+  private readonly onReadyEvent = () => {
+    // Stryker disable next-line all
+    this.logger.debug(`Original event: ready was wrapped to healthy`);
+    this.emit('healthy');
+  };
   /** Callback function for `error` event */
-  private readonly onErrorEvent = (error: ReplyError) =>
-    this.onEvent('error', 'error', true, this.errorParse(error));
+  private readonly onErrorEvent = (rawError: ReplyError) => {
+    // Stryker disable next-line all
+    this.logger.error(`Error event: error was wrapped to error`);
+    const error = this.errorParse(rawError);
+    this.emit('error', error);
+  };
   /** Callback function for `close` event */
-  private readonly onCloseEvent = () =>
-    this.onEvent(
-      'close',
-      'unhealthy',
-      true,
-      new Crash(`The connection was closed unexpectedly`, this.uuid)
-    );
+  private readonly onCloseEvent = () => {
+    // Stryker disable next-line all
+    this.logger.debug(`Original event: close was wrapped to unhealthy`);
+    this.emit('unhealthy', new Crash(`The connection was closed unexpectedly`, this.uuid));
+  };
   /** Callback function for `reconnecting` event */
-  private readonly onReconnectingEvent = (delay: number) =>
-    this.onEvent('reconnecting', 'reconnecting', false, delay);
+  private readonly onReconnectingEvent = (delay: number) => this.onEvent('reconnecting', delay);
   /** Callback function for `end` event */
-  private readonly onEndEvent = () =>
-    this.onEvent(
-      'end',
-      'closed',
-      true,
-      new Crash(`The connection was closed intentionally`, this.uuid)
-    );
+  private readonly onEndEvent = () => {
+    // Stryker disable next-line all
+    this.logger.debug(`Original event: end was wrapped to closed`);
+    this.emit('closed', new Crash(`The connection was closed intentionally`, this.uuid));
+  };
   /** Callback function for `+node` event */
-  private readonly onPlusNodeEvent = () => this.onEvent('+node', '+node', false);
+  private readonly onPlusNodeEvent = () => this.onEvent('+node');
   /** Callback function for `-node` event */
-  private readonly onMinusNodeEvent = () => this.onEvent('-node', '-node', false);
+  private readonly onMinusNodeEvent = () => this.onEvent('-node');
   /**
    * Transforms a ReplyError instance to a Crash instance
    * @param error - Error to be parsed

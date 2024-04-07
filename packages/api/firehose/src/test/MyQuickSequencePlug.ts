@@ -59,4 +59,10 @@ export class MyQuickSequencePlug extends EventEmitter implements Plugs.Source.Se
   public stop(): Promise<void> {
     return Promise.resolve();
   }
+  public get status(): Health.Status {
+    return Health.STATUS.PASS;
+  }
+  public close(): Promise<void> {
+    return this.stop();
+  }
 }

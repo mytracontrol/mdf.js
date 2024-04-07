@@ -202,7 +202,7 @@ describe('#Port #mqtt', () => {
       jest.useFakeTimers();
       const logger = new FakeLogger();
       const port = new Port(
-        { ...DEFAULT_CONFIG, url: 'mqtt://1.1.1.1:1883', keepalive: 50 },
+        { ...DEFAULT_CONFIG, url: 'mqtt://1.1.1.1:1883', keepalive: 100 },
         logger as LoggerInstance
       );
       let healthy = false;
@@ -210,7 +210,8 @@ describe('#Port #mqtt', () => {
       port.on('healthy', () => {
         healthy = true;
       });
-      port.on('unhealthy', () => {
+      port.on('unhealthy', error => {
+        expect(error).toBeDefined();
         unhealthy = true;
       });
       expect(port.state).toBeFalsy();
@@ -258,7 +259,7 @@ describe('#Port #mqtt', () => {
       //@ts-ignore - Test environment
       jest.spyOn(port.client, 'connect').mockImplementation(() => {
         port.client.emit('error', new Error('error'));
-        //return port.client;
+        return port.client;
       });
       try {
         await port.start();

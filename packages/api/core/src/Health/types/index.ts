@@ -7,6 +7,4 @@
 
 export * from './Check.i';
 export * from './Checks.t';
-export * from './Component.i';
-export * from './Service';
 export * from './Status.t';

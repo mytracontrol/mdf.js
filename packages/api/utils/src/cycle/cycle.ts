@@ -5,6 +5,12 @@
  * or at https://opensource.org/licenses/MIT.
  */
 
+/**
+ * De-cycle an object to a JSON-safe representation
+ * @param object - The object to be decycled
+ * @param replacer - A function that transforms the object before decycling
+ * @returns The decycled object
+ */
 export function deCycle(object: any, replacer?: (value: any) => any) {
   const seen = new WeakMap();
 

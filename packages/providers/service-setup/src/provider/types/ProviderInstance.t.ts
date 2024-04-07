@@ -10,4 +10,5 @@ import { Port } from '../Port';
 import { Client } from './Client.t';
 import { Config } from './Config.t';
 
-export type ProviderInstance = Layer.Provider.Manager<Client, Config, Port>;
+export type ProviderInstance<T extends Record<string, any> = Record<string, any>> =
+  Layer.Provider.Manager<Client<T>, Config, Port<T>>;

@@ -7,10 +7,12 @@
 
 import { Crash, Multi } from '@mdf.js/crash';
 import { DebugLogger } from '@mdf.js/logger';
+import { Registry } from 'prom-client';
 import { Limiter } from '../Limiter';
 import { STRATEGY } from '../Limiter/types';
 import { MetaData } from '../Tasks';
 import { PollingExecutor } from './PollingExecutor';
+import { METRICS_DEFINITIONS } from './types';
 describe('#PollingManager', () => {
   describe('#Happy path', () => {
     it('Should create a new instance of PollingExecutor', () => {
@@ -36,7 +38,8 @@ describe('#PollingManager', () => {
           resource: 'test',
           logger: new DebugLogger('test'),
         },
-        limiter
+        limiter,
+        METRICS_DEFINITIONS(new Registry())
       );
       expect(pollingManager).toBeInstanceOf(PollingExecutor);
     });
@@ -59,7 +62,8 @@ describe('#PollingManager', () => {
           resource: 'test',
           logger: new DebugLogger('test'),
         },
-        limiter
+        limiter,
+        METRICS_DEFINITIONS(new Registry())
       );
       expect(pollingManager).toBeInstanceOf(PollingExecutor);
       pollingManager.on('error', error => {
@@ -106,7 +110,8 @@ describe('#PollingManager', () => {
           resource: 'test',
           logger: new DebugLogger('test'),
         },
-        limiter
+        limiter,
+        METRICS_DEFINITIONS(new Registry())
       );
       expect(pollingManager).toBeInstanceOf(PollingExecutor);
       pollingManager.on(

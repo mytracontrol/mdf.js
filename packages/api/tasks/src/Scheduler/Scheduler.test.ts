@@ -6,7 +6,6 @@
  */
 
 import { Crash, Multi } from '@mdf.js/crash';
-import { MetricsRegistry } from '@mdf.js/metrics-registry';
 import { MetaData } from '../Tasks';
 import { Scheduler } from './Scheduler';
 
@@ -425,8 +424,6 @@ describe('#Scheduler', () => {
         }
       );
       expect(scheduler).toBeInstanceOf(Scheduler);
-      const registry = MetricsRegistry.create();
-      scheduler.setMetricRegistry(registry);
       scheduler.start();
       setTimeout(() => {
         expect(cycles).toEqual([5, 11]);
@@ -437,7 +434,7 @@ describe('#Scheduler', () => {
         expect(myCheck.observedValue['consecutiveOverruns']).toEqual(5);
         expect(myCheck.observedValue['overruns']).toEqual(5);
         expect(myCheck.status).toEqual('warn');
-        expect(registry.getMetric('myScheduler_scan_cycles_total')).toBeDefined();
+        expect(scheduler.metrics.getSingleMetric('scan_cycles_total')).toBeDefined();
         done();
       }, 550);
     }, 600);

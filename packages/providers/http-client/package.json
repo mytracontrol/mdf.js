@@ -36,7 +36,6 @@
     "@mdf.js/logger": "*",
     "@mdf.js/utils": "*",
     "axios": "^1.6.8",
-    "debug": "^4.3.4",
     "joi": "^17.12.2",
     "tslib": "^2.6.0"
   },

@@ -5,7 +5,6 @@
  * or at https://opensource.org/licenses/MIT.
  */
 
-export * from './AnyWrappedPort.t';
 export * from './Factory.i';
 export * from './FactoryOptions.i';
 export * from './PortConfigValidationStruct.i';

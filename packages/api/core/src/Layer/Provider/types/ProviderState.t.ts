@@ -5,8 +5,11 @@
  * or at https://opensource.org/licenses/MIT.
  */
 
+/** Provider states */
 export const PROVIDER_STATES = ['running', 'stopped', 'error'] as const;
+/** Provider state type */
 export type ProviderState = (typeof PROVIDER_STATES)[number];
+/** Provider status */
 export enum ProviderStatus {
   'running' = 'pass',
   'stopped' = 'warn',

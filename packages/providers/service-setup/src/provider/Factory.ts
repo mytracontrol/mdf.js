@@ -14,5 +14,5 @@ export const Factory = Layer.Provider.ProviderFactoryCreator<Client, Config, Por
   Port,
   configEntry,
   CONFIG_PROVIDER_BASE_NAME,
-  'service'
+  'setup service'
 );

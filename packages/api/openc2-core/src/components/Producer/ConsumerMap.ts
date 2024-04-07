@@ -5,7 +5,7 @@
  * or at https://opensource.org/licenses/MIT.
  */
 
-import { Health } from '@mdf.js/core';
+import { Health, Layer } from '@mdf.js/core';
 import { Crash } from '@mdf.js/crash';
 import EventEmitter from 'events';
 import { get, isEqual, uniq } from 'lodash';
@@ -28,7 +28,7 @@ export declare interface ConsumerMap {
   on(event: 'updated', listener: (nodes: string[]) => void): this;
 }
 
-export class ConsumerMap extends EventEmitter implements Health.Component {
+export class ConsumerMap extends EventEmitter implements Layer.App.Resource {
   /** Flag to indicate that an unhealthy status has been emitted recently */
   private lastStatusEmitted?: Health.Status;
   /** Component identification */
@@ -171,7 +171,7 @@ export class ConsumerMap extends EventEmitter implements Health.Component {
     });
   }
   /** Overall component status */
-  private get status(): Health.Status {
+  public get status(): Health.Status {
     return Health.overallStatus(this.checks);
   }
   /** Emit the status if it's different from the last emitted status */
@@ -188,5 +188,17 @@ export class ConsumerMap extends EventEmitter implements Health.Component {
       clearInterval(this.agingTimer);
       this.agingTimer = undefined;
     }
+  }
+  /** Fake start method used to implement the Resource interface */
+  public async start(): Promise<void> {
+    return Promise.resolve();
+  }
+  /** Fake stop method used to implement the Resource interface */
+  public async stop(): Promise<void> {
+    return Promise.resolve();
+  }
+  /** Fake close method used to implement the Resource interface */
+  public async close(): Promise<void> {
+    return Promise.resolve();
   }
 }

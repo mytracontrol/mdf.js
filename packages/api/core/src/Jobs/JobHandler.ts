@@ -8,21 +8,99 @@ import { Crash, Multi } from '@mdf.js/crash';
 import { EventEmitter } from 'events';
 import { v4, v5 } from 'uuid';
 import { MDF_NAMESPACE_OID } from '../const';
-import { JobObject, JobRequest, Options, Result, Status } from './types';
-
-export declare interface JobHandler<Type, Data> {
-  /** Emitted when a job has ended */
-  on(event: 'done', listener: (uuid: string, result: Result<Type>, error?: Multi) => void): this;
-}
+import {
+  AnyHeaders,
+  AnyOptions,
+  DoneEventHandler,
+  JobObject,
+  JobRequest,
+  Options,
+  Result,
+  Status,
+} from './types';
 
 /**
  * JobHandler class
  * @category @mdf.js/core
  */
+export declare interface JobHandler<Type extends string> {
+  /**
+   * Register an event listener over the `done` event, which is emitted when a job has ended, either
+   * due to completion or failure.
+   * @param event - `done` event
+   * @param uuid - Unique job processing identification
+   * @param result - Job {@link Result}
+   * @param error - Error raised during job processing, if any
+   */
+  on(event: 'done', listener: DoneEventHandler<Type>): this;
+  /**
+   * Register an event listener over the `done` event, which is emitted when a job has ended, either
+   * due to completion or failure.
+   * @param event - `done` event
+   * @param uuid - Unique job processing identification
+   * @param result - Job {@link Result}
+   * @param error - Error raised during job processing, if any
+   */
+  addListener(event: 'done', listener: DoneEventHandler<Type>): this;
+  /**
+   * Registers a event listener over the `done` event, at the beginning of the listeners array,
+   * which is emitted when a job has ended, either due to completion or failure.
+   * @param event - `done` event
+   * @param uuid - Unique job processing identification
+   * @param result - Job {@link Result}
+   * @param error - Error raised during job processing, if any
+   */
+  prependListener(event: 'done', listener: DoneEventHandler<Type>): this;
+  /**
+   * Registers a one-time event listener over the `done` event, which is emitted when a job has
+   * ended, either due to completion or failure.
+   * @param event - `done` event
+   * @param uuid - Unique job processing identification
+   * @param result - Job {@link Result}
+   * @param error - Error raised during job processing, if any
+   */
+  once(event: 'done', listener: DoneEventHandler<Type>): this;
+  /**
+   * Registers a one-time event listener over the `done` event, at the beginning of the listeners
+   * array, which is emitted when a job has ended, either due to completion or failure.
+   * @param event - `done` event
+   * @param uuid - Unique job processing identification
+   * @param result - Job {@link Result}
+   * @param error - Error raised during job processing, if any
+   */
+  prependOnceListener(event: 'done', listener: DoneEventHandler<Type>): this;
+  /**
+   * Removes the specified listener from the listener array for the `done` event.
+   * @param event - `done` event
+   * @param listener - The listener function to remove
+   */
+  removeListener(event: 'done', listener: DoneEventHandler<Type>): this;
+  /**
+   * Removes the specified listener from the listener array for the `done` event.
+   * @param event - `done` event
+   * @param listener - The listener function to remove
+   */
+  off(event: 'done', listener: DoneEventHandler<Type>): this;
+  /**
+   * Removes all listeners, or those of the specified event.
+   * @param event - `done` event
+   */
+  removeAllListeners(event?: 'done'): this;
+}
+
+/**
+ * JobHandler class
+ * @category @mdf.js/core
+ * @typeParam Type - Job type, used as selector for strategies in job processors
+ * @typeParam Data - Job payload
+ * @typeParam CustomHeaders - Custom headers, used to pass specific information for job processors
+ * @typeParam CustomOptions - Custom options, used to pass specific information for job processors
+ */
 export class JobHandler<
     Type extends string = string,
-    Data = any,
-    CustomHeaders extends Record<string, any> = Record<string, any>,
+    Data = unknown,
+    CustomHeaders extends Record<string, any> = AnyHeaders,
+    CustomOptions extends Record<string, any> = AnyOptions,
   >
   extends EventEmitter
   implements JobObject<Type, Data, CustomHeaders>
@@ -38,7 +116,7 @@ export class JobHandler<
   /** Job type, used as selector for strategies in job processors */
   public readonly type: Type;
   /** Job meta information, used to pass specific information for job processors */
-  public readonly options?: Options<CustomHeaders>;
+  public readonly options?: Options<CustomHeaders, CustomOptions>;
   /** Date object with the timestamp when the job was resolved */
   private resolvedAt?: Date;
   /** Job processing status */
@@ -53,7 +131,7 @@ export class JobHandler<
    * Create a new instance of JobHandler
    * @param jobRequest - job request object
    */
-  constructor(jobRequest: JobRequest<Type, Data, CustomHeaders>);
+  constructor(jobRequest: JobRequest<Type, Data, CustomHeaders, CustomOptions>);
   /**
    * Create a new instance of JobHandler
    * @param jobUserId - User job request identifier, defined by the user
@@ -61,12 +139,17 @@ export class JobHandler<
    * @param type - Job type, used as selector for strategies in job processors
    * @param options - JobHandler options
    */
-  constructor(jobUserId: string, data: Data, type?: Type, options?: Options<CustomHeaders>);
   constructor(
-    jobUserIdOrJobRequest: string | JobRequest<Type, Data, CustomHeaders>,
+    jobUserId: string,
+    data: Data,
+    type?: Type,
+    options?: Options<CustomHeaders, CustomOptions>
+  );
+  constructor(
+    jobUserIdOrJobRequest: string | JobRequest<Type, Data, CustomHeaders, CustomOptions>,
     data?: Data,
     type?: Type,
-    options?: Options<CustomHeaders>
+    options?: Options<CustomHeaders, CustomOptions>
   ) {
     super();
     this.uuid = v4();
@@ -189,7 +272,7 @@ export class JobHandler<
     };
   }
   /** Return an object with the key information of the job, this information is used by the plugs */
-  public toObject(): JobObject<Type, Data, CustomHeaders> {
+  public toObject(): JobObject<Type, Data, CustomHeaders, CustomOptions> {
     return {
       uuid: this.uuid,
       data: this.data,

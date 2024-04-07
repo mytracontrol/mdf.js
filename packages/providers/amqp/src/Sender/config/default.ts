@@ -10,17 +10,17 @@ import { Config } from '../types';
 
 // *************************************************************************************************
 // #region Default values
-const AMQP_SENDER_SETTLE_MODE = 2;
-const AMQP_SENDER_AUTO_SETTLE = true;
-const AMQP_SENDER_TARGET = {};
+const DEFAULT_CONFIG_AMQP_SENDER_SETTLE_MODE = 2;
+const DEFAULT_CONFIG_AMQP_SENDER_AUTO_SETTLE = true;
+const DEFAULT_CONFIG_AMQP_SENDER_TARGET = {};
 
 export const defaultConfig: Config = {
   ...commonDefaultConfig,
   sender_options: {
     name: CONFIG_ARTIFACT_ID,
-    snd_settle_mode: AMQP_SENDER_SETTLE_MODE,
-    autosettle: AMQP_SENDER_AUTO_SETTLE,
-    target: AMQP_SENDER_TARGET,
+    snd_settle_mode: DEFAULT_CONFIG_AMQP_SENDER_SETTLE_MODE,
+    autosettle: DEFAULT_CONFIG_AMQP_SENDER_AUTO_SETTLE,
+    target: DEFAULT_CONFIG_AMQP_SENDER_TARGET,
   },
 };
 // #endregion

@@ -6,7 +6,8 @@
  */
 import { Crash } from '@mdf.js/crash';
 import { State } from '.';
-import { AnyWrappedPort, ProviderState } from '../types';
+import { Port } from '../Port';
+import { ProviderState } from '../types';
 import { RunningState } from './Running';
 import { StoppedState } from './Stopped';
 
@@ -31,7 +32,7 @@ export class ErrorState implements State {
    * @param manageError - Provider error management function function
    */
   constructor(
-    private readonly instance: AnyWrappedPort,
+    private readonly instance: Port<any, any>,
     private readonly changeState: (newState: State) => void,
     private readonly manageError: (error: unknown) => void
   ) {

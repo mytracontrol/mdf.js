@@ -14,7 +14,6 @@ import { Port } from './Port';
 import { Config } from './types';
 
 const DEFAULT_CONFIG: Config = {
-  name: 'test',
   configFiles: ['src/Client/__mocks__/*.*'],
   presetFiles: ['src/Client/__mocks__/presets/*.*'],
   schemaFiles: ['src/Client/__mocks__/schemas/*.*'],
@@ -61,7 +60,7 @@ describe('#Port #ServiceConfig', () => {
         'config:status': [
           {
             componentId: checks['config:status'][0].componentId,
-            componentType: 'service',
+            componentType: 'setup service',
             observedValue: 'stopped',
             output: undefined,
             status: 'warn',
@@ -95,7 +94,7 @@ describe('#Port #ServiceConfig', () => {
         'test:status': [
           {
             componentId: checks['test:status'][0].componentId,
-            componentType: 'service',
+            componentType: 'setup service',
             observedValue: 'stopped',
             output: undefined,
             status: 'warn',
@@ -112,7 +111,7 @@ describe('#Port #ServiceConfig', () => {
       expect(port.checks).toEqual({});
     }, 300);
     it('Should start/stop the client on request', done => {
-      const port = new Port({ name: 'myApp' }, new FakeLogger() as LoggerInstance);
+      const port = new Port({}, new FakeLogger() as LoggerInstance);
       expect(port).toBeDefined();
       port.on('error', error => {
         throw error;
@@ -137,7 +136,6 @@ describe('#Port #ServiceConfig', () => {
     it('Should emit unhealthy events if there configuration is wrong', done => {
       const port = new Port(
         {
-          name: 'test',
           configFiles: ['src/Client/__mocks__/*.*'],
           presetFiles: ['src/Client/__mocks__/wrong/*.preset.*.*'],
           schemaFiles: ['src/Client/__mocks__/schemas/*.*'],

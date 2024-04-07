@@ -3,17 +3,27 @@
 !define DARKGREEN
 !include ./styles/style.puml
 
+skinparam backgroundColor transparent
+
+class Factory {
+    + {static} create(options: FactoryOptions): Manager
+}
+
 class Client {}
 
-class MyWrappedClient< extends Port > {
+class MyProvider< extends Port > {
     + client: Client
 }
 
 abstract class Port <extends EventEmitter> {
-    # addCheck(measure: string, check: Health.Check): boolean
+    + uuid: string
+    + config: PortConfig
+    + name: string
+    # logger: LoggerInstance 
     + checks: Record<string, Health.Check[]>
     + {abstract} client: Client
     + {abstract} state: boolean
+    # addCheck(measure: string, check: Health.Check): boolean
     + {abstract} start(): Promise<void>
     + {abstract} stop(): Promise<void>
     + {abstract} close(): Promise<void>
@@ -23,19 +33,26 @@ abstract class Port <extends EventEmitter> {
     ~ on(event: "unhealthy", listener: (error: Crash) => void): this
     ~ on(event: "closed", listener: (error?: Crash) => void): this
 }
-class Manager <implements Health.Component> {
-    - port: Port
-    + state: Health.State
-    + actualStateDate: string
-    + error: Crash
-    + client: Client
-    + checks: Health.Checks
-    + start(): Promise<void>
-    + stop(): Promise<void>
-    + fail(error: Crash): Promise<void>
-}
 
-Client --> MyWrappedClient::client : wrap
-MyWrappedClient --> Port : extends
-Manager --> MyWrappedClient: create
+class Manager <implements Health.Component> {
+    - port: Port<PortClient, PortConfig> 
+    + componentId: string
+    + name: string
+    + config: PortConfig
+    + state: Health.State
+    + error: Crash | Multi | undefined
+    + date: string
+    + checks: Health.Checks
+    + client: PortClient
+    + async start(): Promise<void>
+    + async stop(): Promise<void>
+    + async fail(error: Crash): Promise<void>
+    ..events..
+    ~ on(event: "error", listener: (error: Crash | Error) => void): this
+    ~ on(event: "status", listener: (status: Health.Status) => void): this
+}
+Factory::create --> Manager : create
+Manager::port --> MyProvider: create
+MyProvider --> Port : extends
+MyProvider::client --> Client : create
 @enduml

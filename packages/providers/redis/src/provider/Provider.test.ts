@@ -163,7 +163,7 @@ describe('#Port #Redis', () => {
               componentId: checks['memory'][0].componentId,
               observedUnit: 'used memory / max memory',
               observedValue: '1090104 / 0',
-              output: undefined,
+              output: `The system is using 0% of the available memory`,
               status: 'pass',
               time: checks['memory'][0].time,
             },
@@ -329,16 +329,22 @@ describe('#Port #Redis', () => {
     }, 300);
     it('Should emit healthy and unhealthy events properly', done => {
       const port = new Port(
-        { ...DEFAULT_CONFIG, checkInterval: 50 },
+        { ...DEFAULT_CONFIG, lazyConnect: false, checkInterval: 50 },
         new FakeLogger() as LoggerInstance
       );
       jest.spyOn(port.client, 'connect').mockResolvedValue();
       jest.spyOn(port.client, 'quit').mockResolvedValue('OK');
-      jest
-        .spyOn(port.client, 'info')
-        .mockResolvedValueOnce(memory)
-        .mockResolvedValueOnce(memoryProblem)
-        .mockResolvedValue(memory);
+      let count = 0;
+      jest.spyOn(port.client, 'info').mockImplementation(() => {
+        count++;
+        if (count === 1 || count === 2 || count === 3 || count > 4) {
+          return Promise.resolve(memory);
+        } else if (count === 4) {
+          return Promise.resolve(memoryProblem);
+        } else {
+          return Promise.resolve(memory);
+        }
+      });
       port.on('error', error => {
         throw error;
       });

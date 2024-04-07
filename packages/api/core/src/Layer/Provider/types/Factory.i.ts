@@ -14,5 +14,5 @@ export declare interface Factory<PortClient, PortConfig, T extends Port<PortClie
    * Create a new provider
    * @param options - Provider configuration options
    */
-  create<P extends PortConfig>(options?: FactoryOptions<P>): Manager<PortClient, PortConfig, T>;
+  create(options?: FactoryOptions<PortConfig>): Manager<PortClient, PortConfig, T>;
 }

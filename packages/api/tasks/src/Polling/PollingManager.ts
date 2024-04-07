@@ -12,7 +12,7 @@ import EventEmitter from 'events';
 import { Validator } from '../Helpers';
 import { Limiter } from '../Limiter';
 import { Group, MetaData, Sequence, SequencePattern, Single, TaskHandler } from '../Tasks';
-import { PollingStatsManager } from './PollingStatsManager';
+import { PollingMetricsHandler } from './PollingStatsManager';
 import { RetryManager } from './RetryManager';
 import { MetricsDefinitions, PollingManagerOptions, PollingStats, TaskBaseConfig } from './types';
 
@@ -44,24 +44,27 @@ export class PollingManager extends EventEmitter {
   /** Retry manager */
   private readonly retryManager: RetryManager;
   /** Metrics definitions */
-  private readonly pollingStats: PollingStatsManager;
+  private readonly pollingStats: PollingMetricsHandler;
   /**
    * Create a polling manager
    * @param options - Polling manager options
    * @param limiter - Rate limiter
    * @param logger - Logger instance
+   * @param metrics - Metrics registry
    */
   constructor(
     private readonly options: PollingManagerOptions,
     private readonly limiter: Limiter,
-    private readonly logger: LoggerInstance
+    private readonly logger: LoggerInstance,
+    private readonly metrics: MetricsDefinitions
   ) {
     super();
-    this.pollingStats = new PollingStatsManager(
+    this.pollingStats = new PollingMetricsHandler(
       options.componentId,
       options.resource,
       options.pollingGroup,
-      options.cyclesOnStats
+      options.cyclesOnStats,
+      this.metrics
     );
     this.retryManager = new RetryManager(
       this.limiter.options.delay,
@@ -196,13 +199,6 @@ export class PollingManager extends EventEmitter {
     for (const task of this.slowEntries.values()) {
       this.scheduleTask(this.wrappedCreatedTaskInstance(task));
     }
-  }
-  /**
-   * Set the metrics definitions for the polling manager
-   * @param metrics - Metrics registry
-   */
-  public setMetrics(metrics?: MetricsDefinitions): void {
-    this.pollingStats.setMetrics(metrics);
   }
   /** Return the stats of the polling manager */
   public get check(): Health.Check {

@@ -10,11 +10,12 @@ import { Base } from './Base.i';
 export interface Jet<
   Type extends string = string,
   Data = any,
-  CustomHeaders extends Record<string, any> = Record<string, any>,
-> extends Base<Type, Data, CustomHeaders> {
+  CustomHeaders extends Record<string, any> = Jobs.AnyHeaders,
+  CustomOptions extends Record<string, any> = Jobs.AnyOptions,
+> extends Base<Type, Data, CustomHeaders, CustomOptions> {
   /**
    * Perform the processing of several Jobs
    * @param jobs - jobs to be processed
    */
-  multi: (jobs: Jobs.JobObject<Type, Data, CustomHeaders>[]) => Promise<void>;
+  multi: (jobs: Jobs.JobObject<Type, Data, CustomHeaders, CustomOptions>[]) => Promise<void>;
 }

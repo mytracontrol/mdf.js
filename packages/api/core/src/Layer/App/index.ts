@@ -5,5 +5,8 @@
  * or at https://opensource.org/licenses/MIT.
  */
 
-export * from './Metadata.i';
-export * from './Resource.i';
+export { Component } from './Component.i';
+export { Health } from './Health.i';
+export { Metadata } from './Metadata.i';
+export { Resource } from './Resource.i';
+export { Service } from './Service.i';

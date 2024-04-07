@@ -5,14 +5,14 @@
  * or at https://opensource.org/licenses/MIT.
  */
 
-import { Health, Jobs } from '@mdf.js/core';
+import { Health, Jobs, Layer } from '@mdf.js/core';
 import { Crash } from '@mdf.js/crash';
 import { EventEmitter } from 'stream';
 import { v4 } from 'uuid';
 import { Constants } from '../../helpers';
 import { CommandJobDone, CommandJobHandler, Control } from '../../types';
 
-export class Registry extends EventEmitter implements Health.Component {
+export class Registry extends EventEmitter implements Layer.App.Resource {
   /** Component identification */
   public readonly componentId: string = v4();
   /** Array of messages used as fifo register */
@@ -26,7 +26,7 @@ export class Registry extends EventEmitter implements Health.Component {
   /** Time in milliseconds assigned to check internal */
   private readonly timeInterval: number;
   /** Represent the actual status of the register of jobs */
-  private status: Health.Status = 'pass';
+  private _status: Health.Status = 'pass';
   /**
    * Creates a new Register instance
    * @param name - Component name
@@ -115,9 +115,9 @@ export class Registry extends EventEmitter implements Health.Component {
         newStatus = 'warn';
       }
     }
-    if (newStatus !== this.status) {
-      this.status = newStatus;
-      this.emit('status', this.status);
+    if (newStatus !== this._status) {
+      this._status = newStatus;
+      this.emit('status', this._status);
     }
   };
   /** Return a resume of the pending jobs in the register */
@@ -132,6 +132,10 @@ export class Registry extends EventEmitter implements Health.Component {
     }
     return pendingJobsResume;
   }
+  /** Return the status of the register */
+  public get status(): Health.Status {
+    return this._status;
+  }
   /**
    * Return the status of the stream in a standard format
    * @returns _check object_ as defined in the draft standard
@@ -139,16 +143,28 @@ export class Registry extends EventEmitter implements Health.Component {
    */
   public get checks(): Health.Checks {
     const check: Health.Check = {
-      status: this.status,
+      status: this._status,
       componentId: this.componentId,
       componentType: 'source',
       observedValue: this.pendingJobs.size,
       observedUnit: 'pending commands',
       time: new Date().toISOString(),
-      output: this.status !== 'pass' ? this.resume() : undefined,
+      output: this._status !== 'pass' ? this.resume() : undefined,
     };
     return {
       [`${this.name}:commands`]: [check],
     };
+  }
+  /** Fake start method used to implement the Resource interface */
+  public async start(): Promise<void> {
+    return Promise.resolve();
+  }
+  /** Fake stop method used to implement the Resource interface */
+  public async stop(): Promise<void> {
+    return Promise.resolve();
+  }
+  /** Fake close method used to implement the Resource interface */
+  public async close(): Promise<void> {
+    return Promise.resolve();
   }
 }

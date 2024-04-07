@@ -27,7 +27,6 @@
   - [**Installation**](#installation)
   - [**Information**](#information)
   - [**Use**](#use)
-  - [**Environment variables**](#environment-variables)
   - [**License**](#license)
 
 ## **Introduction**
@@ -63,7 +62,6 @@ Checks included in the provider:
 
 ## **Environment variables**
 
-- **CONFIG\_ARTIFACT\_ID** (default: `` `mdf-http-client` ``): Artifact identifier for the configuration provider
 - **CONFIG\_HTTP\_CLIENT\_BASE\_URL** (default: `undefined`): Base URL for the HTTP client requests.
 - **CONFIG\_HTTP\_CLIENT\_TIMEOUT** (default: `undefined`): Time in milliseconds before the request is considered a timeout.
 - **CONFIG\_HTTP\_CLIENT\_AUTH\_USERNAME** (default: `undefined`): Username for the HTTP client authentication, if username is set, password must be set too.

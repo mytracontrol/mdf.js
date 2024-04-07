@@ -5,6 +5,7 @@
  * or at https://opensource.org/licenses/MIT.
  */
 
+export * from './DoneEventHandler.t';
 export * from './Headers.i';
 export * from './JobObject.i';
 export * from './JobRequest.i';

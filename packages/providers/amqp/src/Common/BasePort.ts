@@ -12,6 +12,7 @@ import { CONFIG_PROVIDER_BASE_NAME } from './config';
 import { Config } from './types';
 
 const DEFAULT_CHECK_CREDIT_INTERVAL = 10000;
+
 export class BasePort<Client> extends Layer.Provider.Port<Client, Config> {
   /** Credit check interval */
   private timeInterval?: NodeJS.Timeout;

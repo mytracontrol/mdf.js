@@ -5,25 +5,18 @@
  * or at https://opensource.org/licenses/MIT.
  */
 
-import { Health, Jobs } from '@mdf.js/core';
+import { Health, Layer } from '@mdf.js/core';
 import { Crash, Multi } from '@mdf.js/crash';
 import { RetryOptions, retryBind } from '@mdf.js/utils';
 import EventEmitter from 'events';
 import { merge } from 'lodash';
-import { PostConsumeOptions, WrappableSourcePlug } from '../../types';
+import { OpenJobRequest, PostConsumeOptions, WrappableSourcePlug } from '../../types';
 import {
   DEFAULT_CONFIG_SOURCE_PLUG_CHECK_UNCLEANED_INTERVAL,
   DEFAULT_CONFIG_SOURCE_PLUG_MAX_UNKNOWN_JOBS,
 } from './const';
 
-export class PlugWrapper<
-    Type extends string = string,
-    Data = any,
-    CustomHeaders extends Record<string, any> = Record<string, any>,
-  >
-  extends EventEmitter
-  implements Health.Component
-{
+export class PlugWrapper extends EventEmitter implements Layer.App.Component {
   /** Jobs uncleaned after job finish due to problems in the post consume command */
   private readonly uncleanedEntries: string[] = [];
   /** Jobs uncleaned after job finish due to the plugs has declare that not exist */
@@ -43,11 +36,7 @@ export class PlugWrapper<
   /** Plug post consume operation original */
   private readonly postConsumeOriginal: (jobId: string) => Promise<string | undefined>;
   /** Plug ingest data operation */
-  private ingestDataOriginal?: (
-    size: number
-  ) => Promise<
-    Jobs.JobRequest<Type, Data, CustomHeaders> | Jobs.JobRequest<Type, Data, CustomHeaders>[]
-  >;
+  private ingestDataOriginal?: (size: number) => Promise<OpenJobRequest | OpenJobRequest[]>;
   /** Plug ingest addCredits operation */
   private addCreditsOriginal?: (size: number) => Promise<void>;
   /** Plug start operation original */
@@ -61,7 +50,7 @@ export class PlugWrapper<
    * @param postConsumeOptions - options for post consume operations
    */
   constructor(
-    private readonly plug: WrappableSourcePlug<Type, Data, CustomHeaders>,
+    private readonly plug: WrappableSourcePlug,
     retryOptions?: RetryOptions,
     postConsumeOptions?: PostConsumeOptions
   ) {

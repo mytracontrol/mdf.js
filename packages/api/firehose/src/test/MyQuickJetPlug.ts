@@ -56,4 +56,10 @@ export class MyQuickJetPlug extends EventEmitter implements Plugs.Sink.Jet {
   public stop(): Promise<void> {
     return Promise.resolve();
   }
+  public get status(): Health.Status {
+    return Health.STATUS.PASS;
+  }
+  public close(): Promise<void> {
+    return this.stop();
+  }
 }

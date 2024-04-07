@@ -25,7 +25,8 @@
     "OpenC2",
     "OPENC2",
     "RESTAPI",
-    "Retryable"
+    "Retryable",
+    "Struct"
   ],
   "sonarlint.connectedMode.project": {
     "projectKey": "Mytra-Development-Framework-NDF-TypeScript"

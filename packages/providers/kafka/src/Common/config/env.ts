@@ -8,7 +8,8 @@
 import { coerce, loadFile } from '@mdf.js/utils';
 import { SASLMechanismOptions } from 'kafkajs';
 import { ConnectionOptions } from 'tls';
-import { BaseConfig, logger } from '../../Common';
+import { BaseConfig } from '../types';
+import { logger } from './utils';
 
 type AllowedMechanisms = 'plain' | 'scram-sha-256' | 'scram-sha-512' | 'aws' | 'oauthbearer';
 // *************************************************************************************************

@@ -1,4 +1,4 @@
-# **@mdf.js**
+# **@mdf.js/redis-provider**
 
 [![Node Version](https://img.shields.io/static/v1?style=flat\&logo=node.js\&logoColor=green\&label=node\&message=%3E=20\&color=blue)](https://nodejs.org/en/)
 [![Typescript Version](https://img.shields.io/static/v1?style=flat\&logo=typescript\&label=Typescript\&message=5.4\&color=blue)](https://www.typescriptlang.org/)
@@ -12,7 +12,7 @@
   </div>
 </p>
 
-<h1 style="text-align:center;margin-bottom:0">Mytra Development Framework - @mdf.js </h1>
+<h1 style="text-align:center;margin-bottom:0">Mytra Development Framework - @mdf.js/redis-provider</h1>
 <h5 style="text-align:center;margin-top:0">Typescript tools for development</h5>
 
 <!-- markdownlint-enable MD033 -->
@@ -21,7 +21,7 @@
 
 ## **Table of contents**
 
-- [**@mdf.js**](#mdfjs)
+- [**@mdf.js/redis-provider**](#mdfjsredis-provider)
   - [**Table of contents**](#table-of-contents)
   - [**Introduction**](#introduction)
   - [**Installation**](#installation)
@@ -31,15 +31,40 @@
 
 ## **Introduction**
 
+Redis provider for [@mdf.js](https://mytracontrol.github.io/mdf.js/) based on [ioredis](https://www.npmjs.com/package/ioredis).
+
 ## **Installation**
+
+Using npm:
+
+```bash
+npm install @mdf.js/redis-provider
+```
+
+Using yarn:
+
+```bash
+yarn add @mdf.js/redis-provider
+```
 
 ## **Information**
 
+Check information about **@mdf.js** providers in the documentation of the core module [**@mdf.js/core**](https://mytracontrol.github.io/mdf.js/modules/_mdf_js_core.html).
+
 ## **Use**
+
+Checks included in the provider:
+
+- **status**: Checks the ping messages from the server.
+  - **observedValue**: actual state of the consumer/producer provider instance \[`error`, `running`, `stopped`] based in the last ping event. `stopped` if the provider is stopped or has not been initialized yet, `running` if the provider is running and the last ping event was successful, `error` if the provider is running and the last ping event was not successful.
+  - **status**: `pass` if the status is `running`, `warn` if the status is `stopped`, `fail` if the status is `error`.
+- **memory**:
+  - **observedValue**: actual memory usage of the provider instance. The values are in expressed in bytes: `used memory` / `max memory`.
+  - **observedUnit**: `used memory / max memory`.
+  - **status**: `fail` if there is a problem getting the memory usage, or if the memory usage is greater or equal than 100% of the maximum memory, `warn` if the memory usage is greater than 80% of the maximum memory, `pass` in other case.
 
 ## **Environment variables**
 
-- **CONFIG\_ARTIFACT\_ID**: Artifact identifier for the configuration provider
 - **CONFIG\_REDIS\_HOST**: Default REDIS connection host
 - **CONFIG\_REDIS\_PORT**: Default REDIS connection port
 - **CONFIG\_REDIS\_DB**: Default REDIS connection database

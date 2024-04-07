@@ -13,21 +13,7 @@ export class Default {
   public static handler(links?: Links): RequestHandler {
     return (req: Request, res: Response, next: NextFunction): void => {
       const baseRequestUrl = `${req.protocol}://${req.get('host')}`;
-      let formattedLinks: Links | undefined;
-      if (links) {
-        formattedLinks = {};
-        for (const [contextKey, firstLevel] of Object.entries(links)) {
-          if (typeof firstLevel === 'string') {
-            formattedLinks[contextKey] = `${baseRequestUrl}${firstLevel}`;
-          } else {
-            const formattedContextLinks: { [link: string]: string } = {};
-            for (const [innerContextKey, secondLevel] of Object.entries(firstLevel)) {
-              formattedContextLinks[innerContextKey] = `${baseRequestUrl}${secondLevel}`;
-            }
-            formattedLinks[contextKey] = formattedContextLinks;
-          }
-        }
-      }
+      const formattedLinks = Default.FormatLinks(baseRequestUrl, links);
       next(
         BoomHelpers.notFound('Not Found', req.uuid, {
           source: {
@@ -38,5 +24,28 @@ export class Default {
         })
       );
     };
+  }
+  /**
+   * Format the links to be used in the default handler
+   * @param baseRequestUrl - base url where the observability is served
+   * @param links - list of links to be formatted
+   * @returns
+   */
+  public static FormatLinks(baseRequestUrl: string, links: Links = {}): Links {
+    const formattedLinks: Links = {};
+    if (links) {
+      for (const [contextKey, firstLevel] of Object.entries(links)) {
+        if (typeof firstLevel === 'string') {
+          formattedLinks[contextKey] = `${baseRequestUrl}${firstLevel}`;
+        } else {
+          const formattedContextLinks: { [link: string]: string } = {};
+          for (const [innerContextKey, secondLevel] of Object.entries(firstLevel)) {
+            formattedContextLinks[innerContextKey] = `${baseRequestUrl}${secondLevel}`;
+          }
+          formattedLinks[contextKey] = formattedContextLinks;
+        }
+      }
+    }
+    return formattedLinks;
   }
 }

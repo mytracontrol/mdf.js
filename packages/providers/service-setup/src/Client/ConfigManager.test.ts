@@ -11,17 +11,36 @@ import { ConfigManager } from './ConfigManager';
 describe('#ConfigManager', () => {
   describe('#Happy path', () => {
     it('Should read all the files, without error in the validation and as the preset1', () => {
-      const manager = new ConfigManager({
-        name: 'test',
+      const manager = new ConfigManager<{
+        feed: {
+          test: number;
+        };
+        config: {
+          test: number;
+        };
+        otherConfig: {
+          otherTest: string;
+          last?: {
+            butNotLeast?: number;
+          };
+        };
+      }>('test', {
         configFiles: ['src/Client/__mocks__/*.*'],
         presetFiles: ['src/Client/__mocks__/presets/*.*'],
         schemaFiles: ['src/Client/__mocks__/schemas/*.*'],
         schema: 'final',
         preset: 'preset1',
         envPrefix: 'MY_PREFIX_A_',
+        feed: {
+          feed: {
+            test: 1,
+          },
+        },
       });
-      expect(manager.name).toEqual('test');
       expect(manager.config).toEqual({
+        feed: {
+          test: 1,
+        },
         config: {
           test: 2,
         },
@@ -31,14 +50,6 @@ describe('#ConfigManager', () => {
       });
       expect(manager.error).toBeUndefined();
       expect(manager.isErrored).toBeFalsy();
-      expect(manager.router).toBeDefined();
-      expect(manager.links).toEqual({
-        config: {
-          config: '/config/config',
-          presets: '/config/presets',
-          readme: '/config/readme',
-        },
-      });
       expect(manager.defaultConfig).toEqual({
         config: {
           test: 0,
@@ -73,12 +84,14 @@ describe('#ConfigManager', () => {
           },
         },
       });
+      expect(manager.preset).toEqual('preset1');
+      expect(manager.schema).toEqual('final');
       expect(process.env['MY_CRAZY_STUFF']).toEqual('2');
       expect(process.env['MY_PREFIX_A_OTHER_CONFIG__OTHER_TEST']).toBeUndefined();
+      expect(manager.get('otherConfig.last.butNotLeast')).toBeUndefined();
     }, 1000);
     it('Should read all the files, without error in the validation and as the default config', () => {
-      const manager = new ConfigManager({
-        name: 'test',
+      const manager = new ConfigManager('test', {
         configFiles: ['src/Client/__mocks__/*.*'],
         presetFiles: ['src/Client/__mocks__/presets/*.*'],
         schemaFiles: ['src/Client/__mocks__/schemas/*.*'],
@@ -129,8 +142,7 @@ describe('#ConfigManager', () => {
       expect(process.env['MY_PREFIX_A_OTHER_CONFIG__OTHER_TEST']).toEqual('3');
     }, 1000);
     it('Should read all the files, with error (due to preset is not present) and return default config due to preset not exits', () => {
-      const manager = new ConfigManager({
-        name: 'test',
+      const manager = new ConfigManager('test', {
         configFiles: ['src/Client/__mocks__/*.*'],
         presetFiles: ['src/Client/__mocks__/presets/*.*'],
         schemaFiles: ['src/Client/__mocks__/schemas/*.*'],
@@ -184,8 +196,7 @@ describe('#ConfigManager', () => {
       expect(process.env['MY_PREFIX_A_OTHER_CONFIG__OTHER_TEST']).toEqual('3');
     }, 1000);
     it('Should read all the files, with error in the validation and return default config', () => {
-      const manager = new ConfigManager({
-        name: 'test',
+      const manager = new ConfigManager('test', {
         configFiles: ['src/Client/__mocks__/*.*'],
         presetFiles: ['src/Client/__mocks__/presets/*.*'],
         schemaFiles: ['src/Client/__mocks__/badSchemas/*.schema.*'],
@@ -237,8 +248,7 @@ describe('#ConfigManager', () => {
       expect(process.env['MY_PREFIX_A_OTHER_CONFIG__OTHER_TEST']).toEqual('3');
     }, 1000);
     it('Should read all the files, without error in the config selection and return default config', () => {
-      const manager = new ConfigManager({
-        name: 'test',
+      const manager = new ConfigManager('test', {
         configFiles: ['src/Client/__mocks__/*.*'],
         presetFiles: ['src/Client/__mocks__/presets/*.*'],
         preset: 'preset',
@@ -289,8 +299,7 @@ describe('#ConfigManager', () => {
     }, 1000);
     it('Should read all the files, without error in the validation and as the preset1 modified by environment values as a single string', () => {
       process.env['CONFIG_TEST_CONFIG__TEST'] = '4';
-      const manager = new ConfigManager({
-        name: 'test',
+      const manager = new ConfigManager('test', {
         configFiles: ['src/Client/__mocks__/*.*'],
         presetFiles: ['src/Client/__mocks__/presets/*.*'],
         schemaFiles: ['src/Client/__mocks__/schemas/*.*'],
@@ -345,8 +354,7 @@ describe('#ConfigManager', () => {
     it('Should read all the files, without error in the validation and as the preset1 modified by environment values as an array of strings', () => {
       process.env['A_CONFIG__TEST'] = '4';
       process.env['B_OTHER_CONFIG__OTHER_TEST'] = 'b';
-      const manager = new ConfigManager({
-        name: 'test',
+      const manager = new ConfigManager('test', {
         configFiles: ['src/Client/__mocks__/*.*'],
         presetFiles: ['src/Client/__mocks__/presets/*.*'],
         schemaFiles: ['src/Client/__mocks__/schemas/*.*'],
@@ -401,8 +409,7 @@ describe('#ConfigManager', () => {
     it('Should read all the files, without error in the validation and as the preset1 modified by environment values as an object of strings', () => {
       process.env['MY_A_TEST'] = '4';
       process.env['MY_B_OTHER_TEST'] = 'b';
-      const manager = new ConfigManager({
-        name: 'test',
+      const manager = new ConfigManager('test', {
         configFiles: ['src/Client/__mocks__/*.*'],
         presetFiles: ['src/Client/__mocks__/presets/*.*'],
         schemaFiles: ['src/Client/__mocks__/schemas/*.*'],
@@ -458,8 +465,7 @@ describe('#ConfigManager', () => {
   });
   describe('#Sad path', () => {
     it('Should start with errors if its not possible to parse a config file', () => {
-      const manager = new ConfigManager({
-        name: 'test',
+      const manager = new ConfigManager('test', {
         configFiles: ['src/Client/__mocks__/wrong/*.config.*'],
         presetFiles: ['src/Client/__mocks__/presets/*.*'],
         schemaFiles: ['src/Client/__mocks__/schemas/*.*'],
@@ -486,8 +492,7 @@ describe('#ConfigManager', () => {
       );
     }, 1000);
     it('Should start with errors if its not possible to process a schema', () => {
-      const manager = new ConfigManager({
-        name: 'test',
+      const manager = new ConfigManager('test', {
         configFiles: ['src/Client/__mocks__/*.*'],
         presetFiles: ['src/Client/__mocks__/presets/*.*'],
         schemaFiles: ['src/Client/__mocks__/wrong/*.schema.*'],
@@ -507,8 +512,7 @@ describe('#ConfigManager', () => {
       expect(trace[2]).toEqual('caused by Error: $schema must be a string');
     }, 1000);
     it('Should start with errors if its not possible to parse a preset config file', () => {
-      const manager = new ConfigManager({
-        name: 'test',
+      const manager = new ConfigManager('test', {
         configFiles: ['src/Client/__mocks__/*.*'],
         presetFiles: ['src/Client/__mocks__/wrong/*.preset.*.*'],
         schemaFiles: ['src/Client/__mocks__/schemas/*.*'],
@@ -532,8 +536,7 @@ describe('#ConfigManager', () => {
       jest.spyOn(fs, 'readFileSync').mockImplementation(() => {
         throw new Error('Error reading file');
       });
-      const manager = new ConfigManager({
-        name: 'test',
+      const manager = new ConfigManager('test', {
         configFiles: ['src/Client/__mocks__/*.*'],
         presetFiles: ['src/Client/__mocks__/presets/*.*'],
         schemaFiles: ['src/Client/__mocks__/schemas/*.*'],
@@ -554,10 +557,6 @@ describe('#ConfigManager', () => {
         'CrashError: Preset preset1 not found',
         'CrashError: Configuration validation failed: final is not registered in the collection.',
         'caused by ValidationError: final is not registered in the collection.',
-        'CrashError: Error loading package info: Error reading file',
-        'caused by Error: Error reading file',
-        'CrashError: Error loading README info: Error reading file',
-        'caused by Error: Error reading file',
       ]);
     }, 1000);
   });

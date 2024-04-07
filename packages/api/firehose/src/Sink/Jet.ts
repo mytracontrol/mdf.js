@@ -5,27 +5,22 @@
  * or at https://opensource.org/licenses/MIT.
  */
 
-import { Jobs } from '@mdf.js/core';
 import { Crash } from '@mdf.js/crash';
-import { Plugs, SinkOptions } from '../types';
+import { OpenJobHandler, Plugs, SinkOptions } from '../types';
 import { Base } from './core';
 
-export class Jet<
-  Type extends string = string,
-  Data = any,
-  CustomHeaders extends Record<string, any> = Record<string, any>,
-> extends Base<Plugs.Sink.Jet<Type, Data, CustomHeaders>, Type, Data, CustomHeaders> {
+export class Jet extends Base<Plugs.Sink.Jet> {
   /**
    * Create a new Jet instance
    * @param plug - Jet sink plug
    * @param options - sink options
    */
-  constructor(plug: Plugs.Sink.Jet<Type, Data, CustomHeaders>, options?: SinkOptions) {
+  constructor(plug: Plugs.Sink.Jet, options?: SinkOptions) {
     super(plug, options);
   }
   /** Perform the publication of the information on the sink destination */
   override _write(
-    data: Jobs.JobHandler<Type, Data, CustomHeaders>,
+    data: OpenJobHandler,
     encoding: string,
     callback: (error?: Crash | Error) => void
   ): void {
@@ -39,7 +34,10 @@ export class Jet<
   }
   /** Perform the publication of the information on the sink destination */
   override _writev?(
-    data: { chunk: Jobs.JobHandler<Type, Data, CustomHeaders>; encoding: BufferEncoding }[],
+    data: {
+      chunk: OpenJobHandler;
+      encoding: BufferEncoding;
+    }[],
     callback: (error?: Crash | Error) => void
   ): void {
     // Stryker disable next-line all

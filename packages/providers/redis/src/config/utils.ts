@@ -10,8 +10,7 @@ import { ReplyError } from 'redis-errors';
 /** Base name for the Redis provider */
 export const CONFIG_PROVIDER_BASE_NAME = 'redis';
 /** Artifact identifier for the configuration provider */
-export const CONFIG_ARTIFACT_ID =
-  process.env['CONFIG_ARTIFACT_ID'] || `mdf-${CONFIG_PROVIDER_BASE_NAME}`;
+export const CONFIG_ARTIFACT_ID = `mdf-${CONFIG_PROVIDER_BASE_NAME}`;
 /** Default Logger for the configuration provider */
 export const logger = new DebugLogger(`mdf:${CONFIG_PROVIDER_BASE_NAME}:config`);
 

@@ -5,13 +5,16 @@
  * or at https://opensource.org/licenses/MIT.
  */
 
+import { AnyHeaders } from './Headers.i';
 import { JobObject } from './JobObject.i';
+import { AnyOptions } from './Options.i';
 
 /** Base class for strategies */
 export interface Strategy<
   Type extends string = string,
   Data = any,
-  CustomHeaders extends Record<string, any> = Record<string, any>,
+  CustomHeaders extends Record<string, any> = AnyHeaders,
+  CustomOptions extends Record<string, any> = AnyOptions,
 > {
   /** Strategy name */
   readonly name: string;
@@ -19,5 +22,7 @@ export interface Strategy<
    * Perform the filter of the data based in concrete criteria
    * @param process - Data processing task object
    */
-  do: (process: JobObject<Type, Data, CustomHeaders>) => JobObject<Type, Data, CustomHeaders>;
+  do: (
+    process: JobObject<Type, Data, CustomHeaders, CustomOptions>
+  ) => JobObject<Type, Data, CustomHeaders, CustomOptions>;
 }

@@ -27,7 +27,6 @@
   - [**Installation**](#installation)
   - [**Information**](#information)
   - [**Use**](#use)
-  - [**Environment variables**](#environment-variables)
   - [**License**](#license)
 
 ## **Introduction**
@@ -68,7 +67,6 @@ Checks included in the provider:
 
 ## **Environment variables**
 
-- **CONFIG\_ARTIFACT\_ID** (default: `` `mdf-elastic` ``): Artifact identifier for the configuration provider
 - **CONFIG\_ELASTIC\_NODE** (default: `undefined`): Node to connect to. If CONFIG\_ELASTIC\_NODES is set, this is ignored.
 - **CONFIG\_ELASTIC\_NODES** (default: `['http://localhost:9200']`): List of nodes to connect to. If this is set, CONFIG\_ELASTIC\_NODE is ignored.
 - **CONFIG\_ELASTIC\_MAX\_RETRIES** (default: `5`): Maximum number of retries before failing the request.

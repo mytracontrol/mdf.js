@@ -5,30 +5,30 @@
  * or at https://opensource.org/licenses/MIT.
  */
 
-import { CONFIG_ARTIFACT_ID } from '../../Common';
 import { Config } from '../types';
+import { CONFIG_ARTIFACT_ID } from './utils';
 
 // *************************************************************************************************
 // #region Default values
-const AMQP_USER_NAME = 'mdf-amqp';
-const AMQP_HOST = '127.0.0.1';
-const AMQP_PORT = 5672;
-const AMQP_TRANSPORT = 'tcp';
-const AMQP_CONTAINER_ID = `${CONFIG_ARTIFACT_ID}`;
-const AMQP_RECONNECT = 5000;
-const AMQP_INITIAL_RECONNECT_DELAY = 30000;
-const AMQP_MAX_RECONNECT_DELAY = 10000;
-const AMQP_NON_FATAL_ERRORS = ['amqp:connection:forced'];
+const DEFAULT_CONFIG_AMQP_USER_NAME = 'mdf-amqp';
+const DEFAULT_CONFIG_AMQP_HOST = '127.0.0.1';
+const DEFAULT_CONFIG_AMQP_PORT = 5672;
+const DEFAULT_CONFIG_AMQP_TRANSPORT = 'tcp';
+const DEFAULT_CONFIG_AMQP_CONTAINER_ID = `${CONFIG_ARTIFACT_ID}`;
+const DEFAULT_CONFIG_AMQP_RECONNECT = 5000;
+const DEFAULT_CONFIG_AMQP_INITIAL_RECONNECT_DELAY = 30000;
+const DEFAULT_CONFIG_AMQP_MAX_RECONNECT_DELAY = 10000;
+const DEFAULT_CONFIG_AMQP_NON_FATAL_ERRORS = ['amqp:connection:forced'];
 
 export const defaultConfig: Config = {
-  username: AMQP_USER_NAME,
-  host: AMQP_HOST,
-  port: AMQP_PORT,
-  transport: AMQP_TRANSPORT,
-  container_id: AMQP_CONTAINER_ID,
-  reconnect: AMQP_RECONNECT,
-  initial_reconnect_delay: AMQP_INITIAL_RECONNECT_DELAY,
-  max_reconnect_delay: AMQP_MAX_RECONNECT_DELAY,
-  non_fatal_errors: AMQP_NON_FATAL_ERRORS,
+  username: DEFAULT_CONFIG_AMQP_USER_NAME,
+  host: DEFAULT_CONFIG_AMQP_HOST,
+  port: DEFAULT_CONFIG_AMQP_PORT,
+  transport: DEFAULT_CONFIG_AMQP_TRANSPORT,
+  container_id: DEFAULT_CONFIG_AMQP_CONTAINER_ID,
+  reconnect: DEFAULT_CONFIG_AMQP_RECONNECT,
+  initial_reconnect_delay: DEFAULT_CONFIG_AMQP_INITIAL_RECONNECT_DELAY,
+  max_reconnect_delay: DEFAULT_CONFIG_AMQP_MAX_RECONNECT_DELAY,
+  non_fatal_errors: DEFAULT_CONFIG_AMQP_NON_FATAL_ERRORS,
 };
 // #endregion

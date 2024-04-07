@@ -5,18 +5,14 @@
  * or at https://opensource.org/licenses/MIT.
  */
 
-import { Jobs } from '@mdf.js/core';
 import { LoggerInstance } from '@mdf.js/logger';
 import { TransformOptions } from 'stream';
+import { OpenStrategy } from './OpenJobs.t';
 
-export interface EngineOptions<
-  Type extends string = string,
-  Data = any,
-  CustomHeaders extends Record<string, any> = Record<string, any>,
-> {
+export interface EngineOptions {
   /** Strategies to be applied over the jobs */
   strategies?: {
-    [type: string]: Jobs.Strategy<Type, Data, CustomHeaders>[];
+    [type: string]: OpenStrategy[];
   };
   /** Transform streams options */
   transformOptions?: TransformOptions;

@@ -8,7 +8,6 @@
 import Joi from 'joi';
 
 export const schema = Joi.object({
-  name: Joi.string().required(),
   presetFiles: Joi.array().items(Joi.string()),
   preset: Joi.string(),
   schemaFiles: Joi.array().items(Joi.string()),

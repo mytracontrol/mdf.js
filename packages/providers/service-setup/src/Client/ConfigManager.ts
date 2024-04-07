@@ -5,94 +5,66 @@
  * or at https://opensource.org/licenses/MIT.
  */
 
-import { Layer } from '@mdf.js/core';
-import { Crash, Links, Multi } from '@mdf.js/crash';
+import { Crash, Multi } from '@mdf.js/crash';
 import { DoorKeeper } from '@mdf.js/doorkeeper';
-import { DebugLogger } from '@mdf.js/logger';
+import { DebugLogger, LoggerInstance, SetContext } from '@mdf.js/logger';
 import { formatEnv } from '@mdf.js/utils';
 import ENV from 'dotenv';
-import escalade from 'escalade/sync';
-import EventEmitter from 'events';
-import express from 'express';
 import fs from 'fs';
 import { sync } from 'glob';
-import { cloneDeep, merge } from 'lodash';
-import markdown from 'markdown-it';
-import normalize, { Input, Package } from 'normalize-package-data';
+import { cloneDeep, get, merge } from 'lodash';
 import path from 'path';
 import TOML from 'toml';
 import { v4 } from 'uuid';
 import YAML from 'yaml';
-import { Router } from './Router';
-import { ServiceSetupOptions } from './types';
+import { ConfigManagerOptions } from './types';
 
 type FileEntry = [string, string];
 
 /** Class responsible of file management, both configuration file as validator files  */
-export class ConfigManager<Config extends Record<string, any> = Record<string, any>>
-  extends EventEmitter
-  implements Layer.Service.Observable
-{
+export class ConfigManager<SystemConfig extends Record<string, any> = Record<string, any>> {
   /** Unique identifier */
   private readonly uuid: string = v4();
   /** Logger instance for deep debugging tasks */
-  private readonly logger = new DebugLogger(`mdf:config-manager`);
+  private readonly logger: LoggerInstance;
   /** Configuration checker based on DoorKeeper */
   private readonly checker?;
   /** Presets configuration map */
-  public readonly presets: Record<string, Partial<Config>> = {};
+  public readonly presets: Record<string, Partial<SystemConfig>> = {};
   /** Default configuration */
-  public readonly defaultConfig: Partial<Config> = {};
+  public readonly defaultConfig: Partial<SystemConfig> = {};
   /** Environment configuration */
-  public readonly envConfig: Partial<Config> = {};
+  public readonly envConfig: Partial<SystemConfig> = {};
+  /** Final configuration without environment variables */
+  public readonly nonDisclosureConfig: Partial<SystemConfig>;
   /** Final configuration */
-  public readonly config: Config;
-  /** Package version info */
-  public readonly package?: Package;
-  /** Readme file content */
-  public readonly readme?: string;
-  /** Config router */
-  private readonly _router: Router;
+  public readonly config: SystemConfig;
   /** Validation error, if exist */
   private _error?: Multi;
   /**
    * Creates a new instance of the file manager
+   * @param name - Service name
    * @param options - Service setup options
    */
-  constructor(private readonly options: ServiceSetupOptions) {
-    super();
+  constructor(
+    private readonly name: string,
+    private readonly options: ConfigManagerOptions<SystemConfig>,
+    logger?: LoggerInstance
+  ) {
+    this.logger = SetContext(
+      logger || new DebugLogger(`mdf:firehose:${this.name}`),
+      this.name,
+      this.uuid
+    );
     this.checker = options.checker ?? this.loadSchemas(options.schemaFiles);
     this.presets = this.loadPresets(options.presetFiles);
     this.defaultConfig = this.loadDefaultConfigFiles(options.configFiles);
     this.envConfig = this.loadConfigEnv(options.envPrefix);
+    this.nonDisclosureConfig = cloneDeep(this.selectConfig());
     this.config = this.validate(
-      merge(cloneDeep(this.selectConfig()), this.envConfig),
+      merge(this.nonDisclosureConfig, this.envConfig, this.options.feed),
       options.schema
     );
-    this.package = this.loadPackageInfo();
-    this.readme = this.loadReadme();
-    if (this.isErrored && this.listenerCount('error') > 0) {
-      this.emit('error', this.error);
-    }
-    this._router = new Router(this);
-  }
-  /** Service name */
-  public get name(): string {
-    return this.options.name;
-  }
-  /** Return an Express router with access to config information */
-  public get router(): express.Router {
-    return this._router.router;
-  }
-  /** Return links offered by this service */
-  public get links(): Links {
-    return {
-      config: {
-        config: '/config/config',
-        presets: '/config/presets',
-        readme: '/config/readme',
-      },
-    };
   }
   /** Flag to indicate that the final configuration has some errors */
   public get isErrored(): boolean {
@@ -101,6 +73,32 @@ export class ConfigManager<Config extends Record<string, any> = Record<string, a
   /** Validation error, if exist */
   public get error(): Multi | undefined {
     return this._error;
+  }
+  /** Return the preset used to create the final configuration */
+  public get preset(): string | undefined {
+    return this.options.preset;
+  }
+  /** Return the schema used to validate the final configuration */
+  public get schema(): string | undefined {
+    return this.options.schema;
+  }
+  /**
+   * Gets the value at path of object. If the resolved value is undefined, the defaultValue is
+   * returned in its place.
+   * @param path - path to the property to get
+   * @param defaultValue - default value to return if the property is not found
+   * @template T - Type of the property to return
+   */
+  get<T>(path: string | string[], defaultValue?: any): T | undefined;
+  /**
+   * Gets the value at path of object. If the resolved value is undefined, the defaultValue is
+   * returned in its place.
+   * @param key - path to the property to get
+   * @param defaultValue - default value to return if the property is not found
+   */
+  get<P extends keyof SystemConfig>(key: P, defaultValue?: any): SystemConfig[P] | undefined;
+  get<T>(path: string | string[], defaultValue?: any): T | undefined {
+    return get(this.config, path, defaultValue);
   }
   /** Add a new error to the validation error or create a new one */
   private addError(error: Crash): void {
@@ -115,7 +113,7 @@ export class ConfigManager<Config extends Record<string, any> = Record<string, a
    * Select the final configuration based on the given options
    * @returns - The final configuration
    */
-  private selectConfig(): Partial<Config> {
+  private selectConfig(): Partial<SystemConfig> {
     if (this.options.preset) {
       if (this.presets[this.options.preset]) {
         return merge(cloneDeep(this.defaultConfig), this.presets[this.options.preset]);
@@ -133,58 +131,18 @@ export class ConfigManager<Config extends Record<string, any> = Record<string, a
    * @param schema - Schema to be used to validate the configuration
    * @returns - The validated configuration
    */
-  private validate(config: Partial<Config>, schema?: string): Config {
+  private validate(config: Partial<SystemConfig>, schema?: string): SystemConfig {
     if (schema && this.checker) {
       try {
         return this.checker.attempt(schema, config, this.uuid);
       } catch (rawError) {
         const cause = Crash.from(rawError);
         this.addError(new Crash(`Configuration validation failed: ${cause.message}`, { cause }));
-        return this.defaultConfig as Config;
+        return this.defaultConfig as SystemConfig;
       }
     } else {
-      return config as Config;
+      return config as SystemConfig;
     }
-  }
-  /**
-   * Load the package.json file information
-   * @returns
-   */
-  private loadPackageInfo(): Package | undefined {
-    let packageInfo: Package | undefined;
-    try {
-      const packagePath = escalade(process.cwd(), (dir, names) => {
-        return names.includes('package.json') && 'package.json';
-      });
-      if (packagePath) {
-        packageInfo = JSON.parse(fs.readFileSync(packagePath, 'utf8'));
-        normalize(packageInfo as Input);
-      }
-    } catch (rawError) {
-      const cause = Crash.from(rawError);
-      this.addError(new Crash(`Error loading package info: ${cause.message}`, { cause }));
-    }
-    return packageInfo;
-  }
-  /**
-   * Load the readme.md file information
-   * @returns
-   */
-  private loadReadme(): string | undefined {
-    let readme: string | undefined;
-    try {
-      const markdownPath = escalade(process.cwd(), (dir, names) => {
-        return names.includes('README.md') && 'README.md';
-      });
-      if (markdownPath) {
-        const md = markdown({ html: true, linkify: true, typographer: true });
-        readme = md.render(fs.readFileSync(markdownPath, 'utf8'));
-      }
-    } catch (rawError) {
-      const cause = Crash.from(rawError);
-      this.addError(new Crash(`Error loading README info: ${cause.message}`, { cause }));
-    }
-    return readme;
   }
   /**
    * Load the configuration from the environment variables
@@ -194,7 +152,7 @@ export class ConfigManager<Config extends Record<string, any> = Record<string, a
   private loadConfigEnv(
     prefix?: string | string[] | Record<string, string>,
     source: Record<string, string | undefined> = process.env
-  ): Partial<Config> {
+  ): Partial<SystemConfig> {
     if (typeof prefix === 'string') {
       return formatEnv(prefix, {}, source);
     } else if (Array.isArray(prefix)) {
@@ -204,7 +162,7 @@ export class ConfigManager<Config extends Record<string, any> = Record<string, a
       for (const [key, value] of Object.entries(prefix)) {
         result[key] = formatEnv(value, {}, source);
       }
-      return result as Partial<Config>;
+      return result as Partial<SystemConfig>;
     } else {
       return {};
     }
@@ -214,8 +172,8 @@ export class ConfigManager<Config extends Record<string, any> = Record<string, a
    * @param patterns - List of patterns to be used to find config files
    * @returns
    */
-  private loadDefaultConfigFiles(patterns?: string[]): Partial<Config> {
-    let config: Partial<Config> = {};
+  private loadDefaultConfigFiles(patterns?: string[]): Partial<SystemConfig> {
+    let config: Partial<SystemConfig> = {};
     for (const [name, content] of this.listFiles(patterns)) {
       const partialConfig = this.parse(name, content);
       config = merge(config, partialConfig);
@@ -227,8 +185,8 @@ export class ConfigManager<Config extends Record<string, any> = Record<string, a
    * @param patterns - List of patterns to be used to find preset files
    * @returns
    */
-  private loadPresets(patterns?: string[]): Record<string, Partial<Config>> {
-    const presets: Record<string, Partial<Config>> = {};
+  private loadPresets(patterns?: string[]): Record<string, Partial<SystemConfig>> {
+    const presets: Record<string, Partial<SystemConfig>> = {};
     for (const [name, content] of this.listFiles(patterns)) {
       const presetName = path.basename(name, path.extname(name)).split('.')[0];
       const preset = this.parse(name, content);
@@ -289,7 +247,7 @@ export class ConfigManager<Config extends Record<string, any> = Record<string, a
    * @param content - Content to be parsed
    * @returns
    */
-  private parse(filePath: string, content: string): Partial<Config> | undefined {
+  private parse(filePath: string, content: string): Partial<SystemConfig> | undefined {
     const extension = path.extname(filePath);
     const filename = path.basename(filePath);
     try {
@@ -318,7 +276,7 @@ export class ConfigManager<Config extends Record<string, any> = Record<string, a
    * @param content - Content to be parsed
    * @returns
    */
-  private parseJSON(content: string): Partial<Config> | undefined {
+  private parseJSON(content: string): Partial<SystemConfig> | undefined {
     try {
       return JSON.parse(content);
     } catch (rawError) {
@@ -331,7 +289,7 @@ export class ConfigManager<Config extends Record<string, any> = Record<string, a
    * @param content - Content to be parsed
    * @returns
    */
-  private parseYAML(content: string): Partial<Config> | undefined {
+  private parseYAML(content: string): Partial<SystemConfig> | undefined {
     try {
       return YAML.parse(content);
     } catch (rawError) {
@@ -344,7 +302,7 @@ export class ConfigManager<Config extends Record<string, any> = Record<string, a
    * @param content - Content to be parsed
    * @returns
    */
-  private parseTOML(content: string): Partial<Config> | undefined {
+  private parseTOML(content: string): Partial<SystemConfig> | undefined {
     try {
       return TOML.parse(content);
     } catch (rawError) {
@@ -357,7 +315,7 @@ export class ConfigManager<Config extends Record<string, any> = Record<string, a
    * @param content - Content to be parsed
    * @returns
    */
-  private parseENV(content: string): Partial<Config> | undefined {
+  private parseENV(content: string): Partial<SystemConfig> | undefined {
     try {
       const variables = ENV.parse(content);
       let prefixes: string[];

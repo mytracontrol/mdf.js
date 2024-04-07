@@ -64,4 +64,10 @@ export class MySequencePlug extends EventEmitter implements Plugs.Source.Sequenc
   public stop(): Promise<void> {
     return Promise.resolve();
   }
+  public get status(): Health.Status {
+    return Health.STATUS.PASS;
+  }
+  public close(): Promise<void> {
+    return this.stop();
+  }
 }

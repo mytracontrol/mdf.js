@@ -92,7 +92,7 @@ export class Multi extends Base {
     return this._isMulti;
   }
   /** Causes source of error */
-  get causes(): Array<Cause> | undefined {
+  get causes(): Cause[] | undefined {
     return this._causes;
   }
   /** Return the number of causes of this error */

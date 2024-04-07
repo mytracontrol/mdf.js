@@ -5,13 +5,15 @@
  * or at https://opensource.org/licenses/MIT.
  */
 
+import { Jobs } from '@mdf.js/core';
 import { Base } from './Base.i';
 
 export interface CreditsFlow<
   Type extends string = string,
   Data = any,
-  CustomHeaders extends Record<string, any> = Record<string, any>,
-> extends Base<Type, Data, CustomHeaders> {
+  CustomHeaders extends Record<string, any> = Jobs.AnyHeaders,
+  CustomOptions extends Record<string, any> = Jobs.AnyOptions,
+> extends Base<Type, Data, CustomHeaders, CustomOptions> {
   /**
    * Add new credits to the source
    * @param credits - Credits to be added to the source

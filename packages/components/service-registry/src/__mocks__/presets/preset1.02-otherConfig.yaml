@@ -1,0 +1,4 @@
+config:
+  test: 2
+otherConfig:
+  otherTest: a

@@ -1,4 +1,4 @@
-# **@mdf.js**
+# **@mdf.js/mqtt-provider**
 
 [![Node Version](https://img.shields.io/static/v1?style=flat\&logo=node.js\&logoColor=green\&label=node\&message=%3E=20\&color=blue)](https://nodejs.org/en/)
 [![Typescript Version](https://img.shields.io/static/v1?style=flat\&logo=typescript\&label=Typescript\&message=5.4\&color=blue)](https://www.typescriptlang.org/)
@@ -12,7 +12,7 @@
   </div>
 </p>
 
-<h1 style="text-align:center;margin-bottom:0">Mytra Development Framework - @mdf.js </h1>
+<h1 style="text-align:center;margin-bottom:0">Mytra Development Framework - @mdf.js/mqtt-provider</h1>
 <h5 style="text-align:center;margin-top:0">Typescript tools for development</h5>
 
 <!-- markdownlint-enable MD033 -->
@@ -21,7 +21,7 @@
 
 ## **Table of contents**
 
-- [**@mdf.js**](#mdfjs)
+- [**@mdf.js/mqtt-provider**](#mdfjsmqtt-provider)
   - [**Table of contents**](#table-of-contents)
   - [**Introduction**](#introduction)
   - [**Installation**](#installation)
@@ -31,15 +31,42 @@
 
 ## **Introduction**
 
+MQTT provider for [@mdf.js](https://mytracontrol.github.io/mdf.js/) based on [mqtt](https://www.npmjs.com/package/mqtt).
+
 ## **Installation**
+
+Using npm:
+
+```bash
+npm install @mdf.js/mqtt-provider
+```
+
+Using yarn:
+
+```bash
+yarn add @mdf.js/mqtt-provider
+```
 
 ## **Information**
 
+Check information about **@mdf.js** providers in the documentation of the core module [**@mdf.js/core**](https://mytracontrol.github.io/mdf.js/modules/_mdf_js_core.html).
+
 ## **Use**
+
+Checks included in the provider:
+
+- **status**: Checks the ping messages from the server.
+  - **observedValue**: actual state of the consumer/producer provider instance \[`error`, `running`, `stopped`] based in the last ping event. `stopped` if the provider is stopped or has not been initialized yet, `running` if the provider is running and the last ping event was successful, `error` if the provider is running and the last ping event was not successful.
+  - **observedUnit**: `status`.
+  - **status**: `fail` if the observed value is `error`, `warn` if the observed value is `stopped`, `pass` in other case.
+- **lastError**:
+  - **observedValue**: last error message from the provider.
+  - **observedUnit**: `Last error`.
+  - **status**: `pass`.
+  - **output**: last error message from the provider.
 
 ## **Environment variables**
 
-- **CONFIG\_ARTIFACT\_ID**: Artifact identifier for the configuration provider
 - **CONFIG\_MQTT\_URL**: undefined
 - **CONFIG\_MQTT\_PROTOCOL**: undefined
 - **CONFIG\_MQTT\_USERNAME**: undefined

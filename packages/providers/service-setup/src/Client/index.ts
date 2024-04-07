@@ -5,6 +5,5 @@
  * or at https://opensource.org/licenses/MIT.
  */
 
-export type { Package } from 'normalize-package-data';
 export * from './ConfigManager';
 export * from './types';

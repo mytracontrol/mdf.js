@@ -5,6 +5,7 @@
  * or at https://opensource.org/licenses/MIT.
  */
 
+import { Health } from '@mdf.js/core';
 import EventEmitter from 'events';
 import { v4 } from 'uuid';
 import { ConsumerAdapter, ConsumerOptions, OnCommandHandler } from '../../types';
@@ -23,6 +24,7 @@ const NOOP: () => void = () => {};
 class MyAdapter extends EventEmitter implements ConsumerAdapter {
   name = 'myAdapter';
   componentId = v4();
+  status = Health.STATUS.PASS;
   checks = {};
   subscribe(handler: OnCommandHandler): Promise<void> {
     this.on('data', handler);
@@ -36,6 +38,9 @@ class MyAdapter extends EventEmitter implements ConsumerAdapter {
     return Promise.resolve();
   }
   stop(): Promise<void> {
+    return Promise.resolve();
+  }
+  close(): Promise<void> {
     return Promise.resolve();
   }
   subcomponents = [];

@@ -5,7 +5,7 @@
  * or at https://opensource.org/licenses/MIT.
  */
 
-import { Health } from '@mdf.js/core';
+import { Health, Layer } from '@mdf.js/core';
 import { Crash, Multi } from '@mdf.js/crash';
 import { RetryOptions, retryBind } from '@mdf.js/utils';
 import EventEmitter from 'events';
@@ -13,7 +13,7 @@ import { merge } from 'lodash';
 import { validate } from 'uuid';
 import { Control, ProducerAdapter } from '../../../types';
 
-export class AdapterWrapper extends EventEmitter implements Health.Component {
+export class AdapterWrapper extends EventEmitter implements Layer.App.Resource {
   /** Operation retry options */
   private readonly retryOptions: RetryOptions;
   /** Flag to indicate that an unhealthy status has been emitted recently */
@@ -70,6 +70,10 @@ export class AdapterWrapper extends EventEmitter implements Health.Component {
   public stop(): Promise<void> {
     return this.adapter.stop();
   }
+  /** Close the OpenC2 Adapter to the underlayer transport system */
+  public close(): Promise<void> {
+    return this.adapter.close();
+  }
   /**
    * Check if the adapter implements the mandatory methods
    * @throws Crash if the adapter does not implement the mandatory methods
@@ -106,7 +110,7 @@ export class AdapterWrapper extends EventEmitter implements Health.Component {
     }
   }
   /** Overall component status */
-  private get status(): Health.Status {
+  public get status(): Health.Status {
     return Health.overallStatus(this.checks);
   }
   /** Emit the status if it's different from the last emitted status */

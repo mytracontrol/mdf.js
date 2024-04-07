@@ -37,4 +37,10 @@ export class MySlowTapPlug extends EventEmitter implements Plugs.Sink.Tap {
   public stop(): Promise<void> {
     return Promise.resolve();
   }
+  public get status(): Health.Status {
+    return Health.STATUS.PASS;
+  }
+  public close(): Promise<void> {
+    return this.stop();
+  }
 }

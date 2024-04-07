@@ -5,6 +5,7 @@
  * or at https://opensource.org/licenses/MIT.
  */
 
+import { Health } from '@mdf.js/core';
 import EventEmitter from 'events';
 import { v4 } from 'uuid';
 import {
@@ -28,6 +29,7 @@ const options: GatewayOptions = {
 class MyConsumerAdapter extends EventEmitter implements ConsumerAdapter {
   name = 'myAdapter';
   componentId = v4();
+  status = Health.STATUS.PASS;
   checks = {};
   subscribe(handler: OnCommandHandler): Promise<void> {
     this.on('data', handler);
@@ -43,6 +45,9 @@ class MyConsumerAdapter extends EventEmitter implements ConsumerAdapter {
   stop(): Promise<void> {
     return Promise.resolve();
   }
+  close(): Promise<void> {
+    return Promise.resolve();
+  }
   subcomponents = [];
   publishers = [];
   subscribers = [];
@@ -51,6 +56,7 @@ class MyProducerAdapter extends EventEmitter implements ProducerAdapter {
   name = 'myAdapter';
   componentId = v4();
   checks = {};
+  status = Health.STATUS.PASS;
   publish(
     message: Control.CommandMessage
   ): Promise<Control.ResponseMessage | Control.ResponseMessage[] | void> {
@@ -60,6 +66,9 @@ class MyProducerAdapter extends EventEmitter implements ProducerAdapter {
     return Promise.resolve();
   }
   stop(): Promise<void> {
+    return Promise.resolve();
+  }
+  close(): Promise<void> {
     return Promise.resolve();
   }
   subcomponents = [];

@@ -27,7 +27,6 @@
   - [**Installation**](#installation)
   - [**Information**](#information)
   - [**Use**](#use)
-  - [**Environment variables**](#environment-variables)
   - [**License**](#license)
 
 ## **Introduction**
@@ -63,7 +62,6 @@ Checks included in the provider:
 
 ## **Environment variables**
 
-- **CONFIG\_ARTIFACT\_ID** (default: `` `mdf-http-server` ``): Artifact identifier for the configuration provider
 - **CONFIG\_SERVER\_PORT** (default: `8080`): Port for the HTTP server.
 - **CONFIG\_SERVER\_HOST** (default: `localhost`): Host for the HTTP server.
 
