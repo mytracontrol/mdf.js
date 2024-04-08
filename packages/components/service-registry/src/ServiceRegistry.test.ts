@@ -69,7 +69,7 @@ class ResourceMockWithOutMethod extends EventEmitter {
     };
   }
 }
-describe('#AppWrapper class', () => {
+describe('#ServiceRegistry class', () => {
   beforeEach(() => {
     jest.resetAllMocks();
     jest.restoreAllMocks();
@@ -288,6 +288,10 @@ describe('#AppWrapper class', () => {
       jest.spyOn(wrapper._consumer.instance, 'start').mockResolvedValue();
       //@ts-ignore - private property
       jest.spyOn(wrapper._consumer.instance, 'stop').mockResolvedValue();
+      //@ts-ignore - private property
+      jest.spyOn(wrapper._observability, 'start').mockResolvedValue();
+      //@ts-ignore - private property
+      jest.spyOn(wrapper._observability, 'stop').mockResolvedValue();
       await wrapper.start();
       await wrapper.stop();
     }, 300);
