@@ -34,14 +34,15 @@ export interface ServiceRegistryOptions<
   metadata?: Partial<Layer.App.Metadata>;
   /**
    * OpenC2 Consumer configuration options. This configuration is used to setup the OpenC2
-   * consumer, ff this configuration is not provided the consumer will not be started. The consumer
-   * is used to receive OpenC2 commands from a central controller.
+   * consumer, that is used to receive and process OpenC2 commands. The `consumer` option in the
+   * `BootstrapOptions` should be enabled to start the consumer.
    */
-  consumerOptions?: Partial<ConsumerOptions>;
+  consumerOptions?: Partial<Omit<ConsumerOptions, 'logger' | 'registry'>>;
   /**
    * Consumer adapter options: Redis or SocketIO. In order to configure the consumer instance,
-   * `consumer` and `adapter` options must be provided, in other case the consumer will not be
-   * started.
+   * `consumer` and `adapter` options must be provided, in other case the consumer will start with
+   * a Dummy adapter with no connection to any external service, so only HTTP commands over the
+   * observability endpoints will be processed.
    */
   adapterOptions?: ConsumerAdapterOptions;
   /** Observability instance options */

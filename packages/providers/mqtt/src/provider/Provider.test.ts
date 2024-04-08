@@ -7,7 +7,6 @@
 import { Layer } from '@mdf.js/core';
 import { Crash } from '@mdf.js/crash';
 import { LoggerInstance } from '@mdf.js/logger';
-import { undoMocks } from '@mdf.js/utils';
 import { Client, DoneCallback } from 'mqtt';
 import { Factory } from './Factory';
 import { Port } from './Port';
@@ -43,7 +42,6 @@ class FakeLogger {
 describe('#Port #mqtt', () => {
   describe('#Happy path', () => {
     afterEach(() => {
-      undoMocks();
       jest.clearAllMocks();
     });
     it('Should create provider using the factory instance with default configuration', () => {
@@ -240,7 +238,6 @@ describe('#Port #mqtt', () => {
   });
   describe('#Sad path', () => {
     afterEach(() => {
-      undoMocks();
       jest.clearAllMocks();
     });
     it(`Should reject the promise if an error is received when try to connect `, async () => {

@@ -6,7 +6,6 @@
  */
 import { Health, Layer } from '@mdf.js/core';
 import { overallStatus } from '@mdf.js/core/dist/Health';
-import { Logger } from '@mdf.js/logger';
 import { CommandJobHandler, Control } from '@mdf.js/openc2';
 import cluster from 'cluster';
 import EventEmitter from 'events';
@@ -170,7 +169,7 @@ describe('#AppWrapper class', () => {
     }, 2000);
     it('Should create a valid instance with default values and consumer', async () => {
       const wrapper = new ServiceRegistry(
-        {},
+        { consumer: true },
         { consumerOptions: {}, adapterOptions: { type: 'redis' } }
       );
       expect(wrapper).toBeInstanceOf(ServiceRegistry);
@@ -294,7 +293,7 @@ describe('#AppWrapper class', () => {
     }, 300);
     it('Should create a valid instance with non-default values with redis adapter', async () => {
       const wrapper = new ServiceRegistry(
-        {},
+        { consumer: true },
         {
           metadata: {
             name: 'test',
@@ -319,7 +318,6 @@ describe('#AppWrapper class', () => {
           },
           consumerOptions: {
             id: 'myConsumerId',
-            logger: new Logger('myConsumerId'),
             resolver: {
               'query:x-myNamespace:other': (): Promise<number> => Promise.resolve(3),
             },
@@ -468,7 +466,7 @@ describe('#AppWrapper class', () => {
     }, 300);
     it('Should create a valid instance with non-default values with socket-io adapter', async () => {
       const wrapper = new ServiceRegistry(
-        {},
+        { consumer: true },
         {
           metadata: {
             name: 'test',
@@ -492,7 +490,6 @@ describe('#AppWrapper class', () => {
           },
           consumerOptions: {
             id: 'myConsumerId',
-            logger: new Logger('myConsumerId'),
             actionTargetPairs: {
               query: ['x-myNamespace:other'],
             },
@@ -611,7 +608,7 @@ describe('#AppWrapper class', () => {
     }, 300);
     it('Should bootstrap and shutdown properly', async () => {
       const wrapper = new ServiceRegistry(
-        {},
+        { consumer: true },
         { consumerOptions: {}, adapterOptions: { type: 'redis' } }
       );
       const resource = new ResourceMock('oneResource');
@@ -649,7 +646,7 @@ describe('#AppWrapper class', () => {
     }, 300);
     it('Should start and stop properly', async () => {
       const wrapper = new ServiceRegistry(
-        {},
+        { consumer: true },
         { consumerOptions: {}, adapterOptions: { type: 'redis' } }
       );
       const resource = new ResourceMock('oneResource');
@@ -697,7 +694,7 @@ describe('#AppWrapper class', () => {
     it('Should execute the commands', async () => {
       const myCommandResolver = jest.fn(() => Promise.resolve(3));
       const wrapper = new ServiceRegistry(
-        {},
+        { consumer: true },
         {
           metadata: {
             name: 'test',
@@ -1122,7 +1119,7 @@ describe('#AppWrapper class', () => {
     });
     it('Should add an error in the list if the adapter is not valid', async () => {
       const wrapper = new ServiceRegistry(
-        {},
+        { consumer: true },
         {
           metadata: {
             name: 'test',
@@ -1148,7 +1145,7 @@ describe('#AppWrapper class', () => {
     it('Should throw an error if try to bootstrap and its not possible', async () => {
       try {
         const wrapper = new ServiceRegistry(
-          {},
+          { consumer: true },
           {
             metadata: {
               name: 'test',
@@ -1174,7 +1171,7 @@ describe('#AppWrapper class', () => {
     }, 300);
     it('Should throw an error in try to shutdown and its not possible', async () => {
       const wrapper = new ServiceRegistry(
-        {},
+        { consumer: true },
         {
           metadata: {
             name: 'test',
@@ -1209,7 +1206,7 @@ describe('#AppWrapper class', () => {
     }, 300);
     it('Should throw an error in try to start and its not possible', async () => {
       const wrapper = new ServiceRegistry(
-        {},
+        { consumer: true },
         {
           metadata: {
             name: 'test',
@@ -1242,7 +1239,7 @@ describe('#AppWrapper class', () => {
     }, 300);
     it('Should throw an error in try to stop and its not possible', async () => {
       const wrapper = new ServiceRegistry(
-        {},
+        { consumer: true },
         {
           metadata: {
             name: 'test',

@@ -14,7 +14,13 @@ import cluster from 'cluster';
 import express from 'express';
 import { merge } from 'lodash';
 import { ObservabilityOptions } from '../observability';
-import { BootstrapSettings, CustomSetting, ServiceRegistryOptions, ServiceSetting } from '../types';
+import {
+  BootstrapOptions,
+  CustomSetting,
+  ServiceRegistryOptions,
+  ServiceRegistrySettings,
+  ServiceSetting,
+} from '../types';
 import { Router } from './Router';
 import { SettingsManagerBase } from './SettingsManagerBase';
 import { CONFIG_SERVICE_NAME, DEFAULT_RETRY_OPTIONS } from './types';
@@ -41,19 +47,19 @@ export class SettingsManagerAccessors<
   /**
    * Constructs a SettingsManager instance, initializing configuration providers and loading
    * `package.json` and README information.
-   * @param bootstrapSettings - Bootstrap settings, define how the Custom and the Service Registry
+   * @param bootstrapOptions - Bootstrap settings, define how the Custom and the Service Registry
    * settings should be loaded.
-   * @param serviceRegistrySettings - Service Registry settings, used as a base for the Service
+   * @param serviceRegistryOptions - Service Registry settings, used as a base for the Service
    * Registry configuration manager.
    * @param customSettings - Custom settings provided by the user, used as a base for the Custom
    * configuration manager.
    */
   constructor(
-    bootstrapSettings?: BootstrapSettings,
-    serviceRegistrySettings?: ServiceRegistryOptions<CustomSettings>,
+    bootstrapOptions?: BootstrapOptions,
+    serviceRegistryOptions?: ServiceRegistryOptions<CustomSettings>,
     customSettings?: Partial<CustomSettings>
   ) {
-    super(bootstrapSettings, serviceRegistrySettings, customSettings);
+    super(bootstrapOptions, serviceRegistryOptions, customSettings);
     this._router = new Router(this);
   }
   /** @returns Service name */
@@ -132,7 +138,7 @@ export class SettingsManagerAccessors<
     return this.serviceRegistrySettingsProvider.client;
   }
   /** @returns Service Register settings */
-  public get serviceRegistrySettings(): ServiceRegistryOptions<CustomSettings> {
+  public get serviceRegistrySettings(): ServiceRegistrySettings<CustomSettings> {
     return this.serviceRegistrySettingsProvider.client.config;
   }
   /** @returns Custom Configuration Manager */

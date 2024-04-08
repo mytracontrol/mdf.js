@@ -15,6 +15,7 @@ import {
   Factory,
   ResolverMap,
 } from '@mdf.js/openc2';
+import cluster from 'cluster';
 import { MergeWithCustomizer, cloneDeep, merge, mergeWith } from 'lodash';
 import { EventEmitter } from 'stream';
 import { ConsumerAdapterOptions, ServiceRegistryOptions } from '../types';
@@ -61,26 +62,46 @@ export class ControlManager extends EventEmitter {
     private readonly defaultResolver?: ResolverMap
   ) {
     super();
+    if (cluster.isWorker) {
+      // Stryker disable next-line all
+      this.logger.debug(`The OpenC2 Consumer can not be instantiated in a worker process`);
+      return;
+    }
+    this.instance = this.initializeOpenC2Consumer();
+    if (this.instance) {
+      this.wrapConsumerEvents(this.instance);
+    }
+  }
+  /**
+   * Instantiates the OpenC2 Consumer instance based on the service registry settings.
+   * @returns OpenC2 Consumer instance, if it was successfully instantiated.
+   */
+  private initializeOpenC2Consumer(): Consumer | undefined {
     const _consumerOptions = this.getConsumerOptions(
       this.serviceRegistrySettings,
       this.defaultResolver
     );
     const _adapterOptions = this.getAdapterOptions(this.serviceRegistrySettings.adapterOptions);
-    if (_consumerOptions && _adapterOptions) {
-      if (_adapterOptions.type === 'socketIO') {
+    if (_consumerOptions) {
+      if (_adapterOptions && _adapterOptions.type === 'socketIO') {
         // Stryker disable next-line all
         this.logger.info(
           `A OpenC2 Consumer [${_consumerOptions.id}] based on SocketIO is going to be instantiated.`
         );
-        this.instance = Factory.Consumer.SocketIO(_consumerOptions, _adapterOptions.config);
-      } else {
+        return Factory.Consumer.SocketIO(_consumerOptions, _adapterOptions.config);
+      } else if (_adapterOptions && _adapterOptions.type === 'redis') {
         // Stryker disable next-line all
         this.logger.info(
           `A OpenC2 Consumer [${_consumerOptions.id}] based on Redis is going to be instantiated.`
         );
-        this.instance = Factory.Consumer.Redis(_consumerOptions, _adapterOptions.config);
+        return Factory.Consumer.Redis(_consumerOptions, _adapterOptions.config);
+      } else {
+        // Stryker disable next-line all
+        this.logger.warn(
+          `The OpenC2 Consumer will be instantiated with a dummy adapter, no adapter options were provided.`
+        );
+        return Factory.Consumer.Dummy(_consumerOptions);
       }
-      this.wrapConsumerEvents(this.instance);
     } else if (this._error) {
       // Stryker disable next-line all
       this.logger.warn(
@@ -88,8 +109,9 @@ export class ControlManager extends EventEmitter {
       );
     } else {
       // Stryker disable next-line all
-      this.logger.debug(`The OpenC2 Consumer was not instantiated`);
+      this.logger.debug(`A OpenC2 Consumer was not instantiated`);
     }
+    return undefined;
   }
   /**
    * Returns the validation error, if exist.
@@ -106,10 +128,8 @@ export class ControlManager extends EventEmitter {
   private getAdapterOptions(options?: ConsumerAdapterOptions): ConsumerAdapterOptions | undefined {
     let _options: ConsumerAdapterOptions | undefined;
     if (!options) {
-      this.addError(
-        new Crash(
-          `No consumer adapter options were provided in the service registry settings, costumer will not be instantiated.`
-        )
+      this.logger.warn(
+        `No consumer adapter options were provided, a dummy adapter will be created`
       );
     } else if (options.type !== 'redis' && options.type !== 'socketIO') {
       this.addError(new Crash(`Unknown consumer adapter type, costumer will not be instantiated.`));
@@ -132,7 +152,7 @@ export class ControlManager extends EventEmitter {
     const _id = options.consumerOptions?.id || options.metadata?.name;
     const _resolver = merge(defaultResolver, options.consumerOptions?.resolver);
     const _actionTargetPairs = this.getActionTargetPairs(options);
-    const _logger = options.consumerOptions?.logger ?? this.logger;
+    const _logger = this.logger;
     if (!_id) {
       this.addError(
         new Crash(

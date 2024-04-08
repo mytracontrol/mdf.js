@@ -7,19 +7,19 @@
 
 import { Health, Layer } from '@mdf.js/core';
 import { Crash } from '@mdf.js/crash';
-import { ErrorRecord } from '@mdf.js/error-registry';
 import { Logger, LoggerInstance, SetContext } from '@mdf.js/logger';
 import { CommandJobHandler, ResolverMap } from '@mdf.js/openc2';
 import { RetryOptions, deCycle, retryBind } from '@mdf.js/utils';
 import EventEmitter from 'events';
-import { ControlManager } from './control/ControlManager';
-import { Metrics, Observability } from './observability';
+import { ControlManager } from './control';
+import { ErrorRecord, Metrics, Observability } from './observability';
 import { SettingsManager } from './settings';
 import {
-  BootstrapSettings,
+  BootstrapOptions,
   CustomSetting,
   SHUTDOWN_DELAY,
   ServiceRegistryOptions,
+  ServiceRegistrySettings,
   ServiceSetting,
 } from './types';
 
@@ -86,22 +86,22 @@ export class ServiceRegistry<
   private readonly _logger: LoggerInstance;
   /**
    * Create a new instance of the Service Registry
-   * @param bootstrapSettings - Bootstrap settings, define how the Custom and the Service Registry
+   * @param bootstrapOptions - Bootstrap settings, define how the Custom and the Service Registry
    * settings should be loaded.
-   * @param serviceRegistrySettings - Service Registry settings, used as a base for the Service
+   * @param serviceRegistryOptions - Service Registry settings, used as a base for the Service
    * Registry configuration manager.
    * @param customSettings - Custom settings provided by the user, used as a base for the Custom
    * configuration manager.
    */
   constructor(
-    bootstrapSettings?: BootstrapSettings,
-    serviceRegistrySettings?: ServiceRegistryOptions<CustomSettings>,
+    bootstrapOptions?: BootstrapOptions,
+    serviceRegistryOptions?: ServiceRegistryOptions<CustomSettings>,
     customSettings?: Partial<CustomSettings>
   ) {
     super();
     this._settingsManager = new SettingsManager(
-      bootstrapSettings,
-      serviceRegistrySettings,
+      bootstrapOptions,
+      serviceRegistryOptions,
       customSettings
     );
     this._logger = SetContext(
@@ -119,7 +119,7 @@ export class ServiceRegistry<
       this.resolverMap
     );
     this._observability.attach(this._settingsManager);
-    if (this._consumer.instance) {
+    if (this._consumer.instance && !this._consumer.error && bootstrapOptions?.consumer) {
       this._consumer.on('command', this.onCommandEvent.bind(this));
       this._observability.attach(this._consumer.instance);
     } else if (this._consumer.error) {
@@ -282,19 +282,6 @@ export class ServiceRegistry<
       ...this._settingsManager.retryOptions,
     };
   }
-  /**
-   * Register a resource within the service observability
-   * @param resource - The resource or resources to be register
-   */
-  public register(resource: Layer.Observable | Layer.Observable[]): void {
-    const resources = Array.isArray(resource) ? resource : [resource];
-    for (const entry of resources) {
-      this._resources.push(entry);
-      // Stryker disable next-line all
-      this._logger.debug(`Registering resource: ${entry.name}`);
-      this._observability.attach(entry);
-    }
-  }
   /** @returns Service Register health information */
   public get errors(): ErrorRecord[] {
     return this._observability.errors;
@@ -308,7 +295,7 @@ export class ServiceRegistry<
     return this._observability.status;
   }
   /** @returns Service Register settings */
-  public get serviceRegistrySettings(): ServiceRegistryOptions<CustomSettings> {
+  public get serviceRegistrySettings(): ServiceRegistrySettings<CustomSettings> {
     return this._settingsManager.serviceRegistrySettings;
   }
   /** @returns Custom settings */
@@ -320,13 +307,26 @@ export class ServiceRegistry<
     return this._settingsManager.settings;
   }
   /**
+   * Register a resource within the service observability
+   * @param resource - The resource or resources to be register
+   */
+  public register(resource: Layer.Observable | Layer.Observable[]): void {
+    const resources = Array.isArray(resource) ? resource : [resource];
+    for (const entry of resources) {
+      this._resources.push(entry);
+      // Stryker disable next-line all
+      this._logger.debug(`Registering resource: ${entry.name}`);
+      this._observability.attach(entry);
+    }
+  }
+  /**
    * Gets the value at path of object. If the resolved value is undefined, the defaultValue is
    * returned in its place.
    * @param path - path to the property to get
    * @param defaultValue - default value to return if the property is not found
    * @template T - Type of the property to return
    */
-  public get<T>(path: string | string[], defaultValue?: CustomSetting): T | undefined;
+  public get<T>(path: string | string[], defaultValue?: T): T | undefined;
   /**
    * Gets the value at path of object. If the resolved value is undefined, the defaultValue is
    * returned in its place.
@@ -335,7 +335,7 @@ export class ServiceRegistry<
    */
   public get<P extends keyof CustomSettings>(
     key: P,
-    defaultValue?: CustomSetting
+    defaultValue?: CustomSettings[P]
   ): CustomSettings[P] | undefined;
   public get<T>(path: string | string[], defaultValue?: CustomSetting): T | undefined {
     return this._settingsManager.customRegisterConfigManager.get(path, defaultValue);

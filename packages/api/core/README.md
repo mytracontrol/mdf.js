@@ -12,8 +12,8 @@
   </div>
 </p>
 
-<h1 style="text-align:center;margin-bottom:0">@mdf.js/core</h1>
-<h5 style="text-align:center;margin-top:0">Resources management instrumentation API for observability in @mdf.js</h5>
+<h1 style="text-align:center;margin-bottom:0">Mytra Development Framework - @mdf.js/core</h1>
+<h5 style="text-align:center;margin-top:0">Core module with shared components for resource management and instrumentation API</h5>
 
 <!-- markdownlint-enable MD033 -->
 
@@ -175,7 +175,7 @@ The `App` interface is a set of types and interfaces that standardize the way in
 
   - Its own REST API endpoints, using an express router, to expose details about service.
   - A links property to define the endpoints that the service expose.
-  - A metrics property to expose the metrics registry where the service will register its own metrics.
+  - A metrics property to expose the metrics registry where the service will register its own metrics. This registry should be a [prom-client](https://www.npmjs.com/package/prom-client) registry.
 
   ```typescript
   /** Service */
@@ -194,7 +194,7 @@ The `App` interface is a set of types and interfaces that standardize the way in
   - **Properties**:
     - `router`: an express router that will be used to expose the service endpoints.
     - `links`: an object containing link relations and URIs \[RFC3986] for external links that may contain more information about the health of the endpoint. This includes potentially a “self” link, which may be used by clients to check health via HTTP response code.
-    - `metrics`: a metrics registry that will be used to register the service metrics.
+    - `metrics`: a metrics registry that will be used to register the service metrics. This registry should be a [prom-client](https://www.npmjs.com/package/prom-client) registry.
 
 ## ***`Layer.Provider`* API**
 

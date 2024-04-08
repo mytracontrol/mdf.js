@@ -8,6 +8,19 @@
 import { Jobs } from '@mdf.js/core';
 import { Control } from '.';
 
-export type CommandJobRequest = Jobs.JobRequest<'command', Control.CommandMessage>;
-export type CommandJobHandler = Jobs.JobHandler<'command', Control.CommandMessage>;
+export interface CommandJobHeader {
+  /** Delay allowed from command message */
+  duration: number;
+}
+
+export type CommandJobRequest = Jobs.JobRequest<
+  'command',
+  Control.CommandMessage,
+  CommandJobHeader
+>;
+export type CommandJobHandler = Jobs.JobHandler<
+  'command',
+  Control.CommandMessage,
+  CommandJobHeader
+>;
 export type CommandJobDone = Jobs.Result<'command'> & { command: Control.CommandMessage };

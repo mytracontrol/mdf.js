@@ -31,7 +31,7 @@ describe('#Factories', () => {
         'OpenC2 Consumer can not be instantiated in a worker process'
       );
       undoMocks();
-    });
+    }, 300);
     it('Should create a valid instance of socket.io based consumer', () => {
       const registry = new Registry('myId');
       const simple = ConsumerFactory.SocketIO({ id: 'myId', actionTargetPairs: {} });
@@ -50,7 +50,7 @@ describe('#Factories', () => {
         'OpenC2 Consumer can not be instantiated in a worker process'
       );
       undoMocks();
-    });
+    }, 300);
     it('Should create a valid instance of redis based producer', () => {
       const registry = new Registry('myId');
       const simple = ProducerFactory.Redis({ id: 'myId' });
@@ -68,7 +68,7 @@ describe('#Factories', () => {
         'OpenC2 Producer can not be instantiated in a worker process'
       );
       undoMocks();
-    });
+    }, 300);
     it('Should create a valid instance of socket.io based consumer', () => {
       const registry = new Registry('myId');
       const simple = ProducerFactory.SocketIO({ id: 'myId' });
@@ -86,7 +86,7 @@ describe('#Factories', () => {
         'OpenC2 Producer can not be instantiated in a worker process'
       );
       undoMocks();
-    });
+    }, 300);
     it('Should create a valid instance of redis to socket.io based gateway', () => {
       const registry = new Registry('myId');
       const simple = GatewayFactory.RedisToWebSocketIO({ id: 'myId', actionTargetPairs: {} });
@@ -105,7 +105,7 @@ describe('#Factories', () => {
         GatewayFactory.RedisToWebSocketIO({ id: 'myId', actionTargetPairs: {} })
       ).toThrow('OpenC2 Gateway can not be instantiated in a worker process');
       undoMocks();
-    });
+    }, 300);
     it('Should create a valid instance of socket.io to redis based gateway', () => {
       const registry = new Registry('myId');
       const simple = GatewayFactory.SocketIOToRedis({ id: 'myId', actionTargetPairs: {} });
@@ -124,6 +124,43 @@ describe('#Factories', () => {
         'OpenC2 Gateway can not be instantiated in a worker process'
       );
       undoMocks();
-    });
+    }, 300);
+    it('Should create a valid instance of dummy based consumer', () => {
+      const registry = new Registry('myId');
+      const simple = ConsumerFactory.Dummy({ id: 'myId', actionTargetPairs: {} });
+      const simpleWithRegistry = ConsumerFactory.Dummy({
+        id: 'myId',
+        actionTargetPairs: {},
+        registry,
+      });
+      expect(simple).toBeInstanceOf(Consumer);
+      expect(simpleWithRegistry).toBeInstanceOf(Consumer);
+      // @ts-ignore - private property
+      expect(simpleWithRegistry.register).toBe(registry);
+      // @ts-ignore - private property
+      mockProperty(cluster, 'isWorker', true);
+      expect(() => ConsumerFactory.Dummy({ id: 'myId', actionTargetPairs: {} })).toThrow(
+        'OpenC2 Consumer can not be instantiated in a worker process'
+      );
+      undoMocks();
+    }, 300);
+    it('Should create a valid instance of dummy based producer', () => {
+      const registry = new Registry('myId');
+      const simple = ProducerFactory.Dummy({ id: 'myId' });
+      const simpleWithRegistry = ProducerFactory.Dummy({
+        id: 'myId',
+        registry,
+      });
+      expect(simple).toBeInstanceOf(Producer);
+      expect(simpleWithRegistry).toBeInstanceOf(Producer);
+      // @ts-ignore - private property
+      expect(simpleWithRegistry.register).toBe(registry);
+      // @ts-ignore - private property
+      mockProperty(cluster, 'isWorker', true);
+      expect(() => ProducerFactory.Dummy({ id: 'myId' })).toThrow(
+        'OpenC2 Producer can not be instantiated in a worker process'
+      );
+      undoMocks();
+    }, 300);
   });
 });

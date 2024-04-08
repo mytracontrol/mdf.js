@@ -6,7 +6,6 @@
  */
 
 import { Health, Layer } from '@mdf.js/core';
-import { overallStatus } from '@mdf.js/core/dist/Health';
 import { Crash } from '@mdf.js/crash';
 import { Redis } from '@mdf.js/redis-provider';
 import { AdapterOptions } from '../../types';
@@ -40,7 +39,7 @@ export abstract class RedisAdapter extends Adapter implements Layer.App.Resource
   }
   /** Adapter health status */
   public get status(): Health.Status {
-    return overallStatus(this.checks);
+    return Health.overallStatus(this.checks);
   }
   /** Component checks */
   public get checks(): Health.Checks {

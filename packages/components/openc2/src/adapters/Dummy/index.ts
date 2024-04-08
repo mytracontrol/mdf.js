@@ -5,6 +5,6 @@
  * or at https://opensource.org/licenses/MIT.
  */
 
-export * as Dummy from './Dummy';
-export * as Redis from './Redis';
-export * as SocketIO from './SocketIO';
+export * from './DummyConsumerAdapter';
+export * from './DummyProducerAdapter';
+export type Config = {};

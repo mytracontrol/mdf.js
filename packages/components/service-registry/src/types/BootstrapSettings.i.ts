@@ -5,9 +5,9 @@
  * or at https://opensource.org/licenses/MIT.
  */
 
-export interface BootstrapSettings {
+export interface BootstrapOptions {
   /**
-   * File or list of files with deploying options to be loaded. The entries could be a file path or
+   * List of files with deploying options to be loaded. The entries could be a file path or
    * glob pattern. It supports configurations in JSON, YAML, TOML, and .env file formats.
    * @example `['./config/*.json']`
    * @example `['./config/logger.json', './config/metadata.yaml']`
@@ -31,8 +31,7 @@ export interface BootstrapSettings {
   /**
    * Flag indicating that the environment configuration variables should be used. The configuration
    * loaded by environment variables will be merged with the rest of the configuration, overriding
-   * the configuration from files, but not the configuration passed as argument to Application
-   * Wrapper.
+   * the configuration from files, but not the configuration passed as argument to Service Registry.
    * When option is set some filters are applied to the environment variables to avoid conflicts in
    * the configuration. The filters are:
    *
@@ -70,7 +69,7 @@ export interface BootstrapSettings {
    * - `package.config.${name}`, where `name` is the name of the configuration, will be used to find
    * the rest of properties with the same name that in the metadata.
    * This information will be merged with the rest of the configuration, overriding the
-   * configuration from files, but not the configuration passed as argument to Application Wrapper.
+   * configuration from files, but not the configuration passed as argument to Service Registry.
    */
   loadPackage?: boolean;
   /**
@@ -80,4 +79,12 @@ export interface BootstrapSettings {
    * If the flag is a string, the string will be used as the file name to look for.
    */
   loadReadme?: boolean | string;
+  /**
+   * Flag indicating if the OpenC2 Consumer command interface should be enabled. The command
+   * interface is a set of commands that can be used to interact with the application.
+   * The commands are exposed in the observability endpoints and can be used to interact with the
+   * service, or, if a consumer adapter is configured, to interact with the service from a central
+   * controller.
+   */
+  consumer?: boolean;
 }

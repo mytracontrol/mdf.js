@@ -50,4 +50,19 @@ export class ConsumerFactory {
       return new Consumer(adapter, { ...options, registry: register });
     }
   }
+  /**
+   * Create an instance of OpenC2 Consumer with Dummy interface
+   * @param options - Consumer configuration options
+   */
+  public static Dummy(options: ConsumerOptions): Consumer {
+    if (cluster.isWorker) {
+      throw new Crash('OpenC2 Consumer can not be instantiated in a worker process');
+    } else {
+      const adapter = new Adapters.Dummy.DummyConsumerAdapter({ id: options.id });
+      const register =
+        options.registry ??
+        new Registry(options.id, options.maxInactivityTime, options.registerLimit);
+      return new Consumer(adapter, { ...options, registry: register });
+    }
+  }
 }

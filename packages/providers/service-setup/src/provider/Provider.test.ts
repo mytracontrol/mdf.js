@@ -75,7 +75,6 @@ describe('#Port #ServiceConfig', () => {
         name: 'test',
         logger: new FakeLogger() as LoggerInstance,
         config: {
-          name: 'test',
           configFiles: ['src/Client/__mocks__/*.*'],
           presetFiles: ['src/Client/__mocks__/presets/*.*'],
           schemaFiles: ['src/Client/__mocks__/schemas/*.*'],

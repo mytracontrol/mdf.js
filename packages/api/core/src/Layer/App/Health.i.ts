@@ -8,6 +8,7 @@
 import { Checks, Status } from '../../Health';
 import { Metadata } from './Metadata.i';
 
+/** Health service interface */
 export interface Health extends Metadata {
   /** Indicates whether the service status is acceptable or not */
   status: Status;

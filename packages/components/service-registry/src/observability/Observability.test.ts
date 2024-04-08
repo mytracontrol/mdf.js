@@ -4,17 +4,16 @@
  * Use of this source code is governed by an MIT-style license that can be found in the LICENSE file
  * or at https://opensource.org/licenses/MIT.
  */
-// ************************************************************************************************
-// #region Component imports
+
 import { Layer } from '@mdf.js/core';
 import cluster from 'cluster';
 import EventEmitter from 'events';
 import request from 'supertest';
 import { v4 } from 'uuid';
 import { Observability, ObservabilityOptions } from '.';
-// #endregion
-// *************************************************************************************************
-// #region Our tests
+
+// Create a random port number between 1024 and 65535
+const randomPort = () => Math.floor(Math.random() * (65535 - 1024) + 1024);
 
 // @ts-ignore - Test environment
 class MyService extends EventEmitter implements Layer.App.Service {
@@ -49,7 +48,7 @@ describe('#Observability #Service', () => {
             self: 'http://localhost:3000',
           },
         },
-        service: { isCluster: false, port: 6000 },
+        service: { isCluster: false, port: randomPort() },
       };
       const service = new Observability(config);
       expect(service).toBeDefined();
@@ -73,8 +72,8 @@ describe('#Observability #Service', () => {
         },
         service: {
           isCluster: true,
-          primaryPort: 3000,
-          port: 3001,
+          primaryPort: randomPort(),
+          port: randomPort(),
         },
       };
       const service = new Observability(config);
@@ -120,8 +119,8 @@ describe('#Observability #Service', () => {
         },
         service: {
           isCluster: true,
-          port: 3002,
-          primaryPort: 3003,
+          port: randomPort(),
+          primaryPort: randomPort(),
         },
       };
       const service = new Observability(config);
@@ -157,8 +156,8 @@ describe('#Observability #Service', () => {
         },
         service: {
           isCluster: true,
-          port: 3004,
-          primaryPort: 3005,
+          port: randomPort(),
+          primaryPort: randomPort(),
         },
       };
       const service = new Observability(config);
@@ -199,7 +198,6 @@ describe('#Observability #Service', () => {
         service: {
           isCluster: false,
           port: 70000,
-          primaryPort: 70001,
         },
       };
       const service = new Observability(config);
@@ -220,8 +218,8 @@ describe('#Observability #Service', () => {
         },
         service: {
           isCluster: false,
-          port: 3006,
-          primaryPort: 3007,
+          port: randomPort(),
+          primaryPort: randomPort(),
         },
       };
       const service = new Observability(config);
@@ -263,8 +261,8 @@ describe('#Observability #Service', () => {
         },
         service: {
           isCluster: false,
-          port: 3008,
-          primaryPort: 3009,
+          port: randomPort(),
+          primaryPort: randomPort(),
         },
       };
       const service = new Observability(config);

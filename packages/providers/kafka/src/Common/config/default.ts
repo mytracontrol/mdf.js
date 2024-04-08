@@ -13,7 +13,7 @@ import { CONFIG_KAFKA_CLIENT__LOG_LEVEL, defaultLogCreator } from './utils';
 // #region Default values
 const KAFKA_CLIENT__BROKERS = '127.0.0.1:9092';
 const KAFKA_CLIENT__SSL = false;
-const KAFKA_CLIENT__CLIENT_ID = hostname();
+const KAFKA_CLIENT__CLIENT_ID = process.env['NODE_APP_INSTANCE'] || hostname();
 const KAFKA_CLIENT__CONNECTION_TIMEOUT = 1000;
 const KAFKA_CLIENT__REQUEST_TIMEOUT = 30000;
 const KAFKA_CLIENT__ENFORCE_REQUEST_TIMEOUT = false;

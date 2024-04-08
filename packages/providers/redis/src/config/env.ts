@@ -50,7 +50,7 @@ export const envBasedConfig: Config = {
   /** TCP KeepAlive in ms. Set to a non-number value to disable keepAlive */
   keepAlive: CONFIG_REDIS_KEEPALIVE,
   /** Connection name*/
-  connectionName: CONFIG_ARTIFACT_ID,
+  connectionName: process.env['NODE_APP_INSTANCE'] || CONFIG_ARTIFACT_ID,
   /** Enabled the ready event form Redis instance */
   enableReadyCheck: true,
   /** Enable to send command even when the server is not still ready */

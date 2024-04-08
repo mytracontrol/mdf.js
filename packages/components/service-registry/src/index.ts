@@ -5,13 +5,18 @@
  * or at https://opensource.org/licenses/MIT.
  */
 
+export { Health, Layer } from '@mdf.js/core';
+export { LoggerConfig, LoggerInstance } from '@mdf.js/logger';
+export { CommandJobHandler, ConsumerOptions, Control, ResolverMap } from '@mdf.js/openc2';
+export { Setup } from '@mdf.js/service-setup-provider';
+export { RetryOptions } from '@mdf.js/utils';
 export { ServiceRegistry } from './ServiceRegistry';
-
-export { Layer } from '@mdf.js/core';
-export { CommandJobHandler, ResolverMap } from '@mdf.js/openc2';
+export { ErrorRecord, ObservabilityServiceOptions } from './observability';
 export type {
+  ConsumerAdapterOptions,
   CustomSetting,
   CustomSettings,
-  ServiceRegistryOptions as ServiceRegistrySettings,
+  ServiceRegistryOptions,
+  ServiceRegistrySettings,
   ServiceSetting,
 } from './types';

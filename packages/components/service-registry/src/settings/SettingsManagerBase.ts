@@ -16,7 +16,7 @@ import markdown from 'markdown-it';
 import normalize, { Input, Package } from 'normalize-package-data';
 import { v4 } from 'uuid';
 import {
-  BootstrapSettings,
+  BootstrapOptions,
   CustomSetting,
   ServiceRegistryOptions,
   ServiceRegistrySettings,
@@ -66,7 +66,7 @@ export class SettingsManagerBase<
    * configuration manager.
    */
   constructor(
-    bootstrapSettings?: BootstrapSettings,
+    bootstrapSettings?: BootstrapOptions,
     serviceRegistrySettings?: ServiceRegistryOptions<CustomSettings>,
     customSettings?: Partial<CustomSettings>
   ) {
@@ -190,7 +190,7 @@ export class SettingsManagerBase<
    * `Provider`.
    */
   private defineServiceRegistryConfigManagerOptions(
-    bootstrapSettings?: BootstrapSettings,
+    bootstrapSettings?: BootstrapOptions,
     serviceRegistrySettings?: ServiceRegistryOptions<CustomSettings>
   ): Layer.Provider.FactoryOptions<Setup.Config<ServiceRegistrySettings<CustomSettings>>> {
     const _feed = merge(

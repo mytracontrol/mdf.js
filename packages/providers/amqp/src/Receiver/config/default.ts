@@ -19,7 +19,7 @@ const DEFAULT_CONFIG_AMQP_RECEIVER_AUTO_SETTLE = true;
 export const defaultConfig: Config = {
   ...commonDefaultConfig,
   receiver_options: {
-    name: CONFIG_ARTIFACT_ID,
+    name: process.env['NODE_APP_INSTANCE'] || CONFIG_ARTIFACT_ID,
     rcv_settle_mode: DEFAULT_CONFIG_AMQP_RECEIVER_SETTLE_MODE,
     credit_window: DEFAULT_CONFIG_AMQP_RECEIVER_CREDIT_WINDOW,
     autoaccept: DEFAULT_CONFIG_AMQP_RECEIVER_AUTO_ACCEPT,

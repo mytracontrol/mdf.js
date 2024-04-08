@@ -50,4 +50,19 @@ export class ProducerFactory {
       return new Producer(adapter, { ...options, registry: register });
     }
   }
+  /**
+   * Create an instance of OpenC2 Producer with Dummy interface
+   * @param options - Producer configuration options
+   */
+  public static Dummy(options: ProducerOptions): Producer {
+    if (cluster.isWorker) {
+      throw new Crash('OpenC2 Producer can not be instantiated in a worker process');
+    } else {
+      const adapter = new Adapters.Dummy.DummyProducerAdapter({ id: options.id });
+      const register =
+        options.registry ??
+        new Registry(options.id, options.maxInactivityTime, options.registerLimit);
+      return new Producer(adapter, { ...options, registry: register });
+    }
+  }
 }
