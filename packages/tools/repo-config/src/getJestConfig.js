@@ -6,9 +6,12 @@
  */
 
 const config = require('./jest.config');
+const os = require('os');
 
 function getJestConfig(modulePath) {
-  const modulePathParts = modulePath.split('/');
+  // The split should be different depending on the OS, in case of Windows, it should be '\\' instead
+  // of '/' for the linux based systems.
+  const modulePathParts = modulePath.split(os.platform() === 'win32' ? '\\' : '/');
   const internalScope = modulePathParts[modulePathParts.length - 2];
   const packetName = modulePathParts[modulePathParts.length - 1];
   const coverageDirectory = `../../../coverage/${internalScope}/${packetName}`;
