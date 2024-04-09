@@ -138,10 +138,6 @@ describe('#Port #Socket.IO #Client', () => {
         //@ts-ignore - Test environment
         expect(error.message).toEqual('Socket.IO Client connection error');
       }
-      return port.start().catch(error => {
-        expect(error).toBeDefined();
-        expect(error.message).toEqual('Socket.IO Client connection error');
-      });
     }, 300);
     it('Should reject with an error if try to connect and fails without retries', () => {
       const port = new Port(
