@@ -360,7 +360,13 @@ If the user register a service that fullfil the `Layer.App.Service` interface, i
 
 ### **Module's Control Interface**
 
+The **@mdf.js/service-registry** module use the [OpenC2](https://openc2.org/) as Command and Control Interface (CCI).
 
+This interface are based on the two modules of **@mdf.js**:
+- **@mdf.js/openc2-core**: module that implement the OpenC2 core specification for Consumer, Provider and Gateway entities, not attached to any transport layer.
+- **@mdf.js/openc2**: module that implement a tooling interface, to allow the use of OpenC2 entities over several transport layers: MQTT, Redis Pub/Sub, AMQP, SocketIO ...
+
+Please check the documentation of the packages [@mdf.js/openc2](https://www.npmjs.com/package/@mdf.js/openc2) and [@mdf.js/openc2-core](https://www.npmjs.com/package/@mdf.js/openc2-core), and the OpenC2 specification for more details.
 
 ## **License**
 

@@ -9,6 +9,7 @@ const fileName = './sonar-project.properties';
 
 import fs from 'fs';
 import { globSync } from 'glob';
+import os from 'os';
 
 const folders = globSync("packages/*/*");
 console.log(folders);
@@ -20,7 +21,7 @@ fs.appendFileSync(fileName, `sonar.modules=${folders.map((folder) => {
 }).join(',')}\n`);
 fs.appendFileSync(fileName, 'sonar.exclusions=coveragereport/**/*,packages/**/*.test.ts,packages/**/test/*.ts,packages/**/*.js\n\n');
 for (const folder of folders) {
-  const parts = folder.split('/');
+  const parts = folder.split(os.platform() === 'win32' ? '\\' : '/');
   const subFolderPath = `${parts[parts.length - 2]}/${parts[parts.length - 1]}`;
   const moduleName = `${parts[parts.length - 2]}-${parts[parts.length - 1]}`;
   fs.appendFileSync(fileName, `${moduleName}.sonar.projectName=NDS-${moduleName.toLocaleUpperCase()}-Typescript\n`);
