@@ -192,29 +192,17 @@ describe('#Observability #Service', () => {
       };
       const service = new Observability(config);
       expect(service).toBeDefined();
-
-      //@ts-ignore - private property
-      service._app._build = service._app.build;
-      //@ts-ignore - private property
-      jest.spyOn(service._app, 'build').mockImplementation(async () => {
-        // @ts-ignore - private property
-        await service._app._build();
-        // @ts-ignore - private property
-        jest.spyOn(service._app._server.client, 'listen').mockImplementation(() => {
-          // @ts-ignore - private property
-          setImmediate(() => service._app._server.client.emit('listening'));
-          // @ts-ignore - private property
-          return service._app._server.client;
-        });
-        // @ts-ignore - private property
-        jest.spyOn(service._app._server.port.terminator, 'terminate').mockResolvedValue();
-        return Promise.resolve();
-      });
-
-      await service.stop();
-      await service.start();
-      await service.start();
-      await service.stop();
+      //@ts-ignore - spy private
+      jest.spyOn(service._app, 'getPrimaryPort');
+      //@ts-ignore - call private
+      await service._app.build();
+      //@ts-ignore - check private
+      expect(service._app.getPrimaryPort).toHaveLastReturnedWith(9080); //@ts-ignore - spy private
+      jest.spyOn(service._app, 'getPrimaryPort');
+      //@ts-ignore - call private
+      await service._app.build();
+      //@ts-ignore - check private
+      expect(service._app.getPrimaryPort).toHaveLastReturnedWith(9080);
     }, 300);
     it(`Should create an instance of observability service in NO CLUSTER MODE with too much high port`, async () => {
       const config: ObservabilityOptions = {
