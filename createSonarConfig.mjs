@@ -11,7 +11,7 @@ import fs from 'fs';
 import { globSync } from 'glob';
 import os from 'os';
 
-const folders = globSync("packages/*/*");
+const folders = globSync("packages/*/*").filter((folder) => !folder.includes('repo-config'));
 console.log(folders);
 fs.writeFileSync(fileName, `sonar.projectKey=Mytra-Development-Framework-NDF-TypeScript\n`);
 fs.appendFileSync(fileName, `sonar.projectName=Mytra Development Framework - NDF - TypeScript\n`);
@@ -33,4 +33,6 @@ for (const folder of folders) {
   fs.appendFileSync(fileName, `${moduleName}.sonar.javascript.lcov.reportPaths=../../../coverage/${subFolderPath}/lcov.info\n`);
   fs.appendFileSync(fileName, `${moduleName}.sonar.junit.reportPaths=../../../coverage/${subFolderPath}/test-results.xml\n`);
   fs.appendFileSync(fileName, `${moduleName}.sonar.typescript.tsconfigPath=tsconfig.build.json\n\n`);
+  fs.appendFileSync(fileName, `${moduleName}.sonar.dependencyCheck.htmlReportPath=../../../dependency-check-report/${subFolderPath}/dependency-check-report.html\n`);
+  fs.appendFileSync(fileName, `${moduleName}.sonar.dependencyCheck.jsonReportPath=../../../dependency-check-report/${subFolderPath}/dependency-check-report.json\n`);
 }
