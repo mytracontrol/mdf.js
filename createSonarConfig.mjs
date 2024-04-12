@@ -16,7 +16,7 @@ console.log(folders);
 fs.writeFileSync(fileName, `sonar.projectKey=Mytra-Development-Framework-NDF-TypeScript\n`);
 fs.appendFileSync(fileName, `sonar.projectName=Mytra Development Framework - NDF - TypeScript\n`);
 fs.appendFileSync(fileName, `sonar.modules=${folders.map((folder) => {
-  const parts = folder.split('/');
+  const parts = folder.split(os.platform() === 'win32' ? '\\' : '/');
   return `${parts[parts.length - 2]}-${parts[parts.length - 1]}`;
 }).join(',')}\n`);
 fs.appendFileSync(fileName, 'sonar.exclusions=coveragereport/**/*,packages/**/*.test.ts,packages/**/test/*.ts,packages/**/*.js\n\n');
