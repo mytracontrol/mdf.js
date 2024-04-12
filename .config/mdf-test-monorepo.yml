@@ -29,9 +29,9 @@ steps:
     targetdir: 'coveragereport'
     reporttypes: 'HtmlInline_AzurePipelines_Dark;Cobertura;Badges'
 
-- task: PublishCodeCoverageResults@1
+- task: PublishCodeCoverageResults@2
   displayName: 'Publish code coverage results to Azure DevOps'
   inputs:
-    codeCoverageTool: Cobertura
+    #codeCoverageTool: Cobertura
     summaryFileLocation: '$(Build.SourcesDirectory)/coveragereport/Cobertura.xml'
-    reportDirectory: '$(Build.SourcesDirectory)/coveragereport'
+    #reportDirectory: '$(Build.SourcesDirectory)/coveragereport'

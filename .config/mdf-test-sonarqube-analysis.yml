@@ -10,13 +10,15 @@ steps:
     extraProperties:
       sonar.projectVersion=$(Build.BuildNumber)
 
-- task: SonarSource.sonarqube.6D01813A-9589-4B15-8491-8164AEB38055.SonarQubeAnalyze@5
+- task: SonarQubeAnalyze@5
   displayName: 'Run Code Analysis'
+  inputs:
+    jdkversion: 'JAVA_HOME_17_X64'
 
-- task: SonarSource.sonarqube.291ed61f-1ee4-45d3-b1b0-bf822d9095ef.SonarQubePublish@5
+- task: SonarQubePublish@5
   displayName: 'Publish Quality Gate Result'
 
-- task: SimondeLang.sonar-buildbreaker.sonar-buildbreaker.sonar-buildbreaker@8
+- task: sonar-buildbreaker@8
   displayName: 'Break build on quality gate failure'
   inputs:
     SonarQube: 'NetinSystems-SonarQube Endpoint-MytraManagementSystem'
