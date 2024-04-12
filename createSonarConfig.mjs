@@ -25,7 +25,7 @@ for (const folder of folders) {
   const subFolderPath = `${parts[parts.length - 2]}/${parts[parts.length - 1]}`;
   const moduleName = `${parts[parts.length - 2]}-${parts[parts.length - 1]}`;
   fs.appendFileSync(fileName, `${moduleName}.sonar.projectName=NDS-${moduleName.toLocaleUpperCase()}-Typescript\n`);
-  fs.appendFileSync(fileName, `${moduleName}.sonar.projectBaseDir=${folder}\n`);
+  fs.appendFileSync(fileName, `${moduleName}.sonar.projectBaseDir=${folder.replace(/\\/g, '/')}\n`);
   fs.appendFileSync(fileName, `${moduleName}.sonar.sources=src\n`);
   fs.appendFileSync(fileName, `${moduleName}.sonar.inclusions=src/**/*\n`);
   fs.appendFileSync(fileName, `${moduleName}.sonar.exclusions=src/**/*.test.ts,src/**/test/*.ts\n`);
