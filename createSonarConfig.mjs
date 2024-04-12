@@ -33,6 +33,6 @@ for (const folder of folders) {
   fs.appendFileSync(fileName, `${moduleName}.sonar.javascript.lcov.reportPaths=../../../coverage/${subFolderPath}/lcov.info\n`);
   fs.appendFileSync(fileName, `${moduleName}.sonar.junit.reportPaths=../../../coverage/${subFolderPath}/test-results.xml\n`);
   fs.appendFileSync(fileName, `${moduleName}.sonar.typescript.tsconfigPath=tsconfig.build.json\n\n`);
-  fs.appendFileSync(fileName, `${moduleName}.sonar.dependencyCheck.htmlReportPath=../../../dependency-check-report/${subFolderPath}/dependency-check-report.html\n`);
-  fs.appendFileSync(fileName, `${moduleName}.sonar.dependencyCheck.jsonReportPath=../../../dependency-check-report/${subFolderPath}/dependency-check-report.json\n`);
+  // fs.appendFileSync(fileName, `${moduleName}.sonar.dependencyCheck.htmlReportPath=../../../dependency-check-report/${subFolderPath}/dependency-check-report.html\n`);
+  // fs.appendFileSync(fileName, `${moduleName}.sonar.dependencyCheck.jsonReportPath=../../../dependency-check-report/${subFolderPath}/dependency-check-report.json\n`);
 }
