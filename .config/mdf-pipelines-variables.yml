@@ -1,4 +1,5 @@
 variables:
+  - group: SNYK-Secrets
   - group: NPM-Secrets
   - name: isMaster
     value: ${{ eq(variables['Build.SourceBranch'], 'refs/heads/master') }}
