@@ -5,15 +5,33 @@ steps:
     projectDirectory: '.'
     arguments: 'install'
 
-- task: Yarn@3
+- task: SnykSecurityScan@1
   displayName: 'Execute snyk test for security vulnerabilities'
   inputs:
+    serviceConnectionEndpoint: 'Snyk Security Scan-MytraManagementSystem'
+    testType: 'app'
+    monitorWhen: 'always'
+    failOnIssues: true
+    projectName: '@mdf.js'
+    organization: 'faeff5f2-2ffb-4c50-9cb3-5c216ff5b6e5'
+    additionalArguments: '--yarn-workspaces --strict-out-of-sync=false --json-file-output=report.json'
+
+- task: Yarn@3
+  displayName: 'Generate snyk report'
+  inputs:
     projectDirectory: '.'
-    arguments: 'run @:snyk'
-  continueOnError: false
-  env:
-    SNYK_TOKEN: $(SECRET_SNYK_TOKEN)
-    SNYK_CFG_ORG: $(SECRET_SNYK_CFG_ORG)
+    arguments: 'run @:snyk:report'
+  continueOnError: true
+  
+# - task: Yarn@3
+#   displayName: 'Execute snyk test for security vulnerabilities'
+#   inputs:
+#     projectDirectory: '.'
+#     arguments: 'run @:snyk'
+#   continueOnError: false
+#   env:
+#     SNYK_TOKEN: $(SECRET_SNYK_TOKEN)
+#     SNYK_CFG_ORG: $(SECRET_SNYK_CFG_ORG)
 
 - task: Yarn@3
   displayName: 'Execute compilation, unit test and mutants'
