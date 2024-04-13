@@ -6,6 +6,13 @@ steps:
     arguments: 'install'
 
 - task: Yarn@3
+  displayName: 'Execute snyk test for security vulnerabilities'
+  inputs:
+    projectDirectory: '.'
+    arguments: 'run snyk'
+  continueOnError: false
+
+- task: Yarn@3
   displayName: 'Execute compilation, unit test and mutants'
   inputs:
     projectDirectory: '.'
