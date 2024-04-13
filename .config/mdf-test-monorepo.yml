@@ -11,6 +11,9 @@ steps:
     projectDirectory: '.'
     arguments: 'run @:snyk'
   continueOnError: false
+  env:
+    SNYK_TOKEN: $(SNYK_TOKEN)
+    SNYK_CFG_ORG: $(SNYK_CFG_ORG)
 
 - task: Yarn@3
   displayName: 'Execute compilation, unit test and mutants'
