@@ -14,7 +14,7 @@ steps:
     failOnIssues: true
     #projectName: '@mdf.js'
     organization: 'faeff5f2-2ffb-4c50-9cb3-5c216ff5b6e5'
-    additionalArguments: '--yarn-workspaces --strict-out-of-sync=false --json-file-output=report.json'
+    additionalArguments: '--yarn-workspaces --strict-out-of-sync=false'
 
 - task: Yarn@3
   displayName: 'Generate snyk report'
