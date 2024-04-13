@@ -12,7 +12,7 @@ steps:
     testType: 'app'
     monitorWhen: 'always'
     failOnIssues: true
-    projectName: '@mdf.js'
+    #projectName: '@mdf.js'
     organization: 'faeff5f2-2ffb-4c50-9cb3-5c216ff5b6e5'
     additionalArguments: '--yarn-workspaces --strict-out-of-sync=false --json-file-output=report.json'
 
@@ -22,7 +22,7 @@ steps:
     projectDirectory: '.'
     arguments: 'run @:snyk:report'
   continueOnError: true
-  
+
 # - task: Yarn@3
 #   displayName: 'Execute snyk test for security vulnerabilities'
 #   inputs:
