@@ -9,7 +9,7 @@ steps:
   displayName: 'Execute snyk test for security vulnerabilities'
   inputs:
     projectDirectory: '.'
-    arguments: 'run snyk'
+    arguments: 'run @:snyk'
   continueOnError: false
 
 - task: Yarn@3

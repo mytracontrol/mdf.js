@@ -11,7 +11,8 @@
     "@:snyk:report": "snyk-to-html -i report.json -o report.html -a",
     "@:snyk:monitor": "snyk monitor --yarn-workspaces --strict-out-of-sync=false",
     "@:snyk:test": "snyk test --yarn-workspaces --strict-out-of-sync=false --json-file-output=report.json --fail-on=all",
-    "@:snyk": "yarn run @:snyk:test && yarn run @:snyk:report && yarn run @:snyk:monitor",
+    "@:snyk:auth": "snyk auth",
+    "@:snyk": "yarn run @:snyk:auth && yarn run @:snyk:test && yarn run @:snyk:report && yarn run @:snyk:monitor",
     "build": "turbo run build",
     "check-dependencies": "turbo run check-dependencies --continue --concurrency=1",
     "clean": "rimraf -g \"./packages/*/*/*+(.tsbuildinfo)\" \"./{coverage,docs,mutations,tmp}\" \"./packages/*/*/{.turbo,dist,logs,reports}\"",
@@ -25,7 +26,7 @@
     "docs:typedoc": "typedoc --options typedoc.json",
     "lint": "turbo run lint",
     "prettier": "prettier --config .prettierrc.js --write **/src/**/*.ts",
-    "snyk": "yarn run @:snyk",
+    "snyk": "yarn run @:snyk:test && yarn run @:snyk:report && yarn run @:snyk:monitor",
     "sort": "sort-package-json \"packages/*/*/package.json\" package.json",
     "test": "turbo run test licenses --concurrency=1"
   },
