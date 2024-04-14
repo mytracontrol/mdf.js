@@ -76,6 +76,7 @@ Checks included in the provider:
 - **CONFIG\_MQTT\_CLIENT\_CA\_PATH**: undefined
 - **CONFIG\_MQTT\_CLIENT\_CLIENT\_CERT\_PATH**: undefined
 - **CONFIG\_MQTT\_CLIENT\_CLIENT\_KEY\_PATH**: undefined
+- **NODE\_APP\_INSTANCE**: undefined
 
 ## **License**
 

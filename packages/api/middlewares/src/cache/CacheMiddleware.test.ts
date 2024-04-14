@@ -9,7 +9,6 @@
 import { Crash } from '@mdf.js/crash';
 import logger from '@mdf.js/logger';
 import { Redis } from '@mdf.js/redis-provider';
-import { mockProperty, undoMocks } from '@mdf.js/utils';
 // #endregion
 // ************************************************************************************************
 // #region Middleware imports
@@ -71,11 +70,12 @@ app.use(Middleware.ErrorHandler.handler(logger));
 describe('#Middleware #cache', () => {
   describe('#Happy path', () => {
     afterEach(() => {
-      undoMocks();
+      jest.clearAllMocks();
+      jest.restoreAllMocks();
     });
     it('Should response a fresh respond if the request has not been cached previously', async () => {
       //@ts-ignore - Test environment
-      mockProperty(instance, 'repository', {
+      jest.replaceProperty(instance, 'repository', {
         getPath: () => Promise.resolve(null),
         setPath: () => Promise.resolve(),
       });
@@ -97,7 +97,7 @@ describe('#Middleware #cache', () => {
         duration: 10,
       });
       //@ts-ignore - Test environment
-      mockProperty(instance, 'repository', {
+      jest.replaceProperty(instance, 'repository', {
         getPath: () => Promise.resolve(JSON.parse(result)),
       });
       await request(app)
@@ -120,7 +120,7 @@ describe('#Middleware #cache', () => {
         duration: 10,
       });
       //@ts-ignore - Test environment
-      mockProperty(instance, 'repository', {
+      jest.replaceProperty(instance, 'repository', {
         getPath: (path: string) => {
           expect(path).toEqual(
             'api:cache:/example_with_body:6763d0490d971e89790eb635cf3600f96ccd4239'
@@ -148,7 +148,7 @@ describe('#Middleware #cache', () => {
         duration: 10,
       });
       //@ts-ignore - Test environment
-      mockProperty(instance, 'repository', {
+      jest.replaceProperty(instance, 'repository', {
         getPath: () => Promise.resolve(JSON.parse(result)),
       });
       await request(app)
@@ -174,9 +174,14 @@ describe('#Middleware #cache', () => {
     }, 300);
   });
   describe('#Sad path', () => {
+    afterEach(() => {
+      jest.clearAllMocks();
+      jest.resetAllMocks();
+      jest.restoreAllMocks();
+    });
     it('Should response a fresh respond if the cache repository fails to get the cached version', async () => {
       //@ts-ignore - Test environment
-      mockProperty(instance, 'repository', {
+      jest.replaceProperty(instance, 'repository', {
         getPath: () => Promise.reject(new Crash('MyError', FAKE_UUID)),
       });
       await request(app)
@@ -189,7 +194,7 @@ describe('#Middleware #cache', () => {
     }, 300);
     it('Should response a fresh respond if the cache repository fails to set the cached version', async () => {
       //@ts-ignore - Test environment
-      mockProperty(instance, 'repository', {
+      jest.replaceProperty(instance, 'repository', {
         getPath: () => Promise.resolve(null),
         setPath: () => Promise.reject(new Crash('MyError', FAKE_UUID)),
       });

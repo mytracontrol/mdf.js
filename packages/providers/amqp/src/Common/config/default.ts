@@ -10,11 +10,18 @@ import { CONFIG_ARTIFACT_ID } from './utils';
 
 // *************************************************************************************************
 // #region Default values
+
+/**
+ * Used as default container id, receiver name, sender name, etc. in cluster configurations.
+ * @defaultValue undefined
+ */
+export const NODE_APP_INSTANCE = process.env['NODE_APP_INSTANCE'];
+
 const DEFAULT_CONFIG_AMQP_USER_NAME = 'mdf-amqp';
 const DEFAULT_CONFIG_AMQP_HOST = '127.0.0.1';
 const DEFAULT_CONFIG_AMQP_PORT = 5672;
 const DEFAULT_CONFIG_AMQP_TRANSPORT = 'tcp';
-const DEFAULT_CONFIG_AMQP_CONTAINER_ID = process.env['NODE_APP_INSTANCE'] || CONFIG_ARTIFACT_ID;
+const DEFAULT_CONFIG_AMQP_CONTAINER_ID = NODE_APP_INSTANCE || CONFIG_ARTIFACT_ID;
 const DEFAULT_CONFIG_AMQP_RECONNECT = 5000;
 const DEFAULT_CONFIG_AMQP_INITIAL_RECONNECT_DELAY = 30000;
 const DEFAULT_CONFIG_AMQP_MAX_RECONNECT_DELAY = 10000;

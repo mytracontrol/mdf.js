@@ -6,7 +6,6 @@
  */
 
 import { Control } from '@mdf.js/openc2-core';
-import { mockProperty, undoMocks } from '@mdf.js/utils';
 import { ServiceBus } from './ServiceBus';
 
 const COMMAND: Control.CommandMessage = {
@@ -43,6 +42,10 @@ const RESPONSE: Control.ResponseMessage = {
 
 describe('#ServiceBus', () => {
   describe('#Happy path', () => {
+    afterEach(() => {
+      jest.clearAllMocks();
+      jest.restoreAllMocks();
+    });
     it('Should create a valid instance', () => {
       const serviceBus = new ServiceBus({}, { useJwt: true }, 'myServiceBus');
       expect(serviceBus).toBeDefined();
@@ -196,7 +199,6 @@ describe('#ServiceBus', () => {
       const serviceBus = new ServiceBus({}, { useJwt: true }, 'myServiceBus');
       const callback = (responses: Control.ResponseMessage[]) => {
         expect(responses).toEqual([RESPONSE]);
-        undoMocks();
         done();
       };
       class Mock {
@@ -220,7 +222,7 @@ describe('#ServiceBus', () => {
       }
       const mock = new Mock();
       //@ts-ignore - private property
-      mockProperty(serviceBus, 'oc2Namespace', mock);
+      jest.replaceProperty(serviceBus, 'oc2Namespace', mock);
       //@ts-ignore - private property
       serviceBus.eventHandler('oc2.cmd.all', COMMAND, callback);
     }, 300);
@@ -247,7 +249,6 @@ describe('#ServiceBus', () => {
       serviceBus.onConnectionEventOC2Namespace(socket);
       const callback = (responses: Control.ResponseMessage[]) => {
         expect(responses).toEqual([RESPONSE]);
-        undoMocks();
         done();
       };
       class Mock {
@@ -271,7 +272,7 @@ describe('#ServiceBus', () => {
       }
       const mock = new Mock();
       //@ts-ignore - private property
-      mockProperty(serviceBus, 'oc2Namespace', mock);
+      jest.replaceProperty(serviceBus, 'oc2Namespace', mock);
       //@ts-ignore - private property
       serviceBus.eventHandler('oc2.cmd.ap.actuator1', COMMAND, callback);
     }, 300);
@@ -298,7 +299,6 @@ describe('#ServiceBus', () => {
       serviceBus.onConnectionEventOC2Namespace(socket);
       const callback = (responses: Control.ResponseMessage[]) => {
         expect(responses).toEqual([RESPONSE]);
-        undoMocks();
         done();
       };
       class Mock {
@@ -322,12 +322,16 @@ describe('#ServiceBus', () => {
       }
       const mock = new Mock();
       //@ts-ignore - private property
-      mockProperty(serviceBus, 'oc2Namespace', mock);
+      jest.replaceProperty(serviceBus, 'oc2Namespace', mock);
       //@ts-ignore - private property
       serviceBus.eventHandler('oc2.cmd.device.myNodeId', COMMAND, callback);
     }, 300);
   });
   describe('#Sad path', () => {
+    afterEach(() => {
+      jest.clearAllMocks();
+      jest.restoreAllMocks();
+    });
     it('Should manage disconnection of new sockets and emit an error if its not an allowed reason', done => {
       const serviceBus = new ServiceBus({}, { useJwt: true }, 'myServiceBus');
       const socket = {
@@ -381,7 +385,6 @@ describe('#ServiceBus', () => {
       };
       serviceBus.on('error', error => {
         expect(error.message).toEqual('Error in the acknowledgement callback function: myError');
-        undoMocks();
         done();
       });
       class Mock {
@@ -405,7 +408,7 @@ describe('#ServiceBus', () => {
       }
       const mock = new Mock();
       //@ts-ignore - private property
-      mockProperty(serviceBus, 'oc2Namespace', mock);
+      jest.replaceProperty(serviceBus, 'oc2Namespace', mock);
       //@ts-ignore - private property
       serviceBus.eventHandler('oc2.cmd.all', COMMAND, callback);
     }, 300);
@@ -418,7 +421,6 @@ describe('#ServiceBus', () => {
         expect(error.message).toEqual(
           'No responses returned in the acknowledgement callback function'
         );
-        undoMocks();
         done();
       });
       class Mock {
@@ -442,7 +444,7 @@ describe('#ServiceBus', () => {
       }
       const mock = new Mock();
       //@ts-ignore - private property
-      mockProperty(serviceBus, 'oc2Namespace', mock);
+      jest.replaceProperty(serviceBus, 'oc2Namespace', mock);
       //@ts-ignore - private property
       serviceBus.eventHandler('oc2.cmd.all', COMMAND, callback);
     }, 300);

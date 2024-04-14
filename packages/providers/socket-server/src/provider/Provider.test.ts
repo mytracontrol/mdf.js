@@ -7,7 +7,6 @@
 import { Layer } from '@mdf.js/core';
 import { Crash } from '@mdf.js/crash';
 import { LoggerInstance } from '@mdf.js/logger';
-import { undoMocks } from '@mdf.js/utils';
 import { Server } from 'socket.io';
 import { CONFIG_PROVIDER_BASE_NAME } from '../config';
 import { Factory } from './Factory';
@@ -42,9 +41,6 @@ class FakeLogger {
 
 describe('#Port #Socket.io server', () => {
   describe('#Happy path', () => {
-    afterEach(() => {
-      undoMocks();
-    });
     it('Should create provider using the factory instance with default configuration and an app', () => {
       const provider = Factory.create({ config: DEFAULT_CONFIG });
       expect(provider).toBeDefined();

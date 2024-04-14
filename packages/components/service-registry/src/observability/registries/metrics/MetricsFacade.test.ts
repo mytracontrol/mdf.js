@@ -8,7 +8,6 @@
 // #region Component imports
 import { Health, Layer } from '@mdf.js/core';
 import { DebugLogger } from '@mdf.js/logger';
-import { undoMocks } from '@mdf.js/utils';
 import cluster from 'cluster';
 import { Counter, Registry, register } from 'prom-client';
 import { MetricsRegistry } from '.';
@@ -216,7 +215,6 @@ describe('#Metrics #Service', () => {
         metrics: [],
         contentType: 'application/json',
       });
-      undoMocks();
     }, 300);
   });
 });

@@ -21,13 +21,16 @@ describe('#Limiter', () => {
     it(`Simple test for Limiter`, async () => {
       const queue = new Limiter({ concurrency: 1 });
       const results: number[] = [];
-      queue.on('done', (uuid: string, meta: MetaData, error?: Crash) => {
+      queue.on('done', (uuid: string, result: any, meta: MetaData, error?: Crash) => {
         expect(uuid).toBeDefined();
+        expect(result).toEqual(1);
         expect(meta).toBeDefined();
         expect(error).toBeUndefined();
       });
-      queue.on('myId1', (result: any, error?: Crash) => {
+      queue.on('myId1', (uuid: string, result: any, meta: MetaData, error?: Crash) => {
+        expect(uuid).toBeDefined();
         expect(result).toEqual(1);
+        expect(meta).toBeDefined();
         expect(error).toBeUndefined();
       });
       queue.schedule(async () => results.push(1), [], { id: 'myId1' });
@@ -49,33 +52,43 @@ describe('#Limiter', () => {
       let id4OnQueue = false;
       let id1OnPiped = false;
       let id4OnPiped = false;
-      queue.on('done', (uuid: string, meta: MetaData, error?: Crash) => {
+      queue.on('done', (uuid: string, result: any, meta: MetaData, error?: Crash) => {
         expect(uuid).toBeDefined();
+        expect(result).toBeDefined();
         expect(meta).toBeDefined();
         expect(error).toBeUndefined();
       });
-      queue.on('myId1', (result: any, error?: Crash) => {
+      queue.on('myId1', (uuid: string, result: any, meta: MetaData, error?: Crash) => {
+        expect(uuid).toBeDefined();
         expect(result).toEqual(1);
+        expect(meta).toBeDefined();
         expect(error).toBeUndefined();
         id1OnQueue = true;
       });
-      queue.on('myId4', (result: any, error?: Crash) => {
+      queue.on('myId4', (uuid: string, result: any, meta: MetaData, error?: Crash) => {
+        expect(uuid).toBeDefined();
         expect(result).toEqual(4);
+        expect(meta).toBeDefined();
         expect(error).toBeUndefined();
         id4OnQueue = true;
       });
-      piped.on('done', (uuid: string, meta: MetaData, error?: Crash) => {
+      piped.on('done', (uuid: string, result: any, meta: MetaData, error?: Crash) => {
         expect(uuid).toBeDefined();
+        expect(result).toBeDefined();
         expect(meta).toBeDefined();
         expect(error).toBeUndefined();
       });
-      piped.on('myId1', (result: any, error?: Crash) => {
+      piped.on('myId1', (uuid: string, result: any, meta: MetaData, error?: Crash) => {
+        expect(uuid).toBeDefined();
         expect(result).toEqual(1);
+        expect(meta).toBeDefined();
         expect(error).toBeUndefined();
         id1OnPiped = true;
       });
-      piped.on('myId4', (result: any, error?: Crash) => {
+      piped.on('myId4', (uuid: string, result: any, meta: MetaData, error?: Crash) => {
+        expect(uuid).toBeDefined();
         expect(result).toEqual(4);
+        expect(meta).toBeDefined();
         expect(error).toBeUndefined();
         id4OnPiped = true;
       });
@@ -98,13 +111,16 @@ describe('#Limiter', () => {
     it(`Simple test for Limiter, using task single handlers`, async () => {
       const queue = new Limiter({ concurrency: 1 });
       const results: number[] = [];
-      queue.on('done', (uuid: string, meta: MetaData, error?: Crash) => {
+      queue.on('done', (uuid: string, result: any, meta: MetaData, error?: Crash) => {
         expect(uuid).toBeDefined();
+        expect(result).toBeDefined();
         expect(meta).toBeDefined();
         expect(error).toBeUndefined();
       });
-      queue.on('myId1', (result: any, error?: Crash) => {
+      queue.on('myId1', (uuid: string, result: any, meta: MetaData, error?: Crash) => {
+        expect(uuid).toBeDefined();
         expect(result).toEqual(1);
+        expect(meta).toBeDefined();
         expect(error).toBeUndefined();
       });
       queue.schedule(new Single(async () => results.push(1), [], { id: 'myId1' }));
@@ -119,13 +135,16 @@ describe('#Limiter', () => {
     it(`Simple test for Limiter, using task groups handlers`, async () => {
       const queue = new Limiter({ concurrency: 1 });
       const results: number[] = [];
-      queue.on('done', (uuid: string, meta: MetaData, error?: Crash) => {
+      queue.on('done', (uuid: string, result: any, meta: MetaData, error?: Crash) => {
         expect(uuid).toBeDefined();
+        expect(result).toBeDefined();
         expect(meta).toBeDefined();
         expect(error).toBeUndefined();
       });
-      queue.on('myId1', (result: any, error?: Crash) => {
+      queue.on('myId1', (uuid: string, result: any, meta: MetaData, error?: Crash) => {
+        expect(uuid).toBeDefined();
         expect(result).toEqual(1);
+        expect(meta).toBeDefined();
         expect(error).toBeUndefined();
       });
       const scheduleTasks = [
@@ -145,13 +164,16 @@ describe('#Limiter', () => {
     it(`Simple test for Limiter, using task sequence handlers`, async () => {
       const queue = new Limiter({ concurrency: 1 });
       const results: number[] = [];
-      queue.on('done', (uuid: string, meta: MetaData, error?: Crash) => {
+      queue.on('done', (uuid: string, result: any, meta: MetaData, error?: Crash) => {
         expect(uuid).toBeDefined();
+        expect(result).toBeDefined();
         expect(meta).toBeDefined();
         expect(error).toBeUndefined();
       });
-      queue.on('myId1', (result: any, error?: Crash) => {
+      queue.on('myId1', (uuid: string, result: any, meta: MetaData, error?: Crash) => {
+        expect(uuid).toBeDefined();
         expect(result).toEqual(1);
+        expect(meta).toBeDefined();
         expect(error).toBeUndefined();
       });
       const sequence: SequencePattern<number> = {
@@ -167,13 +189,16 @@ describe('#Limiter', () => {
     it(`Simple test for Limiter with delay`, async () => {
       const queue = new Limiter({ concurrency: 1, delay: 100 });
       const results: number[] = [];
-      queue.on('done', (uuid: string, meta: MetaData, error?: Crash) => {
+      queue.on('done', (uuid: string, result: any, meta: MetaData, error?: Crash) => {
         expect(uuid).toBeDefined();
+        expect(result).toBeDefined();
         expect(meta).toBeDefined();
         expect(error).toBeUndefined();
       });
-      queue.on('myId1', (result: any, error?: Crash) => {
+      queue.on('myId1', (uuid: string, result: any, meta: MetaData, error?: Crash) => {
+        expect(uuid).toBeDefined();
         expect(result).toEqual(1);
+        expect(meta).toBeDefined();
         expect(error).toBeUndefined();
       });
       const hrstart = process.hrtime();
@@ -268,8 +293,9 @@ describe('#Limiter', () => {
     });
     it('.execute() should reject if promise rejects, with group task handlers', async () => {
       const queue = new Limiter();
-      queue.on('done', (uuid: string, meta: MetaData, error?: Crash) => {
+      queue.on('done', (uuid: string, result: any, meta: MetaData, error?: Crash) => {
         expect(uuid).toBeDefined();
+        expect(result).toBeDefined();
         expect(meta).toBeDefined();
         expect(error).toBeUndefined();
       });
@@ -474,13 +500,16 @@ describe('#Limiter', () => {
     it('.schedule() - limited concurrency', async () => {
       const queue = new Limiter({ concurrency: 2 });
       const results: number[] = [];
-      queue.on('done', (uuid: string, meta: MetaData, error?: Crash) => {
+      queue.on('done', (uuid: string, result: any, meta: MetaData, error?: Crash) => {
         expect(uuid).toBeDefined();
+        expect(result).toBeDefined();
         expect(meta).toBeDefined();
         expect(error).toBeUndefined();
       });
-      queue.on('myId', (result: any, error?: Crash) => {
+      queue.on('myId', (uuid: string, result: any, meta: MetaData, error?: Crash) => {
+        expect(uuid).toBeDefined();
         expect(result).toEqual(fixture);
+        expect(meta).toBeDefined();
         expect(error).toBeUndefined();
         results.push(result);
       });
@@ -514,13 +543,16 @@ describe('#Limiter', () => {
       const results: number[] = [];
       const hrstart = process.hrtime();
       const queue = new Limiter({ concurrency: 1 });
-      queue.on('done', (uuid: string, meta: MetaData, error?: Crash) => {
+      queue.on('done', (uuid: string, result: any, meta: MetaData, error?: Crash) => {
         expect(uuid).toBeDefined();
+        expect(result).toBeDefined();
         expect(meta).toBeDefined();
         expect(error).toBeUndefined();
       });
-      queue.on('myId', (result: any, error?: Crash) => {
+      queue.on('myId', (uuid: string, result: any, meta: MetaData, error?: Crash) => {
+        expect(uuid).toBeDefined();
         expect(result).toBeDefined();
+        expect(meta).toBeDefined();
         expect(error).toBeUndefined();
         results.push(result);
       });
@@ -657,13 +689,16 @@ describe('#Limiter', () => {
       let unblocked = false;
       const queue = new Limiter({ highWater: 2, strategy: STRATEGY.BLOCK, penalty: 100 });
       const results: number[] = [];
-      queue.on('done', (uuid: string, meta: MetaData, error?: Crash) => {
+      queue.on('done', (uuid: string, result: any, meta: MetaData, error?: Crash) => {
         expect(uuid).toBeDefined();
+        expect(result).toBeDefined();
         expect(meta).toBeDefined();
         expect(error).toBeUndefined();
       });
-      queue.on('myId', (result: any, error?: Crash) => {
+      queue.on('myId', (uuid: string, result: any, meta: MetaData, error?: Crash) => {
+        expect(uuid).toBeDefined();
         expect(result).toBeDefined();
+        expect(meta).toBeDefined();
         expect(error).toBeUndefined();
         results.push(result);
       });
@@ -697,8 +732,9 @@ describe('#Limiter', () => {
     it(`Should apply strategy 'leak'`, async () => {
       const queue = new Limiter({ highWater: 2, strategy: STRATEGY.LEAK });
       const results: number[] = [];
-      queue.on('done', (uuid: string, meta: MetaData, error?: Crash) => {
+      queue.on('done', (uuid: string, result: any, meta: MetaData, error?: Crash) => {
         expect(uuid).toBeDefined();
+        expect(result).toBeDefined();
         expect(meta).toBeDefined();
         expect(error).toBeUndefined();
       });
@@ -714,8 +750,9 @@ describe('#Limiter', () => {
     it(`Should apply strategy 'overflow-priority'`, async () => {
       const queue = new Limiter({ highWater: 2, strategy: STRATEGY.OVERFLOW_PRIORITY });
       const results: number[] = [];
-      queue.on('done', (uuid: string, meta: MetaData, error?: Crash) => {
+      queue.on('done', (uuid: string, result: any, meta: MetaData, error?: Crash) => {
         expect(uuid).toBeDefined();
+        expect(result).toBeDefined();
         expect(meta).toBeDefined();
         expect(error).toBeUndefined();
       });
@@ -732,8 +769,9 @@ describe('#Limiter', () => {
     it(`Should apply strategy 'overflow'`, async () => {
       const queue = new Limiter({ highWater: 2, strategy: STRATEGY.OVERFLOW });
       const results: number[] = [];
-      queue.on('done', (uuid: string, meta: MetaData, error?: Crash) => {
+      queue.on('done', (uuid: string, result: any, meta: MetaData, error?: Crash) => {
         expect(uuid).toBeDefined();
+        expect(result).toBeDefined();
         expect(meta).toBeDefined();
         expect(error).toBeUndefined();
       });
@@ -757,8 +795,9 @@ describe('#Limiter', () => {
         concurrency: 3,
       });
       const results: number[] = [];
-      queue.on('done', (uuid: string, meta: MetaData, error?: Crash) => {
+      queue.on('done', (uuid: string, result: any, meta: MetaData, error?: Crash) => {
         expect(uuid).toBeDefined();
+        expect(result).toBeDefined();
         expect(meta).toBeDefined();
         expect(error).toBeUndefined();
       });

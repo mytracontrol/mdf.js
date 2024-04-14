@@ -75,7 +75,7 @@ In this module there are implemented two providers:
     {
       // ... Common client options, see below
       receiver_options: {
-        name: 'mdf-amqp',
+        name: process.env['NODE_APP_INSTANCE'] ||'mdf-amqp',
         rcv_settle_mode: 0,
         credit_window: 0,
         autoaccept: false,
@@ -118,7 +118,7 @@ In this module there are implemented two providers:
     {
       // ... Common client options, see below
       sender_options: {
-        name: 'mdf-amqp',
+        name: process.env['NODE_APP_INSTANCE'] ||'mdf-amqp',
         snd_settle_mode: 2,
         autosettle: true,
         target: {},
@@ -196,7 +196,7 @@ Checks included in the provider:
   - **status**: `pass` if the number of credits is greater than `0`, `warn` otherwise.
   - **output**: `No credits available` if the number of credits is `0`.
 
-```typescript
+```json
 {
   "[mdf-amqp:status]": [
     {
@@ -221,34 +221,36 @@ Checks included in the provider:
 
 ## **Environment variables**
 
-- **CONFIG\_AMQP\_SENDER\_NAME**: undefined
-- **CONFIG\_AMQP\_SENDER\_SETTLE\_MODE**: undefined
-- **CONFIG\_AMQP\_SENDER\_AUTO\_SETTLE**: undefined
-- **CONFIG\_AMQP\_RECEIVER\_NAME**: undefined
-- **CONFIG\_AMQP\_RECEIVER\_SETTLE\_MODE**: undefined
-- **CONFIG\_AMQP\_RECEIVER\_CREDIT\_WINDOW**: undefined
-- **CONFIG\_AMQP\_RECEIVER\_AUTO\_ACCEPT**: undefined
-- **CONFIG\_AMQP\_RECEIVER\_AUTO\_SETTLE**: undefined
-- **CONFIG\_AMQP\_USER\_NAME**: undefined
-- **CONFIG\_AMQP\_PASSWORD**: undefined
-- **CONFIG\_AMQP\_HOST**: undefined
-- **CONFIG\_AMQP\_HOSTNAME**: undefined
-- **CONFIG\_AMQP\_PORT**: undefined
-- **CONFIG\_AMQP\_TRANSPORT**: undefined
-- **CONFIG\_AMQP\_CONTAINER\_ID**: undefined
-- **CONFIG\_AMQP\_ID**: undefined
-- **CONFIG\_AMQP\_RECONNECT**: undefined
-- **CONFIG\_AMQP\_RECONNECT\_LIMIT**: undefined
-- **CONFIG\_AMQP\_INITIAL\_RECONNECT\_DELAY**: undefined
-- **CONFIG\_AMQP\_MAX\_RECONNECT\_DELAY**: undefined
-- **CONFIG\_AMQP\_MAX\_FRAME\_SIZE**: undefined
-- **CONFIG\_AMQP\_NON\_FATAL\_ERRORS**: undefined
-- **CONFIG\_AMQP\_NON\_FATAL\_ERRORS**: undefined
-- **CONFIG\_AMQP\_CA\_PATH**: undefined
-- **CONFIG\_AMQP\_CLIENT\_CERT\_PATH**: undefined
-- **CONFIG\_AMQP\_CLIENT\_KEY\_PATH**: undefined
-- **CONFIG\_AMQP\_REQUEST\_CERT**: undefined
-- **CONFIG\_AMQP\_REJECT\_UNAUTHORIZED**: undefined
+- **CONFIG\_AMQP\_SENDER\_NAME** (default: `` NODE_APP_INSTANCE || `mdf-amqp` ``): The name of the link. This should be unique for the container. If not specified a unique name is generated.
+- **CONFIG\_AMQP\_SENDER\_SETTLE\_MODE** (default: `2`): It specifies the sender settle mode with following possible values: - 0 - "unsettled" - The sender will send all deliveries initially unsettled to the receiver. - 1 - "settled" - The sender will send all deliveries settled to the receiver. - 2 - "mixed" - (default) The sender MAY send a mixture of settled and unsettled deliveries to the receiver.
+- **CONFIG\_AMQP\_SENDER\_AUTO\_SETTLE** (default: `true`): Whether sent messages should be automatically settled once the peer settles them.
+- **CONFIG\_AMQP\_RECEIVER\_NAME** (default: `` NODE_APP_INSTANCE || `mdf-amqp` ``): The name of the link. This should be unique for the container. If not specified a unique name is generated.
+- **CONFIG\_AMQP\_RECEIVER\_SETTLE\_MODE** (default: `0`): It specifies the receiver settle mode with following possible values: - 0 - "first" - The receiver will spontaneously settle all incoming transfers. - 1 - "second" - The receiver will only settle after sending the disposition to the sender and receiving a disposition indicating settlement of the delivery from the sender.
+- **CONFIG\_AMQP\_RECEIVER\_CREDIT\_WINDOW** (default: `0`): A "prefetch" window controlling the flow of messages over this receiver. Defaults to \`1000\` if not specified. A value of \`0\` can be used to turn off automatic flow control and manage it directly.
+- **CONFIG\_AMQP\_RECEIVER\_AUTO\_ACCEPT** (default: `false`): Whether received messages should be automatically accepted.
+- **CONFIG\_AMQP\_RECEIVER\_AUTO\_SETTLE** (default: `true`): Whether received messages should be automatically settled once the remote settles them.
+- **CONFIG\_AMQP\_USER\_NAME** (default: `'mdf-amqp'`): User name for the AMQP connection
+- **CONFIG\_AMQP\_PASSWORD** (default: `undefined`): The secret key to be used while establishing the connection
+- **CONFIG\_AMQP\_HOST** (default: `undefined`): The hostname of the AMQP server
+- **CONFIG\_AMQP\_HOSTNAME** (default: `127.0.0.1`): The hostname presented in \`open\` frame, defaults to host.
+- **CONFIG\_AMQP\_PORT** (default: `5672`): The port of the AMQP server
+- **CONFIG\_AMQP\_TRANSPORT** (default: `'tcp'`): The transport option. This is ignored if connection\_details is set.
+- **NODE\_APP\_INSTANCE** (default: `'tcp'`): The transport option. This is ignored if connection\_details is set.
+- **CONFIG\_AMQP\_CONTAINER\_ID** (default: `` process.env['NODE_APP_INSTANCE'] || `mdf-amqp` ``): The id of the source container. If not provided then this will be the id (a guid string) of the assocaited container object. When this property is provided, it will be used in the \`open\` frame to let the peer know about the container id. However, the associated container object would still be the same container object from which the connection is being created. The \`"container\_id"\` is how the peer will identify the 'container' the connection is being established from. The container in AMQP terminology is roughly analogous to a process. Using a different container id on connections from the same process would cause the peer to treat them as coming from distinct processes.
+- **CONFIG\_AMQP\_ID** (default: `undefined`): A unique name for the connection. If not provided then this will be a string in the following format: "connection-\<counter>".
+- **CONFIG\_AMQP\_RECONNECT** (default: `5000`): If true (default), the library will automatically attempt to reconnect if disconnected. If false, automatic reconnect will be disabled. If it is a numeric value, it is interpreted as the delay between reconnect attempts (in milliseconds).
+- **CONFIG\_AMQP\_RECONNECT\_LIMIT** (default: `undefined`): Maximum number of reconnect attempts. Applicable only when reconnect is true.
+- **CONFIG\_AMQP\_INITIAL\_RECONNECT\_DELAY** (default: `30000`): Time to wait in milliseconds before attempting to reconnect. Applicable only when reconnect is true or a number is provided for reconnect.
+- **CONFIG\_AMQP\_MAX\_RECONNECT\_DELAY** (default: `10000`): Maximum reconnect delay in milliseconds before attempting to reconnect. Applicable only when reconnect is true.
+- **CONFIG\_AMQP\_MAX\_FRAME\_SIZE** (default: `4294967295`): The largest frame size that the sending peer is able to accept on this connection.
+- **CONFIG\_AMQP\_NON\_FATAL\_ERRORS** (default: `['amqp:connection:forced']`): An array of error conditions which if received on connection close from peer should not prevent reconnect (by default this only includes \`"amqp:connection:forced"\`).
+- **CONFIG\_AMQP\_NON\_FATAL\_ERRORS** (default: `['amqp:connection:forced']`): An array of error conditions which if received on connection close from peer should not prevent reconnect (by default this only includes \`"amqp:connection:forced"\`).
+- **CONFIG\_AMQP\_CA\_PATH** (default: `undefined`): The path to the CA certificate file
+- **CONFIG\_AMQP\_CLIENT\_CERT\_PATH** (default: `undefined`): The path to the client certificate file
+- **CONFIG\_AMQP\_CLIENT\_KEY\_PATH** (default: `undefined`): The path to the client key file
+- **CONFIG\_AMQP\_REQUEST\_CERT** (default: `false`): If true the server will request a certificate from clients that connect and attempt to verify that certificate. Defaults to false.
+- **CONFIG\_AMQP\_REJECT\_UNAUTHORIZED** (default: `true`): If true the server will reject any connection which is not authorized with the list of supplied CAs. This option only has an effect if requestCert is true.
+- **NODE\_APP\_INSTANCE** (default: `undefined`): Used as default container id, receiver name, sender name, etc. in cluster configurations.
 
 ## **License**
 

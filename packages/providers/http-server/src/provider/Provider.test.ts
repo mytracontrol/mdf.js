@@ -7,7 +7,6 @@
 import { Layer } from '@mdf.js/core';
 import { Crash } from '@mdf.js/crash';
 import { LoggerInstance } from '@mdf.js/logger';
-import { undoMocks } from '@mdf.js/utils';
 import express from 'express';
 import { Server } from 'http';
 import { Factory } from './Factory';
@@ -44,7 +43,8 @@ class FakeLogger {
 describe('#Port #HTTP-Server', () => {
   describe('#Happy path', () => {
     afterEach(() => {
-      undoMocks();
+      jest.clearAllMocks();
+      jest.restoreAllMocks();
     });
     it('Should create provider using the factory instance with default configuration and an app', () => {
       const provider = Factory.create({ config: DEFAULT_CONFIG });

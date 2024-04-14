@@ -1,8 +1,8 @@
 # **@mdf.js/service-registry**
 
-[![Node Version](https://img.shields.io/static/v1?style=flat&logo=node.js&logoColor=green&label=node&message=%3E=20&color=blue)](https://nodejs.org/en/)
-[![Typescript Version](https://img.shields.io/static/v1?style=flat&logo=typescript&label=Typescript&message=5.4&color=blue)](https://www.typescriptlang.org/)
-[![Known Vulnerabilities](https://img.shields.io/static/v1?style=flat&logo=snyk&label=Vulnerabilities&message=0&color=300A98F)](https://snyk.io/package/npm/snyk)
+[![Node Version](https://img.shields.io/static/v1?style=flat\&logo=node.js\&logoColor=green\&label=node\&message=%3E=20\&color=blue)](https://nodejs.org/en/)
+[![Typescript Version](https://img.shields.io/static/v1?style=flat\&logo=typescript\&label=Typescript\&message=5.4\&color=blue)](https://www.typescriptlang.org/)
+[![Known Vulnerabilities](https://img.shields.io/static/v1?style=flat\&logo=snyk\&label=Vulnerabilities\&message=0\&color=300A98F)](https://snyk.io/package/npm/snyk)
 
 <!-- markdownlint-disable MD033 MD041 -->
 
@@ -18,7 +18,7 @@
 
 <!-- markdownlint-enable MD033 -->
 
----
+***
 
 ## **Table of contents**
 
@@ -50,7 +50,7 @@ In summary, the **@mdf.js/service-register** module provides the following featu
 
 The **@mdf.js/service-register** module is intended to be loaded at the start of the application, even supporting the use of [`cluster`](https://nodejs.org/api/cluster.html) for creating multiple instances of the application.
 
-_With default parameters:_
+*With default parameters:*
 
 ```typescript
 import { ServiceRegistry } from '@mdf.js/service-registry';
@@ -61,7 +61,7 @@ service.register([myProvider, myResource, myService]);
 await service.start(); // This also starts the registered resources
 ```
 
-_With custom parameters:_
+*With custom parameters:*
 
 ```typescript
 import { ServiceRegistry } from '@mdf.js/service-registry';
@@ -100,7 +100,7 @@ service.register([myProvider, myResource, myService]);
 await service.start(); // This also starts the registered resources
 ```
 
-_Using `cluster` for creating multiple instances:_
+*Using `cluster` for creating multiple instances:*
 
 ```typescript
 import { ServiceRegistry } from '@mdf.js/service-registry';
@@ -242,11 +242,13 @@ const service = new ServiceRegistry(
       - `stop:${namespace}:resources`: Stop the resources of the service. (Only available if the service is NOT in cluster mode).
       - `restart:${namespace}:all`: Kill the process, the service restart should be done by an external process manager.
   - **Default value**: `undefined`
+
 - `adapterOptions` (`AdapterOptions`): Consumer adapter options: Redis or SocketIO. In order to configure the consumer instance, `consumer` and `adapter` options must be provided, in other case the consumer will start with a Dummy adapter with no connection to any external service, so only HTTP commands over the observability endpoints will be processed.
   - **Properties**:
     - `type` (`string`): Type of the adapter, could be `redis` or `socketio`.
     - `config` (`Redis.Config` | `SocketIO.Config`): Configuration options for the adapter, depending on the type of adapter. Check the documentations of the providers [**@mdf.js/redis-provider**](https://https://www.npmjs.com/package/@mdf.js/redis-provider) and [**@mdf.js/socket-client-provider**](https://www.npmjs.com/package/@mdf.js/socket-client-provider) for more details.
   - **Default value**: `undefined`
+
 - `observabilityOptions` (`ObservabilityOptions`): Observability configuration options.
   - **Properties**:
     - `port` (`number`): Port of the observability server.
@@ -257,7 +259,7 @@ const service = new ServiceRegistry(
     - `clusterUpdateInterval` (`number`): Interval of time in milliseconds to update the cluster information.
     - `maxSize` (`number`): Maximum size of the error register.
   - **Default value**:
-  
+
     ```ts
     {
       primaryPort: 9080,
@@ -289,7 +291,7 @@ const service = new ServiceRegistry(
 - `retryOptions` (`RetryOptions`): Retry options. If provided, the application will use this options to retry to start the services/resources registered in the Application Wrapped instance. If this options is not provided, the application will not retry to start the services/resources.
   - **Properties**: check the documentation of the package [@mdf.js/utils](https://www.npmjs.com/package/@mdf.js/utils).
   - **Default value**:
-  
+
     ```ts
     {
       attempts: 3,
@@ -300,24 +302,25 @@ const service = new ServiceRegistry(
     ```
 
 - `configLoaderOptions` (`ConfigLoaderOptions`): Configuration loader options. These options is used to load the configuration information of the application that is been wrapped by the Application Wrapper. This configuration could be loaded from files or environment variables, or even both.
-  
+
   To understand the configuration loader options, check the documentation of the package [@mdf.js/service-setup-provider](https://www.npmjs.com/package/@mdf.js/service-setup-provider).
-  >**Note**: Use different files for Application Wrapper configuration and for your own services to avoid conflicts.
+
+  > **Note**: Use different files for Application Wrapper configuration and for your own services to avoid conflicts.
 
   - **Properties**: check the documentation of the package [@mdf.js/service-setup-provider](https://www.npmjs.com/package/@mdf.js/service-setup-provider).
   - **Default value**:
-  
-      ```ts
-      {
-        configFiles: ['./config/custom/*.*'],
-        presetFiles: ['./config/custom/presets/*.*'],
-        schemaFiles: ['./config/custom/schemas/*.*'],
-        preset: process.env['CONFIG_CUSTOM_PRESET'] || process.env['CONFIG_SERVICE_REGISTRY_PRESET'],
-        useEnvironment: false,
-        loadReadme: false,
-        loadPackage: false,
-      }
-      ```
+
+    ```ts
+    {
+      configFiles: ['./config/custom/*.*'],
+      presetFiles: ['./config/custom/presets/*.*'],
+      schemaFiles: ['./config/custom/schemas/*.*'],
+      preset: process.env['CONFIG_CUSTOM_PRESET'] || process.env['CONFIG_SERVICE_REGISTRY_PRESET'],
+      useEnvironment: false,
+      loadReadme: false,
+      loadPackage: false,
+    }
+    ```
 
 #### **CustomOptions**
 
@@ -363,10 +366,17 @@ If the user register a service that fullfil the `Layer.App.Service` interface, i
 The **@mdf.js/service-registry** module use the [OpenC2](https://openc2.org/) as Command and Control Interface (CCI).
 
 This interface are based on the two modules of **@mdf.js**:
+
 - **@mdf.js/openc2-core**: module that implement the OpenC2 core specification for Consumer, Provider and Gateway entities, not attached to any transport layer.
 - **@mdf.js/openc2**: module that implement a tooling interface, to allow the use of OpenC2 entities over several transport layers: MQTT, Redis Pub/Sub, AMQP, SocketIO ...
 
 Please check the documentation of the packages [@mdf.js/openc2](https://www.npmjs.com/package/@mdf.js/openc2) and [@mdf.js/openc2-core](https://www.npmjs.com/package/@mdf.js/openc2-core), and the OpenC2 specification for more details.
+
+## **Environment variables**
+
+- **CONFIG\_CUSTOM\_PRESET**: Default custom config loader options
+- **CONFIG\_SERVICE\_REGISTRY\_PRESET**: Default service registry config loader options
+- **NODE\_APP\_INSTANCE**: Create a new instance of MetricsAggregator @param logger - Instance for logging @param port - Optional AggregatorRegistry for cluster metrics
 
 ## **License**
 

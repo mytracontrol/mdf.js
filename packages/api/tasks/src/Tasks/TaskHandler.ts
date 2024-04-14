@@ -15,6 +15,7 @@ import {
   DEFAULT_RETRY_OPTIONS,
   DEFAULT_RETRY_STRATEGY,
   DEFAULT_WEIGHT,
+  DoneEventHandler,
   MetaData,
   RETRY_STRATEGY,
   RetryStrategy,
@@ -24,16 +25,73 @@ import {
 } from './types';
 
 /** Represents the task handler */
-export declare interface TaskHandler<T, U> {
-  /** Emitted when a task has ended */
-  on(
-    event: 'done',
-    listener: (uuid: string, result: T, meta: MetaData, error?: Crash) => void
-  ): this;
+export declare interface TaskHandler<Result, Binded> {
+  /**
+   * Register an event listener over the `done` event, which is emitted when a task has ended, either
+   * due to completion or failure.
+   * @param uuid - The unique identifier of the task
+   * @param result - The result of the task
+   * @param meta - The {@link MetaData} information of the task, including all the relevant information
+   * @param error - The error of the task, if any
+   */
+  on(event: 'done', listener: DoneEventHandler<Result>): this;
+  /**
+   * Register an event listener over the `done` event, which is emitted when a task has ended, either
+   * due to completion or failure.
+   * @param uuid - The unique identifier of the task
+   * @param result - The result of the task
+   * @param meta - The {@link MetaData} information of the task, including all the relevant information
+   * @param error - The error of the task, if any
+   */
+  addListener(event: 'done', listener: DoneEventHandler<Result>): this;
+  /**
+   * Registers a event listener over the `done` event, at the beginning of the listeners array,
+   * which is emitted when a task has ended, either due to completion or failure.
+   * @param uuid - The unique identifier of the task
+   * @param result - The result of the task
+   * @param meta - The {@link MetaData} information of the task, including all the relevant information
+   * @param error - The error of the task, if any
+   */
+  prependListener(event: 'done', listener: DoneEventHandler<Result>): this;
+  /**
+   * Registers a one-time event listener over the `done` event, which is emitted when a task has
+   * ended, either due to completion or failure.
+   * @param uuid - The unique identifier of the task
+   * @param result - The result of the task
+   * @param meta - The {@link MetaData} information of the task, including all the relevant information
+   * @param error - The error of the task, if any
+   */
+  once(event: 'done', listener: DoneEventHandler<Result>): this;
+  /**
+   * Registers a one-time event listener over the `done` event, at the beginning of the listeners
+   * array, which is emitted when a task has ended, either due to completion or failure.
+   * @param uuid - The unique identifier of the task
+   * @param result - The result of the task
+   * @param meta - The {@link MetaData} information of the task, including all the relevant information
+   * @param error - The error of the task, if any
+   */
+  prependOnceListener(event: 'done', listener: DoneEventHandler<Result>): this;
+  /**
+   * Removes the specified listener from the listener array for the `done` event.
+   * @param event - `done` event
+   * @param listener - The listener function to remove
+   */
+  removeListener(event: 'done', listener: DoneEventHandler<Result>): this;
+  /**
+   * Removes the specified listener from the listener array for the `done` event.
+   * @param event - `done` event
+   * @param listener - The listener function to remove
+   */
+  off(event: 'done', listener: DoneEventHandler<Result>): this;
+  /**
+   * Removes all listeners, or those of the specified event.
+   * @param event - `done` event
+   */
+  removeAllListeners(event?: 'done'): this;
 }
 
 /** Represents the task handler */
-export abstract class TaskHandler<T = any, U = any> extends EventEmitter {
+export abstract class TaskHandler<Result = any, Binded = any> extends EventEmitter {
   /** Unique task identification, unique for each task */
   public readonly uuid: string;
   /** Task identifier, defined by the user */
@@ -61,16 +119,16 @@ export abstract class TaskHandler<T = any, U = any> extends EventEmitter {
   /** Retry options */
   protected retryOptions: RetryOptions;
   /** Context to be bind to the task */
-  protected context?: U;
+  protected context?: Binded;
   /** Result of the task */
-  private result?: T;
+  private result?: Result;
   /** Strategy to retry the task */
   private readonly strategy: RetryStrategy;
   /**
    * Create a new task handler
    * @param options - The options for the task
    */
-  constructor(options: TaskOptions<U> = {}) {
+  constructor(options: TaskOptions<Binded> = {}) {
     super();
     this.uuid = v4();
     this.createdAt = new Date();
@@ -167,7 +225,7 @@ export abstract class TaskHandler<T = any, U = any> extends EventEmitter {
    * @param result - The result of the task
    * @returns The result
    */
-  private onSuccess(result: T): T {
+  private onSuccess(result: Result): Result {
     this.status = TASK_STATE.COMPLETED;
     this.completedAt = new Date();
     this.result = result;
@@ -195,7 +253,7 @@ export abstract class TaskHandler<T = any, U = any> extends EventEmitter {
     return completedAt - executedAt;
   }
   /** Notify that the task has been processed */
-  private done(result?: T, error?: Multi | Crash): void {
+  private done(result?: Result, error?: Multi | Crash): void {
     if (this.listenerCount('done') <= 0) {
       return;
     }
@@ -220,11 +278,11 @@ export abstract class TaskHandler<T = any, U = any> extends EventEmitter {
     };
   }
   /** Execute the task */
-  public async execute(): Promise<T> {
+  public async execute(): Promise<Result> {
     if (this.shouldBeExecuted()) {
       return this._execute().then(this.onSuccess.bind(this)).catch(this.onError.bind(this));
     }
-    return this.result as T;
+    return this.result as Result;
   }
   /** Cancel the task */
   public cancel(error?: Crash): void {
@@ -237,5 +295,5 @@ export abstract class TaskHandler<T = any, U = any> extends EventEmitter {
     }
   }
   /** Execute the underlayer execution strategy */
-  protected abstract _execute(): Promise<T>;
+  protected abstract _execute(): Promise<Result>;
 }

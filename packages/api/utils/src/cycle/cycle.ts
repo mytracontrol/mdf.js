@@ -44,6 +44,12 @@ export function deCycle(object: any, replacer?: (value: any) => any) {
     return value;
   })(object, '$');
 }
+
+/**
+ * Re-cycle an object to its original form
+ * @param $ - The object to be recycled
+ * @returns The recycled object
+ */
 export function retroCycle($: any) {
   const px = /^\$(?:\[(?:\d+|"(?:[^\\"\u0000-\u001f]|\\(?:[\\"\/bfnrt]|u[0-9a-zA-Z]{4}))*")\])*$/;
   function processArray(value: any[]) {

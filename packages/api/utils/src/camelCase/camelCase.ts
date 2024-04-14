@@ -60,7 +60,7 @@ type StringTransformer = (input: string) => string;
  * ```
  * @returns
  */
-export function camelCase(input: string | string[], options?: Options) {
+export function camelCase(input: string | string[], options?: Options): string {
   if (!(typeof input === 'string' || Array.isArray(input))) {
     throw new Crash('Expected the input to be `string | string[]`', { name: 'TypeError' });
   }

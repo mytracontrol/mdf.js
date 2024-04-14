@@ -5,7 +5,11 @@
  * or at https://opensource.org/licenses/MIT.
  */
 
-import { CONFIG_ARTIFACT_ID, defaultConfig as commonDefaultConfig } from '../../Common';
+import {
+  CONFIG_ARTIFACT_ID,
+  NODE_APP_INSTANCE,
+  defaultConfig as commonDefaultConfig,
+} from '../../Common';
 import { Config } from '../types';
 
 // *************************************************************************************************
@@ -17,7 +21,7 @@ const DEFAULT_CONFIG_AMQP_SENDER_TARGET = {};
 export const defaultConfig: Config = {
   ...commonDefaultConfig,
   sender_options: {
-    name: process.env['NODE_APP_INSTANCE'] || CONFIG_ARTIFACT_ID,
+    name: NODE_APP_INSTANCE || CONFIG_ARTIFACT_ID,
     snd_settle_mode: DEFAULT_CONFIG_AMQP_SENDER_SETTLE_MODE,
     autosettle: DEFAULT_CONFIG_AMQP_SENDER_AUTO_SETTLE,
     target: DEFAULT_CONFIG_AMQP_SENDER_TARGET,

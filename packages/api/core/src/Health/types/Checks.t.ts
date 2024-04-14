@@ -5,10 +5,13 @@
  * or at https://opensource.org/licenses/MIT.
  */
 
-type ComponentName = string;
-type MeasurementName = string;
 import { Check } from './Check.i';
 
+/** String alias type for a component name */
+export type ComponentName = string;
+/** String alias type for a measurement name */
+export type MeasurementName = string;
+/** A check entry is a string that represents a unique key in the checks object */
 export type CheckEntry = `${ComponentName}:${MeasurementName}`;
 /**
  * The “checks” object MAY have a number of unique keys, one for each logical sub-components.

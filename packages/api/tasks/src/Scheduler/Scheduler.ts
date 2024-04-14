@@ -21,16 +21,8 @@ import {
   PollingGroup,
   TaskBaseConfig,
 } from '../Polling';
-import { MetaData } from '../Tasks';
+import { DoneEventHandler, MetaData } from '../Tasks';
 import { SchedulerOptions } from './types';
-
-/** Task done event handler */
-export type DoneEventHandler<Result> = (
-  uuid: string,
-  result: Result,
-  meta: MetaData,
-  error?: Crash | Multi
-) => void;
 
 export declare interface Scheduler<Result = any> {
   /**

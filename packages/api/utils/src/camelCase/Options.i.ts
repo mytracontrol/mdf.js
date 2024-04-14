@@ -13,7 +13,7 @@ export interface Options {
    */
   readonly pascalCase?: boolean;
   /**
-   * Preserve consecutive uppercase characters: `foo-BAR` → `FooBAR`.
+   * Preserve consecutive uppercase characters: `foo-BAR` → `fooBAR`.
    * @default false
    */
   readonly preserveConsecutiveUppercase?: boolean;

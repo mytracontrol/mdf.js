@@ -7,7 +7,6 @@
 import { Layer } from '@mdf.js/core';
 import { Crash } from '@mdf.js/crash';
 import { LoggerInstance } from '@mdf.js/logger';
-import { undoMocks } from '@mdf.js/utils';
 import { EventEmitter } from 'events';
 import { ReceiverEvents } from 'rhea-promise';
 import { Factory } from './Factory';
@@ -102,7 +101,6 @@ class FakeReceiver extends EventEmitter {
 describe('#Port #AMQP #Receiver', () => {
   describe('#Happy path', () => {
     afterEach(() => {
-      undoMocks();
       jest.clearAllMocks();
     });
     it('Should create provider using the factory instance with default configuration', () => {

@@ -75,6 +75,7 @@ Checks included in the provider:
 - **CONFIG\_REDIS\_CONNECTION\_TIMEOUT**: Default REDIS connection keepAlive
 - **CONFIG\_REDIS\_CHECK\_INTERVAL**: Default REDIS status check interval
 - **CONFIG\_REDIS\_DISABLE\_CHECKS**: Disable Redis checks
+- **NODE\_APP\_INSTANCE**: undefined
 
 ## **License**
 

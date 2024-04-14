@@ -57,6 +57,10 @@ The **@mdf.js/core** module is composed of the following elements:
 
 ## **Installation**
 
+To install the **@mdf.js/core** module, you can use the following commands:
+
+- **npm**
+
 ```shell
 npm install @mdf.js/core
 ```

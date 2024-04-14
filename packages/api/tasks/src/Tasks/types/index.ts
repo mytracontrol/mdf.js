@@ -5,6 +5,7 @@
  * or at https://opensource.org/licenses/MIT.
  */
 
+export * from './DoneEventHandler.t';
 export * from './MetaData.i';
 export * from './RetryStrategy.t';
 export * from './SequencePattern.i';

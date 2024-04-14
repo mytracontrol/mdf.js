@@ -8,7 +8,6 @@
 // #region Component imports
 import { Health, Layer } from '@mdf.js/core';
 import { DebugLogger } from '@mdf.js/logger';
-import { undoMocks } from '@mdf.js/utils';
 import { WorkerPort } from '.';
 import { Aggregator } from '../Aggregator';
 import { OurProvider } from '../test/Health.assets';
@@ -35,9 +34,6 @@ const logger = new DebugLogger('test');
 // #region Our tests
 describe('#Health #Port #Worker', () => {
   describe('#Happy path', () => {
-    afterEach(function () {
-      undoMocks();
-    });
     it(`Should return the correct health of the worker service`, () => {
       const aggregator = new Aggregator(microservice, logger);
       aggregator.register([providerPass, providerWarn, providerFail]);

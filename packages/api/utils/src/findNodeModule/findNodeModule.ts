@@ -11,7 +11,7 @@ import path from 'path';
  * Find the path to a node module in every parent directory (node_modules).
  * @param module - Module name
  * @param dir - Directory to start searching from
- * @returns
+ * @returns Path to the module or undefined if not found
  */
 export function findNodeModule(module: string, dir: string = __dirname): string | undefined {
   let modulePath: string | undefined;

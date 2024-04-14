@@ -34,6 +34,7 @@ export {
   SchedulerOptions,
 } from './Scheduler';
 export {
+  DoneEventHandler as DoneListener,
   Group,
   MetaData,
   RETRY_STRATEGY,

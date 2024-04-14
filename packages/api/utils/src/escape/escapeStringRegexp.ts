@@ -7,6 +7,10 @@
 
 import util from 'util';
 
+/**
+ * Escape a regular expression string.
+ * @param regex - Regular expression to escape.
+ */
 export function escapeRegExp(regex: RegExp): string {
   if (!util.types.isRegExp(regex)) {
     throw new TypeError('Expected a RegExp');

@@ -6,18 +6,11 @@
  */
 
 import { Crash, Multi } from '@mdf.js/crash';
-import { undoMocks } from '@mdf.js/utils';
 import fs from 'fs';
 import { SettingsManager } from '.';
-
 describe('#SettingsManager', () => {
-  beforeEach(() => {
-    undoMocks();
-  });
   describe('#Happy path', () => {
-    beforeEach(() => {
-      undoMocks();
-    });
+    beforeEach(() => {});
     it(`Should create a valid instance of SettingsManager with default values`, async () => {
       const manager = new SettingsManager();
       expect(manager).toBeInstanceOf(SettingsManager);
@@ -153,9 +146,6 @@ describe('#SettingsManager', () => {
     });
   });
   describe('#Sad path', () => {
-    beforeEach(() => {
-      undoMocks();
-    });
     it(`Should create a valid instance of SettingsManager when there is a problem reading the "package.json" file`, async () => {
       jest
         .spyOn(fs, 'readFileSync')

@@ -5,7 +5,7 @@
  * or at https://opensource.org/licenses/MIT.
  */
 
-import { Crash, Multi } from '@mdf.js/crash';
+import { Crash } from '@mdf.js/crash';
 import { TaskArguments, TaskAsPromise } from '@mdf.js/utils';
 import { setTimeout as waitFor } from 'timers/promises';
 import { MetaData, Single, TaskHandler, TaskOptions } from '../Tasks';
@@ -56,10 +56,10 @@ export class Limiter extends LimiterStateHandler {
     if (!this.enqueue(handler)) {
       return undefined;
     }
-    const onDone = (uuid: string, result: T, meta: MetaData, error?: Multi) => {
+    const onDone = (uuid: string, result: T, meta: MetaData, error?: Crash) => {
       this.dec();
-      this.emit('done', uuid, meta, error);
-      this.emit(handler.taskId, result, error);
+      this.emit('done', uuid, result, meta, error);
+      this.emit(handler.taskId, uuid, result, meta, error);
     };
     handler.once('done', onDone);
     return handler.taskId;
@@ -92,15 +92,15 @@ export class Limiter extends LimiterStateHandler {
       throw new Crash('The job could not be scheduled', { name: 'JobSchedulingError' });
     }
     return new Promise((resolve, reject) => {
-      const onDone = (uuid: string, result: T, meta: MetaData, error?: Multi) => {
+      const onDone = (uuid: string, result: T, meta: MetaData, error?: Crash) => {
         if (error) {
           reject(error);
         } else {
           resolve(result);
         }
         this.dec();
-        this.emit('done', uuid, meta, error);
-        this.emit(handler.taskId, result, error);
+        this.emit('done', uuid, result, meta, error);
+        this.emit(handler.taskId, uuid, result, meta, error);
       };
       handler.once('done', onDone);
     });

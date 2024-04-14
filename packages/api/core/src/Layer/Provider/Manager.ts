@@ -19,8 +19,6 @@ import { Port } from './Port';
 import { ErrorState, State, StoppedState } from './states';
 import { ProviderOptions, ProviderState, ProviderStatus } from './types';
 
-type ProviderError = Multi | Crash | undefined;
-
 export declare interface Manager<
   PortClient,
   PortConfig,
@@ -140,7 +138,7 @@ export class Manager<PortClient, PortConfig, PortInstance extends Port<PortClien
   /** Debug logger*/
   private readonly logger: LoggerInstance;
   /** Error in error state */
-  private _error: ProviderError;
+  private _error?: Multi | Crash;
   /** Provider actual state */
   private _state: State;
   /** Timestamp of actual state */
@@ -187,7 +185,7 @@ export class Manager<PortClient, PortConfig, PortInstance extends Port<PortClien
     }
   }
   /** Return the errors in the provider */
-  public get error(): ProviderError {
+  public get error(): Multi | Crash | undefined {
     return this._error;
   }
   /** Provider state */
@@ -274,7 +272,7 @@ export class Manager<PortClient, PortConfig, PortInstance extends Port<PortClien
    * @returns
    */
   private formatError(error: unknown): Multi | Crash {
-    let formattedError: ProviderError;
+    let formattedError: Multi | Crash | undefined;
     if (error instanceof ValidationError) {
       if (
         this._error &&

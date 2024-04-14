@@ -28,45 +28,35 @@ export declare interface JobHandler<Type extends string> {
    * Register an event listener over the `done` event, which is emitted when a job has ended, either
    * due to completion or failure.
    * @param event - `done` event
-   * @param uuid - Unique job processing identification
-   * @param result - Job {@link Result}
-   * @param error - Error raised during job processing, if any
+   * @param listener - The listener function to add
    */
   on(event: 'done', listener: DoneEventHandler<Type>): this;
   /**
    * Register an event listener over the `done` event, which is emitted when a job has ended, either
    * due to completion or failure.
    * @param event - `done` event
-   * @param uuid - Unique job processing identification
-   * @param result - Job {@link Result}
-   * @param error - Error raised during job processing, if any
+   * @param listener - The listener function to add
    */
   addListener(event: 'done', listener: DoneEventHandler<Type>): this;
   /**
    * Registers a event listener over the `done` event, at the beginning of the listeners array,
    * which is emitted when a job has ended, either due to completion or failure.
    * @param event - `done` event
-   * @param uuid - Unique job processing identification
-   * @param result - Job {@link Result}
-   * @param error - Error raised during job processing, if any
+   * @param listener - The listener function to add
    */
   prependListener(event: 'done', listener: DoneEventHandler<Type>): this;
   /**
    * Registers a one-time event listener over the `done` event, which is emitted when a job has
    * ended, either due to completion or failure.
    * @param event - `done` event
-   * @param uuid - Unique job processing identification
-   * @param result - Job {@link Result}
-   * @param error - Error raised during job processing, if any
+   * @param listener - The listener function to add
    */
   once(event: 'done', listener: DoneEventHandler<Type>): this;
   /**
    * Registers a one-time event listener over the `done` event, at the beginning of the listeners
    * array, which is emitted when a job has ended, either due to completion or failure.
    * @param event - `done` event
-   * @param uuid - Unique job processing identification
-   * @param result - Job {@link Result}
-   * @param error - Error raised during job processing, if any
+   * @param listener - The listener function to add
    */
   prependOnceListener(event: 'done', listener: DoneEventHandler<Type>): this;
   /**

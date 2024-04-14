@@ -9,7 +9,6 @@
 import { Health } from '@mdf.js/core';
 import { Crash } from '@mdf.js/crash';
 import { DebugLogger } from '@mdf.js/logger';
-import { undoMocks } from '@mdf.js/utils';
 import cluster from 'cluster';
 import { ErrorRegistry } from '.';
 import { MasterPort, WorkerPort } from './Ports';
@@ -169,7 +168,6 @@ describe('#Register #Service', () => {
       expect(service.size).toEqual(0);
       service.start();
       service.stop();
-      undoMocks();
     }, 300);
     it(`Should include the stack on emitted events from monitored components`, () => {
       const service = new ErrorRegistry({

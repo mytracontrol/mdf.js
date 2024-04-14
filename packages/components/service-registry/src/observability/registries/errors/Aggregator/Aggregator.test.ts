@@ -8,7 +8,6 @@
 // #region Component imports
 import { Crash } from '@mdf.js/crash';
 import { DebugLogger } from '@mdf.js/logger';
-import { undoMocks } from '@mdf.js/utils';
 import { Aggregator } from './Aggregator';
 const UUID_FAKE = 'a1e4e76a-8e1a-425c-883d-4d75760f9cee';
 const logger = new DebugLogger(`test`);
@@ -17,9 +16,6 @@ const logger = new DebugLogger(`test`);
 // #region Our tests
 describe('#Register #Port #Aggregator', () => {
   describe('#Happy path', () => {
-    afterEach(function () {
-      undoMocks();
-    });
     it(`Should create a valid instance of a aggregator`, done => {
       const aggregator = new Aggregator(logger);
       expect(aggregator).toBeDefined();

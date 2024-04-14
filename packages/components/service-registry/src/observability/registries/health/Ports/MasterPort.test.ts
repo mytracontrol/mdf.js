@@ -8,7 +8,6 @@
 // #region Component imports
 import { Health, Layer } from '@mdf.js/core';
 import { DebugLogger } from '@mdf.js/logger';
-import { mockProperty, undoMocks } from '@mdf.js/utils';
 import cluster from 'cluster';
 import { MasterPort } from '.';
 import { Aggregator } from '../Aggregator';
@@ -36,8 +35,9 @@ const logger = new DebugLogger('test');
 // #region Our tests
 describe('#Health #Port #Master', () => {
   describe('#Happy path', () => {
-    afterEach(function () {
-      undoMocks();
+    afterEach(() => {
+      jest.clearAllMocks();
+      jest.restoreAllMocks();
     });
     it(`Should return the correct health of the master service`, () => {
       const aggregator = new Aggregator(microservice, logger);
@@ -118,7 +118,7 @@ describe('#Health #Port #Master', () => {
         worker2: createWorker(2),
       };
       //@ts-ignore Test environment
-      mockProperty(cluster, 'workers', workers);
+      jest.replaceProperty(cluster, 'workers', workers);
       const aggregator = new Aggregator(microservice, logger);
       const port = new MasterPort(aggregator, logger, 200);
       port.start();
@@ -289,7 +289,7 @@ describe('#Health #Port #Master', () => {
         worker2: createWorker(2),
       };
       //@ts-ignore Test environment
-      mockProperty(cluster, 'workers', workers);
+      jest.replaceProperty(cluster, 'workers', workers);
       const aggregator = new Aggregator(microservice, logger);
       const port = new MasterPort(aggregator, logger, 200);
       port.start();
@@ -439,7 +439,7 @@ describe('#Health #Port #Master', () => {
         worker2: createWorker(2),
       };
       //@ts-ignore Test environment
-      mockProperty(cluster, 'workers', workers);
+      jest.replaceProperty(cluster, 'workers', workers);
       const aggregator = new Aggregator(microservice, logger);
       const port = new MasterPort(aggregator, logger, 200);
       port.start();

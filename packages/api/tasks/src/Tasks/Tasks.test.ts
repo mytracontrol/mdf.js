@@ -627,7 +627,7 @@ describe('#Limiter', () => {
           reason: 'Execution error in task [test]: Task [test] was cancelled by the user',
         });
         expect(error).toBeInstanceOf(Error);
-        expect(error.message).toBe(
+        expect((error as Error).message).toBe(
           'Execution error in task [test]: Task [test] was cancelled by the user'
         );
       });
@@ -667,7 +667,7 @@ describe('#Limiter', () => {
           reason: 'Execution error in task [test]: Task [test] was cancelled by the user',
         });
         expect(error).toBeInstanceOf(Error);
-        expect(error.message).toBe(
+        expect((error as Error).message).toBe(
           'Execution error in task [test]: Task [test] was cancelled by the user'
         );
       });
@@ -924,7 +924,7 @@ describe('#Limiter', () => {
           reason: 'Execution error in task [test]: This is an error',
         });
         expect(error).toBeInstanceOf(Error);
-        expect(error.message).toBe('Execution error in task [test]: This is an error');
+        expect((error as Error).message).toBe('Execution error in task [test]: This is an error');
       });
       try {
         await unBindedTask.execute();
@@ -976,7 +976,7 @@ describe('#Limiter', () => {
           reason: 'Execution error in task [test]: This is an error',
         });
         expect(error).toBeInstanceOf(Error);
-        expect(error.message).toBe('Execution error in task [test]: This is an error');
+        expect((error as Error).message).toBe('Execution error in task [test]: This is an error');
       });
       try {
         await bindedTask.execute();
@@ -1023,7 +1023,7 @@ describe('#Limiter', () => {
           reason: `Execution error in task [${defaultTask.taskId}]: This is an error`,
         });
         expect(error).toBeInstanceOf(Error);
-        expect(error.message).toBe(
+        expect((error as Error).message).toBe(
           `Execution error in task [${defaultTask.taskId}]: This is an error`
         );
       });
@@ -1148,7 +1148,7 @@ describe('#Limiter', () => {
           reason: errorString,
         });
         expect(error).toBeInstanceOf(Crash);
-        expect(error.message).toBe(errorString);
+        expect((error as Error).message).toBe(errorString);
       });
       try {
         await group.execute();
@@ -1839,7 +1839,7 @@ describe('#Limiter', () => {
             'Execution error in task [test]: The task was aborted externally in attempt number: 0',
         });
         expect(error).toBeInstanceOf(Error);
-        expect(error.message).toBe(
+        expect((error as Error).message).toBe(
           'Execution error in task [test]: The task was aborted externally in attempt number: 0'
         );
       });

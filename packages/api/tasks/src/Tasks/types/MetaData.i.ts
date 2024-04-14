@@ -33,6 +33,9 @@ export interface MetaData {
   priority: number;
   /** Task weight */
   weight: number;
-  /** Additional metadata in case the execution required execute other task */
+  /**
+   * Additional metadata objects, store the metadata information from related tasks in a sequence or
+   * group
+   */
   $meta?: MetaData[];
 }

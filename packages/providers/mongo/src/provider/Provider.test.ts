@@ -7,7 +7,6 @@
 import { Layer } from '@mdf.js/core';
 import { Crash } from '@mdf.js/crash';
 import { LoggerInstance } from '@mdf.js/logger';
-import { undoMocks } from '@mdf.js/utils';
 import { MongoClient } from 'mongodb';
 import { Factory } from './Factory';
 import { Port } from './Port';
@@ -54,7 +53,6 @@ describe('#Port #Mongo', () => {
   describe('#Happy path', () => {
     afterEach(() => {
       jest.clearAllMocks();
-      undoMocks();
     });
     it('Should create provider using the factory instance with default configuration', () => {
       const provider = Factory.create();

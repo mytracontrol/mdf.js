@@ -8,7 +8,6 @@
 // #region Component imports
 import { Crash } from '@mdf.js/crash';
 import { DebugLogger } from '@mdf.js/logger';
-import { mockProperty, undoMocks } from '@mdf.js/utils';
 import cluster from 'cluster';
 import { MasterPort } from '.';
 import { Aggregator } from '../Aggregator';
@@ -20,8 +19,9 @@ const logger = new DebugLogger(`test`);
 // #region Our tests
 describe('#Register #Port #Master', () => {
   describe('#Happy path', () => {
-    afterEach(function () {
-      undoMocks();
+    afterEach(() => {
+      jest.clearAllMocks();
+      jest.restoreAllMocks();
     });
     it(`Should create a valid instance of a master registry`, () => {
       const aggregator = new Aggregator(logger);
@@ -51,7 +51,7 @@ describe('#Register #Port #Master', () => {
         worker1: createWorker(1),
       };
       //@ts-ignore Test environment
-      mockProperty(cluster, 'workers', workers);
+      jest.replaceProperty(cluster, 'workers', workers);
       const aggregator = new Aggregator(logger);
       const port = new MasterPort(aggregator, logger);
       port.clear();
@@ -96,7 +96,7 @@ describe('#Register #Port #Master', () => {
         worker2: createWorker(2),
       };
       //@ts-ignore Test environment
-      mockProperty(cluster, 'workers', workers);
+      jest.replaceProperty(cluster, 'workers', workers);
       const aggregator = new Aggregator(logger);
       const port = new MasterPort(aggregator, logger, 200);
       const ownError = new Crash(`myMessage`, UUID_FAKE, {
@@ -182,7 +182,7 @@ describe('#Register #Port #Master', () => {
         worker2: createWorker(2),
       };
       //@ts-ignore Test environment
-      mockProperty(cluster, 'workers', workers);
+      jest.replaceProperty(cluster, 'workers', workers);
       const aggregator = new Aggregator(logger);
       const port = new MasterPort(aggregator, logger, 200);
       port.start();
@@ -244,7 +244,7 @@ describe('#Register #Port #Master', () => {
         worker2: createWorker(2),
       };
       //@ts-ignore Test environment
-      mockProperty(cluster, 'workers', workers);
+      jest.replaceProperty(cluster, 'workers', workers);
       const aggregator = new Aggregator(logger);
       const port = new MasterPort(aggregator, logger, 200);
       port.start();

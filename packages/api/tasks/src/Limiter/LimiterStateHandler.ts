@@ -8,10 +8,180 @@
 import { Crash } from '@mdf.js/crash';
 import EventEmitter from 'events';
 import { cloneDeep, merge } from 'lodash';
-import { TaskHandler } from '../Tasks';
+import { DoneEventHandler, TaskHandler } from '../Tasks';
 import { Queue } from './Queue';
 import { ConsolidatedLimiterOptions, DEFAULT_OPTIONS, LimiterOptions, LimiterState } from './types';
 
+export declare interface LimiterStateHandler {
+  /**
+   * Register an event listener over the `done` event, which is emitted when a task has ended, either
+   * due to completion or failure.
+   * @param uuid - The unique identifier of the task
+   * @param result - The result of the task
+   * @param meta - The {@link MetaData} information of the task, including all the relevant information
+   * @param error - The error of the task, if any
+   */
+  on(event: 'done' | string, listener: DoneEventHandler): this;
+  /**
+   * Register an event listener over the `done` event, which is emitted when a task has ended, either
+   * due to completion or failure.
+   * @param uuid - The unique identifier of the task
+   * @param result - The result of the task
+   * @param meta - The {@link MetaData} information of the task, including all the relevant information
+   * @param error - The error of the task, if any
+   */
+  addListener(event: 'done' | string, listener: DoneEventHandler): this;
+  /**
+   * Registers a event listener over the `done` event, at the beginning of the listeners array,
+   * which is emitted when a task has ended, either due to completion or failure.
+   * @param uuid - The unique identifier of the task
+   * @param result - The result of the task
+   * @param meta - The {@link MetaData} information of the task, including all the relevant information
+   * @param error - The error of the task, if any
+   */
+  prependListener(event: 'done' | string, listener: DoneEventHandler): this;
+  /**
+   * Registers a one-time event listener over the `done` event, which is emitted when a task has
+   * ended, either due to completion or failure.
+   * @param uuid - The unique identifier of the task
+   * @param result - The result of the task
+   * @param meta - The {@link MetaData} information of the task, including all the relevant information
+   * @param error - The error of the task, if any
+   */
+  once(event: 'done' | string, listener: DoneEventHandler): this;
+  /**
+   * Registers a one-time event listener over the `done` event, at the beginning of the listeners
+   * array, which is emitted when a task has ended, either due to completion or failure.
+   * @param uuid - The unique identifier of the task
+   * @param result - The result of the task
+   * @param meta - The {@link MetaData} information of the task, including all the relevant information
+   * @param error - The error of the task, if any
+   */
+  prependOnceListener(event: 'done' | string, listener: DoneEventHandler): this;
+  /**
+   * Removes the specified listener from the listener array for the `done` event.
+   * @param event - `done` event
+   * @param listener - The listener function to remove
+   */
+  removeListener(event: 'done' | string, listener: DoneEventHandler): this;
+  /**
+   * Removes the specified listener from the listener array for the `done` event.
+   * @param event - `done` event
+   * @param listener - The listener function to remove
+   */
+  off(event: 'done' | string, listener: DoneEventHandler): this;
+  /**
+   * Removes all listeners, or those of the specified event.
+   * @param event - `done` event
+   */
+  removeAllListeners(event?: 'done'): this;
+  /**
+   * Register an event listener over the `refill` event, which is emitted when queue bucket is refilled
+   * @param event - `refill` event
+   * @param listener - The listener function to add
+   */
+  on(event: 'refill', listener: () => void): this;
+  /**
+   * Register an event listener over the `refill` event, which is emitted when queue bucket is refilled
+   * @param event - `refill` event
+   * @param listener - The listener function to add
+   */
+  addListener(event: 'refill', listener: () => void): this;
+  /**
+   * Registers a event listener over the `refill` event, at the beginning of the listeners array,
+   * which is emitted when queue bucket is refilled
+   * @param event - `refill` event
+   * @param listener - The listener function to add
+   */
+  prependListener(event: 'refill', listener: () => void): this;
+  /**
+   * Registers a one-time event listener over the `refill` event, which is emitted when queue bucket
+   * is refilled
+   * @param event - `refill` event
+   * @param listener - The listener function to add
+   */
+  once(event: 'refill', listener: () => void): this;
+  /**
+   * Registers a one-time event listener over the `refill` event, at the beginning of the listeners
+   * array, which is emitted when queue bucket is refilled
+   * @param event - `refill` event
+   * @param listener - The listener function to add
+   */
+  prependOnceListener(event: 'refill', listener: () => void): this;
+  /**
+   * Removes the specified listener from the listener array for the `refill` event.
+   * @param event - `refill` event
+   * @param listener - The listener function to remove
+   */
+  removeListener(event: 'refill', listener: () => void): this;
+  /**
+   * Removes the specified listener from the listener array for the `refill` event.
+   * @param event - `refill` event
+   * @param listener - The listener function to remove
+   */
+  off(event: 'refill', listener: () => void): this;
+  /**
+   * Removes all listeners, or those of the specified event.
+   * @param event - `refill` event
+   */
+  removeAllListeners(event?: 'refill'): this;
+  /**
+   * Register an event listener over the `seed` event, which is emitted when queue is empty and a
+   * new task is added
+   * @param event - `seed` event
+   * @param listener - The listener function to add
+   */
+  on(event: 'seed', listener: () => void): this;
+  /**
+   * Register an event listener over the `seed` event, which is emitted when queue is empty and a
+   * new task is added
+   * @param event - `seed` event
+   * @param listener - The listener function to add
+   */
+  addListener(event: 'seed', listener: () => void): this;
+  /**
+   * Registers a event listener over the `seed` event, at the beginning of the listeners array, which
+   * is emitted when queue is empty and a new task is added
+   * @param event - `seed` event
+   * @param listener - The listener function to add
+   */
+  prependListener(event: 'seed', listener: () => void): this;
+  /**
+   * Registers a one-time event listener over the `seed` event, which is emitted when queue is empty
+   * and a new task is added
+   * @param event - `seed` event
+   * @param listener - The listener function to add
+   */
+  once(event: 'seed', listener: () => void): this;
+  /**
+   * Registers a one-time event listener over the `seed` event, at the beginning of the listeners
+   * array, which is emitted when queue is empty and a new task is added
+   * @param event - `seed` event
+   * @param listener - The listener function to add
+   */
+  prependOnceListener(event: 'seed', listener: () => void): this;
+  /**
+   * Removes the specified listener from the listener array for the `seed` event.
+   * @param event - `seed` event
+   * @param listener - The listener function to remove
+   */
+  removeListener(event: 'seed', listener: () => void): this;
+  /**
+   * Removes the specified listener from the listener array for the `seed` event.
+   * @param event - `seed` event
+   * @param listener - The listener function to remove
+   */
+  off(event: 'seed', listener: () => void): this;
+  /**
+   * Removes all listeners, or those of the specified event.
+   * @param event - `seed` event
+   */
+  removeAllListeners(event?: 'seed'): this;
+}
+/**
+ * A limiter state handler is a class that manages the state of a limiter, including the queue of tasks,
+ * the concurrency, and the limiter options.
+ */
 export abstract class LimiterStateHandler extends EventEmitter {
   /** The limiter queue of tasks */
   private readonly queue: Queue;

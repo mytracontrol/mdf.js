@@ -27,6 +27,8 @@
   - [**Installation**](#installation)
   - [**Information**](#information)
   - [**Use**](#use)
+    - [**Health checks**](#health-checks)
+  - [**Environment variables**](#environment-variables)
   - [**License**](#license)
 
 ## **Introduction**
@@ -53,6 +55,56 @@ Check information about **@mdf.js** providers in the documentation of the core m
 
 ## **Use**
 
+The provider implemented in this module wraps the [elasticsearch-js](https://www.npmjs.com/package/@elastic/elasticsearch) client.
+
+```typescript
+import { Elastic } from '@mdf.js/elastic-provider';
+
+const elastic = Elastic.Factory.create({
+  name: `myElasticProvider`,
+  config: {...}, // elasticsearch-js - `ClientOptions`
+  logger: myLoggerInstance,
+  useEnvironment: true,
+});
+```
+
+- **Defaults**:
+
+  ```typescript
+  {
+    nodes: ['http://localhost:9200'],
+    maxRetries: 5,
+    requestTimeout: 30000,
+    pingTimeout: 3000,
+    resurrectStrategy: 'ping',
+    name: process.env['NODE_APP_INSTANCE'] || 'mdf-elastic',
+  }
+  ```
+
+- **Environment**: remember to set the `useEnvironment` flag to `true` to use these environment variables.
+
+  ```typescript
+  {
+    nodes: process.env['CONFIG_ELASTIC_NODES'] || process.env['CONFIG_ELASTIC_NODE'], // If CONFIG_ELASTIC_NODES is set, CONFIG_ELASTIC_NODE is ignored. CONFIG_ELASTIC_NODES is split by ','
+    maxRetries: process.env['CONFIG_ELASTIC_MAX_RETRIES'],
+    requestTimeout: process.env['CONFIG_ELASTIC_REQUEST_TIMEOUT'],
+    pingTimeout: process.env['CONFIG_ELASTIC_PING_TIMEOUT'],
+    resurrectStrategy: process.env['CONFIG_ELASTIC_RESURRECT_STRATEGY'],
+    tls: {
+      ca: CA, // file loaded from process.env['CONFIG_ELASTIC_CA_PATH']
+      cert: CERT, // file loaded from process.env['CONFIG_ELASTIC_CLIENT_CERT_PATH']
+      key: KEY, // file loaded from process.env['CONFIG_ELASTIC_CLIENT_KEY_PATH']
+      rejectUnauthorized: process.env['CONFIG_ELASTIC_HTTP_SSL_VERIFY'],
+      servername: process.env['CONFIG_ELASTIC_TLS_SERVER_NAME'],
+    },
+    name: process.env['CONFIG_ELASTIC_NAME'],
+    auth, // { username: process.env['CONFIG_ELASTIC_AUTH_USERNAME'], password: process.env['CONFIG_ELASTIC_AUTH_PASSWORD'] } if both are set
+    proxy: process.env['CONFIG_ELASTIC_PROXY'],
+  }
+  ```
+
+### **Health checks**
+
 Checks included in the provider:
 
 - **status**: Checks the status of the Elasticsearch nodes using the [`cat health API`](https://www.elastic.co/guide/en/elasticsearch/reference/8.13/cat-health.html) and evaluating the number of nodes in `red` state.
@@ -64,6 +116,29 @@ Checks included in the provider:
   - **observedUnit**: `Nodes Health`.
   - **status**: `pass` if no nodes are in `red` state, `fail` in other case.
   - **output**: in case of `fail` state `At least one of the nodes in the system is red state`.
+
+```json
+{
+  "[mdf-elastic:status]": [
+    {
+      "status": "pass",
+      "componentId": "00000000-0000-0000-0000-000000000000",
+      "observedValue": "running",
+      "componentType": "database",
+      "output": undefined,
+    },
+  ],
+  "[mdf-elastic:nodes]": [
+    {
+      "status": "pass",
+      "componentId": "00000000-0000-0000-0000-000000000000",
+      "observedValue": { ... },
+      "observedUnit": "Nodes Health",
+      "output": undefined,
+    },
+  ],
+}
+```
 
 ## **Environment variables**
 
@@ -81,6 +156,7 @@ Checks included in the provider:
 - **CONFIG\_ELASTIC\_TLS\_SERVER\_NAME** (default: `undefined`): Server name for the TLS certificate.
 - **CONFIG\_ELASTIC\_AUTH\_USERNAME** (default: `undefined`): Username for the Elasticsearch cluster. If this is set, a password must also be provided.
 - **CONFIG\_ELASTIC\_AUTH\_PASSWORD** (default: `undefined`): Password for the Elasticsearch cluster. If this is set, a username must also be provided.
+- **NODE\_APP\_INSTANCE**: undefined
 
 ## **License**
 

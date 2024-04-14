@@ -7,7 +7,6 @@
 import { Layer } from '@mdf.js/core';
 import { Crash, Multi } from '@mdf.js/crash';
 import { LoggerInstance } from '@mdf.js/logger';
-import { undoMocks } from '@mdf.js/utils';
 import { Factory } from './Factory';
 import { Port } from './Port';
 import { Config } from './types';
@@ -565,7 +564,6 @@ class FakeLogger {
 describe('#Port #Kafka #Consumer', () => {
   describe('#Happy path', () => {
     afterEach(() => {
-      undoMocks();
       jest.clearAllMocks();
     });
     it('Should create provider using the factory instance with default configuration', () => {

@@ -119,6 +119,7 @@ Checks included in the provider:
 - **CONFIG\_KAFKA\_CLIENT\_SSL\_KEY\_PATH** (default: `undefined`): Path to the client key.
 - **CONFIG\_KAFKA\_CLIENT\_\_SASL\_USERNAME**: undefined
 - **CONFIG\_KAFKA\_CLIENT\_\_SASL\_PASSWORD**: undefined
+- **NODE\_APP\_INSTANCE**: undefined
 
 ## **License**
 

@@ -8,7 +8,6 @@
 // #region Component imports
 import { Crash } from '@mdf.js/crash';
 import { DebugLogger } from '@mdf.js/logger';
-import { undoMocks } from '@mdf.js/utils';
 import { WorkerPort } from '.';
 import { Aggregator } from '../Aggregator';
 import { RegisterMessage, RegisterMessageType } from '../types';
@@ -21,11 +20,11 @@ describe('#Register #Port #Worker', () => {
   describe('#Happy path', () => {
     afterEach(function () {
       jest.resetAllMocks();
-      undoMocks();
+      jest.restoreAllMocks();
     });
     beforeEach(function () {
       jest.resetAllMocks();
-      undoMocks();
+      jest.restoreAllMocks();
     });
     it(`Should respond to messages than come from master node informing with the errors`, done => {
       const aggregator = new Aggregator(logger);
