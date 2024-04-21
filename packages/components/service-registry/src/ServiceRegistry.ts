@@ -225,7 +225,7 @@ export class ServiceRegistry<
       }
       // Stryker disable next-line all
       this._logger.info(
-        `Welcome to ${this._settingsManager.name} - ${this._settingsManager.release} - ${this._settingsManager.instanceId}`
+        `Welcome to ${this.health.name} - ${this._settingsManager.release}, running with instanceId: [${this._settingsManager.instanceId}]`
       );
       // Stryker disable next-line all
       this._logger.info('Bootstrapping application engine ...');

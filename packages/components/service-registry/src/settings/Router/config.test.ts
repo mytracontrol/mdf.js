@@ -92,8 +92,8 @@ describe('#Component #service-setup', () => {
               name: '@mdf.js/service-registry',
               description: 'MMS - API - Service Registry',
               instanceId: expect.any(String),
-              release: '0',
-              version: '0.0.1',
+              release: '0.0.1',
+              version: '0',
               tags: ['NodeJS', 'MMS', 'API', 'APP'],
             },
             loggerOptions: {

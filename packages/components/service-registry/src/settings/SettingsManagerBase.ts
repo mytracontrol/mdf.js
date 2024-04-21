@@ -115,8 +115,8 @@ export class SettingsManagerBase<
       metadata: {
         name: packageInfo.name,
         description: packageInfo.description,
-        version: packageInfo.version,
-        release: packageInfo.version?.split('.')[0],
+        version: packageInfo.version?.split('.')[0],
+        release: packageInfo.version,
         tags: packageInfo.keywords,
         instanceId: get(packageInfo, `config.${packageInfo.name}.instanceId`, undefined),
         serviceId: get(packageInfo, `config.${packageInfo.name}.serviceId`, undefined),
