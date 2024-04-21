@@ -22,7 +22,7 @@ import {
   ServiceRegistrySettings,
 } from '../types';
 import {
-  DEFAULT_CUSTOM_CONFIG_LOADER_OPTIONS,
+  DEFAULT_SERVICE_REGISTRY_CONFIG_CONFIG_LOADER_OPTIONS,
   DEFAULT_SERVICE_REGISTRY_OPTIONS,
   DEFAULT_SERVICE_REGISTRY_SETTINGS_ENV_CONFIG,
 } from './types';
@@ -205,7 +205,7 @@ export class SettingsManagerBase<
         : undefined;
     return {
       name: `ServiceRegistry`,
-      config: merge(cloneDeep(DEFAULT_CUSTOM_CONFIG_LOADER_OPTIONS), {
+      config: merge(cloneDeep(DEFAULT_SERVICE_REGISTRY_CONFIG_CONFIG_LOADER_OPTIONS), {
         configFiles: bootstrapSettings?.configFiles,
         presetFiles: bootstrapSettings?.presetFiles,
         preset: bootstrapSettings?.preset,
