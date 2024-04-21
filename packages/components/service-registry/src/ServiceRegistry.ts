@@ -306,6 +306,10 @@ export class ServiceRegistry<
   public get settings(): ServiceSetting<CustomSetting> {
     return this._settingsManager.settings;
   }
+  /** @returns The logger instance */
+  public get logger(): LoggerInstance {
+    return this._logger;
+  }
   /**
    * Register a resource within the service observability
    * @param resource - The resource or resources to be register

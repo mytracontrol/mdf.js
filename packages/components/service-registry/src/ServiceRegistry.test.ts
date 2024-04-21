@@ -151,6 +151,7 @@ describe('#ServiceRegistry class', () => {
           ],
         },
       });
+      expect(wrapper.logger).toBeDefined();
     }, 300);
     it('Should call `process.exit` if SIGINT or SIGTERM', done => {
       const wrapper = new ServiceRegistry<{ test: string }>();
