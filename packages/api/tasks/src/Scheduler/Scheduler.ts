@@ -109,6 +109,8 @@ export class Scheduler<
   private readonly managers: PollingExecutor[] = [];
   /** Rate limiter */
   private readonly limiter: Limiter;
+  /** Scheduler running status */
+  private isRunning = false;
   /**
    * Create a new scheduler
    * @param name - The name of the scheduler
@@ -167,16 +169,23 @@ export class Scheduler<
   };
   /** Start the scheduler */
   public async start(): Promise<void> {
+    if (this.isRunning) {
+      return;
+    }
     this.limiter.start();
     for (const manager of this.managers) {
       manager.start();
       manager.on('error', this.onError);
       manager.on('done', this.onDone);
     }
+    this.isRunning = true;
     this.logger.info('Scheduler started');
   }
   /** Stop the scheduler */
   public async stop(): Promise<void> {
+    if (!this.isRunning) {
+      return;
+    }
     for (const manager of this.managers) {
       await manager.stop();
       manager.off('error', this.onError);
@@ -184,6 +193,7 @@ export class Scheduler<
     }
     this.limiter.stop();
     this.limiter.clear();
+    this.isRunning = false;
     this.logger.info('Scheduler stopped');
   }
   /** Close the scheduler */
