@@ -12,7 +12,7 @@ import EventEmitter from 'events';
 import { Registry } from 'prom-client';
 import { v4 } from 'uuid';
 import { Validator } from '../Helpers';
-import { Limiter } from '../Limiter';
+import { Limiter, LimiterOptions } from '../Limiter';
 import {
   DefaultPollingGroups,
   METRICS_DEFINITIONS,
@@ -22,7 +22,12 @@ import {
   TaskBaseConfig,
 } from '../Polling';
 import { DoneEventHandler, MetaData } from '../Tasks';
-import { SchedulerOptions } from './types';
+import { ResourceConfigEntry, ResourcesConfigObject, SchedulerOptions } from './types';
+
+/** Represents the resource configuration */
+type Resource = string;
+/** Represents the polling period */
+type PollingPeriod = string;
 
 export declare interface Scheduler<Result = any> {
   /**
@@ -106,7 +111,9 @@ export class Scheduler<
   /** Metrics definitions */
   readonly metricsDefinitions: MetricsDefinitions = METRICS_DEFINITIONS(this.metrics);
   /** Polling managers */
-  private readonly managers: PollingExecutor[] = [];
+  private readonly pollingExecutors: Map<Resource, Map<PollingPeriod, PollingExecutor>> = new Map();
+  /** Rate limiters for each resource */
+  private readonly limiters: Map<Resource, Limiter> = new Map();
   /** Rate limiter */
   private readonly limiter: Limiter;
   /** Scheduler running status */
@@ -118,7 +125,7 @@ export class Scheduler<
    */
   constructor(
     public readonly name: string,
-    private readonly options: SchedulerOptions<Result, Binding, PollingGroups>
+    private readonly options: SchedulerOptions<Result, Binding, PollingGroups> = {}
   ) {
     super();
     // Stryker disable next-line all
@@ -127,25 +134,9 @@ export class Scheduler<
       'Scheduler',
       this.componentId
     );
-    Validator.validateResources(options.resources);
     this.limiter = new Limiter(options.limiterOptions);
-    for (const [resource, entry] of Object.entries(this.options.resources)) {
-      const limiter = new Limiter(entry.limiterOptions);
-      limiter.pipe(this.limiter);
-      for (const [period, tasks] of Object.entries(entry.pollingGroups)) {
-        const manager = new PollingExecutor(
-          {
-            componentId: this.componentId,
-            resource,
-            pollingGroup: period as PollingGroup,
-            entries: tasks as TaskBaseConfig<Result, Binding>[],
-            logger: this.logger,
-          },
-          limiter,
-          this.metricsDefinitions
-        );
-        this.managers.push(manager);
-      }
+    if (this.options.resources) {
+      this.addResources(this.options.resources);
     }
   }
   /**
@@ -167,16 +158,118 @@ export class Scheduler<
   private onDone = (uuid: string, result: any, meta: MetaData, error?: Crash | Multi): void => {
     this.emit('done', uuid, result, meta, error);
   };
+  /**
+   * Get a map with the instances of the polling executor for a resource
+   * @param resource - The resource
+   * @returns The polling executor instances
+   */
+  private getResource(resource: Resource): Map<PollingPeriod, PollingExecutor> {
+    let entry = this.pollingExecutors.get(resource);
+    if (!entry) {
+      entry = new Map();
+      this.pollingExecutors.set(resource, entry);
+    }
+    return entry;
+  }
+  /**
+   * Get the limiter for a resource, creating a new one if it does not exist. The limiter is
+   * piped to the main limiter of the scheduler if it is created.
+   * @param resource - The resource
+   * @param options - The limiter options
+   * @returns The limiter instance
+   */
+  private getLimiter(resource: Resource, options: LimiterOptions): Limiter {
+    const limiter = this.limiters.get(resource);
+    if (limiter) {
+      return limiter;
+    }
+    const newLimiter = new Limiter(options);
+    this.limiters.set(resource, newLimiter);
+    newLimiter.pipe(this.limiter);
+    return newLimiter;
+  }
+  /**
+   * Add a resource to the scheduler
+   * @param resource - The resource
+   * @param entry - The resource configuration
+   */
+  public addResource(
+    resource: string,
+    entry: ResourceConfigEntry<Result, Binding, PollingGroups>
+  ): void {
+    return this.addResources({ [resource]: entry });
+  }
+  /**
+   * Add resources to the scheduler
+   * @param resources - The resources configuration
+   */
+  public addResources(resources: ResourcesConfigObject<Result, Binding, PollingGroups>): void {
+    if (this.isRunning) {
+      throw new Crash(`Cannot add resources to a running scheduler`, this.componentId);
+    }
+    Validator.validateResources(resources);
+    for (const [resource, entry] of Object.entries(resources)) {
+      const resourceEntry = this.getResource(resource);
+      const limiter = this.getLimiter(resource, entry.limiterOptions || {});
+      for (const [period, tasks] of Object.entries(entry.pollingGroups)) {
+        const manager = new PollingExecutor(
+          {
+            componentId: this.componentId,
+            resource,
+            pollingGroup: period as PollingGroup,
+            entries: tasks as TaskBaseConfig<Result, Binding>[],
+            logger: this.logger,
+          },
+          limiter,
+          this.metricsDefinitions
+        );
+        resourceEntry.set(period, manager);
+      }
+    }
+  }
+  /**
+   * Drop a resource from the scheduler
+   * @param resource - The resource to drop
+   */
+  public dropResource(resource: string): void {
+    if (this.isRunning) {
+      throw new Crash(`Cannot drop resources from a running scheduler`, this.componentId);
+    }
+    const resourceEntry = this.pollingExecutors.get(resource);
+    if (!resourceEntry) {
+      return;
+    }
+    for (const manager of resourceEntry.values()) {
+      manager.stop();
+      manager.removeAllListeners();
+    }
+    this.pollingExecutors.delete(resource);
+    const limiter = this.limiters.get(resource);
+    if (limiter) {
+      limiter.stop();
+      limiter.removeAllListeners();
+      this.limiters.delete(resource);
+    }
+  }
+  /** Cleanup the scheduler */
+  public cleanup(): void {
+    if (this.isRunning) {
+      throw new Crash(`Cannot cleanup a running scheduler`, this.componentId);
+    }
+    this.pollingExecutors.clear();
+  }
   /** Start the scheduler */
   public async start(): Promise<void> {
     if (this.isRunning) {
       return;
     }
     this.limiter.start();
-    for (const manager of this.managers) {
-      manager.start();
-      manager.on('error', this.onError);
-      manager.on('done', this.onDone);
+    for (const resource of this.pollingExecutors.values()) {
+      for (const manager of resource.values()) {
+        manager.start();
+        manager.on('error', this.onError);
+        manager.on('done', this.onDone);
+      }
     }
     this.isRunning = true;
     this.logger.info('Scheduler started');
@@ -186,10 +279,12 @@ export class Scheduler<
     if (!this.isRunning) {
       return;
     }
-    for (const manager of this.managers) {
-      await manager.stop();
-      manager.off('error', this.onError);
-      manager.off('done', this.onDone);
+    for (const resource of this.pollingExecutors.values()) {
+      for (const manager of resource.values()) {
+        await manager.stop();
+        manager.off('error', this.onError);
+        manager.off('done', this.onDone);
+      }
     }
     this.limiter.stop();
     this.limiter.clear();
@@ -211,8 +306,10 @@ export class Scheduler<
     const checks: Health.Checks = {
       'scheduler:status': [],
     };
-    for (const manager of this.managers) {
-      checks['scheduler:status'].push(manager.check);
+    for (const resource of this.pollingExecutors.values()) {
+      for (const manager of resource.values()) {
+        checks['scheduler:status'].push(manager.check);
+      }
     }
     return checks;
   }

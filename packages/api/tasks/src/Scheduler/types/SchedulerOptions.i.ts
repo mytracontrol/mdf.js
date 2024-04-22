@@ -17,7 +17,7 @@ export interface ResourceConfigEntry<
   PollingGroups extends PollingGroup = DefaultPollingGroups,
 > {
   /** The polling groups */
-  pollingGroups: { [polling in PollingGroups]: TaskBaseConfig<Result, Binding>[] };
+  pollingGroups: { [polling in PollingGroups]?: TaskBaseConfig<Result, Binding>[] };
   /** The limiter options */
   limiterOptions?: LimiterOptions;
 }
@@ -44,7 +44,7 @@ export interface SchedulerOptions<
   /** The logger for the scheduler */
   logger?: LoggerInstance;
   /** The entries for the scheduler */
-  resources: ResourcesConfigObject<Result, Binding, PollingGroups>;
+  resources?: ResourcesConfigObject<Result, Binding, PollingGroups>;
   /** The limiter options */
   limiterOptions?: LimiterOptions;
 }

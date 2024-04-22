@@ -39,45 +39,45 @@ describe('#Scheduler', () => {
             },
             limiterOptions: { concurrency: 2, delay: 0 },
           },
-          myResource2: {
-            pollingGroups: {
-              '50ms': [
-                {
-                  taskArgs: [],
-                  task: () => Promise.resolve(`R2-50ms-T1-${cycles[2]}`),
-                  options: {
-                    id: 'myTask3',
-                  },
-                },
-                {
-                  taskArgs: [],
-                  task: () => Promise.resolve(`R2-50ms-T2-${cycles[3]}`),
-                  options: {
-                    id: 'myTask4',
-                  },
-                },
-              ],
-              '100ms': [
-                {
-                  taskArgs: [],
-                  task: () => Promise.resolve(`R2-100ms-T1-${cycles[4]}`),
-                  options: {
-                    id: 'myTask5',
-                  },
-                },
-                {
-                  taskArgs: [],
-                  task: () => Promise.resolve(`R2-100ms-T2-${cycles[5]}`),
-                  options: {
-                    id: 'myTask6',
-                  },
-                },
-              ],
-            },
-            limiterOptions: { concurrency: 4, delay: 0 },
-          },
         },
         limiterOptions: { concurrency: 6, delay: 0 },
+      });
+      scheduler.addResource('myResource2', {
+        pollingGroups: {
+          '50ms': [
+            {
+              taskArgs: [],
+              task: () => Promise.resolve(`R2-50ms-T1-${cycles[2]}`),
+              options: {
+                id: 'myTask3',
+              },
+            },
+            {
+              taskArgs: [],
+              task: () => Promise.resolve(`R2-50ms-T2-${cycles[3]}`),
+              options: {
+                id: 'myTask4',
+              },
+            },
+          ],
+          '100ms': [
+            {
+              taskArgs: [],
+              task: () => Promise.resolve(`R2-100ms-T1-${cycles[4]}`),
+              options: {
+                id: 'myTask5',
+              },
+            },
+            {
+              taskArgs: [],
+              task: () => Promise.resolve(`R2-100ms-T2-${cycles[5]}`),
+              options: {
+                id: 'myTask6',
+              },
+            },
+          ],
+        },
+        limiterOptions: { concurrency: 4, delay: 0 },
       });
       scheduler.on(
         'done',
@@ -91,10 +91,14 @@ describe('#Scheduler', () => {
       );
       expect(scheduler).toBeInstanceOf(Scheduler);
       scheduler.start();
+      //To test that it does not do anything
+      scheduler.start();
       setTimeout(() => {
         expect(cycles).toEqual([5, 3, 5, 5, 3, 3]);
-        scheduler.stop();
-        done();
+        scheduler
+          .stop()
+          .then(() => scheduler.stop())
+          .then(done);
       }, 225);
     }, 300);
     it('Should create a new instance of Scheduler with single, grouped and sequence task and executed more than one cycle', done => {
@@ -275,6 +279,100 @@ describe('#Scheduler', () => {
         done();
       }, 225);
     }, 300);
+    it(`Should add and drop resources to a scheduler properly`, () => {
+      const scheduler = new Scheduler<any, any, '50ms' | '100ms'>('myScheduler');
+      scheduler.addResource('myResource1', {
+        pollingGroups: {
+          '50ms': [
+            {
+              taskArgs: [],
+              task: () => Promise.resolve(),
+              options: {
+                id: 'myTask1',
+              },
+            },
+          ],
+        },
+        limiterOptions: { concurrency: 1, delay: 0 },
+      });
+      expect(
+        //@ts-ignore - Testing the pollingExecutors
+        scheduler.pollingExecutors.get('myResource1').get('50ms').manager.fastEntries.size
+      ).toEqual(1);
+      //@ts-ignore - Testing the pollingExecutors
+      expect(Array.from(scheduler.pollingExecutors.get('myResource1').values()).length).toEqual(1);
+      //@ts-ignore - Testing the pollingExecutors
+      expect(Array.from(scheduler.pollingExecutors.values()).length).toEqual(1);
+      // To test all the lines of code
+      scheduler.addResource('myResource1', {
+        pollingGroups: {
+          '50ms': [
+            {
+              taskArgs: [],
+              task: () => Promise.resolve(),
+              options: {
+                id: 'myTask1',
+              },
+            },
+            {
+              taskArgs: [],
+              task: () => Promise.resolve(),
+              options: {
+                id: 'myTask2',
+              },
+            },
+          ],
+          '100ms': [
+            {
+              taskArgs: [],
+              task: () => Promise.resolve(),
+              options: {
+                id: 'myTask3',
+              },
+            },
+          ],
+        },
+        limiterOptions: { concurrency: 4, delay: 0 },
+      });
+      expect(
+        //@ts-ignore - Testing the pollingExecutors
+        scheduler.pollingExecutors.get('myResource1').get('50ms').manager.fastEntries.size
+      ).toEqual(2);
+      //@ts-ignore - Testing the pollingExecutors
+      expect(Array.from(scheduler.pollingExecutors.get('myResource1').values()).length).toEqual(2);
+      //@ts-ignore - Testing the pollingExecutors
+      expect(Array.from(scheduler.pollingExecutors.values()).length).toEqual(1);
+      scheduler.dropResource('myResource1');
+      //@ts-ignore - Testing the pollingExecutors
+      expect(scheduler.pollingExecutors.get('myResource1')).toBeUndefined();
+      //Do nothing
+      scheduler.dropResource('myResource2');
+      scheduler.addResource('myResource1', {
+        pollingGroups: {
+          '50ms': [
+            {
+              taskArgs: [],
+              task: () => Promise.resolve(),
+              options: {
+                id: 'myTask1',
+              },
+            },
+          ],
+        },
+        limiterOptions: { concurrency: 1, delay: 0 },
+      });
+      expect(
+        //@ts-ignore - Testing the pollingExecutors
+        scheduler.pollingExecutors.get('myResource1').get('50ms').manager.fastEntries.size
+      ).toEqual(1);
+      //@ts-ignore - Testing the pollingExecutors
+      expect(Array.from(scheduler.pollingExecutors.get('myResource1').values()).length).toEqual(1);
+      //@ts-ignore - Testing the pollingExecutors
+      expect(Array.from(scheduler.pollingExecutors.values()).length).toEqual(1);
+      scheduler.cleanup();
+      //@ts-ignore - Testing the pollingExecutors
+      expect(scheduler.pollingExecutors.get('myResource1')).toBeUndefined();
+    });
   });
   describe('#Sad path', () => {
     it('Should create a new instance of Scheduler with simple task and executed more than one cycle with some task that fail always', done => {
@@ -458,7 +556,7 @@ describe('#Scheduler', () => {
           'The task configuration should have a task, tasks or pattern property'
         );
       }
-    });
+    }, 300);
     it(`Should throw an error if the resources is not valid`, async () => {
       try {
         new Scheduler<any, any, '50ms'>('myScheduler', {
@@ -470,7 +568,7 @@ describe('#Scheduler', () => {
         expect(error).toBeInstanceOf(Crash);
         expect((error as Crash).message).toBe('The resources should be an object: []');
       }
-    });
+    }, 300);
     it(`Should throw an error if a resource entry is not valid`, async () => {
       try {
         new Scheduler<any, any, '50ms'>('myScheduler', {
@@ -484,7 +582,7 @@ describe('#Scheduler', () => {
         expect(error).toBeInstanceOf(Crash);
         expect((error as Crash).message).toBe('The resource entry should be an object: []');
       }
-    });
+    }, 300);
     it(`Should throw an error if a resource key is not valid`, async () => {
       try {
         new Scheduler<any, any, '50ms'>('myScheduler', {
@@ -498,7 +596,7 @@ describe('#Scheduler', () => {
         expect(error).toBeInstanceOf(Crash);
         expect((error as Crash).message).toBe('The resource should be a non empty string: ""');
       }
-    });
+    }, 300);
     it(`Should throw an error if a period is not well configured`, async () => {
       try {
         new Scheduler<any, any, '50ms'>('myScheduler', {
@@ -560,7 +658,7 @@ describe('#Scheduler', () => {
         expect(error).toBeInstanceOf(Crash);
         expect((error as Crash).message).toBe('The tasks should be an array of tasks: {}');
       }
-    });
+    }, 300);
     it(`Should throw an error if a task config is not valid`, async () => {
       try {
         new Scheduler<any, any, '50ms'>('myScheduler', {
@@ -818,6 +916,106 @@ describe('#Scheduler', () => {
           'The finally property should be an array of tasks: {\n  "pattern": {\n    "task": {},\n    "finally": {}\n  }\n}'
         );
       }
-    });
+    }, 300);
+    it(`Should throw if try to add a resource to a running scheduler`, async () => {
+      const scheduler = new Scheduler<any, any, '50ms'>('myScheduler', {
+        resources: {
+          myResource1: {
+            pollingGroups: {
+              '50ms': [
+                {
+                  taskArgs: [],
+                  task: () => Promise.resolve(`R1-50ms-T1`),
+                  options: {
+                    id: 'myTask1',
+                  },
+                },
+              ],
+            },
+            limiterOptions: { concurrency: 2, delay: 0 },
+          },
+        },
+        limiterOptions: { concurrency: 6, delay: 0 },
+      });
+      scheduler.start();
+      try {
+        scheduler.addResource('myResource2', {
+          pollingGroups: {
+            '50ms': [
+              {
+                taskArgs: [],
+                task: () => Promise.resolve(`R2-50ms-T1`),
+                options: {
+                  id: 'myTask2',
+                },
+              },
+            ],
+          },
+          limiterOptions: { concurrency: 2, delay: 0 },
+        });
+      } catch (error) {
+        expect(error).toBeInstanceOf(Crash);
+        expect((error as Crash).message).toBe('Cannot add resources to a running scheduler');
+      }
+      scheduler.stop();
+    }, 300);
+    it(`Should throw if try to drop a resource to a running scheduler`, async () => {
+      const scheduler = new Scheduler<any, any, '50ms'>('myScheduler', {
+        resources: {
+          myResource1: {
+            pollingGroups: {
+              '50ms': [
+                {
+                  taskArgs: [],
+                  task: () => Promise.resolve(`R1-50ms-T1`),
+                  options: {
+                    id: 'myTask1',
+                  },
+                },
+              ],
+            },
+            limiterOptions: { concurrency: 2, delay: 0 },
+          },
+        },
+        limiterOptions: { concurrency: 6, delay: 0 },
+      });
+      scheduler.start();
+      try {
+        scheduler.dropResource('myResource1');
+      } catch (error) {
+        expect(error).toBeInstanceOf(Crash);
+        expect((error as Crash).message).toBe('Cannot drop resources from a running scheduler');
+      }
+      scheduler.stop();
+    }, 300);
+    it(`Should throw if try to cleanup a scheduler that is running`, async () => {
+      const scheduler = new Scheduler<any, any, '50ms'>('myScheduler', {
+        resources: {
+          myResource1: {
+            pollingGroups: {
+              '50ms': [
+                {
+                  taskArgs: [],
+                  task: () => Promise.resolve(`R1-50ms-T1`),
+                  options: {
+                    id: 'myTask1',
+                  },
+                },
+              ],
+            },
+            limiterOptions: { concurrency: 2, delay: 0 },
+          },
+        },
+        limiterOptions: { concurrency: 6, delay: 0 },
+      });
+      scheduler.start();
+      try {
+        scheduler.cleanup();
+      } catch (error) {
+        expect(error).toBeInstanceOf(Crash);
+        expect((error as Crash).message).toBe('Cannot cleanup a running scheduler');
+      }
+      scheduler.stop();
+    }, 300);
   });
 });

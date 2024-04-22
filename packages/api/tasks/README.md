@@ -589,6 +589,53 @@ const scheduler = new Scheduler<number, MyClass, MyPollingGroups>('myScheduler',
 });
 ```
 
+New resources can be added to the scheduler using the `addResource` or `addResources` methods, and deleted using the `dropResource` method, in all the cases the `Scheduler` should be stopped, in other case the method will throw an error. The resources can be cleared using the `cleanup` method.
+
+```typescript
+scheduler.addResource('resource3', {
+  limiterOptions: {
+    concurrency: 2,
+    delay: 1000,
+    highWater: 10,
+    strategy: 'leak',
+    penalty: 5000,
+    bucketSize: 10,
+    tokensPerInterval: 1,
+    interval: 1000,
+  },
+  pollingGroups: {
+    '5m': [
+      {
+        task: resource2.task1,
+        taskArgs: [5],
+        options: {
+          id: 'task1',
+          priority: 1,
+          weight: 1,
+          retryOptions: { attempts: 3 },
+        },
+      },
+    ],
+    '1m': [
+      {
+        task: resource2.task2,
+        taskArgs: [10],
+        options: {
+          id: 'task2',
+          priority: 1,
+          weight: 1,
+          retryOptions: { attempts: 3 },
+        },
+      },
+    ],
+  },
+});
+
+scheduler.dropResource('resource3');
+scheduler.cleanup();
+```
+
+
 #### **Start and stop the scheduler**
 
 The `Scheduler` class allows to start and stop the scheduler, controlling the execution of the tasks:
