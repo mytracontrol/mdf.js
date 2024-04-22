@@ -12,7 +12,6 @@ import { ConfigManager } from '@mdf.js/service-setup-provider';
 import { RetryOptions } from '@mdf.js/utils';
 import cluster from 'cluster';
 import express from 'express';
-import { merge } from 'lodash';
 import { ObservabilityOptions } from '../observability';
 import {
   BootstrapOptions,
@@ -23,7 +22,7 @@ import {
 } from '../types';
 import { Router } from './Router';
 import { SettingsManagerBase } from './SettingsManagerBase';
-import { CONFIG_SERVICE_NAME, DEFAULT_RETRY_OPTIONS } from './types';
+import { CONFIG_SERVICE_NAME } from './types';
 
 /**
  * SettingsManager is responsible for managing the application's settings, including the
@@ -158,13 +157,7 @@ export class SettingsManagerAccessors<
   }
   /** Get the retry options */
   public get retryOptions(): RetryOptions | undefined {
-    return merge(
-      {},
-      {
-        ...DEFAULT_RETRY_OPTIONS,
-      },
-      this.serviceRegistrySettingsProvider.client.config.retryOptions
-    );
+    return this.serviceRegistrySettingsProvider.client.config.retryOptions;
   }
   /** @returns Express router with access to config information */
   public get router(): express.Router {

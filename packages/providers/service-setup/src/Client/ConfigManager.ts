@@ -62,7 +62,7 @@ export class ConfigManager<SystemConfig extends Record<string, any> = Record<str
     this.envConfig = this.loadConfigEnv(options.envPrefix);
     this.nonDisclosureConfig = cloneDeep(this.selectConfig());
     this.config = this.validate(
-      merge(this.nonDisclosureConfig, this.envConfig, this.options.feed),
+      merge(this.nonDisclosureConfig, this.envConfig, this.options.base),
       options.schema
     );
   }
@@ -114,16 +114,15 @@ export class ConfigManager<SystemConfig extends Record<string, any> = Record<str
    * @returns - The final configuration
    */
   private selectConfig(): Partial<SystemConfig> {
+    let _config = this.defaultConfig;
     if (this.options.preset) {
       if (this.presets[this.options.preset]) {
-        return merge(cloneDeep(this.defaultConfig), this.presets[this.options.preset]);
+        _config = merge(cloneDeep(this.defaultConfig), this.presets[this.options.preset]);
       } else {
         this.addError(new Crash(`Preset ${this.options.preset} not found`));
-        return this.defaultConfig;
       }
-    } else {
-      return this.defaultConfig;
     }
+    return merge(cloneDeep(this.options.default), _config);
   }
   /**
    * Perform the validation of the final configuration

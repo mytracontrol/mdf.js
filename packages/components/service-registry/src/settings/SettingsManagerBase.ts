@@ -11,7 +11,7 @@ import { Setup } from '@mdf.js/service-setup-provider';
 import escalade from 'escalade/sync';
 import EventEmitter from 'events';
 import fs from 'fs';
-import { cloneDeep, get, merge, omit } from 'lodash';
+import { cloneDeep, get, merge } from 'lodash';
 import markdown from 'markdown-it';
 import normalize, { Input, Package } from 'normalize-package-data';
 import { v4 } from 'uuid';
@@ -193,11 +193,11 @@ export class SettingsManagerBase<
     bootstrapSettings?: BootstrapOptions,
     serviceRegistrySettings?: ServiceRegistryOptions<CustomSettings>
   ): Layer.Provider.FactoryOptions<Setup.Config<ServiceRegistrySettings<CustomSettings>>> {
-    const _feed = merge(
-      cloneDeep({ ...DEFAULT_SERVICE_REGISTRY_OPTIONS }),
+    const _default = merge(
+      cloneDeep(DEFAULT_SERVICE_REGISTRY_OPTIONS),
       { metadata: { instanceId: this.instanceId } },
       this.loadPackageInfo(bootstrapSettings?.loadPackage),
-      omit(serviceRegistrySettings, ['consumer'])
+      serviceRegistrySettings
     );
     const _envPrefix =
       bootstrapSettings?.useEnvironment === true
@@ -210,7 +210,7 @@ export class SettingsManagerBase<
         presetFiles: bootstrapSettings?.presetFiles,
         preset: bootstrapSettings?.preset,
         envPrefix: _envPrefix,
-        feed: _feed,
+        default: _default,
       }),
       useEnvironment: false,
     };
@@ -232,7 +232,7 @@ export class SettingsManagerBase<
       name: `CustomSettings`,
       config: {
         ...configLoader,
-        feed: customSettings,
+        base: customSettings,
       },
       useEnvironment: false,
     };

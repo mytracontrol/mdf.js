@@ -68,5 +68,11 @@ export interface ConfigManagerOptions<
    * to allow the user to define some configuration in the code and let the rest of the
    * configuration to be loaded, using the Configuration Manager as unique source of configuration.
    */
-  feed?: Partial<SystemConfig>;
+  base?: Partial<SystemConfig>;
+  /**
+   * Object to be used as default configuration options. The configuration will be merged with the
+   * configuration from the configuration files, the environment variables and the base option. This
+   * object will be used as the default configuration if no other configuration is found.
+   */
+  default?: Partial<SystemConfig>;
 }

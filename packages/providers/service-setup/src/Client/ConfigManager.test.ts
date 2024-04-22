@@ -14,6 +14,7 @@ describe('#ConfigManager', () => {
       const manager = new ConfigManager<{
         feed: {
           test: number;
+          other?: string;
         };
         config: {
           test: number;
@@ -31,15 +32,22 @@ describe('#ConfigManager', () => {
         schema: 'final',
         preset: 'preset1',
         envPrefix: 'MY_PREFIX_A_',
-        feed: {
+        base: {
           feed: {
             test: 1,
+          },
+        },
+        default: {
+          feed: {
+            test: 0,
+            other: 'b',
           },
         },
       });
       expect(manager.config).toEqual({
         feed: {
           test: 1,
+          other: 'b',
         },
         config: {
           test: 2,
