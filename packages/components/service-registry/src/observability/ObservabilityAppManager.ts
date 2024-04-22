@@ -14,7 +14,7 @@ import express, { Express } from 'express';
 import { createProxyMiddleware } from 'http-proxy-middleware';
 import { merge } from 'lodash';
 import { Registry } from 'prom-client';
-import { DEFAULT_PRIMARY_PORT, ObservabilityOptions } from './types';
+import { DEFAULT_PORT, DEFAULT_PRIMARY_PORT, ObservabilityOptions } from './types';
 
 /**
  * Manages the lifecycle and configuration of an Express application dedicated to observability.
@@ -58,12 +58,10 @@ export class ObservabilityAppManager {
     if (this.isBuild) {
       return;
     }
-    if (
-      typeof this.options.service?.isCluster === 'boolean' &&
-      this.options.service?.isCluster &&
-      !cluster.isPrimary
-    ) {
+    let port: number;
+    if (!this.isPrimary) {
       this._app = this.workerApp();
+      port = this.checkPort(this.options.service?.port);
     } else {
       this._app = this.primaryApp(
         this._router,
@@ -71,14 +69,13 @@ export class ObservabilityAppManager {
         this.apiVersion,
         Middleware.Default.FormatLinks(this.apiVersion, this._links)
       );
+      port = this.checkPort(this.options.service?.primaryPort);
     }
     this._server = HTTP.Factory.create({
       name: 'observability',
       config: {
         app: this._app,
-        port: cluster.isPrimary
-          ? this.getPrimaryPort(this.options.service?.primaryPort, this.options.service?.port)
-          : this.options.service?.port,
+        port,
         host: this.options.service?.host,
       },
     });
@@ -166,18 +163,21 @@ export class ObservabilityAppManager {
     );
     return app;
   }
+  /** Get if the current process is the primary */
+  private get isPrimary(): boolean {
+    return typeof this.options.service?.isCluster === 'boolean'
+      ? this.options.service.isCluster && cluster.isPrimary
+      : false;
+  }
   /**
-   * Define the port used offer the api
-   * @param primaryPort - primary port to be used
-   * @param port - port to be used
+   *  Check that the port is in valid range
+   * @param port - port to be checked
+   * @returns The port to be used
    */
-  private getPrimaryPort(primaryPort?: number, port?: number): number {
-    if (typeof primaryPort === 'number' && primaryPort > 0) {
-      return primaryPort;
-    } else if (typeof port === 'number' && port > 1024 && port <= 65535) {
-      return port;
-    } else {
-      return DEFAULT_PRIMARY_PORT;
+  private checkPort(port?: number): number {
+    if (!port || port < 1 || port > 65535) {
+      return this.isPrimary ? DEFAULT_PRIMARY_PORT : DEFAULT_PORT;
     }
+    return port;
   }
 }

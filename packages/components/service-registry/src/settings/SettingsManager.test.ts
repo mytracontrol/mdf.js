@@ -61,7 +61,7 @@ describe('#SettingsManager', () => {
           instanceId: manager.componentId,
         },
         service: {
-          primaryPort: 9080,
+          primaryPort: 9081,
           host: 'localhost',
           isCluster: false,
           includeStack: false,
@@ -100,7 +100,7 @@ describe('#SettingsManager', () => {
           waitTime: 1000,
         },
         observabilityOptions: {
-          primaryPort: 9080,
+          primaryPort: 9081,
           host: 'localhost',
           isCluster: false,
           includeStack: false,

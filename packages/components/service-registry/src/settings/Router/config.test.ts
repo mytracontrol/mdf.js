@@ -112,7 +112,7 @@ describe('#Component #service-setup', () => {
               includeStack: false,
               isCluster: false,
               maxSize: 100,
-              primaryPort: 9080,
+              primaryPort: 9081,
             },
             retryOptions: {
               attempts: 3,

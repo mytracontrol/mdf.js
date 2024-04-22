@@ -5,4 +5,7 @@
  * or at https://opensource.org/licenses/MIT.
  */
 
-export const DEFAULT_PRIMARY_PORT = 9080;
+/** Default port for the observability server */
+export const DEFAULT_PORT = 9080;
+/** Default primary port for the observability server, used for primary process in cluster mode */
+export const DEFAULT_PRIMARY_PORT = 9081;
