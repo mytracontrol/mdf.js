@@ -58,10 +58,8 @@ export class ObservabilityAppManager {
     if (this.isBuild) {
       return;
     }
-    let port: number;
-    if (!this.isPrimary) {
+    if (this.isWorker) {
       this._app = this.workerApp();
-      port = this.checkPort(this.options.service?.port);
     } else {
       this._app = this.primaryApp(
         this._router,
@@ -69,13 +67,12 @@ export class ObservabilityAppManager {
         this.apiVersion,
         Middleware.Default.FormatLinks(this.apiVersion, this._links)
       );
-      port = this.checkPort(this.options.service?.primaryPort);
     }
     this._server = HTTP.Factory.create({
       name: 'observability',
       config: {
         app: this._app,
-        port,
+        port: this.getPort(),
         host: this.options.service?.host,
       },
     });
@@ -163,21 +160,28 @@ export class ObservabilityAppManager {
     );
     return app;
   }
-  /** Get if the current process is the primary */
-  private get isPrimary(): boolean {
+  /** Get if the current process is a worker */
+  private get isWorker(): boolean {
+    return cluster.isWorker;
+  }
+  /** Get if the current process is working in cluster mode */
+  private get isClusterMode(): boolean {
     return typeof this.options.service?.isCluster === 'boolean'
-      ? this.options.service.isCluster && cluster.isPrimary
+      ? this.options.service?.isCluster
       : false;
   }
   /**
-   *  Check that the port is in valid range
-   * @param port - port to be checked
+   * Get the port to be used by the service based on the configuration
    * @returns The port to be used
    */
-  private checkPort(port?: number): number {
-    if (!port || port < 1 || port > 65535) {
-      return this.isPrimary ? DEFAULT_PRIMARY_PORT : DEFAULT_PORT;
+  private getPort(): number {
+    const setInRange = (port: number | undefined, defaultPort: number): number => {
+      return !port || port < 1 || port > 65535 ? defaultPort : port;
+    };
+    if (this.isClusterMode && cluster.isPrimary) {
+      return setInRange(this.options.service?.primaryPort, DEFAULT_PRIMARY_PORT);
+    } else {
+      return setInRange(this.options.service?.port, DEFAULT_PORT);
     }
-    return port;
   }
 }

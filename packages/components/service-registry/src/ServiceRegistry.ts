@@ -230,6 +230,7 @@ export class ServiceRegistry<
       // Stryker disable next-line all
       this._logger.info('Bootstrapping application engine ...');
       await retryBind(this._observability.start, this._observability, [], this.retryOptions);
+      await retryBind(this._settingsManager.start, this._settingsManager, [], this.retryOptions);
       const links = JSON.stringify(this._observability.links, null, 2);
       // Stryker disable next-line all
       this._logger.info(`Observability engine started, the health information is at: ${links}`);
@@ -262,6 +263,7 @@ export class ServiceRegistry<
         this._logger.info('OpenC2 Consumer engine stopped');
       }
       await retryBind(this._observability.stop, this._observability, [], this.retryOptions);
+      await retryBind(this._settingsManager.stop, this._settingsManager, [], this.retryOptions);
       // Stryker disable next-line all
       this._logger.info('Observability engine stopped');
       this._booted = false;

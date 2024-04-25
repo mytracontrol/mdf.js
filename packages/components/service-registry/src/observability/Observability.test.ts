@@ -193,16 +193,16 @@ describe('#Observability #Service', () => {
       const service = new Observability(config);
       expect(service).toBeDefined();
       //@ts-ignore - spy private
-      jest.spyOn(service._app, 'checkPort');
+      jest.spyOn(service._app, 'getPort');
       //@ts-ignore - call private
       await service._app.build();
       //@ts-ignore - check private
-      expect(service._app.checkPort).toHaveLastReturnedWith(9080); //@ts-ignore - spy private
-      jest.spyOn(service._app, 'checkPort');
+      expect(service._app.getPort).toHaveLastReturnedWith(9080); //@ts-ignore - spy private
+      jest.spyOn(service._app, 'getPort');
       //@ts-ignore - call private
       await service._app.build();
       //@ts-ignore - check private
-      expect(service._app.checkPort).toHaveLastReturnedWith(9080);
+      expect(service._app.getPort).toHaveLastReturnedWith(9080);
     }, 300);
     it(`Should create an instance of observability service in NO CLUSTER MODE with too much high port`, async () => {
       const config: ObservabilityOptions = {
@@ -221,11 +221,11 @@ describe('#Observability #Service', () => {
       const service = new Observability(config);
       expect(service).toBeDefined();
       //@ts-ignore - spy private
-      jest.spyOn(service._app, 'checkPort');
+      jest.spyOn(service._app, 'getPort');
       //@ts-ignore - call private
       await service._app.build();
       //@ts-ignore - check private
-      expect(service._app.checkPort).toHaveLastReturnedWith(9080);
+      expect(service._app.getPort).toHaveLastReturnedWith(9080);
     }, 300);
     it(`Should store in the registry the errors emitted by underlayer services`, async () => {
       const config: ObservabilityOptions = {

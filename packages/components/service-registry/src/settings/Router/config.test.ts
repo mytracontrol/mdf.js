@@ -9,6 +9,7 @@
 import express from 'express';
 import request from 'supertest';
 import { SettingsManager } from '..';
+import { CONFIG_SERVICE_NAME } from '../types';
 import { Router } from './config.router';
 // #endregion
 // *************************************************************************************************
@@ -39,9 +40,9 @@ app.use(configRouter.router);
 // #region Our tests
 describe('#Component #service-setup', () => {
   describe('#Happy path', () => {
-    it(`Should response 200 and json object with all the presets when a GET request is performed over /config/presets`, done => {
+    it(`Should response 200 and json object with all the presets when a GET request is performed over /${CONFIG_SERVICE_NAME}/presets`, done => {
       request(app)
-        .get(`/config/presets`)
+        .get(`/${CONFIG_SERVICE_NAME}/presets`)
         .set('Content-Type', 'application/json')
         .set('Accept', 'application/json')
         .expect('Content-Type', /json/)
@@ -79,9 +80,9 @@ describe('#Component #service-setup', () => {
           done(error);
         });
     }, 300);
-    it(`Should response 200 and json object with all the presets when a GET request is performed over /config/config`, done => {
+    it(`Should response 200 and json object with all the presets when a GET request is performed over /${CONFIG_SERVICE_NAME}/config`, done => {
       request(app)
-        .get(`/config/config`)
+        .get(`/${CONFIG_SERVICE_NAME}/config`)
         .set('Content-Type', 'application/json')
         .set('Accept', 'application/json')
         .expect('Content-Type', /json/)
@@ -141,9 +142,9 @@ describe('#Component #service-setup', () => {
           done(error);
         });
     }, 300);
-    it(`Should response 200 and html text when a GET request is performed over /config/readme`, done => {
+    it(`Should response 200 and html text when a GET request is performed over /${CONFIG_SERVICE_NAME}/readme`, done => {
       request(app)
-        .get(`/config/readme`)
+        .get(`/${CONFIG_SERVICE_NAME}/readme`)
         .set('Content-Type', 'html/text')
         .set('Accept', 'html/text')
         .expect('Content-Type', /text/)
@@ -158,9 +159,9 @@ describe('#Component #service-setup', () => {
     }, 300);
   });
   describe('#Sad path', () => {
-    it(`Should response 404 when a GET request is performed over /config/unknown`, done => {
+    it(`Should response 404 when a GET request is performed over /${CONFIG_SERVICE_NAME}/unknown`, done => {
       request(app)
-        .get(`/config/unknown`)
+        .get(`/${CONFIG_SERVICE_NAME}/unknown`)
         .set('Content-Type', 'application/json')
         .set('Accept', 'application/json')
         .expect(400)

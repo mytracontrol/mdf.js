@@ -7,11 +7,12 @@
 
 import express from 'express';
 import { SettingsManager } from '..';
+import { CONFIG_SERVICE_NAME } from '../types';
 import { Controller } from './config.controller';
 import { Model } from './config.model';
 import { Service } from './config.service';
 
-const PREFIX_PATH = '/config';
+const PREFIX_PATH = `/${CONFIG_SERVICE_NAME}`;
 
 /** Router class */
 export class Router {
