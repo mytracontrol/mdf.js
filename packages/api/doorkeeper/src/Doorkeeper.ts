@@ -420,10 +420,10 @@ export class DoorKeeper<T = void> {
     ) => {
       if (entry['$ref']) {
         const refSchema = this.getSchema(entry['$ref'], uuid);
-        parentSchema[key] = forOwn(
-          omit(cloneDeep(refSchema.schema) as object, ['$id', '$schema']),
-          iterator
-        );
+        parentSchema[key] = {
+          ...forOwn(omit(cloneDeep(refSchema.schema) as object, ['$id', '$schema']), iterator),
+          ...omit(cloneDeep(entry), ['$ref']),
+        };
       } else if (typeof entry === 'object') {
         parentSchema[key] = forOwn(entry, iterator);
       }

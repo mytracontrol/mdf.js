@@ -26,7 +26,7 @@ export const schema = Joi.object({
   username: Joi.string(),
   password: Joi.string(),
   clientId: Joi.string(),
-  ca: Joi.string(),
-  cert: Joi.string(),
-  key: Joi.string(),
+  ca: Joi.binary(),
+  cert: Joi.binary(),
+  key: Joi.binary(),
 }).unknown(true);

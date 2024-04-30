@@ -42,10 +42,10 @@ export const DEFAULT_RETRY_OPTIONS: RetryOptions = {
 /** Default service registry settings environment configuration */
 export const DEFAULT_SERVICE_REGISTRY_SETTINGS_ENV_CONFIG: Record<string, string> = {
   metadata: 'CONFIG_METADATA_',
-  observability: 'CONFIG_OBSERVABILITY_',
-  logger: 'CONFIG_LOGGER_',
+  observabilityOptions: 'CONFIG_OBSERVABILITY_',
+  loggerOptions: 'CONFIG_LOGGER_',
   retryOptions: 'CONFIG_RETRY_OPTIONS_',
-  adapter: 'CONFIG_ADAPTER_',
+  adapterOptions: 'CONFIG_ADAPTER_',
 };
 
 /** Default observability options */
