@@ -41,7 +41,12 @@ class FakeLogger {
   }
 }
 class FakeClient extends EventEmitter {
-  public pingResp = false;
+  public pingResp = 0;
+  public options: {
+    keepalive: number;
+  } = {
+    keepalive: 60,
+  };
   public connect(): void {
     setImmediate(() => {
       this.emit('connect', {
@@ -149,11 +154,11 @@ describe('#Port #mqtt', () => {
       await port.start();
       expect(port.state).toBeFalsy();
       //@ts-ignore - Test environment
-      port.client.pingResp = true;
+      port.client.pingResp = Date.now();
       expect(port.state).toBeTruthy();
       await port.stop();
       //@ts-ignore - Test environment
-      port.client.pingResp = false;
+      port.client.pingResp = 0;
       expect(port.state).toBeFalsy();
       expect(port.client.endAsync).toHaveBeenCalledTimes(1);
     }, 300);
@@ -179,7 +184,7 @@ describe('#Port #mqtt', () => {
       await port.start();
       expect(port.state).toBeFalsy();
       //@ts-ignore - Test environment
-      port.client.pingResp = true;
+      port.client.pingResp = Date.now();
       expect(port.state).toBeTruthy();
       port.client.emit('disconnect', { cmd: 'disconnect' });
       expect(logger.entry).toEqual(
@@ -191,7 +196,7 @@ describe('#Port #mqtt', () => {
       expect(logger.entry).toEqual(`error`);
       await port.stop();
       //@ts-ignore - Test environment
-      port.client.pingResp = false;
+      port.client.pingResp = 0;
       expect(port.state).toBeFalsy();
       expect(port.client.endAsync).toHaveBeenCalledTimes(1);
     }, 300);
@@ -205,7 +210,7 @@ describe('#Port #mqtt', () => {
       let unhealthy = false;
       port.on('healthy', () => {
         healthy = true;
-        port.client.pingResp = false;
+        port.client.pingResp = 0;
       });
       port.on('unhealthy', error => {
         expect(error).toBeDefined();
@@ -218,7 +223,7 @@ describe('#Port #mqtt', () => {
       //@ts-ignore - Test environment
       port.instance = new FakeClient();
       jest.spyOn(port.client, 'endAsync');
-      port.client.pingResp = true;
+      port.client.pingResp = Date.now();
       port.start().then();
     }, 300);
   });

@@ -28,6 +28,8 @@ stages:
     displayName: 'Application Build'
     pool:
       name: NUCHUB
+      demands:
+        - Agent.OS -equals Linux
     jobs:
       - job: 'CODE_QUALITY'
         displayName: 'Code Quality Assurance'

@@ -46,7 +46,7 @@
     "@mdf.js/repo-config": "*",
     "@types/lodash": "^4.17.0",
     "@types/uuid": "^9.0.1",
-    "supertest": "^6.3.4"
+    "supertest": "^7.0.0"
   },
   "engines": {
     "node": ">=16.14.2"

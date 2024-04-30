@@ -49,7 +49,17 @@ export class Port extends Layer.Provider.Port<Client, Config> {
   }
   /** Return the port state as a boolean value, true if the port is available, false in otherwise */
   public get state(): boolean {
-    return this.isConnected && this.instance.pingResp;
+    if (!this.isConnected) {
+      return false;
+    } else if (this.instance.pingResp === 0) {
+      return false;
+    } else {
+      if (this.instance.pingResp > Date.now() - (this.instance.options.keepalive || 60) * 1000) {
+        return true;
+      } else {
+        return false;
+      }
+    }
   }
   /** Initialize the port instance */
   public async start(): Promise<void> {
@@ -100,7 +110,7 @@ export class Port extends Layer.Provider.Port<Client, Config> {
   }
   /** Update the state of the ping response */
   private readonly checkConnectionStatus = () => {
-    const shouldBeHealthy = this.isConnected && this.instance.pingResp;
+    const shouldBeHealthy = this.state;
     if (this.isHealthy === shouldBeHealthy) {
       return;
     } else if (shouldBeHealthy) {
