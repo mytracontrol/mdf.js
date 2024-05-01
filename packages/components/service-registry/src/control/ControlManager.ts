@@ -131,7 +131,11 @@ export class ControlManager extends EventEmitter {
       this.logger.warn(
         `No consumer adapter options were provided, a dummy adapter will be created`
       );
-    } else if (options.type !== 'redis' && options.type !== 'socketIO') {
+    } else if (
+      typeof options.type === 'string' &&
+      options.type !== 'redis' &&
+      options.type !== 'socketIO'
+    ) {
       this.addError(new Crash(`Unknown consumer adapter type, costumer will not be instantiated.`));
     } else {
       _options = options;

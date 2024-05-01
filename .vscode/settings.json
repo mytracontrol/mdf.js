@@ -72,7 +72,8 @@
     "middlewares",
     "limiter",
     "general",
-    "tasks"
+    "tasks",
+    "elastic-provider"
   ],
 
 }
