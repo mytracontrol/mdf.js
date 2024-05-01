@@ -30,16 +30,27 @@ export class ObservabilityAppManager {
   private _links: Links = {};
   /** HTTP server */
   private _server?: HTTP.Provider;
+  /** Options for the observability service */
+  private _options: ObservabilityOptions & { service: { primaryPort: number; port: number } };
   /**
    * Create an instance of observability service
    * @param options - observability options
    * @param registry - registry to be used for endpoints metrics
    */
   constructor(
-    public readonly options: ObservabilityOptions,
+    options: ObservabilityOptions,
     private readonly registry: Registry
   ) {
     this._router = express.Router();
+    this._options = merge(
+      { service: { primaryPort: DEFAULT_PRIMARY_PORT, port: DEFAULT_PORT } },
+      options
+    );
+    this._options.service.port = this.checkPortInRange(this._options.service.port, DEFAULT_PORT);
+    this._options.service.primaryPort = this.checkPortInRange(
+      this._options.service.primaryPort,
+      DEFAULT_PRIMARY_PORT
+    );
   }
   /** Indicates whether the server has been initialized. */
   public get isBuild(): boolean {
@@ -73,7 +84,7 @@ export class ObservabilityAppManager {
       config: {
         app: this._app,
         port: this.getPort(),
-        host: this.options.service?.host,
+        host: this._options.service?.host,
       },
     });
   }
@@ -86,7 +97,10 @@ export class ObservabilityAppManager {
   }
   /** @returns The links offered by this service */
   public get links(): Links {
-    return Middleware.Default.FormatLinks(`${this.baseURL}${this.apiVersion}`, this._links);
+    return Middleware.Default.FormatLinks(
+      `${this.baseURL}:${this.getPort()}${this.apiVersion}`,
+      this._links
+    );
   }
   /** Registers a new service with the observability app. */
   public register(service: Layer.App.Service | Layer.App.Service[]): void {
@@ -102,22 +116,22 @@ export class ObservabilityAppManager {
   }
   /** Get the base url whew the observability is served */
   private get baseURL(): string {
-    const address = this._server?.client?.address();
-    let baseURL: string;
-    if (address) {
-      if (typeof address === 'string') {
-        baseURL = address;
+    const _attachedAddress = this._server?.client?.address();
+    let address: string;
+    if (_attachedAddress) {
+      if (typeof _attachedAddress === 'string') {
+        address = _attachedAddress.split(':')[1];
       } else {
-        baseURL = `http://${address.address}:${address.port}`;
+        address = _attachedAddress.address;
       }
     } else {
-      baseURL = '';
+      address = '127.0.0.1';
     }
-    return baseURL;
+    return `http://${address}`;
   }
   /** Get the api version */
   private get apiVersion(): string {
-    return `/v${this.options.metadata.version}`;
+    return `/v${this._options.metadata.version}`;
   }
   /** Add a new link to the observability */
   private addLinks(links: Links): void {
@@ -154,7 +168,7 @@ export class ObservabilityAppManager {
     const app = express();
     app.use(
       createProxyMiddleware({
-        router: () => `${this.baseURL}`,
+        router: () => `${this.baseURL}:${this._options.service.primaryPort}`,
         changeOrigin: true,
       })
     );
@@ -166,22 +180,28 @@ export class ObservabilityAppManager {
   }
   /** Get if the current process is working in cluster mode */
   private get isClusterMode(): boolean {
-    return typeof this.options.service?.isCluster === 'boolean'
-      ? this.options.service?.isCluster
+    return typeof this._options.service?.isCluster === 'boolean'
+      ? this._options.service?.isCluster
       : false;
+  }
+  /**
+   * Check if the port is in the range of valid ports
+   * @param port - port to be used
+   * @param defaultPort - default port to be used
+   * @returns The port to be used
+   */
+  private checkPortInRange(port: number | undefined, defaultPort: number): number {
+    return !port || port < 1 || port > 65535 ? defaultPort : port;
   }
   /**
    * Get the port to be used by the service based on the configuration
    * @returns The port to be used
    */
   private getPort(): number {
-    const setInRange = (port: number | undefined, defaultPort: number): number => {
-      return !port || port < 1 || port > 65535 ? defaultPort : port;
-    };
     if (this.isClusterMode && cluster.isPrimary) {
-      return setInRange(this.options.service?.primaryPort, DEFAULT_PRIMARY_PORT);
+      return this._options.service.primaryPort;
     } else {
-      return setInRange(this.options.service?.port, DEFAULT_PORT);
+      return this._options.service.port;
     }
   }
 }
