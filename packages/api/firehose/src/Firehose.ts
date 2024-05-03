@@ -159,8 +159,6 @@ export class Firehose<
   private metricsHandler = new MetricsHandler();
   /** Flag to indicate that an stop request has been received */
   private stopping: boolean;
-  /** Flag to indicate that the firehose is booted */
-  private isBooted: boolean;
   /**
    * Create a new instance for a firehose
    * @param name - Firehose name
@@ -183,13 +181,13 @@ export class Firehose<
     if (this.options.sources.length < 1) {
       throw new Crash(`Firehose must have at least one source`, this.componentId);
     }
+    this.bootstrap();
     this.engine = new Engine(this.name, {
       strategies: this.options.strategies,
       transformOptions: { highWaterMark: this.options.bufferSize },
       logger: this.options.logger,
     });
     this.stopping = false;
-    this.isBooted = false;
   }
   /** Sink/Source/Engine/Plug error event handler */
   private readonly onErrorEvent = (error: Error | Crash) => {
@@ -299,7 +297,7 @@ export class Firehose<
     return this.metricsHandler.registry;
   }
   /** Perform the bootstrapping of the firehose */
-  private async bootstrap(): Promise<void> {
+  private bootstrap(): void {
     this.sinks.push(...Helpers.GetSinkStreamsFromPlugs(this.options.sinks, this.options));
     this.sources.push(
       ...Helpers.GetSourceStreamsFromPlugs(
@@ -316,14 +314,10 @@ export class Firehose<
         this.metricsHandler.enroll(sink);
       }
     }
-    this.wrappingEvents();
-    this.isBooted = true;
   }
   /** Perform the piping of all the streams */
   public async start(): Promise<void> {
-    if (!this.isBooted) {
-      await this.bootstrap();
-    }
+    this.wrappingEvents();
     const startedPlugs = [];
     try {
       for (const sink of this.sinks) {
@@ -384,7 +378,6 @@ export class Firehose<
     }
     this.sinks.length = 0;
     this.sources.length = 0;
-    this.isBooted = false;
   }
   /** Stop and close all the streams */
   public async close(): Promise<void> {

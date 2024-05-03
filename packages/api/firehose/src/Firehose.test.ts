@@ -498,7 +498,7 @@ describe('#Firehose', () => {
           sources: [new MyFlowPlug()],
           sinks: [],
         });
-      }).toThrowError('Firehose must have at least one sink');
+      }).toThrow('Firehose must have at least one sink');
     }, 300);
     it(`Should throw an error if there is not source`, () => {
       expect(() => {
@@ -506,35 +506,29 @@ describe('#Firehose', () => {
           sources: [],
           sinks: [new MyTapPlug()],
         });
-      }).toThrowError('Firehose must have at least one source');
+      }).toThrow('Firehose must have at least one source');
     }, 300);
     it(`Should throw an error if there is a not valid source`, () => {
-      const fh = new Firehose('MyFirehose', {
-        //@ts-ignore - Test environment
-        sources: [new MyFlowPlug(), {}],
-        sinks: [new MyTapPlug()],
-      });
-      fh.start()
-        .then(() => {
-          throw new Error('Should not be here');
-        })
-        .catch(error => {
-          expect(error.message).toEqual('Source type not supported');
+      try {
+        const fh = new Firehose('MyFirehose', {
+          //@ts-ignore - Test environment
+          sources: [new MyFlowPlug(), {}],
+          sinks: [new MyTapPlug()],
         });
+      } catch (error) {
+        expect((error as Crash).message).toEqual('Source type not supported');
+      }
     }, 300);
     it(`Should throw an error if there is a not valid sink`, () => {
-      const fh = new Firehose('MyFirehose', {
-        sources: [new MyFlowPlug()],
-        //@ts-ignore - Test environment
-        sinks: [new MyTapPlug(), {}],
-      });
-      fh.start()
-        .then(() => {
-          throw new Error('Should not be here');
-        })
-        .catch(error => {
-          expect(error.message).toEqual('Sink type not supported');
+      try {
+        const fh = new Firehose('MyFirehose', {
+          sources: [new MyFlowPlug()],
+          //@ts-ignore - Test environment
+          sinks: [new MyTapPlug(), {}],
         });
+      } catch (error) {
+        expect((error as Crash).message).toEqual('Sink type not supported');
+      }
     }, 300);
     it(`Should emit an error if any of the streams/plugs emit an error`, done => {
       const mySinkPlug = new MyTapPlug();
