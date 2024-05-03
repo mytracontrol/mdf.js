@@ -10,6 +10,7 @@ import { Crash, Multi } from '@mdf.js/crash';
 import { RetryOptions, retryBind } from '@mdf.js/utils';
 import EventEmitter from 'events';
 import { merge } from 'lodash';
+import { Registry } from 'prom-client';
 import { OpenJobObject, WrappableSinkPlug } from '../../types';
 
 export class PlugWrapper extends EventEmitter implements Layer.App.Component {
@@ -129,6 +130,10 @@ export class PlugWrapper extends EventEmitter implements Layer.App.Component {
   /** Component identification */
   public get componentId(): string {
     return this.plug.componentId;
+  }
+  /** Metrics registry for this component */
+  public get metrics(): Registry | undefined {
+    return this.plug.metrics;
   }
   /**
    * Return the status of the stream in a standard format

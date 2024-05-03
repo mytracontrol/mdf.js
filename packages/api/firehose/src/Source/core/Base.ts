@@ -9,6 +9,7 @@ import { Health, Jobs, Layer } from '@mdf.js/core';
 import { Crash, Multi } from '@mdf.js/crash';
 import { DebugLogger, LoggerInstance, SetContext } from '@mdf.js/logger';
 import { merge } from 'lodash';
+import { Registry } from 'prom-client';
 import { Readable } from 'stream';
 import { OpenJobHandler, Plugs, SourceOptions } from '../../types';
 import { PlugWrapper } from './PlugWrapper';
@@ -196,5 +197,9 @@ export abstract class Base<T extends Plugs.Source.Any>
   /** Stop the Plug and the underlayer resources, making it unavailable */
   public async stop(): Promise<void> {
     await this.plug.stop();
+  }
+  /** Metrics registry for this component */
+  public get metrics(): Registry | undefined {
+    return this.plugWrapper.metrics;
   }
 }

@@ -159,6 +159,8 @@ export class Firehose<
   private metricsHandler = new MetricsHandler();
   /** Flag to indicate that an stop request has been received */
   private stopping: boolean;
+  /** Flag to indicate that the firehose is booted */
+  private isBooted: boolean;
   /**
    * Create a new instance for a firehose
    * @param name - Firehose name
@@ -187,6 +189,7 @@ export class Firehose<
       logger: this.options.logger,
     });
     this.stopping = false;
+    this.isBooted = false;
   }
   /** Sink/Source/Engine/Plug error event handler */
   private readonly onErrorEvent = (error: Error | Crash) => {
@@ -295,8 +298,8 @@ export class Firehose<
   public get metrics(): Registry {
     return this.metricsHandler.registry;
   }
-  /** Perform the piping of all the streams */
-  public async start(): Promise<void> {
+  /** Perform the bootstrapping of the firehose */
+  private async bootstrap(): Promise<void> {
     this.sinks.push(...Helpers.GetSinkStreamsFromPlugs(this.options.sinks, this.options));
     this.sources.push(
       ...Helpers.GetSourceStreamsFromPlugs(
@@ -309,15 +312,57 @@ export class Firehose<
       for (const source of this.sources) {
         this.metricsHandler.enroll(source);
       }
+      for (const sink of this.sinks) {
+        this.metricsHandler.enroll(sink);
+      }
     }
     this.wrappingEvents();
-    for (const sink of this.sinks) {
-      await sink.start();
-      this.engine.pipe(sink);
+    this.isBooted = true;
+  }
+  /** Perform the piping of all the streams */
+  public async start(): Promise<void> {
+    if (!this.isBooted) {
+      await this.bootstrap();
     }
-    for (const source of this.sources) {
-      await source.start();
-      source.pipe(this.engine);
+    const startedPlugs = [];
+    try {
+      for (const sink of this.sinks) {
+        // Stryker disable next-line all
+        this.logger.info(`Starting sink ${sink.name} ...`);
+        await sink.start();
+        // Stryker disable next-line all
+        this.logger.info(`... sink ${sink.name} started`);
+        startedPlugs.push(sink);
+      }
+      for (const source of this.sources) {
+        // Stryker disable next-line all
+        this.logger.info(`Starting source ${source.name} ...`);
+        await source.start();
+        // Stryker disable next-line all
+        this.logger.info(`... source ${source.name} started`);
+        startedPlugs.push(source);
+      }
+      // Wait for all the plugs to be started before starting the engine
+      for (const sink of this.sinks) {
+        this.engine.pipe(sink);
+      }
+      for (const source of this.sources) {
+        source.pipe(this.engine);
+      }
+    } catch (rawError) {
+      const error = Crash.from(rawError);
+      // Stryker disable next-line all
+      this.logger.error(`Error starting firehose: ${error.message}`);
+      // Stryker disable next-line all
+      this.logger.warn(`Stopping all the already started plugs ...`);
+      for (const plug of startedPlugs) {
+        // Stryker disable next-line all
+        this.logger.warn(`Stopping plug ${plug.name} ...`);
+        await plug.stop();
+        // Stryker disable next-line all
+        this.logger.warn(`... plug ${plug.name} stopped`);
+      }
+      throw error;
     }
   }
   /** Perform the unpipe of all the streams */
@@ -339,6 +384,7 @@ export class Firehose<
     }
     this.sinks.length = 0;
     this.sources.length = 0;
+    this.isBooted = false;
   }
   /** Stop and close all the streams */
   public async close(): Promise<void> {

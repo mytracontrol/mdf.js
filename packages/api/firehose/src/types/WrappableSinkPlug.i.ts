@@ -6,6 +6,7 @@
  */
 
 import { Layer } from '@mdf.js/core';
+import { Registry } from 'prom-client';
 import { OpenJobObject } from './OpenJobs.t';
 
 export interface WrappableSinkPlug extends Layer.App.Resource {
@@ -23,4 +24,6 @@ export interface WrappableSinkPlug extends Layer.App.Resource {
   start(): Promise<void>;
   /** Stop the Plug and the underlayer resources, making it unavailable */
   stop(): Promise<void>;
+  /** Metrics registry for this component */
+  readonly metrics?: Registry;
 }

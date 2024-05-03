@@ -7,6 +7,7 @@
 
 import { Health, Jobs, Layer } from '@mdf.js/core';
 import { Crash } from '@mdf.js/crash';
+import { Registry } from 'prom-client';
 
 export interface Base<
   Type extends string = string,
@@ -27,4 +28,6 @@ export interface Base<
   start(): Promise<void>;
   /** Stop the Plug and the underlayer resources, making it unavailable */
   stop(): Promise<void>;
+  /** Metrics registry for this component */
+  readonly metrics?: Registry;
 }

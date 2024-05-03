@@ -7,7 +7,7 @@
 
 import { Jobs } from '@mdf.js/core';
 import { Counter, Gauge, Histogram, Registry } from 'prom-client';
-import { Sources } from '../types';
+import { Sinks, Sources } from '../types';
 
 /** Metric types */
 type MetricInstances = {
@@ -25,10 +25,12 @@ type MetricInstances = {
 
 /** Metrics handler */
 export class MetricsHandler {
+  /** Map of registered plugs */
+  private plugs: Map<string, Sources | Sinks> = new Map();
   /** Metrics instances */
   private readonly metrics: MetricInstances;
   /** The registry to register the metrics */
-  public readonly registry: Registry;
+  public registry: Registry;
   /** Create an instance of MetricsHandler */
   constructor() {
     this.registry = new Registry();
@@ -101,9 +103,19 @@ export class MetricsHandler {
   }
   /**
    * Register the metrics handler to a firehose source
-   * @param source - Source to be managed
+   * @param plug - Source to be managed
    */
-  public enroll(source: Sources): void {
-    source.on('job', this.onJobEventHandler);
+  public enroll(plug: Sources | Sinks): void {
+    plug.on('job', this.onJobEventHandler);
+    if (!this.plugs.has(plug.name)) {
+      if (
+        'metrics' in plug &&
+        typeof plug.metrics !== 'undefined' &&
+        plug.metrics instanceof Registry
+      ) {
+        this.registry = Registry.merge([this.registry, plug.metrics]);
+        this.plugs.set(plug.name, plug);
+      }
+    }
   }
 }

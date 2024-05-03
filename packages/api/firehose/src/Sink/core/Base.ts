@@ -13,6 +13,7 @@ import { Plugs, SinkOptions } from '../../types';
 import { PlugWrapper } from './PlugWrapper';
 
 import { DebugLogger, LoggerInstance, SetContext } from '@mdf.js/logger';
+import { Registry } from 'prom-client';
 import { DEFAULT_WRITABLE_OPTIONS } from './const';
 
 /** Firehose sink (Writable) plug class */
@@ -161,5 +162,9 @@ export abstract class Base<T extends Plugs.Sink.Any>
   /** Stop the Plug and the underlayer resources, making it unavailable */
   public async stop(): Promise<void> {
     await this.plug.stop();
+  }
+  /** Metrics registry for this component */
+  public get metrics(): Registry | undefined {
+    return this.plugWrapper.metrics;
   }
 }

@@ -348,6 +348,7 @@ export class ServiceRegistry<
   }
   /** Perform the initialization of all the service resources that has been attached */
   public readonly start = async (): Promise<void> => {
+    const startedResources: Layer.Observable[] = [];
     try {
       if (this._started) {
         return;
@@ -369,6 +370,7 @@ export class ServiceRegistry<
         await this.wrappedStart(resource);
         // Stryker disable next-line all
         this._logger.info(`... ${resource.name} started`);
+        startedResources.push(resource);
       }
       // Stryker disable next-line all
       this._logger.info('... application resources started');
@@ -379,6 +381,15 @@ export class ServiceRegistry<
         cause,
       });
       this._logger.crash(error);
+      // Stryker disable next-line all
+      this._logger.info('Rolling back started resources ...');
+      for (const resource of startedResources) {
+        // Stryker disable next-line all
+        this._logger.info(`Stopping resource: ${resource.name} ...`);
+        await this.wrappedStop(resource);
+        // Stryker disable next-line all
+        this._logger.info(`... ${resource.name} stopped`);
+      }
       throw error;
     }
   };

@@ -50,6 +50,7 @@ describe('#Firehose', () => {
         if (result.jobUserId === '4') {
           const metrics = await firehose.metrics.metrics();
           expect(metrics).toBeDefined();
+          expect(metrics).toContain(`my_counter{plug="MyTapPlug"} 4`);
           expect(metrics).toContain(`api_all_job_processed_total{type="myType"} 4`);
           expect(metrics).toContain(`api_all_job_in_processing_total{type="myType"} 6`);
           const checks = firehose.checks;

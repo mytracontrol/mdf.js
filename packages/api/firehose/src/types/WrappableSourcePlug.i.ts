@@ -7,6 +7,7 @@
 
 import { Layer } from '@mdf.js/core';
 import { EventEmitter } from 'events';
+import { Registry } from 'prom-client';
 import { OpenJobRequest } from './OpenJobs.t';
 
 export interface WrappableSourcePlug extends EventEmitter, Layer.App.Resource {
@@ -36,4 +37,6 @@ export interface WrappableSourcePlug extends EventEmitter, Layer.App.Resource {
   start: () => Promise<void>;
   /** Stop the Plug and the underlayer resources, making it unavailable */
   stop: () => Promise<void>;
+  /** Metrics registry for this component */
+  readonly metrics?: Registry;
 }

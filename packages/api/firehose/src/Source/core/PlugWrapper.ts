@@ -10,6 +10,7 @@ import { Crash, Multi } from '@mdf.js/crash';
 import { RetryOptions, retryBind } from '@mdf.js/utils';
 import EventEmitter from 'events';
 import { merge } from 'lodash';
+import { Registry } from 'prom-client';
 import { OpenJobRequest, PostConsumeOptions, WrappableSourcePlug } from '../../types';
 import {
   DEFAULT_CONFIG_SOURCE_PLUG_CHECK_UNCLEANED_INTERVAL,
@@ -302,5 +303,9 @@ export class PlugWrapper extends EventEmitter implements Layer.App.Component {
         },
       ],
     };
+  }
+  /** Metrics registry for this component */
+  public get metrics(): Registry | undefined {
+    return this.plug.metrics;
   }
 }
