@@ -124,7 +124,7 @@ describe('#Metrics #Service', () => {
         help: 'counter',
         name: 'counter',
         type: 'counter',
-        values: [{ labels: {}, value: 0 }],
+        values: [{ labels: { NODE_APP_INSTANCE: 'primary' }, value: 0 }],
       });
       expect(service.getMetric('counter')).toBeInstanceOf(Counter);
       expect(typeof (await service.getMetric('gauge'))).toEqual('undefined');
@@ -190,7 +190,7 @@ describe('#Metrics #Service', () => {
         help: 'counter',
         name: 'counter',
         type: 'counter',
-        values: [{ labels: {}, value: 0 }],
+        values: [{ labels: { NODE_APP_INSTANCE: 'workerundefined' }, value: 0 }],
       });
       expect(service.getMetric('counter')).toBeInstanceOf(Counter);
       expect(typeof (await service.getMetric('gauge'))).toEqual('undefined');
@@ -199,7 +199,7 @@ describe('#Metrics #Service', () => {
       expect(metrics.metrics.length).toBeGreaterThan(1);
       metrics = await service.metricsText();
       expect(metrics.contentType).toEqual('text/plain; version=0.0.4; charset=utf-8');
-      expect(metrics.metrics).toContain('counter 0');
+      expect(metrics.metrics).toContain('counter{NODE_APP_INSTANCE="workerundefined"} 0');
       const secondRegistry = new Registry();
       const addedCounter2 = new Counter({
         name: 'counter2',

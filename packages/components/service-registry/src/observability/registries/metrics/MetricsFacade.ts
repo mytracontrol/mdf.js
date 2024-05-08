@@ -71,7 +71,7 @@ export class MetricsFacade extends EventEmitter implements Layer.App.Service {
    * @returns An AggregatorRegistry instance or undefined if not in cluster mode.
    */
   private getPort(isCluster?: boolean): AggregatorRegistry<PrometheusContentType> | undefined {
-    if (typeof isCluster === 'boolean') {
+    if (typeof isCluster === 'boolean' && isCluster) {
       return new AggregatorRegistry();
     } else {
       return undefined;

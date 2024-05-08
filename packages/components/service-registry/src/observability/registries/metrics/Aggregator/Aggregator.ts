@@ -42,15 +42,38 @@ export class Aggregator {
     // Collect default metrics and label them with the instance identifier
     this.collectDefaultMetrics(this.defaultRegistry);
     this._registry = new Registry();
-    if (this.port !== undefined && !cluster.isPrimary) {
-      // Stryker disable next-line all
-      this.logger.debug(
-        `The metrics aggregator is running in a worker node, we will collect the metrics from the application and the default prom-client registry`
-      );
-      AggregatorRegistry.setRegistries([this._registry, this.defaultRegistry]);
-    }
+    this.updateAggregatorRegistry(this._registry, port);
     // Stryker disable next-line all
     this.logger.debug(`New metric aggregator instance created: ${this._registry.contentType}`);
+  }
+  /**
+   * Update the aggregator registry based on the current environment and node type
+   */
+  private updateAggregatorRegistry(
+    registry: Registry,
+    port?: AggregatorRegistry<PrometheusContentType>
+  ): void {
+    if (port !== undefined) {
+      if (cluster.isPrimary) {
+        // Stryker disable next-line all
+        this.logger.debug(
+          `The metrics aggregator is running in the primary node, we will collect the metrics from the application, the default prom-client registry, and the cluster registry`
+        );
+        this._registry.setDefaultLabels({
+          NODE_APP_INSTANCE: process.env['NODE_APP_INSTANCE'] ?? 'primary',
+        });
+        AggregatorRegistry.setRegistries([registry, this.defaultRegistry, port]);
+      } else {
+        // Stryker disable next-line all
+        this.logger.debug(
+          `The metrics aggregator is running in a worker node, we will collect the metrics from the application and the default prom-client registry`
+        );
+        this._registry.setDefaultLabels({
+          NODE_APP_INSTANCE: process.env['NODE_APP_INSTANCE'] ?? `worker${cluster.worker?.id}`,
+        });
+        AggregatorRegistry.setRegistries([registry, this.defaultRegistry]);
+      }
+    }
   }
   /**
    * Add default metrics to the registry if they are not already present
@@ -82,6 +105,7 @@ export class Aggregator {
           this.logger.debug(`Registering metrics for service: ${entry.name}`);
           this._registry = Registry.merge([this._registry, entry.metrics]);
           this.components.set(entry.name, entry);
+          this.updateAggregatorRegistry(this._registry, this.port);
         } else {
           // Stryker disable next-line all
           this.logger.debug(`Service ${entry.name} does not have metrics to register`);
