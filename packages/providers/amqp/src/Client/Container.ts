@@ -46,6 +46,10 @@ export class Container extends EventEmitter {
     // Stryker disable next-line all
     this.logger.debug(`New instance of AMQP port created: ${this.componentId}`);
   }
+  /**
+   * Connection details for the AMQP client
+   * @param counter - Number of connection attempts
+   */
   private readonly connectionDetails = (counter: number): ConnectionDetails => {
     this.logger.debug(`Connection details called: ${counter}`);
     return {
@@ -58,6 +62,10 @@ export class Container extends EventEmitter {
       connect: this.connectionHandler,
     };
   };
+  /**
+   * Connection handler for the AMQP client
+   * @param args - Connection arguments
+   */
   private readonly connectionHandler = (...args: any[]): Socket => {
     if (
       typeof args[0] !== 'number' ||

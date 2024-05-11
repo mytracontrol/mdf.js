@@ -137,6 +137,31 @@ const CONFIG_AMQP_REJECT_UNAUTHORIZED = coerce<boolean>(
   process.env['CONFIG_AMQP_REJECT_UNAUTHORIZED']
 );
 
+/**
+ * If true the server will send a keep-alive packet to maintain the connection alive.
+ * @defaultValue true
+ */
+const CONFIG_AMQP_KEEP_ALIVE = coerce<boolean>(process.env['CONFIG_AMQP_KEEP_ALIVE']);
+/**
+ * The initial delay in milliseconds for the keep-alive packet.
+ * @defaultValue 2000
+ */
+const CONFIG_AMQP_KEEP_ALIVE_INITIAL_DELAY = coerce<number>(
+  process.env['CONFIG_AMQP_KEEP_ALIVE_INITIAL_DELAY']
+);
+/**
+ * The time in milliseconds to wait for the connection to be established.
+ * @defaultValue 5000
+ */
+const CONFIG_AMQP_TIMEOUT = coerce<number>(process.env['CONFIG_AMQP_TIMEOUT']);
+/**
+ * Determines if rhea's auto-reconnect should attempt reconnection on all fatal errors
+ * @defaultValue true
+ */
+const CONFIG_AMQP_ALL_ERRORS_NON_FATAL = coerce<boolean>(
+  process.env['CONFIG_AMQP_ALL_ERRORS_NON_FATAL']
+);
+
 export const envBasedConfig: Config = {
   username: CONFIG_AMQP_USER_NAME,
   password: CONFIG_AMQP_PASSWORD,
@@ -158,5 +183,9 @@ export const envBasedConfig: Config = {
   ca: CA_CERT?.toString(),
   requestCert: CONFIG_AMQP_REQUEST_CERT,
   rejectUnauthorized: CONFIG_AMQP_REJECT_UNAUTHORIZED,
+  keepAlive: CONFIG_AMQP_KEEP_ALIVE,
+  keepAliveInitialDelay: CONFIG_AMQP_KEEP_ALIVE_INITIAL_DELAY,
+  timeout: CONFIG_AMQP_TIMEOUT,
+  all_errors_non_fatal: CONFIG_AMQP_ALL_ERRORS_NON_FATAL,
 };
 // #endregion

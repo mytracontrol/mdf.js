@@ -197,7 +197,7 @@ describe('#Port #AMQP #Receiver', () => {
               {
                 componentId: checks['credits'][0].componentId,
                 observedUnit: 'credits',
-                observedValue: 20,
+                observedValue: 10,
                 output: undefined,
                 status: 'pass',
                 time: checks['credits'][0].time,

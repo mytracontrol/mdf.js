@@ -159,7 +159,6 @@ export class Receiver extends Container {
       return this.start();
     }
     try {
-      const actualCredits = this.receiver.credit;
       const newReceiver = await this.connection.createReceiver();
       this.receiverEventsUnwrapping(this.receiver);
       this.receiverEventsWrapping(newReceiver);
@@ -172,7 +171,6 @@ export class Receiver extends Container {
       }
       await this.receiver.close({ closeSession: true });
       this.receiver = newReceiver;
-      this.receiver.addCredit(actualCredits);
       return undefined;
     } catch (rawError) {
       const error = Crash.from(rawError, this.componentId);
