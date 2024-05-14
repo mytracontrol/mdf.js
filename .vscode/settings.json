@@ -26,6 +26,8 @@
     "OPENC2",
     "RESTAPI",
     "Retryable",
+    "sasl",
+    "SASL",
     "Struct"
   ],
   "sonarlint.connectedMode.project": {
