@@ -6,7 +6,7 @@
  */
 
 /** Represents the primitive types */
-export enum Primitives {
+export enum Primitive {
   /** Indicates a empty value */
   NULL = 0x40,
   /** Indicates a boolean value */
@@ -87,45 +87,86 @@ export enum Primitives {
   ARRAY32 = 0xf0,
 }
 
+/** Fixed width primitives */
+export type FixedWidth =
+  | Primitive.NULL
+  | Primitive.BOOLEAN
+  | Primitive.TRUE
+  | Primitive.FALSE
+  | Primitive.UBYTE
+  | Primitive.USHORT
+  | Primitive.UINT
+  | Primitive.SMALL_UINT
+  | Primitive.UNIT0
+  | Primitive.ULONG
+  | Primitive.SMALL_ULONG
+  | Primitive.ULONG0
+  | Primitive.BYTE
+  | Primitive.SHORT
+  | Primitive.INT
+  | Primitive.SMALL_INT
+  | Primitive.LONG
+  | Primitive.SMALL_LONG
+  | Primitive.FLOAT
+  | Primitive.DOUBLE
+  | Primitive.DECIMAL32
+  | Primitive.DECIMAL64
+  | Primitive.DECIMAL128
+  | Primitive.CHAR
+  | Primitive.TIMESTAMP
+  | Primitive.UUID;
+/** Variable width primitives */
+export type VariableWidth =
+  | Primitive.VBIN8
+  | Primitive.VBIN32
+  | Primitive.STR8
+  | Primitive.STR32
+  | Primitive.SYM8
+  | Primitive.SYM32;
+/** Compound primitives */
+export type Compound = Primitive.LIST8 | Primitive.LIST32 | Primitive.MAP8 | Primitive.MAP32;
+/** Array primitives */
+export type Array = Primitive.ARRAY8 | Primitive.ARRAY32;
+
 /** Represents a primitive based value */
-export type PrimitiveBasedValue<T extends Primitives> = {
-  [Primitives.NULL]: null;
-  [Primitives.BOOLEAN]: boolean;
-  [Primitives.TRUE]: true;
-  [Primitives.FALSE]: false;
-  [Primitives.UBYTE]: number;
-  [Primitives.USHORT]: number;
-  [Primitives.UINT]: number;
-  [Primitives.SMALL_UINT]: number;
-  [Primitives.UNIT0]: 0;
-  [Primitives.ULONG]: bigint;
-  [Primitives.SMALL_ULONG]: number;
-  [Primitives.ULONG0]: 0;
-  [Primitives.BYTE]: number;
-  [Primitives.SHORT]: number;
-  [Primitives.INT]: number;
-  [Primitives.SMALL_INT]: number;
-  [Primitives.LONG]: bigint;
-  [Primitives.SMALL_LONG]: number;
-  [Primitives.FLOAT]: number;
-  [Primitives.DOUBLE]: number;
-  [Primitives.DECIMAL32]: number;
-  [Primitives.DECIMAL64]: number;
-  [Primitives.DECIMAL128]: number;
-  [Primitives.CHAR]: string;
-  [Primitives.TIMESTAMP]: Date;
-  [Primitives.UUID]: string;
-  [Primitives.VBIN8]: Buffer;
-  [Primitives.VBIN32]: Buffer;
-  [Primitives.STR8]: string;
-  [Primitives.STR32]: string;
-  [Primitives.SYM8]: string;
-  [Primitives.SYM32]: string;
-  [Primitives.LIST0]: [];
-  [Primitives.LIST8]: unknown[];
-  [Primitives.LIST32]: unknown[];
-  [Primitives.MAP8]: Record<string, unknown>;
-  [Primitives.MAP32]: Record<string, unknown>;
-  [Primitives.ARRAY8]: unknown[];
-  [Primitives.ARRAY32]: unknown[];
+export type PrimitiveBasedValue<T extends Primitive> = {
+  [Primitive.NULL]: null;
+  [Primitive.BOOLEAN]: boolean;
+  [Primitive.TRUE]: true;
+  [Primitive.FALSE]: false;
+  [Primitive.UBYTE]: number;
+  [Primitive.USHORT]: number;
+  [Primitive.UINT]: number;
+  [Primitive.SMALL_UINT]: number;
+  [Primitive.UNIT0]: 0;
+  [Primitive.ULONG]: bigint;
+  [Primitive.SMALL_ULONG]: number;
+  [Primitive.ULONG0]: 0;
+  [Primitive.BYTE]: number;
+  [Primitive.SHORT]: number;
+  [Primitive.INT]: number;
+  [Primitive.SMALL_INT]: number;
+  [Primitive.LONG]: bigint;
+  [Primitive.SMALL_LONG]: number;
+  [Primitive.FLOAT]: number;
+  [Primitive.DOUBLE]: number;
+  [Primitive.DECIMAL32]: number;
+  [Primitive.DECIMAL64]: number;
+  [Primitive.DECIMAL128]: number;
+  [Primitive.CHAR]: string;
+  [Primitive.TIMESTAMP]: Date;
+  [Primitive.UUID]: string;
+  [Primitive.VBIN8]: Buffer;
+  [Primitive.VBIN32]: Buffer;
+  [Primitive.STR8]: string;
+  [Primitive.STR32]: string;
+  [Primitive.SYM8]: string;
+  [Primitive.SYM32]: string;
+  [Primitive.LIST0]: [];
+  [Primitive.LIST8]: unknown[];
+  [Primitive.LIST32]: unknown[];
+  [Primitive.MAP8]: Record<string, unknown>;
+  [Primitive.MAP32]: Record<string, unknown>;
+  [Primitive.ARRAY8]: unknown[];
+  [Primitive.ARRAY32]: unknown[];
 }[T];

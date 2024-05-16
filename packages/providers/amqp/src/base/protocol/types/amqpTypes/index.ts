@@ -5,5 +5,6 @@
  * or at https://opensource.org/licenses/MIT.
  */
 
-export * from './Deserializer';
-export * from './Serializer';
+export * from './Constructor.i';
+export * from './Primitive.t';
+export * from './Subcategory.t';

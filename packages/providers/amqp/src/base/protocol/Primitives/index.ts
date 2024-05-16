@@ -5,7 +5,5 @@
  * or at https://opensource.org/licenses/MIT.
  */
 
-export * as Elements from './Elements';
-export * as Frame from './Frame';
-export * as Version from './Version';
-export * from './types';
+export * from './Deserializer/Deserializer';
+export * from './Serializer';

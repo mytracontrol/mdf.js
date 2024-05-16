@@ -7,7 +7,7 @@
 
 import { Crash } from '@mdf.js/crash';
 import { parse } from 'uuid';
-import { Element, Primitives } from '..';
+import { DecodedType, PrimitiveType } from '..';
 /** Serializer for AMQP elements */
 export class Serializer {
   /**
@@ -15,143 +15,143 @@ export class Serializer {
    * @param value The value to serialize
    * @returns The serialized value
    */
-  public static serialize<T extends Primitives>(element: Element<T>): Buffer {
+  public static serialize<T extends PrimitiveType>(element: DecodedType<T>): Buffer {
     let buffer = Buffer.alloc(element.size);
-    buffer.writeUInt8(element.primitive, 0);
-    switch (element.primitive) {
+    buffer.writeUInt8(element.type, 0);
+    switch (element.type) {
       // size: 1, code: 0x41
-      case Primitives.TRUE:
+      case PrimitiveType.TRUE:
       // size: 1, code: 0x42
-      case Primitives.FALSE:
+      case PrimitiveType.FALSE:
       // size: 1, code: 0x40
-      case Primitives.NULL:
+      case PrimitiveType.NULL:
       // size: 1, code: 0x43
-      case Primitives.UNIT0:
+      case PrimitiveType.UNIT0:
       // size: 1, code: 0x44
-      case Primitives.ULONG0:
+      case PrimitiveType.ULONG0:
       // size: 1, code: 0x45
-      case Primitives.LIST0:
+      case PrimitiveType.LIST0:
         break;
       // size: 2, code: 0x56
-      case Primitives.BOOLEAN:
-        buffer.writeUInt8((element.value as boolean) ? Primitives.TRUE : Primitives.FALSE, 1);
+      case PrimitiveType.BOOLEAN:
+        buffer.writeUInt8((element.value as boolean) ? PrimitiveType.TRUE : PrimitiveType.FALSE, 1);
         break;
       // size: 2, code: 0x50
-      case Primitives.UBYTE:
+      case PrimitiveType.UBYTE:
       // size: 2, code: 0x51
-      case Primitives.SMALL_UINT:
+      case PrimitiveType.SMALL_UINT:
       // size: 2, code: 0x52
-      case Primitives.SMALL_ULONG:
+      case PrimitiveType.SMALL_ULONG:
         buffer.writeUInt8(element.value as number, 1);
         break;
       // size: 3, code: 0x61
-      case Primitives.USHORT:
+      case PrimitiveType.USHORT:
         buffer.writeUInt16BE(element.value as number, 1);
         break;
       // size: 5, code: 0x71
-      case Primitives.UINT:
+      case PrimitiveType.UINT:
         buffer.writeUInt32BE(element.value as number, 1);
         break;
       // size: 9, code: 0x81
-      case Primitives.ULONG:
+      case PrimitiveType.ULONG:
         buffer.writeBigUInt64BE(BigInt(element.value as number), 1);
         break;
       // size: 5, code: 0x72
-      case Primitives.BYTE:
+      case PrimitiveType.BYTE:
       // size: 2, code: 0x54
-      case Primitives.SMALL_INT:
+      case PrimitiveType.SMALL_INT:
       // size: 2, code: 0x55
-      case Primitives.SMALL_LONG:
+      case PrimitiveType.SMALL_LONG:
         buffer.writeInt8(element.value as number, 1);
         break;
       // size: 3, code: 0x61
-      case Primitives.SHORT:
+      case PrimitiveType.SHORT:
         buffer.writeInt16BE(element.value as number, 1);
         break;
       // size: 5, code: 0x71
-      case Primitives.INT:
+      case PrimitiveType.INT:
         buffer.writeInt32BE(element.value as number, 1);
         break;
       // size: 9, code: 0x81
-      case Primitives.LONG:
+      case PrimitiveType.LONG:
         buffer.writeBigInt64BE(BigInt(element.value as number), 1);
         break;
       // size: 5, code: 0x72
-      case Primitives.FLOAT:
+      case PrimitiveType.FLOAT:
         buffer.writeFloatBE(element.value as number, 1);
         break;
       // size: 9, code: 0x82
-      case Primitives.DOUBLE:
+      case PrimitiveType.DOUBLE:
         buffer.writeDoubleBE(element.value as number, 1);
         break;
       // size: 5, code: 0x73
-      case Primitives.DECIMAL32:
+      case PrimitiveType.DECIMAL32:
       // size: 9, code: 0x83
-      case Primitives.DECIMAL64:
+      case PrimitiveType.DECIMAL64:
       // size: 17, code: 0x94
-      case Primitives.DECIMAL128:
-        Serializer.notImplemented(element.primitive);
+      case PrimitiveType.DECIMAL128:
+        Serializer.notImplemented(element.type);
       // size: 5, code: 0x73
-      case Primitives.CHAR:
+      case PrimitiveType.CHAR:
         buffer.writeUInt32BE(element.value as number, 1);
         break;
       // size: 5, code: 0x83
-      case Primitives.TIMESTAMP:
+      case PrimitiveType.TIMESTAMP:
         buffer.writeBigUInt64BE(BigInt((element.value as Date).getTime()), 1);
         break;
       // size: 17, code: 0x98
-      case Primitives.UUID:
+      case PrimitiveType.UUID:
         const uuid = Buffer.from(parse(element.value as string));
         uuid.copy(buffer, 1);
         break;
       // size: 2 + value length, code: 0xa0
-      case Primitives.VBIN8:
+      case PrimitiveType.VBIN8:
         buffer.writeUInt8((element.value as Buffer).length, 1);
         (element.value as Buffer).copy(buffer, 2);
         break;
       // size: 5 + value.length, code: 0xb0
-      case Primitives.VBIN32:
+      case PrimitiveType.VBIN32:
         buffer.writeUInt32BE((element.value as Buffer).length, 1);
         (element.value as Buffer).copy(buffer, 5);
         break;
       // size: 2 + value.length, code: 0xa1
-      case Primitives.STR8:
+      case PrimitiveType.STR8:
         buffer.writeUInt8((element.value as string).length, 1);
         buffer.write(element.value as string, 2, 'utf-8');
         break;
       // size: 5 + value.length, code: 0xb1
-      case Primitives.STR32:
+      case PrimitiveType.STR32:
         buffer.writeUInt32BE((element.value as string).length, 1);
         buffer.write(element.value as string, 5, 'utf-8');
         break;
       // size: 2 + value.length, code: 0xa3
-      case Primitives.SYM8:
+      case PrimitiveType.SYM8:
         buffer.writeUInt8((element.value as string).length, 1);
         buffer.write(element.value as string, 2, 'ascii');
         break;
       // size: 5 + value.length, code: 0xb3
-      case Primitives.SYM32:
+      case PrimitiveType.SYM32:
         buffer.writeUInt32BE((element.value as string).length, 1);
         buffer.write(element.value as string, 5, 'ascii');
         break;
       // size: 2 + value.length, code: 0xc0
-      case Primitives.LIST8:
+      case PrimitiveType.LIST8:
       // size: 5 + value.length, code: 0xd0
-      case Primitives.LIST32:
+      case PrimitiveType.LIST32:
         break;
       // size: 2 + value.length, code: 0xc1
-      case Primitives.MAP8:
+      case PrimitiveType.MAP8:
       // size: 5 + value.length, code: 0xd1
-      case Primitives.MAP32:
+      case PrimitiveType.MAP32:
         break;
       // size: 2 + value.length, code: 0xe0
-      case Primitives.ARRAY8:
+      case PrimitiveType.ARRAY8:
       // size: 5 + value.length, code: 0xf0
-      case Primitives.ARRAY32:
+      case PrimitiveType.ARRAY32:
         break;
       default:
         //@ts-expect-error - Its supposed to be unreachable, but to be safe we throw an error
-        throw new Crash(`Unknown code ${code.toString(16)}[${Primitives[code]}]`);
+        throw new Crash(`Unknown code ${code.toString(16)}[${PrimitiveType[code]}]`);
     }
     return buffer;
   }
@@ -161,8 +161,8 @@ export class Serializer {
    * @returns never
    * @throws Crash
    */
-  private static notImplemented(primitive: Primitives): never {
-    throw new Crash(`Decoder for ${Primitives[primitive]} is not implemented`, {
+  private static notImplemented(primitive: PrimitiveType): never {
+    throw new Crash(`Decoder for ${PrimitiveType[primitive]} is not implemented`, {
       name: 'NotImplemented',
     });
   }
