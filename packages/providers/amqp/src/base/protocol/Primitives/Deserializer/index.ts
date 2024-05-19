@@ -5,7 +5,4 @@
  * or at https://opensource.org/licenses/MIT.
  */
 
-/** The AMQP protocol identifier */
-export const AMQP_PROTOCOL_ID = 0x00;
-/** The SASL protocol identifier */
-export const SASL_PROTOCOL_ID = 0x03;
+export { Constructors as Deserializer } from './Constructors';

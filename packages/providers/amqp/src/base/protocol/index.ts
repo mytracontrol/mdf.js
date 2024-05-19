@@ -5,7 +5,7 @@
  * or at https://opensource.org/licenses/MIT.
  */
 
-export * as Frame from './Frame';
+//export * as Frame from './Frame';
 export * as Elements from './Primitives';
 export * as Version from './Version';
 export * from './types';

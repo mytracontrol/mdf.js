@@ -7,6 +7,8 @@
 
 /** Represents the primitive types */
 export enum Primitive {
+  /** Indicates a descriptor value */
+  DESCRIPTOR = 0x00,
   /** Indicates a empty value */
   NULL = 0x40,
   /** Indicates a boolean value */
@@ -87,6 +89,8 @@ export enum Primitive {
   ARRAY32 = 0xf0,
 }
 
+export type Descriptor = Primitive.DESCRIPTOR;
+
 /** Fixed width primitives */
 export type FixedWidth =
   | Primitive.NULL
@@ -130,6 +134,7 @@ export type Array = Primitive.ARRAY8 | Primitive.ARRAY32;
 
 /** Represents a primitive based value */
 export type PrimitiveBasedValue<T extends Primitive> = {
+  [Primitive.DESCRIPTOR]: object;
   [Primitive.NULL]: null;
   [Primitive.BOOLEAN]: boolean;
   [Primitive.TRUE]: true;

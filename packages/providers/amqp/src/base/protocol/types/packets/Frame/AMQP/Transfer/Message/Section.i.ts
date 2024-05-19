@@ -5,7 +5,7 @@
  * or at https://opensource.org/licenses/MIT.
  */
 
-import { MessageSectionCode } from '../../MesssageSectionCode.t';
+import { MessageSectionCode } from '../../../../../MessageSectionCode.t';
 
 export interface Section {
   /** Message Section Code */

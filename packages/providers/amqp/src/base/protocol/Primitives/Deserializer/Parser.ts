@@ -63,7 +63,7 @@ export class Parser {
       case Types.Primitive.CHAR:
         return String.fromCharCode(data.readUInt32BE()) as Types.PrimitiveBasedValue<P>;
       case Types.Primitive.TIMESTAMP:
-        return new Date(data.readBigInt64BE().toString()) as Types.PrimitiveBasedValue<P>;
+        return new Date(Number(data.readBigInt64BE())) as Types.PrimitiveBasedValue<P>;
       case Types.Primitive.UUID:
         return stringify(data) as Types.PrimitiveBasedValue<P>;
       case Types.Primitive.VBIN8:
@@ -79,7 +79,7 @@ export class Parser {
         return [] as Types.PrimitiveBasedValue<P>;
       default:
         throw new Crash(
-          `Unknown code ${primitive.toString(16)}[${Types.Primitive[primitive]}], parsing failed.`,
+          `Not parsable code [0x${primitive.toString(16)}]/[${Types.Primitive[primitive]}], parsing failed.`,
           { name: 'ProtocolError' }
         );
     }

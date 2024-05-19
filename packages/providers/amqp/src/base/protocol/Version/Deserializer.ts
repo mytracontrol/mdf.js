@@ -14,6 +14,7 @@ const VERSION_PROTOCOL_ID_OFFSET = 4;
 const VERSION_MAJOR_OFFSET = 5;
 const VERSION_MINOR_OFFSET = 6;
 const VERSION_REVISION_OFFSET = 7;
+const VERSION_HEADER_SIZE = 8;
 
 /** Deserializer for the Version packet */
 export class Deserializer implements Packets.Version {
@@ -32,6 +33,12 @@ export class Deserializer implements Packets.Version {
    * @param buffer - packet to be deserialized
    */
   constructor(buffer: Buffer) {
+    if (buffer.length !== VERSION_HEADER_SIZE) {
+      throw new Crash(
+        `Invalid buffer size for Version frame, expected ${VERSION_HEADER_SIZE} but got ${buffer.length}`,
+        { name: 'ProtocolError' }
+      );
+    }
     this.name = buffer.toString('utf8', VERSION_NAME_OFFSET, VERSION_NAME_SIZE);
     if (this.name !== 'AMQP') {
       throw new Crash(`Invalid protocol header for AMQP, expected 'AMQP' but got '${this.name}'`, {
@@ -42,11 +49,14 @@ export class Deserializer implements Packets.Version {
     this.major = buffer.readUInt8(VERSION_MAJOR_OFFSET);
     this.minor = buffer.readUInt8(VERSION_MINOR_OFFSET);
     this.revision = buffer.readUInt8(VERSION_REVISION_OFFSET);
-    if (this.protocolId !== 0 || (this.major !== 1 && this.minor !== 0 && this.revision !== 0)) {
-      throw new Crash(
-        `Unsupported protocol version: ${this.major}.${this.minor}.${this.revision}`,
-        { name: 'ProtocolError' }
-      );
+    if (this.protocolId !== 3 && this.protocolId !== 2 && this.protocolId !== 0) {
+      throw new Crash(`Unsupported AMQP protocol identifier: ${this.toString()}`, {
+        name: 'ProtocolError',
+      });
+    } else if (this.major !== 1 || this.minor !== 0 || this.revision !== 0) {
+      throw new Crash(`Unsupported AMQP protocol version: ${this.toString()}`, {
+        name: 'ProtocolError',
+      });
     }
   }
   /** Return a object representation */

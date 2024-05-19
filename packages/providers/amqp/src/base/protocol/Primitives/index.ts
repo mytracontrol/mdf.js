@@ -5,5 +5,5 @@
  * or at https://opensource.org/licenses/MIT.
  */
 
-export * from './Deserializer/Deserializer';
+export * from './Deserializer';
 export * from './Serializer';

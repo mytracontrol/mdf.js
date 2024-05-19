@@ -10,6 +10,8 @@
  */
 export enum Subcategory {
   /** Fixed width with zero octets of data */
+  DESCRIPTOR = 0x00,
+  /** Fixed width with zero octets of data */
   EMPTY = 0x04,
   /** Fixed width with one octet of data */
   FIXED_ONE = 0x05,

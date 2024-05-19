@@ -7,17 +7,12 @@
 
 import { Primitive, PrimitiveBasedValue } from './Primitive.t';
 
-/** Represent the constructor of a primitive or described type */
-export interface Constructor<P extends Primitive = any, D extends Primitive | null = null> {
+/** Represents the decoded types */
+export interface Decoded<P extends Primitive = any, D extends Primitive | null = null> {
   /** Primitive type */
   type: P;
   /** Element description */
   descriptor: D extends Primitive ? Decoded<D> : null;
-}
-
-/** Represents the decoded types */
-export interface Decoded<P extends Primitive = any, D extends Primitive = never>
-  extends Constructor<P, D> {
   /** Element size, in bytes, including all the type information */
   size: number;
   /** Element data width, in bytes */
@@ -27,9 +22,11 @@ export interface Decoded<P extends Primitive = any, D extends Primitive = never>
 }
 
 /** Represents the undecoded types */
-export interface Undecoded<P extends Primitive, D extends Primitive> extends Constructor<P, D> {
-  /** Element size, in bytes */
-  size: number;
+export interface Unencoded<P extends Primitive = any, D extends Primitive | null = null> {
+  /** Primitive type */
+  type: P;
+  /** Element description */
+  descriptor: D extends Primitive ? Unencoded<D> : null;
   /** Element value */
   value: unknown;
 }

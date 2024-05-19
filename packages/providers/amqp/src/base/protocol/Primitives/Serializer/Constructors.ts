@@ -6,6 +6,7 @@
  */
 
 import { Crash } from '@mdf.js/crash';
+import { cloneDeep } from 'lodash';
 import { Types } from '../..';
 import { Parser } from './Parser';
 
@@ -16,43 +17,40 @@ const SUBCATEGORY_OFFSET = 4;
 
 export class Constructors {
   /**
-   * Deserializes a buffer into a primitive
-   * @param buffer - buffer to be deserialized
-   * @returns decoded primitive
+   * Serializes a primitive into a buffer
+   * @param unencoded - unencoded value that represents a primitive type to be serialized
+   * @returns buffer with the serialized value
    */
-  public static decode<P extends Types.Primitive = any, D extends Types.Primitive = never>(
-    buffer: Buffer
-  ): Types.Decoded<P, D> | Types.Decoded<P> {
-    if (!buffer || Buffer.isBuffer(buffer) === false || buffer.length === 0) {
-      const got = Buffer.isBuffer(buffer) ? 'an empty buffer' : `[${typeof buffer}]`;
-      throw new Crash(`Invalid buffer, expected a non-empty buffer but got ${got}`, {
-        name: 'ProtocolError',
-      });
-    }
-    const primitive = buffer.readUInt8(0);
-    const subcategory = Constructors.getSubcategory(primitive);
-    if (subcategory === Types.Subcategory.DESCRIPTOR) {
-      return Constructors.descriptor(buffer, primitive) as Types.Decoded<P, D>;
+  public static encode<P extends Types.Primitive = any, D extends Types.Primitive = never>(
+    unencoded: Types.Unencoded<P, D> | Types.Unencoded<P>
+  ): Buffer {
+    const subcategory = Constructors.getSubcategory(unencoded.type);
+    if (unencoded.descriptor !== null) {
+      return Constructors.descriptor(
+        unencoded as Types.Unencoded<Types.Primitive, Types.Primitive>
+      );
     } else if (
       subcategory >= Types.Subcategory.EMPTY &&
       subcategory <= Types.Subcategory.FIXED_SIXTEEN
     ) {
-      return Constructors.fixedWidth(buffer, primitive) as Types.Decoded<P>;
+      return Constructors.fixedWidth(unencoded as Types.Unencoded<Types.FixedWidth>);
     } else if (
       subcategory === Types.Subcategory.VARIABLE_ONE ||
       subcategory === Types.Subcategory.VARIABLE_FOUR
     ) {
-      return Constructors.variableWidth(buffer, primitive) as Types.Decoded<P>;
+      return Constructors.variableWidth(
+        unencoded as unknown as Types.Unencoded<Types.VariableWidth>
+      );
     } else if (
       subcategory === Types.Subcategory.COMPOUND_ONE ||
       subcategory === Types.Subcategory.COMPOUND_FOUR
     ) {
-      return Constructors.compound(buffer, primitive) as Types.Decoded<P>;
+      return Constructors.compound(unencoded as unknown as Types.Unencoded<Types.Compound>);
     } else if (
       subcategory === Types.Subcategory.ARRAY_ONE ||
       subcategory === Types.Subcategory.ARRAY_FOUR
     ) {
-      return Constructors.array(buffer, primitive) as Types.Decoded<P>;
+      return Constructors.array(unencoded as unknown as Types.Unencoded<Types.Array>);
     } else {
       throw new Crash(
         `Invalid primitive, expected one of supported primitive but got [${Types.Subcategory[subcategory]}]/[${subcategory.toString(16)}]`,
@@ -61,7 +59,7 @@ export class Constructors {
     }
   }
   /**
-   * Deserializes a buffer into a type that has a descriptor
+   * Serializes a primitive into a buffer
    * An AMQP constructor consists of either a primitive format code, or a described format code. A
    * primitive format code is a constructor for an AMQP primitive type. A described format code
    * consists of a descriptor and a primitive format-code. A descriptor defines how to produce a
@@ -106,30 +104,28 @@ export class Constructors {
    *
    * (Note: this example shows a string-typed descriptor, which is considered reserved)
    * ```
-   * @param buffer - buffer to be deserialized
-   * @param primitive - primitive to be deserialized
+   * @param unencoded - unencoded value that represents a primitive type to be serialized
    * @returns decoded primitive
    */
-  private static descriptor(
-    buffer: Buffer,
-    primitive: Types.Descriptor
-  ): Types.Decoded<Types.Primitive, Types.Primitive> {
-    const subcategory = Constructors.getSubcategory(primitive);
-    if (subcategory !== Types.Subcategory.DESCRIPTOR) {
+  private static descriptor(unencoded: Types.Unencoded<Types.Primitive, Types.Primitive>): Buffer {
+    if (!unencoded.descriptor) {
       throw new Crash(
-        `Invalid primitive, expected a DESCRIPTOR but got [${Types.Subcategory[subcategory]}]/[${subcategory.toString(16)}]`,
+        `Invalid primitive, expected a DESCRIPTOR but got a primitive without a descriptor [${unencoded.type}]`,
         { name: 'ProtocolError' }
       );
     }
-    const descriptor = Constructors.decode(buffer.subarray(PRIMITIVE_SIZE));
-    const decoded = Constructors.decode(
-      buffer.subarray(descriptor.size + PRIMITIVE_SIZE)
-    ) as Types.Decoded<Types.Primitive, Types.Primitive>;
-    decoded.descriptor = descriptor;
-    return decoded;
+    const buffer = Buffer.alloc(PRIMITIVE_SIZE);
+    buffer.writeUInt8(0);
+    const descriptorBuffer = Constructors.encode(unencoded.descriptor);
+    const cloneDecoded = cloneDeep(unencoded);
+    // Remove the descriptor to avoid infinite recursion
+    //@ts-ignore - We know that descriptor should be null
+    cloneDecoded.descriptor = null;
+    const data = Constructors.encode(cloneDecoded);
+    return Buffer.concat([buffer, descriptorBuffer, data]);
   }
   /**
-   * Deserializes a buffer into a fixed width
+   * Serializes a primitive into a buffer
    * The width of a specific fixed width encoding can be computed from the subcategory of the format
    * code for the fixed width value:
    * ```plaintext
@@ -147,35 +143,24 @@ export class Constructors {
    * 0x8             8
    * 0x9             16
    * ```
-   * @param buffer - buffer to be deserialized
-   * @param primitive - primitive to be deserialized
+   * @param unencoded - unencoded value that represents a primitive type to be serialized
    * @returns decoded fixed width
    */
-  private static fixedWidth(
-    buffer: Buffer,
-    primitive: Types.FixedWidth
-  ): Types.Decoded<Types.FixedWidth> {
-    const subcategory = Constructors.getSubcategory(primitive);
+  private static fixedWidth(unencoded: Types.Unencoded<Types.FixedWidth>): Buffer {
+    const subcategory = Constructors.getSubcategory(unencoded.type);
     if (subcategory > Types.Subcategory.FIXED_SIXTEEN || subcategory < Types.Subcategory.EMPTY) {
       throw new Crash(
         `Invalid primitive, expected a fixed width but got [${Types.Subcategory[subcategory]}]/[${subcategory.toString(16)}]`,
         { name: 'ProtocolError' }
       );
     }
-    const subcategoryWidth = Constructors.getSubcategoryWidth(subcategory);
-    const width = Constructors.getDataWidth(buffer, subcategory);
-    const size = subcategoryWidth + width + PRIMITIVE_SIZE;
-    const value = Parser.parse(buffer.subarray(subcategoryWidth + PRIMITIVE_SIZE, size), primitive);
-    return {
-      type: primitive,
-      descriptor: null,
-      size,
-      width,
-      value,
-    } as Types.Decoded<Types.FixedWidth>;
+    const buffer = Buffer.alloc(PRIMITIVE_SIZE);
+    buffer.writeUInt8(unencoded.type);
+    const data = Parser.parse(unencoded.value, unencoded.type);
+    return Buffer.concat([buffer, data]);
   }
   /**
-   * Deserializes a buffer into a variable width
+   * Serializes a primitive into a buffer
    * All variable width encodings consist of a size in octets followed by size octets of encoded
    * data. The width of the size for a specific variable width encoding can be computed from the
    * subcategory of the format code:
@@ -190,15 +175,11 @@ export class Constructors {
    *     0xA             1
    *     0xB             4
    * ```
-   * @param buffer - buffer to be deserialized
-   * @param primitive - primitive to be deserialized
+   * @param unencoded - unencoded value that represents a primitive type to be serialized
    * @returns decoded variable width
    */
-  private static variableWidth(
-    buffer: Buffer,
-    primitive: Types.VariableWidth
-  ): Types.Decoded<Types.VariableWidth> {
-    const subcategory = Constructors.getSubcategory(primitive);
+  private static variableWidth(unencoded: Types.Unencoded<Types.VariableWidth>): Buffer {
+    const subcategory = Constructors.getSubcategory(unencoded.type);
     if (
       subcategory !== Types.Subcategory.VARIABLE_ONE &&
       subcategory !== Types.Subcategory.VARIABLE_FOUR
@@ -208,21 +189,13 @@ export class Constructors {
         { name: 'ProtocolError' }
       );
     }
-    const subcategoryWidth = Constructors.getSubcategoryWidth(subcategory);
-    const width = Constructors.getDataWidth(buffer, subcategory);
-    const size = subcategoryWidth + width + PRIMITIVE_SIZE;
-    const valueBuffer = buffer.subarray(subcategoryWidth + PRIMITIVE_SIZE, size);
-    const value = Parser.parse(valueBuffer, primitive);
-    return {
-      type: primitive,
-      descriptor: null,
-      size,
-      width,
-      value,
-    } as Types.Decoded<Types.VariableWidth>;
+    const buffer = Buffer.alloc(PRIMITIVE_SIZE);
+    buffer.writeUInt8(unencoded.type);
+    const data = Parser.parse(unencoded.value, unencoded.type);
+    return Buffer.concat([buffer, data]);
   }
   /**
-   * Deserializes a buffer into a list
+   * Serializes a primitive into a buffer
    * ```plaintext
    *                        +----------= count items =----------+
    *                        |                                   |
@@ -255,15 +228,11 @@ export class Constructors {
    *            0x09, 0x41, 0x4E, 0x4F, 0x4E, 0x59, 0x4D, 0x4F, 0x55, 0x53 // "ANONYMOUS"
    * ]
    * ```
-   * @param buffer - buffer to be deserialized
-   * @param width - width of the list
+   * @param unencoded - unencoded value that represents a primitive type to be serialized
    * @returns decoded list
    */
-  private static compound(
-    buffer: Buffer,
-    primitive: Types.Compound
-  ): Types.Decoded<Types.Compound> {
-    const subcategory = Constructors.getSubcategory(primitive);
+  private static compound(unencoded: Types.Unencoded<Types.Compound>): Buffer {
+    const subcategory = Constructors.getSubcategory(unencoded.type);
     if (
       subcategory !== Types.Subcategory.COMPOUND_ONE &&
       subcategory !== Types.Subcategory.COMPOUND_FOUR
@@ -273,29 +242,28 @@ export class Constructors {
         { name: 'ProtocolError' }
       );
     }
-    const subcategoryWidth = Constructors.getSubcategoryWidth(subcategory);
-    const width = Constructors.getDataWidth(buffer, subcategory) - subcategoryWidth;
-    const size = subcategoryWidth * 2 + width + PRIMITIVE_SIZE;
-    const count = Constructors.getCount(buffer, subcategory);
-
-    const elements: Types.Decoded<any>[] = [];
-    let offset = subcategoryWidth * 2 + PRIMITIVE_SIZE;
-    for (let index = 0; index < count; index++) {
-      const elementBuffer = buffer.subarray(offset);
-      const element = Constructors.decode(elementBuffer);
-      elements.push(element);
-      offset += element.size;
+    if (!Array.isArray(unencoded.value)) {
+      throw new Crash('Invalid compound value, expected an array', { name: 'ProtocolError' });
     }
-    return {
-      type: primitive,
-      descriptor: null,
-      width,
-      size,
-      value: elements,
-    } as Types.Decoded<Types.Compound>;
+    const subcategoryWidth = Constructors.getSubcategoryWidth(subcategory);
+    let data = Buffer.alloc(0);
+    for (const element of unencoded.value) {
+      const elementBuffer = Constructors.encode(element as Types.Unencoded<any>);
+      data = Buffer.concat([data, elementBuffer]);
+    }
+    const buffer = Buffer.alloc(PRIMITIVE_SIZE + subcategoryWidth * 2);
+    buffer.writeUInt8(unencoded.type);
+    if (subcategory === Types.Subcategory.COMPOUND_ONE) {
+      buffer.writeUInt8(data.length + subcategoryWidth, PRIMITIVE_SIZE);
+      buffer.writeUInt8(unencoded.value.length, PRIMITIVE_SIZE + subcategoryWidth);
+    } else {
+      buffer.writeUInt32BE(data.length + subcategoryWidth, PRIMITIVE_SIZE);
+      buffer.writeUInt32BE(unencoded.value.length, PRIMITIVE_SIZE + subcategoryWidth);
+    }
+    return Buffer.concat([buffer, data]);
   }
   /**
-   * Deserializes a buffer into an array
+   * Serializes a primitive into a buffer
    * All array encodings consist of a size followed by a count followed by an element constructor
    * followed by <i>count</i> elements of encoded data formatted as required by the element
    * constructor:
@@ -322,12 +290,11 @@ export class Constructors {
    *        0x09, 0x41, 0x4E, 0x4F, 0x4E, 0x59, 0x4D, 0x4F, 0x55, 0x53 // "ANONYMOUS"
    * ]
    * ```
-   * @param buffer - buffer to be deserialized
-   * @param primitive - primitive to be deserialized
+   * @param unencoded - unencoded value that represents a primitive type to be serialized
    * @returns decoded array
    */
-  private static array(buffer: Buffer, primitive: Types.Array): Types.Decoded<Types.Array> {
-    const subcategory = Constructors.getSubcategory(primitive);
+  private static array(unencoded: Types.Unencoded<Types.Array>): Buffer {
+    const subcategory = Constructors.getSubcategory(unencoded.type);
     if (
       subcategory !== Types.Subcategory.ARRAY_ONE &&
       subcategory !== Types.Subcategory.ARRAY_FOUR
@@ -337,30 +304,35 @@ export class Constructors {
         { name: 'ProtocolError' }
       );
     }
-    const subcategoryWidth = Constructors.getSubcategoryWidth(subcategory);
-    const width = Constructors.getDataWidth(buffer, subcategory) - subcategoryWidth;
-    const size = subcategoryWidth * 2 + width + PRIMITIVE_SIZE;
-    const count = Constructors.getCount(buffer, subcategory);
-
-    const elements: Types.Decoded<any>[] = [];
-    let offset = subcategoryWidth * 2 + PRIMITIVE_SIZE;
-    const elementConstructorBuffer = Buffer.from([buffer.readUInt8(offset)]);
-    offset += PRIMITIVE_SIZE;
-
-    for (let index = 0; index < count; index++) {
-      const elementBuffer = buffer.subarray(offset);
-      const element = Constructors.decode(Buffer.concat([elementConstructorBuffer, elementBuffer]));
-      elements.push(element);
-      offset += element.size - PRIMITIVE_SIZE;
+    if (!Array.isArray(unencoded.value)) {
+      throw new Crash('Invalid array value, expected an array', { name: 'ProtocolError' });
     }
-
-    return {
-      type: primitive,
-      descriptor: null,
-      width,
-      size,
-      value: elements,
-    } as Types.Decoded<Types.Array>;
+    // Check that all the elements have the same type
+    const elementConstructor = (unencoded.value[0] as Types.Unencoded).type;
+    if (
+      !unencoded.value.every(element => (element as Types.Unencoded).type === elementConstructor)
+    ) {
+      throw new Crash('Invalid array value, all elements must have the same type', {
+        name: 'ProtocolError',
+      });
+    }
+    const subcategoryWidth = Constructors.getSubcategoryWidth(subcategory);
+    let data = Buffer.alloc(0);
+    for (const element of unencoded.value) {
+      const elementBuffer = Constructors.encode(element as Types.Unencoded<any>);
+      data = Buffer.concat([data, elementBuffer.subarray(PRIMITIVE_SIZE)]);
+    }
+    const buffer = Buffer.alloc(PRIMITIVE_SIZE + subcategoryWidth * 2 + PRIMITIVE_SIZE);
+    buffer.writeUInt8(unencoded.type);
+    if (subcategory === Types.Subcategory.ARRAY_ONE) {
+      buffer.writeUInt8(data.length + subcategoryWidth + PRIMITIVE_SIZE, PRIMITIVE_SIZE);
+      buffer.writeUInt8(unencoded.value.length, PRIMITIVE_SIZE + subcategoryWidth);
+    } else {
+      buffer.writeUInt32BE(data.length + subcategoryWidth + PRIMITIVE_SIZE, PRIMITIVE_SIZE);
+      buffer.writeUInt32BE(unencoded.value.length, PRIMITIVE_SIZE + subcategoryWidth);
+    }
+    buffer.writeUInt8(elementConstructor, PRIMITIVE_SIZE + subcategoryWidth * 2);
+    return Buffer.concat([buffer, data]);
   }
   /**
    * Gets the subcategory of a primitive
@@ -387,87 +359,6 @@ export class Constructors {
       return 4;
     } else {
       return 1;
-    }
-  }
-  /**
-   * Returns the number of elements in a primitive
-   * @param buffer - buffer to be deserialized
-   * @param subcategory - subcategory of the primitive
-   * @returns number of elements in the primitive
-   */
-  private static getCount(buffer: Buffer, subcategory: Types.Subcategory): number {
-    if (subcategory <= Types.Subcategory.FIXED_SIXTEEN) {
-      return 1;
-    } else if (
-      subcategory === Types.Subcategory.VARIABLE_FOUR ||
-      subcategory === Types.Subcategory.COMPOUND_FOUR ||
-      subcategory === Types.Subcategory.ARRAY_FOUR
-    ) {
-      return buffer.readUInt32BE(5);
-    } else {
-      return buffer.readUInt8(2);
-    }
-  }
-  /**
-   * Gets the size of data in a primitive based on its subcategory and the size field from the
-   * buffer
-   * @param buffer - buffer to be deserialized
-   * @param subcategory - subcategory of the primitive
-   * @returns size of data in the primitive
-   * @throws {Crash} when the subcategory is not a fixed or variable width
-   */
-  private static getDataWidth(buffer: Buffer, subcategory: Types.Subcategory): number {
-    return subcategory <= Types.Subcategory.FIXED_SIXTEEN
-      ? Constructors.getFixedDataWidth(subcategory)
-      : Constructors.getVariableDataWidth(buffer, subcategory);
-  }
-  /**
-   * Gets the size of data in a fixed width primitive based on its subcategory
-   * @param subcategory - subcategory of the primitive
-   * @returns size of data in the primitive
-   * @throws {Crash} when the subcategory is not a fixed width
-   */
-  private static getFixedDataWidth(subcategory: Types.Subcategory): number {
-    switch (subcategory) {
-      case Types.Subcategory.EMPTY:
-        return 0;
-      case Types.Subcategory.FIXED_ONE:
-        return 1;
-      case Types.Subcategory.FIXED_TWO:
-        return 2;
-      case Types.Subcategory.FIXED_FOUR:
-        return 4;
-      case Types.Subcategory.FIXED_EIGHT:
-        return 8;
-      case Types.Subcategory.FIXED_SIXTEEN:
-        return 16;
-      default:
-        throw new Crash(`Category detected as fixed width but no size was found`, {
-          name: 'ProtocolError',
-        });
-    }
-  }
-  /**
-   * Gets the size of data in a variable width primitive based on its subcategory
-   * @param buffer - buffer to be deserialized
-   * @param subcategory - subcategory of the primitive
-   * @returns size of data in the primitive
-   * @throws {Crash} when the subcategory is not a variable width
-   */
-  private static getVariableDataWidth(buffer: Buffer, subcategory: Types.Subcategory): number {
-    switch (subcategory) {
-      case Types.Subcategory.VARIABLE_ONE:
-      case Types.Subcategory.ARRAY_ONE:
-      case Types.Subcategory.COMPOUND_ONE:
-        return buffer.readUInt8(1);
-      case Types.Subcategory.COMPOUND_FOUR:
-      case Types.Subcategory.ARRAY_FOUR:
-      case Types.Subcategory.VARIABLE_FOUR:
-        return buffer.readUInt32BE(1);
-      default:
-        throw new Crash(`Category detected as variable width but no size was found`, {
-          name: 'ProtocolError',
-        });
     }
   }
 }

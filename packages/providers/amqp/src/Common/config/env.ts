@@ -136,7 +136,14 @@ const CONFIG_AMQP_REQUEST_CERT = coerce<boolean>(process.env['CONFIG_AMQP_REQUES
 const CONFIG_AMQP_REJECT_UNAUTHORIZED = coerce<boolean>(
   process.env['CONFIG_AMQP_REJECT_UNAUTHORIZED']
 );
-
+/**
+ * The maximum period in milliseconds between activity (frames) on the connection that is desired
+ * from the peer. The open frame carries the idle-time-out field for this purpose.
+ * To avoid spurious timeouts, the value in idle_time_out is set to be half of the peer’s actual
+ * timeout threshold.
+ * @defaultValue 5000
+ */
+const CONFIG_AMQP_IDLE_TIME_OUT = coerce<number>(process.env['CONFIG_AMQP_IDLE_TIME_OUT']);
 /**
  * If true the server will send a keep-alive packet to maintain the connection alive.
  * @defaultValue true
@@ -151,7 +158,7 @@ const CONFIG_AMQP_KEEP_ALIVE_INITIAL_DELAY = coerce<number>(
 );
 /**
  * The time in milliseconds to wait for the connection to be established.
- * @defaultValue 5000
+ * @defaultValue 10000
  */
 const CONFIG_AMQP_TIMEOUT = coerce<number>(process.env['CONFIG_AMQP_TIMEOUT']);
 /**
@@ -183,6 +190,7 @@ export const envBasedConfig: Config = {
   ca: CA_CERT?.toString(),
   requestCert: CONFIG_AMQP_REQUEST_CERT,
   rejectUnauthorized: CONFIG_AMQP_REJECT_UNAUTHORIZED,
+  idle_time_out: CONFIG_AMQP_IDLE_TIME_OUT,
   keepAlive: CONFIG_AMQP_KEEP_ALIVE,
   keepAliveInitialDelay: CONFIG_AMQP_KEEP_ALIVE_INITIAL_DELAY,
   timeout: CONFIG_AMQP_TIMEOUT,

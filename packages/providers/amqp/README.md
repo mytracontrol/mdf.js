@@ -28,6 +28,7 @@
   - [**Information**](#information)
   - [**Use**](#use)
     - [**Health checks**](#health-checks)
+  - [**Environment variables**](#environment-variables)
   - [**License**](#license)
 
 ## **Introduction**
@@ -148,11 +149,17 @@ In this module there are implemented two providers:
       host: '127.0.0.1',
       port: 5672,
       transport: 'tcp',
-      container_id: 'mdf-amqp',
+      container_id: process.env['NODE_APP_INSTANCE'] || 'mdf-amqp',
       reconnect: 5000,
       initial_reconnect_delay: 30000,
       max_reconnect_delay: 10000,
       non_fatal_errors: ['amqp:connection:forced'],
+      idle_time_out: 5000,
+      reconnect_limit: Number.MAX_SAFE_INTEGER,
+      keepAlive: true,
+      keepAliveInitialDelay: 2000,
+      timeout: 10000,
+      all_errors_non_fatal: true,
     }
     ```
 
@@ -179,6 +186,11 @@ In this module there are implemented two providers:
       ca: process.env['CONFIG_AMQP_CA_PATH'], // The file will be read and the content will be used as the CA
       requestCert: process.env['CONFIG_AMQP_REQUEST_CERT'], // coerced to boolean
       rejectUnauthorized: process.env['CONFIG_AMQP_REJECT_UNAUTHORIZED'], // coerced to boolean
+      idle_time_out: process.env['CONFIG_AMQP_IDLE_TIME_OUT'], // coerced to number
+      keepAlive: process.env['CONFIG_AMQP_KEEP_ALIVE'], // coerced to boolean
+      keepAliveInitialDelay: process.env['CONFIG_AMQP_KEEP_ALIVE_INITIAL_DELAY'], // coerced to number
+      timeout: process.env['CONFIG_AMQP_TIMEOUT'], // coerced to number
+      all_errors_non_fatal: process.env['CONFIG_AMQP_ALL_ERRORS_NON_FATAL'], // coerced to boolean
     };
     ```
 
