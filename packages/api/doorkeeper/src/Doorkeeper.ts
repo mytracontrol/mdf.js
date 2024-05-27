@@ -32,6 +32,7 @@ const DEFAULT_SNIPPET_META_SCHEMA = {
   },
 };
 
+export type { JSONSchemaType, SchemaObject } from 'ajv';
 export type SchemaSelector<T> = T extends void ? string : keyof T & string;
 export type ValidatedOutput<T, K> = K extends keyof T ? T[K] : any;
 
@@ -44,7 +45,6 @@ export interface DoorkeeperOptions extends Omit<Options, 'allErrors'> {
   /** Dynamic defaults to be used in the schemas */
   dynamicDefaults?: Record<string, DynamicDefaultFunc>;
 }
-export { JSONSchemaType } from 'ajv';
 
 /** Callback function for the validation process */
 export type ResultCallback<T, K> = (error?: Crash | Multi, result?: ValidatedOutput<T, K>) => void;
@@ -414,18 +414,26 @@ export class DoorKeeper<T = void> {
     }
     const _schema = cloneDeep(validatorSchema.schema);
     const iterator = (
-      entry: Record<string, any>,
-      key: string,
-      parentSchema: Record<string, any>
+      propertyValue: Record<string, any> | string,
+      propertyKey: string,
+      parentObject: Record<string, any>
     ) => {
-      if (entry['$ref']) {
-        const refSchema = this.getSchema(entry['$ref'], uuid);
-        parentSchema[key] = {
-          ...forOwn(omit(cloneDeep(refSchema.schema) as object, ['$id', '$schema']), iterator),
-          ...omit(cloneDeep(entry), ['$ref']),
+      if (typeof propertyValue === 'string' && propertyKey === '$ref') {
+        const refSchema = this.getSchema(propertyValue as SchemaSelector<T>, uuid);
+        const copyOfRefSchema = omit(cloneDeep(refSchema.schema) as object, ['$id', '$schema']);
+        const dereferencedSchema = forOwn(copyOfRefSchema, iterator);
+        Object.assign(parentObject, omit(dereferencedSchema, ['$ref']));
+      } else if (typeof propertyValue === 'object' && propertyValue['$ref']) {
+        const refSchema = this.getSchema(propertyValue['$ref'], uuid);
+        const copyOfRefSchema = omit(cloneDeep(refSchema.schema) as object, ['$id', '$schema']);
+        const copyOfEntry = omit(cloneDeep(propertyValue), ['$ref']);
+        const dereferencedSchema = {
+          ...forOwn(copyOfRefSchema, iterator),
+          ...copyOfEntry,
         };
-      } else if (typeof entry === 'object') {
-        parentSchema[key] = forOwn(entry, iterator);
+        parentObject[propertyKey] = omit(dereferencedSchema, ['$ref']);
+      } else if (typeof propertyValue === 'object') {
+        parentObject[propertyKey] = forOwn(propertyValue, iterator);
       }
     };
     return forOwn(_schema, iterator);

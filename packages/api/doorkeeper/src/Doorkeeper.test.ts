@@ -21,7 +21,6 @@ const entity = {
   format: 'uuid',
   errorMessage: 'Entity must be a valid RFC4122 UUID',
 };
-
 const schema1 = {
   $schema: 'http://json-schema.org/draft-07/schema',
   $id: 'schema1.schema.json',
@@ -81,7 +80,21 @@ const schema5 = {
   required: ['schema1', 'schema2', 'schemaDeep'],
   additionalProperties: false,
 };
-
+const schema1Referenced = {
+  $schema: 'http://json-schema.org/draft-07/schema',
+  $id: 'schema1.referenced.schema.json',
+  $ref: 'schema2.referenced.schema.json#',
+};
+const schema2Referenced = {
+  $schema: 'http://json-schema.org/draft-07/schema',
+  $id: 'schema2.referenced.schema.json',
+  $ref: 'schema3.referenced.schema.json#',
+};
+const schema3Referenced = {
+  $schema: 'http://json-schema.org/draft-07/schema',
+  $id: 'schema3.referenced.schema.json',
+  type: 'number',
+};
 const schema6 = {
   $schema: 'http://json-schema.org/draft-07/schema',
   $id: 'schema6.schema.json',
@@ -115,11 +128,11 @@ const schema6 = {
     schema3: { $ref: 'schema3.schema.json#' },
     schema4: { $ref: 'schema4.schema.json#' },
     schema5: { $ref: 'schema5.schema.json#' },
+    schemaNestedReferenced: { $ref: 'schema1.referenced.schema.json#' },
   },
   required: ['schema1', 'schema2', 'schema3', 'schema4', 'schema5'],
   additionalProperties: false,
 };
-
 const schema7 = {
   $schema: 'http://json-schema.org/draft-07/schema',
   $id: 'schema7.schema.json',
@@ -134,8 +147,7 @@ const schema7 = {
     },
   },
 };
-
-const schema7Dereference = {
+const resultSchema7Dereference = {
   $schema: 'http://json-schema.org/draft-07/schema',
   $id: 'schema7.schema.json',
   title: 'Schema 7',
@@ -155,7 +167,14 @@ const schemas = {
   Schema1: schema1,
   Schema2: schema2,
 };
-const schemasArray = [schema3, schema4, schemaDeep];
+const schemasArray = [
+  schema3,
+  schema4,
+  schemaDeep,
+  schema3Referenced,
+  schema2Referenced,
+  schema1Referenced,
+];
 
 const artifact = {
   id: 'myArtifact',
@@ -194,7 +213,7 @@ const myDynamicDefaultsSchema = {
   additionalProperties: false,
 };
 dk.register('Config.Artifact', artifactSchema);
-const result = {
+const resultSchema6Dereference = {
   $schema: 'http://json-schema.org/draft-07/schema',
   $id: 'schema6.schema.json',
   title: 'Schema ',
@@ -285,6 +304,7 @@ const result = {
       required: ['schema1', 'schema2', 'schemaDeep'],
       additionalProperties: false,
     },
+    schemaNestedReferenced: { type: 'number' },
   },
   required: ['schema1', 'schema2', 'schema3', 'schema4', 'schema5'],
   additionalProperties: false,
@@ -311,20 +331,26 @@ describe('#DoorKeeper #package', () => {
     }, 300);
     it(`Should register all the schemas properly`, () => {
       const test = () => {
-        dk.register(schemasArray);
-        dk.register(schemas);
-        dk.register('other', entity);
-        dk.register('Schema5', schema5);
-        dk.register('Schema6', schema6);
-        dk.register('Schema7', schema7);
-        expect(dk.isSchemaRegistered('other')).toBeTruthy();
-        expect(dk.isSchemaRegistered('Config.Artifact')).toBeTruthy();
-        expect(dk.isSchemaRegistered('Schema1')).toBeTruthy();
-        expect(dk.isSchemaRegistered('Schema2')).toBeTruthy();
-        expect(dk.isSchemaRegistered('schema3.schema.json#')).toBeTruthy();
-        expect(dk.isSchemaRegistered('schema4.schema.json#')).toBeTruthy();
-        expect(dk.dereference('Schema6')).toEqual(result);
-        expect(dk.dereference('Schema7')).toEqual(schema7Dereference);
+        try {
+          dk.register(schemasArray);
+          dk.register(schemas);
+          dk.register('other', entity);
+          dk.register('Schema5', schema5);
+          dk.register('Schema6', schema6);
+          dk.register('Schema7', schema7);
+          expect(dk.isSchemaRegistered('other')).toBeTruthy();
+          expect(dk.isSchemaRegistered('Config.Artifact')).toBeTruthy();
+          expect(dk.isSchemaRegistered('Schema1')).toBeTruthy();
+          expect(dk.isSchemaRegistered('Schema2')).toBeTruthy();
+          expect(dk.isSchemaRegistered('schema3.schema.json#')).toBeTruthy();
+          expect(dk.isSchemaRegistered('schema4.schema.json#')).toBeTruthy();
+          const schema6Dereference = dk.dereference('Schema6');
+          expect(schema6Dereference).toEqual(resultSchema6Dereference);
+          const schema7Dereference = dk.dereference('Schema7');
+          expect(schema7Dereference).toEqual(resultSchema7Dereference);
+        } catch (error) {
+          throw error;
+        }
       };
       expect(test).not.toThrow();
     }, 300);

@@ -10,6 +10,7 @@ export {
   DoorkeeperOptions,
   JSONSchemaType,
   ResultCallback,
+  SchemaObject,
   SchemaSelector,
   ValidatedOutput,
 } from './Doorkeeper';
