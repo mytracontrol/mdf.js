@@ -36,7 +36,7 @@
     "@mdf.js/utils": "*",
     "@types/redis-errors": "^1.2.0",
     "ioredis": "^5.4.1",
-    "joi": "^17.13.0",
+    "joi": "^17.13.1",
     "redis-errors": "^1.2.0",
     "tslib": "^2.6.0"
   },

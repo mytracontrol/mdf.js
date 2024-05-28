@@ -34,8 +34,8 @@
     "@mdf.js/crash": "*",
     "@mdf.js/logger": "*",
     "@mdf.js/utils": "*",
-    "joi": "^17.13.0",
-    "mqtt": "^5.5.5",
+    "joi": "^17.13.1",
+    "mqtt": "^5.6.2",
     "tslib": "^2.6.0"
   },
   "devDependencies": {

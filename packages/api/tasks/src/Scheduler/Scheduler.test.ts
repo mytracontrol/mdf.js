@@ -101,6 +101,49 @@ describe('#Scheduler', () => {
           .then(done);
       }, 225);
     }, 300);
+    it(`Should create a new instance of Scheduler with a simple task and try to executed several time event if the task always rejects`, done => {
+      const results: number[] = [];
+      const cycles: number[] = [0];
+      const scheduler = new Scheduler<any, any, '50ms'>('myScheduler', {
+        resources: {
+          myResource1: {
+            pollingGroups: {
+              '50ms': [
+                {
+                  taskArgs: [],
+                  task: () => Promise.reject(new Error(`R1-50ms-T1-${cycles[0]}`)),
+                  options: {
+                    id: 'myTask1',
+                  },
+                },
+              ],
+            },
+            limiterOptions: { concurrency: 2, delay: 0 },
+          },
+        },
+        limiterOptions: { concurrency: 2, delay: 0 },
+      });
+      scheduler.on(
+        'done',
+        (uuid: string, result: number, meta: MetaData, error?: Crash | Multi) => {
+          results.push(result);
+          expect(meta.status).toBe('failed');
+          expect(meta.taskId).toMatch(/myTask1/);
+          expect(error).toBeInstanceOf(Error);
+          if (!error) {
+            throw new Error('Error not found');
+          }
+          expect(error.message).toBe(`Execution error in task [myTask1]: R1-50ms-T1-${cycles[0]}`);
+          cycles[parseInt(meta.taskId.charAt(meta.taskId.length - 1)) - 1] += 1;
+        }
+      );
+      expect(scheduler).toBeInstanceOf(Scheduler);
+      scheduler.start();
+      setTimeout(() => {
+        expect(cycles).toEqual([5]);
+        scheduler.stop().then(done);
+      }, 225);
+    }, 300);
     it('Should create a new instance of Scheduler with single, grouped and sequence task and executed more than one cycle', done => {
       const results: number[] = [];
       const cycles: number[] = [0, 0, 0, 0, 0, 0];

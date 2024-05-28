@@ -85,20 +85,10 @@ export class PollingManager extends EventEmitter {
       return undefined;
     }
     this.logger.debug(`Scheduling task ${task.metadata.taskId}`);
-    const taskId = this.limiter.schedule(task);
     this.pending.add(task.metadata.taskId);
     this.pollingStats.addTaskInProgress(task.metadata.taskId);
     task.once('done', this.onDoneTaskHandler);
-    if (taskId) {
-      this.logger.info(`Task ${taskId} has been scheduled`);
-    } else {
-      const cause = new Crash(
-        `Task ${task.metadata.taskId} could not be scheduled, the task was skipped`
-      );
-      this.logger.warn(cause.message);
-      setImmediate(() => task.cancel(cause));
-    }
-    return taskId;
+    return this.limiter.schedule(task);
   }
   /**
    * Create a task handler instance

@@ -24,7 +24,7 @@ export class Port extends Layer.Provider.Port<Client, Config> {
   /** Port health status */
   private isHealthy: boolean;
   /** Ping checker interval */
-  private pingChecker: NodeJS.Timeout | undefined;
+  private connectionChecker: NodeJS.Timeout | undefined;
   /**
    * Implementation of functionalities of an MQTT port instance.
    * @param config - Port configuration options
@@ -49,17 +49,7 @@ export class Port extends Layer.Provider.Port<Client, Config> {
   }
   /** Return the port state as a boolean value, true if the port is available, false in otherwise */
   public get state(): boolean {
-    if (!this.isConnected) {
-      return false;
-    } else if (this.instance.pingResp === 0) {
-      return false;
-    } else {
-      if (this.instance.pingResp > Date.now() - (this.instance.options.keepalive || 60) * 1000) {
-        return true;
-      } else {
-        return false;
-      }
-    }
+    return this.isConnected && this.client.connected;
   }
   /** Initialize the port instance */
   public async start(): Promise<void> {
@@ -73,7 +63,7 @@ export class Port extends Layer.Provider.Port<Client, Config> {
         this.instance.removeListener('error', onError);
         this.onConnect(connectACK);
         this.eventsWrapping(this.instance);
-        this.pingChecker = setInterval(
+        this.connectionChecker = setInterval(
           this.checkConnectionStatus,
           this.config.keepalive || DEFAULT_PING_CHECK_INTERVAL
         );
@@ -100,15 +90,15 @@ export class Port extends Layer.Provider.Port<Client, Config> {
     await this.instance.endAsync();
     this.onClose();
     this.eventsUnwrapping(this.instance);
-    if (this.pingChecker) {
-      clearInterval(this.pingChecker);
+    if (this.connectionChecker) {
+      clearInterval(this.connectionChecker);
     }
   }
   /** Close the port instance */
   public async close(): Promise<void> {
     await this.stop();
   }
-  /** Update the state of the ping response */
+  /** Update the state of the connection*/
   private readonly checkConnectionStatus = () => {
     const shouldBeHealthy = this.state;
     if (this.isHealthy === shouldBeHealthy) {

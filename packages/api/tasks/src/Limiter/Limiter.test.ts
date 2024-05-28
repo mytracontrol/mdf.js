@@ -494,7 +494,8 @@ describe('#Limiter', () => {
         expect(error).toBeDefined();
         expect(queue.size).toBe(2);
         expect(queue.pending).toBe(0);
-        expect((error as Crash).message).toEqual('The job could not be scheduled');
+        expect((error as Crash).message).toContain('Execution error in task');
+        expect((error as Crash).message).toContain('The job could not be scheduled');
       }
     });
     it('.schedule() - limited concurrency', async () => {
@@ -773,7 +774,10 @@ describe('#Limiter', () => {
         expect(uuid).toBeDefined();
         expect(result).toBeDefined();
         expect(meta).toBeDefined();
-        expect(error).toBeUndefined();
+        if (error) {
+          expect(error).toBeDefined();
+          expect(error.message).toContain('The job could not be scheduled');
+        }
       });
       queue.schedule(async () => results.push(1), [], { id: 'myId1', priority: 0 });
       queue.schedule(async () => results.push(2), [], { id: 'myId2', priority: 0 });

@@ -36,7 +36,7 @@
     "@mdf.js/logger": "*",
     "@mdf.js/utils": "*",
     "dotenv": "^16.4.5",
-    "glob": "10.3.12",
+    "glob": "10.4.1",
     "lodash": "^4.17.21",
     "toml": "^3.0.0",
     "tslib": "^2.6.0",
@@ -47,7 +47,7 @@
     "@mdf.js/repo-config": "*",
     "@types/debug": "^4.1.8",
     "@types/glob": "^8.1.0",
-    "@types/lodash": "^4.17.0",
+    "@types/lodash": "^4.17.4",
     "@types/uuid": "^9.0.1"
   },
   "engines": {

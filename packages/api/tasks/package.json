@@ -42,7 +42,7 @@
   },
   "devDependencies": {
     "@mdf.js/repo-config": "*",
-    "@types/lodash": "^4.17.0",
+    "@types/lodash": "^4.17.4",
     "@types/ms": "^0.7.34",
     "@types/uuid": "^9.0.1"
   },

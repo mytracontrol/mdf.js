@@ -35,8 +35,8 @@
     "@mdf.js/crash": "*",
     "@mdf.js/logger": "*",
     "@mdf.js/utils": "*",
-    "axios": "^1.6.8",
-    "joi": "^17.13.0",
+    "axios": "^1.7.2",
+    "joi": "^17.13.1",
     "tslib": "^2.6.0"
   },
   "devDependencies": {

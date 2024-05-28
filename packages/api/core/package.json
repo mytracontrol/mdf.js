@@ -39,7 +39,7 @@
     "@mdf.js/utils": "*",
     "@types/express": "^4.17.17",
     "express": "^4.19.2",
-    "joi": "^17.13.0",
+    "joi": "^17.13.1",
     "lodash": "^4.17.21",
     "prom-client": "^15.1.2",
     "tslib": "^2.6.0",
@@ -47,7 +47,7 @@
   },
   "devDependencies": {
     "@mdf.js/repo-config": "*",
-    "@types/lodash": "^4.17.0",
+    "@types/lodash": "^4.17.4",
     "@types/uuid": "^9.0.1"
   },
   "engines": {

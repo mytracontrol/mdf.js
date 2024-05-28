@@ -53,15 +53,19 @@ export class Limiter extends LimiterStateHandler {
     options?: TaskOptions<U>
   ): string | undefined {
     const handler = task instanceof TaskHandler ? task : new Single(task, taskArgs, options);
-    if (!this.enqueue(handler)) {
-      return undefined;
-    }
+    let unScheduled = false;
     const onDone = (uuid: string, result: T, meta: MetaData, error?: Crash) => {
-      this.dec();
+      if (!unScheduled) {
+        this.dec();
+      }
       this.emit('done', uuid, result, meta, error);
       this.emit(handler.taskId, uuid, result, meta, error);
     };
     handler.once('done', onDone);
+    if (!this.enqueue(handler)) {
+      unScheduled = true;
+      handler.cancel(new Crash('The job could not be scheduled', { name: 'JobSchedulingError' }));
+    }
     return handler.taskId;
   }
   /**
@@ -87,22 +91,26 @@ export class Limiter extends LimiterStateHandler {
     taskArgs?: TaskArguments,
     options?: TaskOptions<U>
   ): Promise<T> {
-    const handler = task instanceof TaskHandler ? task : new Single(task, taskArgs, options);
-    if (!this.enqueue(handler)) {
-      throw new Crash('The job could not be scheduled', { name: 'JobSchedulingError' });
-    }
     return new Promise((resolve, reject) => {
+      const handler = task instanceof TaskHandler ? task : new Single(task, taskArgs, options);
+      let unScheduled = false;
       const onDone = (uuid: string, result: T, meta: MetaData, error?: Crash) => {
         if (error) {
           reject(error);
         } else {
           resolve(result);
         }
-        this.dec();
+        if (!unScheduled) {
+          this.dec();
+        }
         this.emit('done', uuid, result, meta, error);
         this.emit(handler.taskId, uuid, result, meta, error);
       };
       handler.once('done', onDone);
+      if (!this.enqueue(handler)) {
+        unScheduled = true;
+        handler.cancel(new Crash('The job could not be scheduled', { name: 'JobSchedulingError' }));
+      }
     });
   }
   /** Waits until the queue is empty */

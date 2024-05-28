@@ -41,7 +41,7 @@
   "devDependencies": {
     "@mdf.js/repo-config": "*",
     "@types/uuid": "^9.0.1",
-    "joi": "^17.13.0"
+    "joi": "^17.13.1"
   },
   "engines": {
     "node": ">=16.14.2"

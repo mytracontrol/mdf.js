@@ -126,7 +126,7 @@ describe('#PollingManager', () => {
           if (meta.taskId === 'test2') {
             expect(error).toBeInstanceOf(Crash);
             expect((error as Crash).message).toBe(
-              'Execution error in task [test2]: Task test2 could not be scheduled, the task was skipped'
+              'Execution error in task [test2]: The job could not be scheduled'
             );
             expect(meta).toBeDefined();
             expect(meta.status).toBe('cancelled');
@@ -134,7 +134,7 @@ describe('#PollingManager', () => {
           if (meta.taskId === 'test3') {
             expect(error).toBeInstanceOf(Crash);
             expect((error as Crash).message).toBe(
-              'Execution error in task [test3]: Task test3 could not be scheduled, the task was skipped'
+              'Execution error in task [test3]: The job could not be scheduled'
             );
             expect(meta).toBeDefined();
             expect(meta.status).toBe('cancelled');

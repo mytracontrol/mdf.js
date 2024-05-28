@@ -41,7 +41,7 @@ class FakeLogger {
   }
 }
 class FakeClient extends EventEmitter {
-  public pingResp = 0;
+  public connected = false;
   public options: {
     keepalive: number;
   } = {
@@ -49,6 +49,7 @@ class FakeClient extends EventEmitter {
   };
   public connect(): void {
     setImmediate(() => {
+      this.connected = true;
       this.emit('connect', {
         cmd: 'connack',
         length: 2,
@@ -58,6 +59,7 @@ class FakeClient extends EventEmitter {
     });
   }
   public end(): void {
+    this.connected = false;
     this.emit('close');
   }
   public endAsync(): Promise<void> {
@@ -152,13 +154,8 @@ describe('#Port #mqtt', () => {
       port.instance = new FakeClient();
       jest.spyOn(port.client, 'endAsync');
       await port.start();
-      expect(port.state).toBeFalsy();
-      //@ts-ignore - Test environment
-      port.client.pingResp = Date.now();
       expect(port.state).toBeTruthy();
       await port.stop();
-      //@ts-ignore - Test environment
-      port.client.pingResp = 0;
       expect(port.state).toBeFalsy();
       expect(port.client.endAsync).toHaveBeenCalledTimes(1);
     }, 300);
@@ -182,9 +179,6 @@ describe('#Port #mqtt', () => {
       port.client.emit('reconnect');
       expect(logger.entry).toEqual(`New instance of MQTT port created: ${port.uuid}`);
       await port.start();
-      expect(port.state).toBeFalsy();
-      //@ts-ignore - Test environment
-      port.client.pingResp = Date.now();
       expect(port.state).toBeTruthy();
       port.client.emit('disconnect', { cmd: 'disconnect' });
       expect(logger.entry).toEqual(
@@ -195,8 +189,6 @@ describe('#Port #mqtt', () => {
       port.client.emit('error', new Error('error'));
       expect(logger.entry).toEqual(`error`);
       await port.stop();
-      //@ts-ignore - Test environment
-      port.client.pingResp = 0;
       expect(port.state).toBeFalsy();
       expect(port.client.endAsync).toHaveBeenCalledTimes(1);
     }, 300);
@@ -210,7 +202,7 @@ describe('#Port #mqtt', () => {
       let unhealthy = false;
       port.on('healthy', () => {
         healthy = true;
-        port.client.pingResp = 0;
+        port.client.connected = false;
       });
       port.on('unhealthy', error => {
         expect(error).toBeDefined();
@@ -223,7 +215,6 @@ describe('#Port #mqtt', () => {
       //@ts-ignore - Test environment
       port.instance = new FakeClient();
       jest.spyOn(port.client, 'endAsync');
-      port.client.pingResp = Date.now();
       port.start().then();
     }, 300);
   });

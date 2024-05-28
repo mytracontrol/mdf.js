@@ -37,7 +37,7 @@
     "@mdf.js/utils": "*",
     "express": "^4.19.2",
     "http-terminator": "^3.2.0",
-    "joi": "^17.13.0",
+    "joi": "^17.13.1",
     "tslib": "^2.6.0"
   },
   "devDependencies": {
