@@ -61,7 +61,7 @@ export class Limiter extends LimiterStateHandler {
       this.emit('done', uuid, result, meta, error);
       this.emit(handler.taskId, uuid, result, meta, error);
     };
-    handler.once('done', onDone);
+    handler.prependOnceListener('done', onDone);
     if (!this.enqueue(handler)) {
       unScheduled = true;
       handler.cancel(new Crash('The job could not be scheduled', { name: 'JobSchedulingError' }));
@@ -106,7 +106,7 @@ export class Limiter extends LimiterStateHandler {
         this.emit('done', uuid, result, meta, error);
         this.emit(handler.taskId, uuid, result, meta, error);
       };
-      handler.once('done', onDone);
+      handler.prependOnceListener('done', onDone);
       if (!this.enqueue(handler)) {
         unScheduled = true;
         handler.cancel(new Crash('The job could not be scheduled', { name: 'JobSchedulingError' }));
