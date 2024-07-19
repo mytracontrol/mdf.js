@@ -1,11 +1,13 @@
 {
   "name": "mms",
-  "version": "0.0.0",
+  "version": "1.16.0",
   "private": true,
   "license": "MIT",
   "workspaces": [
-    "packages/**/*",
-    "libs/**/*"
+    "packages/api/*",
+    "packages/components/*",
+    "packages/providers/*",
+    "packages/tools/*"
   ],
   "scripts": {
     "@:snyk:report": "snyk-to-html -i report.json -o report.html -a",
