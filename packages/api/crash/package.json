@@ -35,13 +35,13 @@
     "test": "jest --detectOpenHandles --config ./jest.config.js"
   },
   "dependencies": {
-    "tslib": "^2.6.0",
-    "uuid": "^9.0.0"
+    "tslib": "^2.6.3",
+    "uuid": "^10.0.0"
   },
   "devDependencies": {
     "@mdf.js/repo-config": "*",
-    "@types/uuid": "^9.0.1",
-    "joi": "^17.13.1"
+    "@types/uuid": "^10.0.0",
+    "joi": "^17.13.3"
   },
   "engines": {
     "node": ">=16.14.2"

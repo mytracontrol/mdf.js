@@ -18,6 +18,11 @@ import { LimiterOptions } from './types';
  * the queue, and the strategy to use when the queue length reaches highWater.
  */
 export class Limiter extends LimiterStateHandler {
+  /**
+   * Flag to indicate that a delay is set, this will make the limiter wait before executing the next
+   * job, even if no jobs are in the queue but the limiter is in "wait for delay" time.
+   */
+  private onDelayTime = false;
   /** The private piped limiter */
   private pipedLimiter?: Limiter;
   /**
@@ -144,7 +149,7 @@ export class Limiter extends LimiterStateHandler {
   }
   /** Request to process a new job if the conditions are met */
   private onEnqueueEvent(): void {
-    if (this.pending === 0 || this.size > 0) {
+    if ((this.pending === 0 || this.size > 0) && !this.onDelayTime) {
       setImmediate(this.nextJobExecution.bind(this));
     }
   }
@@ -167,7 +172,9 @@ export class Limiter extends LimiterStateHandler {
     }
     // If there's a delay, we should wait before executing the next job
     if (this.delay > 0) {
+      this.onDelayTime = true;
       await waitFor(this.delay);
+      this.onDelayTime = false;
     }
     this.nextJobExecution.bind(this)();
   }

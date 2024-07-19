@@ -213,6 +213,20 @@ describe('#Limiter', () => {
       expect(end()).toBeLessThan(220);
       expect(results).toEqual([1, 2, 3]);
     });
+    it(`Simple test for Limiter with delay and concurrency`, async () => {
+      const queue = new Limiter({ concurrency: 2, delay: 100 });
+      const results: number[] = [];
+      const hrstart = process.hrtime();
+      await queue.execute(async () => results.push(1), [], { id: 'myId1' });
+      await queue.execute(async () => results.push(2));
+      await queue.execute(async () => results.push(3));
+      const hrend = process.hrtime(hrstart);
+      expect(hrend[0]).toBe(0);
+      const end = () => hrend[1] / 1000000;
+      expect(end()).toBeGreaterThan(200);
+      expect(end()).toBeLessThan(220);
+      expect(results).toEqual([1, 2, 3]);
+    });
     it('.execute() should resolve', async () => {
       const queue = new Limiter();
       const result = await queue.execute(async () => fixture);

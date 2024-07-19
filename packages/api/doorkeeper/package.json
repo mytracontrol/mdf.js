@@ -33,20 +33,20 @@
   },
   "dependencies": {
     "@mdf.js/crash": "*",
-    "ajv": "^8.14.0",
+    "ajv": "^8.17.1",
     "ajv-errors": "^3.0.0",
     "ajv-formats": "^3.0.1",
     "ajv-keywords": "^5.1.0",
     "jsonpointer": "^5.0.0",
     "lodash": "^4.17.21",
-    "tslib": "^2.6.0",
-    "uuid": "^9.0.0"
+    "tslib": "^2.6.3",
+    "uuid": "^10.0.0"
   },
   "devDependencies": {
     "@mdf.js/repo-config": "*",
-    "@types/lodash": "^4.17.4",
+    "@types/lodash": "^4.17.7",
     "@types/supertest": "^6.0.2",
-    "@types/uuid": "^9.0.1"
+    "@types/uuid": "^10.0.0"
   },
   "engines": {
     "node": ">=16.14.2"
