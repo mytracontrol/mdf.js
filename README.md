@@ -83,6 +83,7 @@ The complete framework is composed of the following packages:
   - [**@mdf.js/redis-provider**](https://www.npmjs.com/package/@mdf.js/redis-provider): Package for managing Redis connections, based on [**ioredis**](https://www.npmjs.com/package/ioredis).
   - [**@mdf.js/socket-client-provider**](https://www.npmjs.com/package/@mdf.js/socket-client-provider): Package for managing **socket.io** connections, based on [**socket.io**](https://www.npmjs.com/package/socket.io)
   - [**@mdf.js/socket-server-provider**](https://www.npmjs.com/package/@mdf.js/socket-server-provider): Package for managing **socket.io** servers, based on [**socket.io**](https://www.npmjs.com/package/socket.io)
+  - [**@mdf.js/s3-provider**](https://www.npmjs.com/package/@mdf.js/s3-provider): Package for managing S3 connections, based on [**aws-sdk/client-s3**](https://www.npmjs.com/package/@aws-sdk/client-s3).
 - Components:
   - [**@mdf.js/openc2**](https://www.npmjs.com/package/@mdf.js/openc2): Package for managing the OpenC2 protocol.
   - [**@mdf.js/service-registry**](https://www.npmjs.com/package/@mdf.js/service-registry): Package for managing the observability of the services.
