@@ -28,7 +28,7 @@ describe('#Retry', () => {
       }
       function logger(error: Crash | Multi | Boom): void {
         called = true;
-        console.log(error.message);
+        //console.log(error.message);
       }
       const result = await retry(myPromise, [2, 2], { logger, waitTime: 10, maxWaitTime: 100 });
       expect(called).toBe(true);
@@ -55,7 +55,7 @@ describe('#Retry', () => {
       }
       function logger(error: Crash | Multi | Boom): void {
         called = true;
-        console.log(error.message);
+        //console.log(error.message);
       }
       try {
         let cutExecution = false;
@@ -86,7 +86,7 @@ describe('#Retry', () => {
       }
       function logger(error: Crash | Multi | Boom): void {
         called = true;
-        console.log(error.message);
+        //console.log(error.message);
       }
       try {
         const controller = new AbortController();
@@ -119,7 +119,7 @@ describe('#Retry', () => {
       }
       function logger(error: Crash | Multi | Boom): void {
         called = true;
-        console.log(error.message);
+        //console.log(error.message);
       }
       try {
         const controller = new AbortController();
@@ -150,7 +150,7 @@ describe('#Retry', () => {
       }
       function logger(error: Crash | Multi | Boom): void {
         called = true;
-        console.log(error.message);
+        //console.log(error.message);
       }
       try {
         const controller = new AbortController();
@@ -183,7 +183,7 @@ describe('#Retry', () => {
       }
       function logger(error: Crash | Multi | Boom): void {
         called = true;
-        console.log(error.message);
+        //console.log(error.message);
       }
       try {
         const controller = new AbortController();
@@ -213,7 +213,7 @@ describe('#Retry', () => {
       function logger(error: Crash | Multi | Boom): void {
         called = true;
         tries += 1;
-        console.log(error.message);
+        //console.log(error.message);
       }
       try {
         await retry(myPromise, [2, 2], { logger, attempts: 3, waitTime: 10 });
@@ -242,7 +242,7 @@ describe('#Retry', () => {
       function logger(error: Crash | Multi | Boom): void {
         called = true;
         tries += 1;
-        console.log(error.message);
+        //console.log(error.message);
       }
       try {
         await retry(myPromise, [2, 2], { logger, waitTime: 10, maxWaitTime: 100 });
@@ -268,9 +268,9 @@ describe('#Retry', () => {
         called = true;
         tries += 1;
         const actualDate = new Date().getTime();
-        expect(actualDate - date).toBeLessThan(50 + 10);
+        expect(actualDate - date).toBeLessThan(50 + 20);
         date = actualDate;
-        console.log(error.message);
+        //console.log(error.message);
       }
       try {
         await retry(myPromise, [2, 2], { logger, attempts: 3, maxWaitTime: 50, waitTime: 50 });

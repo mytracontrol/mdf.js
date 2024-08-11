@@ -36,7 +36,7 @@
     "body-parser": "^1.20.2",
     "cors": "^2.8.5",
     "express": "^4.19.2",
-    "express-rate-limit": "7.3.1",
+    "express-rate-limit": "7.4.0",
     "feature-policy": "^0.6.0",
     "helmet": "^7.0.0",
     "http-errors": "^2.0.0",
