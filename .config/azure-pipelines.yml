@@ -1,4 +1,4 @@
-## Template for a monorepository based on GitFlow, Docker and DockerCompose in Netin Development Ecosystem
+## Template for a monorepository based on GitFlow, Docker and DockerCompose in Mytra Development Ecosystem
 name: mdf-js$(Date:yyyyMMdd)$(Rev:.r)
 ## CI trigger based on GitFlow
 trigger:
@@ -10,7 +10,7 @@ trigger:
 pr:
   - master
   - develop
-## Netin - Variables
+## Mytra - Variables
 variables:
     ## Artifact name
   - name: artifactName
@@ -28,6 +28,8 @@ stages:
     displayName: 'Application Build'
     pool:
       name: NUCHUB
+      demands:
+        - Agent.OS -equals Linux
     jobs:
       - job: 'CODE_QUALITY'
         displayName: 'Code Quality Assurance'

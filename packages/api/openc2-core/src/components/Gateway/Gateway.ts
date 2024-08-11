@@ -1,20 +1,21 @@
 /**
- * Copyright 2022 Mytra Control S.L. All rights reserved.
+ * Copyright 2024 Mytra Control S.L. All rights reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be found in the LICENSE file
  * or at https://opensource.org/licenses/MIT.
  */
 
 import { Health, Layer } from '@mdf.js/core';
+import { overallStatus } from '@mdf.js/core/dist/Health';
 import { Crash, Links } from '@mdf.js/crash';
 import { DebugLogger, LoggerInstance, SetContext } from '@mdf.js/logger';
 import EventEmitter from 'events';
 import express from 'express';
 import { cloneDeep } from 'lodash';
 import { v4 } from 'uuid';
+import { Router } from '../../Router';
 import { Accessors } from '../../helpers';
 import { HealthWrapper, Registry } from '../../modules';
-import { Router } from '../../Router';
 import {
   CommandJobHandler,
   ConsumerAdapter,
@@ -39,13 +40,86 @@ interface GatewayTimers {
   delay: number;
 }
 export declare interface Gateway {
-  /** Emitted when a consumer's operation has some error */
+  /**
+   * Add a listener for the `error` event, emitted when the component detects an error.
+   * @param event - `error` event
+   * @param listener - Error event listener
+   * @event
+   */
   on(event: 'error', listener: (error: Crash | Error) => void): this;
-  /** Emitted on every state change */
+  /**
+   * Add a listener for the `error` event, emitted when the component detects an error.
+   * @param event - `error` event
+   * @param listener - Error event listener
+   * @event
+   */
+  addListener(event: 'error', listener: (error: Crash | Error) => void): this;
+  /**
+   * Add a listener for the `error` event, emitted when the component detects an error. This is a
+   * one-time event, the listener will be removed after the first emission.
+   * @param event - `error` event
+   * @param listener - Error event listener
+   * @event
+   */
+  once(event: 'error', listener: (error: Crash | Error) => void): this;
+  /**
+   * Removes the specified listener from the listener array for the `error` event.
+   * @param event - `error` event
+   * @param listener - Error event listener
+   * @event
+   */
+  off(event: 'error', listener: (error: Crash | Error) => void): this;
+  /**
+   * Removes the specified listener from the listener array for the `error` event.
+   * @param event - `error` event
+   * @param listener - Error event listener
+   * @event
+   */
+  removeListener(event: 'error', listener: (error: Crash | Error) => void): this;
+  /**
+   * Removes all listeners, or those of the specified event.
+   * @param event - `error` event
+   */
+  removeAllListeners(event?: 'error'): this;
+  /**
+   * Add a listener for the `status` event, emitted when the component changes its status.
+   * @param event - `status` event
+   * @param listener - Status event listener
+   * @event
+   */
   on(event: 'status', listener: (status: Health.Status) => void): this;
+  /**
+   * Add a listener for the `status` event, emitted when the component changes its status.
+   * @param event - `status` event
+   * @param listener - Status event listener
+   * @event
+   */
+  addListener(event: 'status', listener: (status: Health.Status) => void): this;
+  /**
+   * Add a listener for the `status` event, emitted when the component changes its status. This is a
+   * one-time event, the listener will be removed after the first emission.
+   * @param event - `status` event
+   * @param listener - Status event listener
+   * @event
+   */
+  once(event: 'status', listener: (status: Health.Status) => void): this;
+  /**
+   * Removes the specified listener from the listener array for the `status` event.
+   * @param event - `status` event
+   * @param listener - Status event listener
+   * @event
+   */
+  off(event: 'status', listener: (status: Health.Status) => void): this;
+  /**
+   * Removes the specified listener from the listener array for the `status` event.
+   * @param event - `status` event
+   * @param listener - Status event listener
+   * @event
+   */
+  removeListener(event: 'status', listener: (status: Health.Status) => void): this;
 }
 
-export class Gateway extends EventEmitter implements Health.Component, Layer.Service.Registry {
+export class Gateway extends EventEmitter implements Layer.App.Service {
   /** Component identification */
   public readonly componentId: string = v4();
   /** Component commands and message register */
@@ -99,6 +173,10 @@ export class Gateway extends EventEmitter implements Health.Component, Layer.Ser
   /** Component name */
   public get name(): string {
     return this.options.id;
+  }
+  /** Component status */
+  public get status(): Health.Status {
+    return overallStatus(this.health.checks);
   }
   /**
    * Return the status of the Consumer in a standard format
@@ -159,6 +237,10 @@ export class Gateway extends EventEmitter implements Health.Component, Layer.Ser
         })
         .catch(reject);
     });
+  }
+  /** Close the OpenC2 gateway */
+  public close(): Promise<void> {
+    return this.stop();
   }
   /** Consumer Map */
   public get consumerMap(): ConsumerMap {

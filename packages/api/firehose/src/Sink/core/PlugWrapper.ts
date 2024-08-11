@@ -1,25 +1,19 @@
 /**
- * Copyright 2022 Mytra Control S.L. All rights reserved.
+ * Copyright 2024 Mytra Control S.L. All rights reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be found in the LICENSE file
  * or at https://opensource.org/licenses/MIT.
  */
 
-import { Health, Jobs } from '@mdf.js/core';
+import { Health, Layer } from '@mdf.js/core';
 import { Crash, Multi } from '@mdf.js/crash';
-import { retryBind, RetryOptions } from '@mdf.js/utils';
+import { RetryOptions, retryBind } from '@mdf.js/utils';
 import EventEmitter from 'events';
 import { merge } from 'lodash';
-import { WrappableSinkPlug } from '../../types';
+import { Registry } from 'prom-client';
+import { OpenJobObject, WrappableSinkPlug } from '../../types';
 
-export class PlugWrapper<
-    Type extends string = string,
-    Data = any,
-    CustomHeaders extends Record<string, any> = Record<string, any>
-  >
-  extends EventEmitter
-  implements Health.Component
-{
+export class PlugWrapper extends EventEmitter implements Layer.App.Component {
   /** Indicate if the last operation was finished with error */
   private lastOperationError?: Crash | Multi;
   /** Date of the last operation performed */
@@ -27,13 +21,9 @@ export class PlugWrapper<
   /** Operation retry options */
   private readonly retryOptions: RetryOptions;
   /** Plug single operation original */
-  private readonly singleOriginal: (
-    job: Jobs.JobObject<Type, Data, CustomHeaders>
-  ) => Promise<void>;
+  private readonly singleOriginal: (job: OpenJobObject) => Promise<void>;
   /** Plug multi operation original */
-  private readonly multiOriginal?: (
-    jobs: Jobs.JobObject<Type, Data, CustomHeaders>[]
-  ) => Promise<void>;
+  private readonly multiOriginal?: (jobs: OpenJobObject[]) => Promise<void>;
   /** Plug start operation original */
   private readonly startOriginal: () => Promise<void>;
   /** Plug stop operation original */
@@ -44,7 +34,7 @@ export class PlugWrapper<
    * @param retryOptions - options for job retry operations
    */
   constructor(
-    private readonly plug: WrappableSinkPlug<Type, Data, CustomHeaders>,
+    private readonly plug: WrappableSinkPlug,
     retryOptions?: RetryOptions
   ) {
     super();
@@ -112,18 +102,14 @@ export class PlugWrapper<
    * Perform the processing of a single Job
    * @param job - job to be processed
    */
-  private readonly single = async (
-    job: Jobs.JobObject<Type, Data, CustomHeaders>
-  ): Promise<void> => {
+  private readonly single = async (job: OpenJobObject): Promise<void> => {
     await this.wrappedOperation(this.singleOriginal, [job]);
   };
   /**
    * Perform the processing of several Jobs
    * @param jobs - jobs to be processed
    */
-  private readonly multi = async (
-    jobs: Jobs.JobObject<Type, Data, CustomHeaders>[]
-  ): Promise<void> => {
+  private readonly multi = async (jobs: OpenJobObject[]): Promise<void> => {
     if (!this.multiOriginal) {
       throw new Crash(`Plug ${this.plug.name} does not implement the multi method`);
     }
@@ -144,6 +130,10 @@ export class PlugWrapper<
   /** Component identification */
   public get componentId(): string {
     return this.plug.componentId;
+  }
+  /** Metrics registry for this component */
+  public get metrics(): Registry | undefined {
+    return this.plug.metrics;
   }
   /**
    * Return the status of the stream in a standard format

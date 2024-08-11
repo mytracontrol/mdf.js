@@ -1,5 +1,5 @@
 /**
- * Copyright 2022 Mytra Control S.L. All rights reserved.
+ * Copyright 2024 Mytra Control S.L. All rights reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be found in the LICENSE file
  * or at https://opensource.org/licenses/MIT.
@@ -12,6 +12,7 @@ import { CONFIG_PROVIDER_BASE_NAME } from './config';
 import { Config } from './types';
 
 const DEFAULT_CHECK_CREDIT_INTERVAL = 10000;
+
 export class BasePort<Client> extends Layer.Provider.Port<Client, Config> {
   /** Credit check interval */
   private timeInterval?: NodeJS.Timeout;

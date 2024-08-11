@@ -1,5 +1,5 @@
 /**
- * Copyright 2022 Mytra Control S.L. All rights reserved.
+ * Copyright 2024 Mytra Control S.L. All rights reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be found in the LICENSE file
  * or at https://opensource.org/licenses/MIT.
@@ -23,12 +23,39 @@ export interface ProviderOptions<PortConfig> {
   /** Port validation options */
   validation: PortConfigValidationStruct<PortConfig>;
   /**
-   * Flag indicating that the environment configuration variables should be used, merged with
-   * the default values and the configuration passed as argument to the provider.
+   * String is used as prefix for the environment configuration variables, represented in
+   * `SCREAMING_SNAKE_CASE`, that will parsed to `camelCase` and merged with the rest of the
+   * configuration.
    *
-   * If a string is passed this will be used as prefix for the environment configuration variables,
-   * represented in `SCREAMING_SNAKE_CASE`, that will parsed to `camelCase` and merged with the rest
-   * of the configuration.
+   * @example
+   * ```ts
+   * // Environment variables
+   * process.env.PORT_NAME_TYPE = 'http';
+   * process.env.PORT_NAME_HOST = 'localhost';
+   * process.env.PORT_NAME_PORT = '8080';
+   * process.env.PORT_NAME_OTHER_CONFIG__MY_CONFIG = 'true';
+   * ```
+   *
+   * ```ts
+   * // Provider configuration
+   * {
+   *    name: 'port-name',
+   *    type: 'http',
+   *    validation: {...},
+   *    envPrefix: 'PORT_NAME_',
+   * }
+   * ```
+   * ```ts
+   * // Resulting configuration
+   * {
+   *    type: 'http',
+   *    host: 'localhost',
+   *    port: 8080,
+   *    otherConfig: {
+   *      myConfig: true,
+   *    },
+   * }
+   * ```
    */
   useEnvironment?: boolean | string;
   /** Port and provider logger, to be used internally */

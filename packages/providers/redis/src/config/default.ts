@@ -1,5 +1,5 @@
 /**
- * Copyright 2022 Mytra Control S.L. All rights reserved.
+ * Copyright 2024 Mytra Control S.L. All rights reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be found in the LICENSE file
  * or at https://opensource.org/licenses/MIT.
@@ -32,11 +32,11 @@ const CONFIG_REDIS_CHECK_INTERVAL = 60000;
 const CONFIG_REDIS_DISABLE_CHECKS = false;
 
 export const defaultConfig: Config = {
-  /** Default Netin Redis instance port */
+  /** Default Redis instance port */
   port: CONFIG_REDIS_PORT,
-  /** Default Netin Redis instance host address */
+  /** Default Redis instance host address */
   host: CONFIG_REDIS_HOST,
-  /** Default Netin Redis instance DB */
+  /** Default Redis instance DB */
   db: CONFIG_REDIS_DB,
   /** If set, client will send AUTH command with the value of this option when connected */
   password: CONFIG_REDIS_PASSWORD,

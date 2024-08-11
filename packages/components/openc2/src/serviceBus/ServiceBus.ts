@@ -1,10 +1,11 @@
 /**
- * Copyright 2022 Mytra Control S.L. All rights reserved.
+ * Copyright 2024 Mytra Control S.L. All rights reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be found in the LICENSE file
  * or at https://opensource.org/licenses/MIT.
  */
-import { Health } from '@mdf.js/core';
+import { Health, Layer } from '@mdf.js/core';
+import { overallStatus } from '@mdf.js/core/dist/Health';
 import { Crash } from '@mdf.js/crash';
 import { Accessors, Control } from '@mdf.js/openc2-core';
 import { SocketIOServer } from '@mdf.js/socket-server-provider';
@@ -38,7 +39,7 @@ export interface ServiceBusOptions {
   /** Secret used in JWT token validation */
   secret?: string;
 }
-export class ServiceBus extends EventEmitter implements Health.Component {
+export class ServiceBus extends EventEmitter implements Layer.App.Resource {
   /** Component identification */
   public readonly componentId: string = v4();
   /** Socket.IO server instance */
@@ -211,6 +212,15 @@ export class ServiceBus extends EventEmitter implements Health.Component {
   public stop(): Promise<void> {
     this.instance.client.disconnectSockets();
     return this.instance.stop();
+  }
+  /** Close the server and disconnect all the actual connections */
+  public close(): Promise<void> {
+    this.instance.client.disconnectSockets();
+    return this.instance.close();
+  }
+  /** Return the status of the server */
+  public get status(): Health.Status {
+    return overallStatus(this.checks);
   }
   /**
    * Return the status of the server in a standard format

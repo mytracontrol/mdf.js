@@ -1,5 +1,5 @@
 /**
- * Copyright 2022 Mytra Control S.L. All rights reserved.
+ * Copyright 2024 Mytra Control S.L. All rights reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be found in the LICENSE file
  * or at https://opensource.org/licenses/MIT.
@@ -44,6 +44,21 @@ export class ProducerFactory {
         { id: options.id },
         socketOptions
       );
+      const register =
+        options.registry ??
+        new Registry(options.id, options.maxInactivityTime, options.registerLimit);
+      return new Producer(adapter, { ...options, registry: register });
+    }
+  }
+  /**
+   * Create an instance of OpenC2 Producer with Dummy interface
+   * @param options - Producer configuration options
+   */
+  public static Dummy(options: ProducerOptions): Producer {
+    if (cluster.isWorker) {
+      throw new Crash('OpenC2 Producer can not be instantiated in a worker process');
+    } else {
+      const adapter = new Adapters.Dummy.DummyProducerAdapter({ id: options.id });
       const register =
         options.registry ??
         new Registry(options.id, options.maxInactivityTime, options.registerLimit);

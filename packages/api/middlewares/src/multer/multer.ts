@@ -1,14 +1,17 @@
 /**
- * Copyright 2022 Mytra Control S.L. All rights reserved.
+ * Copyright 2024 Mytra Control S.L. All rights reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be found in the LICENSE file
  * or at https://opensource.org/licenses/MIT.
  */
 import { BoomHelpers, Crash, Multi } from '@mdf.js/crash';
-import { coerce } from '@mdf.js/utils';
 import { NextFunction, Request, RequestHandler, Response } from 'express';
-import multer, { FileFilterCallback, MulterError, StorageEngine } from 'multer';
+import { merge } from 'lodash';
+import multer, { FileFilterCallback, MulterError, Options, StorageEngine } from 'multer';
+
 const MEMORY_STORAGE = multer.memoryStorage();
+
+export type MulterLimits = Options['limits'];
 
 // *************************************************************************************************
 // #region Multer limits and configuration default values
@@ -27,37 +30,6 @@ const DEFAULT_CONFIG_API_MAX_PARTS = 100;
 /** For multipart forms, the max number of header key=>value pairs to parse */
 const DEFAULT_CONFIG_API_MAX_HEADERS = 2000;
 // #endregion
-// *************************************************************************************************
-// #region Check the environment variables and set the configuration
-const CONFIG_API_MAX_FORM_FIELD_SIZE = coerce(
-  process.env['CONFIG_API_MAX_FORM_FIELD_SIZE'],
-  DEFAULT_CONFIG_API_MAX_FORM_FIELD_SIZE
-);
-const CONFIG_API_MAX_FIELD_SIZE = coerce(
-  process.env['CONFIG_API_MAX_FIELD_SIZE'],
-  DEFAULT_CONFIG_API_MAX_FIELD_SIZE
-);
-const CONFIG_API_MAX_FIELDS = coerce(
-  process.env['CONFIG_API_MAX_FIELDS'],
-  DEFAULT_CONFIG_API_MAX_FIELDS
-);
-const CONFIG_API_MAX_UPLOAD_FILE_SIZE = coerce(
-  process.env['CONFIG_API_MAX_UPLOAD_FILE_SIZE'],
-  DEFAULT_CONFIG_API_MAX_UPLOAD_FILE_SIZE
-);
-const CONFIG_API_MAX_FILES = coerce(
-  process.env['CONFIG_API_MAX_FILES'],
-  DEFAULT_CONFIG_API_MAX_FILES
-);
-const CONFIG_API_MAX_PARTS = coerce(
-  process.env['CONFIG_API_MAX_PARTS'],
-  DEFAULT_CONFIG_API_MAX_PARTS
-);
-const CONFIG_API_MAX_HEADERS = coerce(
-  process.env['CONFIG_API_MAX_HEADERS'],
-  DEFAULT_CONFIG_API_MAX_HEADERS
-);
-// #endregion
 /**
  * Multer middleware wrapping for multipart/from-data
  * @remarks WARNING:
@@ -74,9 +46,14 @@ export class Multer {
    * Return a new instance of the multipart/form-data middleware
    * @param storage - storage engine used for this middleware
    * @param allowedMineTypes - Allowed mime types allowed for this multer instance
+   * @param limits - Limits for the middleware
    */
-  static Instance(storage?: StorageEngine, allowedMineTypes?: string | string[]): Multer {
-    return new Multer(storage, allowedMineTypes);
+  static Instance(
+    storage?: StorageEngine,
+    allowedMineTypes?: string | string[],
+    limits?: MulterLimits
+  ): Multer {
+    return new Multer(storage, allowedMineTypes, limits);
   }
   /**
    * Return a new instance of the multipart/form-data middleware that accepts a single file with the
@@ -84,13 +61,15 @@ export class Multer {
    * @param fieldName - name of the file field
    * @param storage - storage engine used for this middleware
    * @param allowedMineTypes - Allowed mime types allowed for this multer instance
+   * @param limits - Limits for the middleware
    */
   static SingleHandler(
     fieldName: string,
     storage?: StorageEngine,
-    allowedMineTypes?: string | string[]
+    allowedMineTypes?: string | string[],
+    limits?: MulterLimits
   ): RequestHandler {
-    return new Multer(storage, allowedMineTypes).single(fieldName);
+    return new Multer(storage, allowedMineTypes, limits).single(fieldName);
   }
   /**
    * Return a new instance of the multipart/form-data middleware that accepts an array of files, all
@@ -100,14 +79,16 @@ export class Multer {
    * @param maxCount - maximum number of files
    * @param storage - storage engine used for this middleware
    * @param allowedMineTypes - Allowed mime types allowed for this multer instance
+   * @param limits - Limits for the middleware
    */
   static ArrayHandler(
     fieldName: string,
     maxCount?: number,
     storage?: StorageEngine,
-    allowedMineTypes?: string | string[]
+    allowedMineTypes?: string | string[],
+    limits?: MulterLimits
   ): RequestHandler {
-    return new Multer(storage, allowedMineTypes).array(fieldName, maxCount);
+    return new Multer(storage, allowedMineTypes, limits).array(fieldName, maxCount);
   }
   /**
    * Return a new instance of the multipart/form-data middleware that accepts a mix of files,
@@ -121,43 +102,54 @@ export class Multer {
    * ```
    * @param storage - storage engine used for this middleware
    * @param allowedMineTypes - Allowed mime types allowed for this multer instance
+   * @param limits - Limits for the middleware
    */
   static FieldsHandler(
     fields: readonly multer.Field[],
     storage?: StorageEngine,
-    allowedMineTypes?: string | string[]
+    allowedMineTypes?: string | string[],
+    limits?: MulterLimits
   ): RequestHandler {
-    return new Multer(storage, allowedMineTypes).fields(fields);
+    return new Multer(storage, allowedMineTypes, limits).fields(fields);
   }
   /**
    * Return a new instance of the multipart/form-data middleware that accepts only text fields. If
    * any file upload is made, error with code "Unexpected field" will be issued.
    * @param storage - storage engine used for this middleware
    * @param allowedMineTypes - Allowed mime types allowed for this multer instance
+   * @param limits - Limits for the middleware
    */
   static NoneHandler(
     storage?: StorageEngine,
-    allowedMineTypes?: string | string[]
+    allowedMineTypes?: string | string[],
+    limits?: MulterLimits
   ): RequestHandler {
-    return new Multer(storage, allowedMineTypes).none();
+    return new Multer(storage, allowedMineTypes, limits).none();
   }
   /**
    * Return a new instance of the multipart/form-data middleware that accepts all files that comes
    * over the wire. An array of files will be stored in req.files.
    * @param storage - storage engine used for this middleware
    * @param allowedMineTypes - Allowed mime types allowed for this multer instance
+   * @param limits - Limits for the middleware
    */
-  static AnyHandler(storage?: StorageEngine, allowedMineTypes?: string | string[]): RequestHandler {
-    return new Multer(storage, allowedMineTypes).any();
+  static AnyHandler(
+    storage?: StorageEngine,
+    allowedMineTypes?: string | string[],
+    limits?: MulterLimits
+  ): RequestHandler {
+    return new Multer(storage, allowedMineTypes, limits).any();
   }
   /**
    * Return a new instance of the multipart/form-data middleware
    * @param storage - storage engine used for this middleware
    * @param allowedMineTypes - Allowed mime types allowed for this multer instance
+   * @param limits - Limits for the middleware
    */
   private constructor(
     storage: StorageEngine = MEMORY_STORAGE,
-    allowedMineTypes: string | string[] = []
+    allowedMineTypes: string | string[] = [],
+    limits: MulterLimits
   ) {
     if (typeof allowedMineTypes === 'string' || Array.isArray(allowedMineTypes)) {
       this.allowedMimeTypes =
@@ -165,15 +157,15 @@ export class Multer {
     }
     this.instance = multer({
       storage,
-      limits: {
-        fieldNameSize: CONFIG_API_MAX_FORM_FIELD_SIZE,
-        fieldSize: CONFIG_API_MAX_FIELD_SIZE,
-        fields: CONFIG_API_MAX_FIELDS,
-        fileSize: CONFIG_API_MAX_UPLOAD_FILE_SIZE,
-        files: CONFIG_API_MAX_FILES,
-        parts: CONFIG_API_MAX_PARTS,
-        headerPairs: CONFIG_API_MAX_HEADERS,
-      },
+      limits: merge(limits, {
+        fieldNameSize: DEFAULT_CONFIG_API_MAX_FORM_FIELD_SIZE,
+        fieldSize: DEFAULT_CONFIG_API_MAX_FIELD_SIZE,
+        fields: DEFAULT_CONFIG_API_MAX_FIELDS,
+        fileSize: DEFAULT_CONFIG_API_MAX_UPLOAD_FILE_SIZE,
+        files: DEFAULT_CONFIG_API_MAX_FILES,
+        parts: DEFAULT_CONFIG_API_MAX_PARTS,
+        headerPairs: DEFAULT_CONFIG_API_MAX_HEADERS,
+      }),
       preservePath: true,
       fileFilter: this.fileFilter,
     });

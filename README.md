@@ -67,7 +67,7 @@ The complete framework is composed of the following packages:
     - retry: Functions for retrying functions.
     - camelCase: Functions for converting strings to camelCase.
     - cycle: Functions for managing circular references in objects.
-    - escape: Functions for escaping strings.
+    - escapeRegExp: Functions for escaping RegExp.
     - findNodeModule: Functions for finding node modules.
     - formatEnv: Functions for formatting environment variables.
     - loadFile: Functions for loading files.
@@ -83,14 +83,10 @@ The complete framework is composed of the following packages:
   - [**@mdf.js/redis-provider**](https://www.npmjs.com/package/@mdf.js/redis-provider): Package for managing Redis connections, based on [**ioredis**](https://www.npmjs.com/package/ioredis).
   - [**@mdf.js/socket-client-provider**](https://www.npmjs.com/package/@mdf.js/socket-client-provider): Package for managing **socket.io** connections, based on [**socket.io**](https://www.npmjs.com/package/socket.io)
   - [**@mdf.js/socket-server-provider**](https://www.npmjs.com/package/@mdf.js/socket-server-provider): Package for managing **socket.io** servers, based on [**socket.io**](https://www.npmjs.com/package/socket.io)
-- Registries:
-  - [**@mdf.js/error-registry**](https://www.npmjs.com/package/@mdf.js/error-registry): Package for registering errors, based on [**@mdf.js/crash**](https://www.npmjs.com/package/@mdf.js/crash), mainly used by the [**@mdf.js/observability**](https://www.npmjs.com/package/@mdf.js/observability) component.
-  - [**@mdf.js/health-registry**](https://www.npmjs.com/package/@mdf.js/health-registry): Package for registering health information, mainly used by the [**@mdf.js/observability**](https://www.npmjs.com/package/@mdf.js/observability) component.
-  - [**@mdf.js/metrics-registry**](https://www.npmjs.com/package/@mdf.js/metrics-registry)): Package for registering metrics, based on [**prom-client**](https://www.npmjs.com/package/prom-client), mainly used by the [**@mdf.js/observability**](https://www.npmjs.com/package/@mdf.js/observability) component.
+  - [**@mdf.js/s3-provider**](https://www.npmjs.com/package/@mdf.js/s3-provider): Package for managing S3 connections, based on [**aws-sdk/client-s3**](https://www.npmjs.com/package/@aws-sdk/client-s3).
 - Components:
-  - [**@mdf.js/observability**](https://www.npmjs.com/package/@mdf.js/observability): Package for managing the observability of the applications.
   - [**@mdf.js/openc2**](https://www.npmjs.com/package/@mdf.js/openc2): Package for managing the OpenC2 protocol.
-  - [**@mdf.js/app-wrapper**](https://www.npmjs.com/package/@mdf.js/app-wrapper): Package for wrapping applications.
+  - [**@mdf.js/service-registry**](https://www.npmjs.com/package/@mdf.js/service-registry): Package for managing the observability of the services.
 
 ## **Use**
 
@@ -98,6 +94,6 @@ Check the documentation of each package for more information.
 
 ## **License**
 
-Copyright 2022 Mytra Control S.L. All rights reserved.
+Copyright 2024 Mytra Control S.L. All rights reserved.
 
 Use of this source code is governed by an MIT-style license that can be found in the LICENSE file or at https://opensource.org/licenses/MIT.

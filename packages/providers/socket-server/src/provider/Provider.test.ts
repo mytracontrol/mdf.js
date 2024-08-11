@@ -1,5 +1,5 @@
 /**
- * Copyright 2022 Mytra Control S.L. All rights reserved.
+ * Copyright 2024 Mytra Control S.L. All rights reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be found in the LICENSE file
  * or at https://opensource.org/licenses/MIT.
@@ -7,7 +7,6 @@
 import { Layer } from '@mdf.js/core';
 import { Crash } from '@mdf.js/crash';
 import { LoggerInstance } from '@mdf.js/logger';
-import { undoMocks } from '@mdf.js/utils';
 import { Server } from 'socket.io';
 import { CONFIG_PROVIDER_BASE_NAME } from '../config';
 import { Factory } from './Factory';
@@ -42,9 +41,6 @@ class FakeLogger {
 
 describe('#Port #Socket.io server', () => {
   describe('#Happy path', () => {
-    afterEach(() => {
-      undoMocks();
-    });
     it('Should create provider using the factory instance with default configuration and an app', () => {
       const provider = Factory.create({ config: DEFAULT_CONFIG });
       expect(provider).toBeDefined();
@@ -104,12 +100,16 @@ describe('#Port #Socket.io server', () => {
       expect(port.checks).toEqual({});
     }, 300);
     it('Should start/stop the server on request', done => {
-      const port = new Port(DEFAULT_CONFIG, new FakeLogger() as LoggerInstance);
+      const logger = new FakeLogger() as LoggerInstance;
+      const port = new Port(DEFAULT_CONFIG, logger);
       expect(port).toBeDefined();
       // This is one because there is a TLS connection listener
       expect(port.client.listenerCount('connection')).toEqual(0);
+      jest.spyOn(logger, 'debug');
       port.on('error', error => {
-        throw error;
+        if (!error.message.startsWith('Connection error:')) {
+          throw error;
+        }
       });
       port
         .start()
@@ -117,6 +117,8 @@ describe('#Port #Socket.io server', () => {
           // This is to test that can not wrap method twice
           port.start().then();
           expect(port.client.listenerCount('connection')).toEqual(1);
+          port.client.engine.emit('connection_error', new Error('Test error'));
+          expect(logger.debug).toHaveBeenCalledTimes(2);
           port.close().then();
           expect(port.client.listenerCount('connection')).toEqual(0);
           port.close().then();

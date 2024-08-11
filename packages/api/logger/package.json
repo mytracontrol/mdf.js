@@ -25,6 +25,7 @@
     "build": "yarn clean && tsc -p tsconfig.build.json",
     "check-dependencies": "npm-check",
     "clean": "rimraf \"{tsconfig.build.tsbuildinfo,dist}\"",
+    "envDoc": "node ../../../.config/envDoc.mjs",
     "licenses": "license-checker --start ./ --production --csv --out ../../../licenses/api/logger/licenses.csv --customPath ../../../.config/customFormat.json",
     "mutants": "stryker run stryker.conf.js",
     "test": "jest --detectOpenHandles --config ./jest.config.js"
@@ -32,17 +33,17 @@
   "dependencies": {
     "@mdf.js/crash": "*",
     "@mdf.js/utils": "*",
-    "debug": "^4.3.4",
+    "debug": "^4.3.5",
     "fluent-logger": "^3.4.1",
-    "joi": "^17.9.2",
-    "tslib": "^2.6.0",
-    "uuid": "^9.0.0",
-    "winston": "^3.8.2"
+    "joi": "^17.13.3",
+    "tslib": "^2.6.3",
+    "uuid": "^10.0.0",
+    "winston": "^3.13.1"
   },
   "devDependencies": {
     "@mdf.js/repo-config": "*",
     "@types/debug": "^4.1.8",
-    "@types/uuid": "^9.0.1"
+    "@types/uuid": "^10.0.0"
   },
   "engines": {
     "node": ">=16.14.2"

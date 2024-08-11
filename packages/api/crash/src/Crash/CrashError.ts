@@ -1,5 +1,5 @@
 /**
- * Copyright 2022 Mytra Control S.L. All rights reserved.
+ * Copyright 2024 Mytra Control S.L. All rights reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be found in the LICENSE file
  * or at https://opensource.org/licenses/MIT.
@@ -96,11 +96,11 @@ export class Crash extends Base {
     }
   }
   /** Determine if this instance is a Crash error */
-  get isCrash(): boolean {
+  public get isCrash(): boolean {
     return this._isCrash;
   }
   /** Cause source of error */
-  get cause(): Cause | undefined {
+  public override get cause(): Cause | undefined {
     return this._cause;
   }
   /** Get the trace of this hierarchy of errors */

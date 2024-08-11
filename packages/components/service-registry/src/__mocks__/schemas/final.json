@@ -1,0 +1,16 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "final.schema.json",
+  "type": "object",
+  "properties": {
+    "config": {
+      "$ref": "config.schema.json#"
+    },
+    "otherConfig": {
+      "$ref": "otherConfig.schema.json#"
+    }
+  },
+  "required": [
+    "config"
+  ]
+}

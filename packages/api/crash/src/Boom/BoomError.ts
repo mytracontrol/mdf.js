@@ -1,5 +1,5 @@
 /**
- * Copyright 2022 Mytra Control S.L. All rights reserved.
+ * Copyright 2024 Mytra Control S.L. All rights reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be found in the LICENSE file
  * or at https://opensource.org/licenses/MIT.
@@ -84,7 +84,7 @@ export class Boom extends Base {
     };
   }
   /** Boom error code */
-  get status(): number {
+  public get status(): number {
     return this._code;
   }
   /**
@@ -95,26 +95,26 @@ export class Boom extends Base {
    *    - href: a string containing the link’s URL.
    *    - meta: a meta object containing non-standard meta-information about the link.
    */
-  get links(): Links | undefined {
+  public get links(): Links | undefined {
     return this._links;
   }
   /**
    * Object with the key information of the requested resource in the REST API context
    * @deprecated - `source` has been deprecated, use resource instead
    */
-  get source(): APISource | undefined {
+  public get source(): APISource | undefined {
     return this._source;
   }
   /** Object with the key information of the requested resource in the REST API context */
-  get resource(): APISource | undefined {
+  public get resource(): APISource | undefined {
     return this._source;
   }
   /** Boom error */
-  get isBoom(): boolean {
+  public get isBoom(): boolean {
     return this._isBoom;
   }
   /** Cause source of error */
-  get cause(): Cause | undefined {
+  public override get cause(): Cause | undefined {
     return this._cause;
   }
   /** Get the trace of this hierarchy of errors */
@@ -144,7 +144,7 @@ export class Boom extends Base {
    * @param error - `ValidationError` from a Joi validation process
    * @param uuid - unique identifier for this particular occurrence of the problem
    */
-  Boomify(error: ValidationError): void {
+  public Boomify(error: ValidationError): void {
     if (error.name === 'ValidationError') {
       if (error.details.length > 1) {
         this._cause = new Multi(error.message, this._uuid, { name: 'ValidationError' });

@@ -1,19 +1,15 @@
 /**
- * Copyright 2022 Mytra Control S.L. All rights reserved.
+ * Copyright 2024 Mytra Control S.L. All rights reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be found in the LICENSE file
  * or at https://opensource.org/licenses/MIT.
  */
 
 import { Health, Jobs } from '@mdf.js/core';
-import { Plugs, SourceOptions } from '../types';
+import { OpenJobRequest, Plugs, SourceOptions } from '../types';
 import { Base } from './core';
 
-export class Sequence<
-  Type extends string = string,
-  Data = any,
-  CustomHeaders extends Record<string, any> = Record<string, any>
-> extends Base<Plugs.Source.Sequence<Type, Data, CustomHeaders>, Type, Data, CustomHeaders> {
+export class Sequence extends Base<Plugs.Source.Sequence> {
   /** Indication of pending data request flag */
   private pendingRequest = false;
   /** Actual window size */
@@ -25,7 +21,7 @@ export class Sequence<
    * @param plug - Sequence source plug
    * @param options - source options
    */
-  constructor(plug: Plugs.Source.Sequence<Type, Data, CustomHeaders>, options?: SourceOptions) {
+  constructor(plug: Plugs.Source.Sequence, options?: SourceOptions) {
     super(plug, options);
   }
   /** Perform the read of data from the source */
@@ -81,15 +77,13 @@ export class Sequence<
    * Push the received jobs to the stream
    * @param jobs - jobs to be pushed to the stream
    */
-  private processJobs(
-    jobs: Jobs.JobRequest<Type, Data, CustomHeaders> | Jobs.JobRequest<Type, Data, CustomHeaders>[]
-  ): void {
+  private processJobs(jobs: OpenJobRequest | OpenJobRequest[]): void {
     const arrayOfJobs = Array.isArray(jobs) ? jobs : [jobs];
     this.actualWindowSize += arrayOfJobs.length;
     for (const job of arrayOfJobs) {
       this.push(
         this.subscribeJob(
-          new Jobs.JobHandler<Type, Data, CustomHeaders>({
+          new Jobs.JobHandler({
             data: job.data,
             type: job.type,
             jobUserId: job.jobUserId,
@@ -108,14 +102,14 @@ export class Sequence<
    * Process the received jobs
    * @param job - job to be processed
    */
-  private readonly _onJobReceived = (job: Jobs.JobRequest<Type, Data, CustomHeaders>) => {
+  private readonly _onJobReceived = (job: OpenJobRequest) => {
     this.actualWindowSize++;
     // Stryker disable next-line all
     this.logger.verbose(`New job from consumer: ${job.jobUserId}`);
     if (
       !this.push(
         this.subscribeJob(
-          new Jobs.JobHandler<Type, Data, CustomHeaders>({
+          new Jobs.JobHandler({
             data: job.data,
             type: job.type,
             jobUserId: job.jobUserId,

@@ -1,5 +1,5 @@
 /**
- * Copyright 2022 Mytra Control S.L. All rights reserved.
+ * Copyright 2024 Mytra Control S.L. All rights reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be found in the LICENSE file
  * or at https://opensource.org/licenses/MIT.
@@ -9,7 +9,7 @@ import { Crash } from '@mdf.js/crash';
 import { LoggerInstance } from '@mdf.js/logger';
 import { Socket } from 'dgram';
 import { createServer, Server } from 'http';
-import { createHttpTerminator } from 'http-terminator';
+import { createHttpTerminator, HttpTerminator } from 'http-terminator';
 import { CONFIG_PROVIDER_BASE_NAME } from '../config';
 import { Config } from './types';
 
@@ -17,7 +17,7 @@ export class Port extends Layer.Provider.Port<Server, Config> {
   /** Server handler */
   private readonly instance: Server;
   /** Server terminator */
-  private readonly terminator;
+  private readonly terminator: HttpTerminator;
   /**
    * Implementation of functionalities of an HTTP port instance.
    * @param config - Port configuration options

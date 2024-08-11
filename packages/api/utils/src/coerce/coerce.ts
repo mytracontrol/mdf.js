@@ -1,5 +1,5 @@
 /**
- * Copyright 2022 Mytra Control S.L. All rights reserved.
+ * Copyright 2024 Mytra Control S.L. All rights reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be found in the LICENSE file
  * or at https://opensource.org/licenses/MIT.
@@ -49,7 +49,7 @@ export function coerce<T extends Coerceable>(env: string | undefined): T | undef
  * @param alternative - default value
  */
 export function coerce(env: string | undefined, alternative: any): any;
-export function coerce(env: string | undefined, alternative?: any): Coerceable | undefined {
+export function coerce(env: string | undefined, alternative?: Coerceable): Coerceable | undefined {
   if (typeof env !== 'string') {
     return alternative;
   } else if (env.toLowerCase() === 'true') {

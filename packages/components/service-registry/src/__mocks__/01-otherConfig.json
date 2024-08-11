@@ -1,0 +1,8 @@
+{
+  "config": {
+    "test": -1
+  },
+  "otherConfig": {
+    "otherTest": "-a"
+  }
+}

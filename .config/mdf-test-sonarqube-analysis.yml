@@ -1,22 +1,27 @@
 steps:
-- task: SonarQubePrepare@5
+- task: SonarQubePrepare@6
   displayName: 'Setting Sonarqube analysis'
   inputs:
     SonarQube: 'NetinSystems-SonarQube Endpoint-MytraManagementSystem'
     scannerMode: 'CLI'
+    cliVersion: '6.1.0.4477'
     configMode: 'file'
     configFile: './.config/sonar-project.properties'
     projectVersion: $(Build.BuildNumber)
     extraProperties:
       sonar.projectVersion=$(Build.BuildNumber)
 
-- task: SonarSource.sonarqube.6D01813A-9589-4B15-8491-8164AEB38055.SonarQubeAnalyze@5
+- task: SonarQubeAnalyze@6
   displayName: 'Run Code Analysis'
+  inputs:
+    jdkversion: 'JAVA_HOME_17_X64'
 
-- task: SonarSource.sonarqube.291ed61f-1ee4-45d3-b1b0-bf822d9095ef.SonarQubePublish@5
+- task: SonarQubePublish@6
   displayName: 'Publish Quality Gate Result'
+  inputs:
+    pollingTimeoutSec: '300'
 
-- task: SimondeLang.sonar-buildbreaker.sonar-buildbreaker.sonar-buildbreaker@8
+- task: sonar-buildbreaker@8
   displayName: 'Break build on quality gate failure'
   inputs:
     SonarQube: 'NetinSystems-SonarQube Endpoint-MytraManagementSystem'

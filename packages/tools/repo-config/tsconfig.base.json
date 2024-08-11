@@ -3,7 +3,7 @@
   "compilerOptions": {
     "module": "CommonJS",
     "target": "ES2019",
-    "lib": ["ES2020.Promise", "DOM", "ES2019"],
+    "lib": ["ES2020.Promise", "DOM", "ES2019", "ES2023"],
     "moduleResolution": "node",
     "rootDir": ".",
     "composite": true,

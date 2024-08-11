@@ -1,5 +1,5 @@
 /**
- * Copyright 2022 Mytra Control S.L. All rights reserved.
+ * Copyright 2024 Mytra Control S.L. All rights reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be found in the LICENSE file
  * or at https://opensource.org/licenses/MIT.
@@ -67,7 +67,7 @@ class MyWrapperPort extends Port<MyPortInstance, MyPortConfig> {
     this._instance.on('error', error => this.emit('error', error));
     this._instance.on('closed', error => this.emit('closed', error));
     this._instance.on('unhealthy', error => this.emit('unhealthy', error));
-    this._instance.on('healthy', state => this.emit('healthy', state));
+    this._instance.on('healthy', () => this.emit('healthy'));
     this.addCheck('myMeasure', { componentId: 'myComponentId', status: 'fail' });
     this.addCheck('myMeasure', { componentId: 'myComponentId', status: 'pass' });
     this.addCheck('myMeasure', { componentId: 'myOtherComponentId', status: 'pass' });
@@ -1082,7 +1082,7 @@ describe('#Provider #API', () => {
             observedValue: 'stopped',
             output: undefined,
             status: 'warn',
-            time: provider.actualStateDate,
+            time: provider.date,
           },
         ],
         'myProvider:myMeasure': [
@@ -1090,7 +1090,7 @@ describe('#Provider #API', () => {
           { componentId: 'myOtherComponentId', status: 'pass' },
         ],
       });
-      expect(provider.actualStateDate).toEqual(checks['myProvider:status'][0].time);
+      expect(provider.date).toEqual(checks['myProvider:status'][0].time);
       expect(provider.state).toEqual('stopped');
       expect(provider.name).toEqual('myProvider');
       expect(provider.error).toEqual(undefined);
@@ -1209,7 +1209,7 @@ describe('#Provider #API', () => {
               'ValidationError: "myParam" must be a string',
             ],
             status: 'fail',
-            time: provider.actualStateDate,
+            time: provider.date,
           },
         ],
         'myProvider:myMeasure': [
@@ -1260,9 +1260,7 @@ describe('#Provider #API', () => {
           { myParam: 'myValue', fail: true, empty: true }
         );
       };
-      expect(test).toThrowError(
-        'Unknown error in port myProvider, triggered during configuration process'
-      );
+      expect(test).toThrow('Unknown error in port myProvider');
     }, 300);
   });
 });

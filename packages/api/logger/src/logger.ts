@@ -1,5 +1,5 @@
 /**
- * Copyright 2022 Mytra Control S.L. All rights reserved.
+ * Copyright 2024 Mytra Control S.L. All rights reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be found in the LICENSE file
  * or at https://opensource.org/licenses/MIT.
@@ -66,7 +66,10 @@ export class Logger implements LoggerInstance {
    * @param configuration - logger configuration
    */
   constructor(label: string, configuration?: LoggerConfig);
-  constructor(private label = 'mdf-app', configuration?: LoggerConfig) {
+  constructor(
+    private label = 'mdf-app',
+    configuration?: LoggerConfig
+  ) {
     // Stryker disable all
     this._debug = Debug('mdf:logger');
     this._debug(`${process.pid} - New instance of logger for ${label}`);

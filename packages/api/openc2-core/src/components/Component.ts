@@ -1,11 +1,12 @@
 /**
- * Copyright 2022 Mytra Control S.L. All rights reserved.
+ * Copyright 2024 Mytra Control S.L. All rights reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be found in the LICENSE file
  * or at https://opensource.org/licenses/MIT.
  */
 import { Health, Layer } from '@mdf.js/core';
-import { Crash, Links } from '@mdf.js/crash';
+import { overallStatus } from '@mdf.js/core/dist/Health';
+import { Crash, Links, Multi } from '@mdf.js/crash';
 import { DebugLogger, LoggerInstance, SetContext } from '@mdf.js/logger';
 import EventEmitter from 'events';
 import express from 'express';
@@ -15,15 +16,25 @@ import { HealthWrapper, Registry } from '../modules';
 import { ComponentAdapter, ComponentOptions } from '../types';
 
 export declare interface Component<T, K> {
-  /** Emitted when a producer's operation has some problem */
-  on(event: 'error', listener: (error: Crash | Error) => void): this;
-  /** Emitted on every state change */
+  /**
+   * Add a listener for the `error` event, emitted when the component detects an error.
+   * @param event - `error` event
+   * @param listener - Error event listener
+   * @event
+   */
+  on(event: 'error', listener: (error: Crash | Multi | Error) => void): this;
+  /**
+   * Add a listener for the status event, emitted when the component status changes.
+   * @param event - `status` event
+   * @param listener - Status event listener
+   * @event
+   */
   on(event: 'status', listener: (status: Health.Status) => void): this;
 }
 
 export abstract class Component<T extends ComponentAdapter, K extends ComponentOptions>
   extends EventEmitter
-  implements Health.Component, Layer.Service.Registry
+  implements Layer.App.Service
 {
   /** Component identification */
   public readonly componentId: string = v4();
@@ -42,7 +53,10 @@ export abstract class Component<T extends ComponentAdapter, K extends ComponentO
    * @param adapter - transport adapter
    * @param options - configuration options
    */
-  constructor(protected readonly adapter: T, protected options: K) {
+  constructor(
+    protected readonly adapter: T,
+    protected options: K
+  ) {
     super();
     this.logger = SetContext(
       this.options.logger ?? new DebugLogger(`mdf:oc2:component:${this.name}`),
@@ -59,6 +73,10 @@ export abstract class Component<T extends ComponentAdapter, K extends ComponentO
   /** Component name */
   public get name(): string {
     return this.options.id;
+  }
+  /** Component health status */
+  public get status(): Health.Status {
+    return overallStatus(this.health.checks);
   }
   /**
    * Return the status of the Consumer in a standard format
@@ -146,6 +164,10 @@ export abstract class Component<T extends ComponentAdapter, K extends ComponentO
         })
         .catch(reject);
     });
+  }
+  /** Close the OpenC2 component */
+  public close(): Promise<void> {
+    return this.stop();
   }
   /** Initialize the OpenC2 component */
   protected abstract startup(): Promise<void>;

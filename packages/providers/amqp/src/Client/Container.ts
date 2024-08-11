@@ -1,5 +1,5 @@
 /**
- * Copyright 2022 Mytra Control S.L. All rights reserved.
+ * Copyright 2024 Mytra Control S.L. All rights reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be found in the LICENSE file
  * or at https://opensource.org/licenses/MIT.
@@ -9,6 +9,8 @@ import { Crash } from '@mdf.js/crash';
 import { DebugLogger, LoggerInstance, SetContext } from '@mdf.js/logger';
 import EventEmitter from 'events';
 import { get } from 'lodash';
+import { NetConnectOpts, Socket, createConnection } from 'net';
+import { ConnectionDetails } from 'rhea';
 import {
   Connection,
   ConnectionError,
@@ -35,11 +37,70 @@ export class Container extends EventEmitter {
    */
   constructor(protected readonly options: ConnectionOptions) {
     super();
-    this.connection = new Connection(this.options);
+    //@ts-ignore - Rhea does not expose all the parameters
+    this.connection = new Connection({
+      ...this.options,
+      connection_details: this.connectionDetails,
+    });
     this.logger = SetContext(new DebugLogger('mdf:client:amqp'), 'amqp', this.componentId);
     // Stryker disable next-line all
     this.logger.debug(`New instance of AMQP port created: ${this.componentId}`);
   }
+  /**
+   * Connection details for the AMQP client
+   * @param counter - Number of connection attempts
+   */
+  private readonly connectionDetails = (counter: number): ConnectionDetails => {
+    this.logger.debug(`Connection details called: ${counter}`);
+    return {
+      //@ts-ignore - rhea-promise does not expose all the parameters
+      host: this.options.host,
+      //@ts-ignore - rhea-promise does not expose all the parameters
+      port: this.options.port,
+      options: this.options,
+      transport: this.options.transport,
+      connect: this.connectionHandler,
+    };
+  };
+  /**
+   * Connection handler for the AMQP client
+   * @param args - Connection arguments
+   */
+  private readonly connectionHandler = (...args: any[]): Socket => {
+    if (
+      typeof args[0] !== 'number' ||
+      typeof args[1] !== 'string' ||
+      typeof args[2] !== 'object' ||
+      typeof args[3] !== 'function'
+    ) {
+      throw new Crash('Invalid arguments for the connection handler', this.componentId);
+    }
+    const abortController = new AbortController();
+    const options: NetConnectOpts = {
+      ...args[2],
+      port: args[0],
+      host: args[1],
+      signal: abortController.signal,
+    };
+    this.logger.debug(`A new socket connection is being created to ${args[1]}:${args[0]}`);
+    const onConnect = (): void => {
+      this.logger.debug(`Socket connected to ${args[1]}:${args[0]}`);
+      args[3]();
+    };
+    return createConnection(options, onConnect)
+      .once('timeout', () => {
+        this.logger.warn(`Socket connection to ${args[1]}:${args[0]} has timed out`);
+        abortController.abort();
+      })
+      .once('error', (error: Error) => {
+        this.logger.error(
+          `Socket connection to ${args[1]}:${args[0]} has failed: ${error.message}`
+        );
+      })
+      .once('close', () => {
+        this.logger.debug(`Socket connection to ${args[1]}:${args[0]} has been closed`);
+      });
+  };
   /**
    * Event handler for the connection open event
    * @param context - EventContext instance
@@ -147,7 +208,10 @@ export class Container extends EventEmitter {
       return;
     }
     try {
+      const storeReconnect = this.connection.options.reconnect;
+      this.connection.options.reconnect = false;
       await this.connection.open();
+      this.connection.options.reconnect = storeReconnect;
       this.eventsWrapping(this.connection);
     } catch (rawError) {
       const error = Crash.from(rawError, this.componentId);

@@ -1,59 +1,24 @@
 /**
- * Copyright 2022 Mytra Control S.L. All rights reserved.
+ * Copyright 2024 Mytra Control S.L. All rights reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be found in the LICENSE file
  * or at https://opensource.org/licenses/MIT.
  */
 
-import { Health, Jobs } from '@mdf.js/core';
+import { Health, Jobs, Layer } from '@mdf.js/core';
 import { Crash, Multi } from '@mdf.js/crash';
 import { DebugLogger, LoggerInstance, SetContext } from '@mdf.js/logger';
 import { merge } from 'lodash';
+import { Registry } from 'prom-client';
 import { Readable } from 'stream';
-import { Plugs, SourceOptions } from '../../types';
-import { DEFAULT_READABLE_OPTIONS } from './const';
+import { OpenJobHandler, Plugs, SourceOptions } from '../../types';
 import { PlugWrapper } from './PlugWrapper';
-
-export declare interface Base<
-  T extends Plugs.Source.Any<Type, Data, CustomHeaders>,
-  Type extends string = string,
-  Data = any,
-  CustomHeaders extends Record<string, any> = Record<string, any>
-> {
-  /** Emitted when stream.resume() is called and readableFlowing is not true*/
-  on(event: 'resume', listener: () => void): this;
-  /** Emitted when there is data available to be read from the stream */
-  on(event: 'readable', listener: () => void): this;
-  /** Emitted when stream.pause() is called and readableFlowing is not false */
-  on(event: 'pause', listener: () => void): this;
-  /** Due to the implementation of consumer classes, this event will never emitted */
-  on(event: 'error', listener: (error: Error | Crash) => void): this;
-  /** Emitted when there is no more data to be consumed from the stream */
-  on(event: 'end', listener: () => void): this;
-  /** Emitted whenever the stream is relinquishing ownership of a chunk of data to a consumer */
-  on(event: 'data', listener: (chunk: Buffer | string | any) => void): this;
-  /** Emitted when the stream have been closed */
-  on(event: 'close', listener: () => void): this;
-  /** Emitted on every state change */
-  on(event: 'status', listener: (status: Health.Status) => void): this;
-  /** Emitted when a job is created */
-  on(event: 'job', listener: (job: Jobs.JobHandler<Type, Data, CustomHeaders>) => void): this;
-  /** Emitted when a job has ended */
-  on(
-    event: 'done',
-    listener: (uuid: string, result: Jobs.Result<Type>, error?: Crash) => void
-  ): this;
-}
+import { DEFAULT_READABLE_OPTIONS } from './const';
 
 /** Firehose source (Readable) plug class */
-export abstract class Base<
-    T extends Plugs.Source.Any<Type, Data, CustomHeaders>,
-    Type extends string = string,
-    Data = any,
-    CustomHeaders extends Record<string, any> = Record<string, any>
-  >
+export abstract class Base<T extends Plugs.Source.Any>
   extends Readable
-  implements Health.Component
+  implements Layer.App.Component
 {
   /** Debug logger for development and deep troubleshooting */
   protected readonly logger: LoggerInstance;
@@ -62,7 +27,7 @@ export abstract class Base<
   /** Flag to indicate that an unhealthy status has been emitted recently */
   private lastStatusEmitted?: Health.Status;
   /** Wrapped source plug */
-  public readonly plugWrapper: PlugWrapper<Type, Data, CustomHeaders>;
+  public readonly plugWrapper: PlugWrapper;
   /**
    * Indicates the number of handlers that must be successfully processed to consider the job as
    * successfully processed
@@ -73,7 +38,10 @@ export abstract class Base<
    * @param plug - source plug instance
    * @param options - source options
    */
-  constructor(protected readonly plug: T, options?: SourceOptions) {
+  constructor(
+    protected readonly plug: T,
+    options?: SourceOptions
+  ) {
     super(merge(DEFAULT_READABLE_OPTIONS, options?.readableOptions));
     this.numberOfHandlers = options?.qos ?? this.numberOfHandlers;
     // Stryker disable next-line all
@@ -187,7 +155,7 @@ export abstract class Base<
     this.plugWrapper.on('status', this.onStatusEvent);
   }
   /** Manage the `done` event of a job */
-  private readonly onJobDone = (uuid: string, jobResult: Jobs.Result, error?: Crash) => {
+  private readonly onJobDone = (uuid: string, jobResult: Jobs.Result, error?: Multi) => {
     if (error) {
       // Stryker disable next-line all
       this.logger.debug(`Job ${jobResult.uuid} was finished with error: ${error.message}`);
@@ -215,7 +183,7 @@ export abstract class Base<
    * Manage the events of the jobs
    * @param job - job object
    */
-  protected subscribeJob(job: Jobs.JobHandler<Type, Data, CustomHeaders>): Jobs.JobHandler<any> {
+  protected subscribeJob(job: OpenJobHandler): OpenJobHandler {
     job.once('done', this.onJobDone);
     this.emit('job', job);
     return job;
@@ -229,5 +197,9 @@ export abstract class Base<
   /** Stop the Plug and the underlayer resources, making it unavailable */
   public async stop(): Promise<void> {
     await this.plug.stop();
+  }
+  /** Metrics registry for this component */
+  public get metrics(): Registry | undefined {
+    return this.plugWrapper.metrics;
   }
 }

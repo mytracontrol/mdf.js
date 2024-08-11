@@ -1,5 +1,5 @@
 /**
- * Copyright 2022 Mytra Control S.L. All rights reserved.
+ * Copyright 2024 Mytra Control S.L. All rights reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be found in the LICENSE file
  * or at https://opensource.org/licenses/MIT.
@@ -31,15 +31,17 @@ const CONFIG_REDIS_KEEPALIVE = coerce<number>(process.env['CONFIG_REDIS_KEEPALIV
 const CONFIG_REDIS_CONNECTION_TIMEOUT = coerce<number>(
   process.env['CONFIG_REDIS_CONNECTION_TIMEOUT']
 );
+/** Default REDIS status check interval */
 const CONFIG_REDIS_CHECK_INTERVAL = coerce<number>(process.env['CONFIG_REDIS_CHECK_INTERVAL']);
+/** Disable Redis checks */
 const CONFIG_REDIS_DISABLE_CHECKS = coerce<boolean>(process.env['CONFIG_REDIS_DISABLE_CHECKS']);
 
 export const envBasedConfig: Config = {
-  /** Default Netin Redis instance port */
+  /** Default Redis instance port */
   port: CONFIG_REDIS_PORT,
-  /** Default Netin Redis instance host address */
+  /** Default Redis instance host address */
   host: CONFIG_REDIS_HOST,
-  /** Default Netin Redis instance DB */
+  /** Default Redis instance DB */
   db: CONFIG_REDIS_DB,
   /** If set, client will send AUTH command with the value of this option when connected */
   password: CONFIG_REDIS_PASSWORD,
@@ -48,7 +50,7 @@ export const envBasedConfig: Config = {
   /** TCP KeepAlive in ms. Set to a non-number value to disable keepAlive */
   keepAlive: CONFIG_REDIS_KEEPALIVE,
   /** Connection name*/
-  connectionName: CONFIG_ARTIFACT_ID,
+  connectionName: process.env['NODE_APP_INSTANCE'] || CONFIG_ARTIFACT_ID,
   /** Enabled the ready event form Redis instance */
   enableReadyCheck: true,
   /** Enable to send command even when the server is not still ready */

@@ -5,8 +5,8 @@
   },
   "files.eol": "\r\n",
   "editor.codeActionsOnSave": {
-    "source.organizeImports": true,
-    "source.fixAll.eslint": true
+    "source.organizeImports": "explicit",
+    "source.fixAll.eslint": "explicit"
   },
   "eslint.validate": [
     "typescript",
@@ -23,7 +23,12 @@
     "Middlewares",
     "openc2",
     "OpenC2",
-    "OPENC2"
+    "OPENC2",
+    "RESTAPI",
+    "Retryable",
+    "sasl",
+    "SASL",
+    "Struct"
   ],
   "sonarlint.connectedMode.project": {
     "projectKey": "Mytra-Development-Framework-NDF-TypeScript"
@@ -62,7 +67,15 @@
     "ci",
     "doorkeeper",
     "faker",
-    "kafka-provider"
+    "kafka-provider",
+    "mqtt-provider",
+    "utils",
+    "logger",
+    "middlewares",
+    "limiter",
+    "general",
+    "tasks",
+    "elastic-provider"
   ],
 
 }

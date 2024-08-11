@@ -1,5 +1,5 @@
 /**
- * Copyright 2022 Mytra Control S.L. All rights reserved.
+ * Copyright 2024 Mytra Control S.L. All rights reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be found in the LICENSE file
  * or at https://opensource.org/licenses/MIT.
@@ -20,5 +20,13 @@
  * the behavior that current infrastructural tooling expects: load-balancers, service discoveries
  * and others, utilizing health-checks.
  */
-export const STATUS = ['pass', 'fail', 'warn'] as const;
-export type Status = typeof STATUS[number];
+export const STATUSES = ['pass', 'fail', 'warn'] as const;
+/** Service status */
+export type Status = (typeof STATUSES)[number];
+
+/** Service status */
+export enum STATUS {
+  PASS = 'pass',
+  FAIL = 'fail',
+  WARN = 'warn',
+}

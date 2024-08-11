@@ -28,7 +28,7 @@
   "excludeTags": [],
   "readme": "README.md",
   "categorizeByGroup": false,
-  "categoryOrder": ["Crash", "Multi", "Boom", "*"],
+  "categoryOrder": [],
   "cleanOutputDir": true,
   "gitRevision": "master",
 }

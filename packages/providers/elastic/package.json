@@ -24,18 +24,19 @@
     "build": "yarn clean && tsc -p tsconfig.build.json",
     "check-dependencies": "npm-check",
     "clean": "rimraf \"{tsconfig.build.tsbuildinfo,dist}\"",
+    "envDoc": "node ../../../.config/envDoc.mjs",
     "licenses": "license-checker --start ./ --production --csv --out ../../../licenses/providers/elastic/licenses.csv --customPath ../../../.config/customFormat.json",
     "mutants": "stryker run stryker.conf.js",
     "test": "jest --detectOpenHandles --config ./jest.config.js"
   },
   "dependencies": {
-    "@elastic/elasticsearch": "^7.17.11-patch.1",
+    "@elastic/elasticsearch": "^8.14.0",
     "@mdf.js/core": "*",
     "@mdf.js/crash": "*",
     "@mdf.js/logger": "*",
     "@mdf.js/utils": "*",
-    "joi": "^17.9.2",
-    "tslib": "^2.6.0"
+    "joi": "^17.13.3",
+    "tslib": "^2.6.3"
   },
   "devDependencies": {
     "@mdf.js/repo-config": "*"

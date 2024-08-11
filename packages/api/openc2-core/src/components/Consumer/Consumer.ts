@@ -1,5 +1,5 @@
 /**
- * Copyright 2022 Mytra Control S.L. All rights reserved.
+ * Copyright 2024 Mytra Control S.L. All rights reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be found in the LICENSE file
  * or at https://opensource.org/licenses/MIT.
@@ -21,12 +21,124 @@ import { Component } from '../Component';
 import { AdapterWrapper } from './core';
 
 export declare interface Consumer {
-  /** Emitted when a consumer's operation has some error */
+  /**
+   * Add a listener for the `error` event, emitted when the component detects an error.
+   * @param event - `error` event
+   * @param listener - Error event listener
+   * @event
+   */
   on(event: 'error', listener: (error: Crash | Error) => void): this;
-  /** Emitted on every state change */
+  /**
+   * Add a listener for the `error` event, emitted when the component detects an error.
+   * @param event - `error` event
+   * @param listener - Error event listener
+   * @event
+   */
+  addListener(event: 'error', listener: (error: Crash | Error) => void): this;
+  /**
+   * Add a listener for the `error` event, emitted when the component detects an error. This is a
+   * one-time event, the listener will be removed after the first emission.
+   * @param event - `error` event
+   * @param listener - Error event listener
+   * @event
+   */
+  once(event: 'error', listener: (error: Crash | Error) => void): this;
+  /**
+   * Removes the specified listener from the listener array for the `error` event.
+   * @param event - `error` event
+   * @param listener - Error event listener
+   * @event
+   */
+  off(event: 'error', listener: (error: Crash | Error) => void): this;
+  /**
+   * Removes the specified listener from the listener array for the `error` event.
+   * @param event - `error` event
+   * @param listener - Error event listener
+   * @event
+   */
+  removeListener(event: 'error', listener: (error: Crash | Error) => void): this;
+  /**
+   * Removes all listeners, or those of the specified event.
+   * @param event - `error` event
+   */
+  removeAllListeners(event?: 'error'): this;
+  /**
+   * Add a listener for the `status` event, emitted when the component changes its status.
+   * @param event - `status` event
+   * @param listener - Status event listener
+   * @event
+   */
   on(event: 'status', listener: (status: Health.Status) => void): this;
-  /** Emitted when a incoming command is received */
+  /**
+   * Add a listener for the `status` event, emitted when the component changes its status.
+   * @param event - `status` event
+   * @param listener - Status event listener
+   * @event
+   */
+  addListener(event: 'status', listener: (status: Health.Status) => void): this;
+  /**
+   * Add a listener for the `status` event, emitted when the component changes its status. This is a
+   * one-time event, the listener will be removed after the first emission.
+   * @param event - `status` event
+   * @param listener - Status event listener
+   * @event
+   */
+  once(event: 'status', listener: (status: Health.Status) => void): this;
+  /**
+   * Removes the specified listener from the listener array for the `status` event.
+   * @param event - `status` event
+   * @param listener - Status event listener
+   * @event
+   */
+  off(event: 'status', listener: (status: Health.Status) => void): this;
+  /**
+   * Removes the specified listener from the listener array for the `status` event.
+   * @param event - `status` event
+   * @param listener - Status event listener
+   * @event
+   */
+  removeListener(event: 'status', listener: (status: Health.Status) => void): this;
+  /**
+   * Add a listener for the `command` event, emitted when a new command is received
+   * @param event - `command` event
+   * @param listener - Command event listener
+   * @event
+   */
   on(event: 'command', listener: (job: CommandJobHandler) => void): this;
+  /**
+   * Add a listener for the `command` event, emitted when a new command is received
+   * @param event - `command` event
+   * @param listener - Command event listener
+   * @event
+   */
+  addListener(event: 'command', listener: (job: CommandJobHandler) => void): this;
+  /**
+   * Add a listener for the `command` event, emitted when a new command is received. This is a
+   * one-time event, the listener will be removed after the first emission.
+   * @param event - `command` event
+   * @param listener - Command event listener
+   * @event
+   */
+  once(event: 'command', listener: (job: CommandJobHandler) => void): this;
+  /**
+   * Removes the specified listener from the listener array for the `command` event.
+   * @param event - `command` event
+   * @param listener - Command event listener
+   * @event
+   */
+  off(event: 'command', listener: (job: CommandJobHandler) => void): this;
+  /**
+   * Removes the specified listener from the listener array for the `command` event.
+   * @param event - `command` event
+   * @param listener - Command event listener
+   * @event
+   */
+  removeListener(event: 'command', listener: (job: CommandJobHandler) => void): this;
+  /**
+   * Removes all listeners, or those of the specified event.
+   * @param event - `command` event
+   */
+  removeAllListeners(event?: 'command'): this;
 }
 export class Consumer extends Component<AdapterWrapper, ConsumerOptions> {
   /**

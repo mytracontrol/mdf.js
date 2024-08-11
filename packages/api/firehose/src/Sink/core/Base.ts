@@ -1,65 +1,25 @@
 /**
- * Copyright 2022 Mytra Control S.L. All rights reserved.
+ * Copyright 2024 Mytra Control S.L. All rights reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be found in the LICENSE file
  * or at https://opensource.org/licenses/MIT.
  */
 
-import { Health } from '@mdf.js/core';
+import { Health, Layer } from '@mdf.js/core';
 import { Crash, Multi } from '@mdf.js/crash';
 import { merge } from 'lodash';
-import { Readable, Writable } from 'stream';
+import { Writable } from 'stream';
 import { Plugs, SinkOptions } from '../../types';
 import { PlugWrapper } from './PlugWrapper';
 
 import { DebugLogger, LoggerInstance, SetContext } from '@mdf.js/logger';
+import { Registry } from 'prom-client';
 import { DEFAULT_WRITABLE_OPTIONS } from './const';
 
-export declare interface Base<
-  T extends Plugs.Sink.Any<Type, Data, CustomHeaders>,
-  Type extends string = string,
-  Data = any,
-  CustomHeaders extends Record<string, any> = Record<string, any>
-> {
-  /** Emitted when the stream have been closed */
-  on(event: 'close', listener: () => void): this;
-  /** Emitted when it is appropriate to resume writing data to the stream */
-  on(event: 'drain', listener: () => void): this;
-  /** Due to the implementation of consumer classes, this event will never emitted */
-  on(event: 'error', listener: (error: Crash | Error) => void): this;
-  /**
-   * Emitted after the stream.end() method has been called, and all data has been flushed to the
-   * underlying system
-   */
-  on(event: 'finish', listener: () => void): this;
-  /**
-   * Emitted when the stream.pipe() method is called on a readable stream, adding this writable to
-   * its set of destinations
-   */
-  on(event: 'pipe', listener: (src: Readable) => void): this;
-  /**
-   * Emitted when the stream.unpipe() method is called on a Readable stream, removing this Writable
-   * from its set of destinations
-   */
-  on(event: 'unpipe', listener: (src: Readable) => void): this;
-  /**
-   * Emitted when a unpipe event is received to inform upper firehose manager about the sink that
-   * have been unpipe
-   */
-  on(event: 'lost', listener: (src: Writable) => void): this;
-  /** Emitted on every state change */
-  on(event: 'status', listener: (status: Health.Status) => void): this;
-}
-
 /** Firehose sink (Writable) plug class */
-export abstract class Base<
-    T extends Plugs.Sink.Any<Type, Data, CustomHeaders>,
-    Type extends string = string,
-    Data = any,
-    CustomHeaders extends Record<string, any> = Record<string, any>
-  >
+export abstract class Base<T extends Plugs.Sink.Any>
   extends Writable
-  implements Health.Component
+  implements Layer.App.Component
 {
   /** Debug logger for development and deep troubleshooting */
   protected readonly logger: LoggerInstance;
@@ -68,13 +28,16 @@ export abstract class Base<
   /** Flag to indicate that an unhealthy status has been emitted recently */
   private lastStatusEmitted?: Health.Status;
   /** Wrapped source plug */
-  public readonly plugWrapper: PlugWrapper<Type, Data, CustomHeaders>;
+  public readonly plugWrapper: PlugWrapper;
   /**
    * Create a new instance for a firehose sink
    * @param plug - sink plug instance
    * @param options - sink options
    */
-  constructor(protected readonly plug: T, options?: SinkOptions) {
+  constructor(
+    protected readonly plug: T,
+    options?: SinkOptions
+  ) {
     super(merge(DEFAULT_WRITABLE_OPTIONS, options?.writableOptions));
     // Stryker disable next-line all
     this.logger = SetContext(
@@ -183,7 +146,7 @@ export abstract class Base<
    * Wrap super and plug events in the same to aggregate them in one component
    * @param plug - sink plug instance
    */
-  private wrappingEvents(plug: Plugs.Sink.Any<Type, Data, CustomHeaders>): void {
+  private wrappingEvents(plug: Plugs.Sink.Any): void {
     super.on('error', this.onErrorEvent);
     super.on('unpipe', this.onUnpipeEvent);
     super.on('pipe', this.onPipeEvent);
@@ -199,5 +162,9 @@ export abstract class Base<
   /** Stop the Plug and the underlayer resources, making it unavailable */
   public async stop(): Promise<void> {
     await this.plug.stop();
+  }
+  /** Metrics registry for this component */
+  public get metrics(): Registry | undefined {
+    return this.plugWrapper.metrics;
   }
 }

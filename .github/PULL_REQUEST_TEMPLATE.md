@@ -21,7 +21,7 @@ List the areas that one might assume have been changed but have not been in this
 ### Author's Checklist Before Publication
 
 - [ ] I have verified that the modification works correctly.
-- [ ] The modification adheres to the [standards](https://devopmytra.visualstudio.com/NetinSystems/_wiki/wikis/NetinSystems.wiki/1381/Netin-Systems-DevOps) set by the Netin Systems DevOps group.
+- [ ] The modification adheres to the standards set by the Mytra Control DevOps group.
 - [ ] The modifications do not include keys, tokens, or confidential information in the pipeline.
 - [ ] Corresponding unit tests have been conducted to cover the new code and/or the tests that are no longer necessary have been removed.
 

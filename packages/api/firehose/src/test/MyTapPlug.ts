@@ -1,5 +1,5 @@
 /**
- * Copyright 2022 Mytra Control S.L. All rights reserved.
+ * Copyright 2024 Mytra Control S.L. All rights reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be found in the LICENSE file
  * or at https://opensource.org/licenses/MIT.
@@ -7,6 +7,7 @@
 import { Health, Jobs } from '@mdf.js/core';
 import { Crash } from '@mdf.js/crash';
 import EventEmitter from 'events';
+import { Counter, Registry } from 'prom-client';
 import { v4 } from 'uuid';
 import {} from '../Engine';
 import { Plugs } from '../types';
@@ -16,8 +17,16 @@ export class MyTapPlug extends EventEmitter implements Plugs.Sink.Tap {
   componentId = v4();
   shouldReject = 0;
   irresolvable = false;
+  myMetrics: Registry = new Registry();
+  counter = new Counter({
+    name: 'my_counter',
+    help: 'my counter help',
+    labelNames: ['plug'],
+    registers: [this.myMetrics],
+  });
   constructor() {
     super();
+    this.myMetrics.resetMetrics();
   }
   public get checks(): Health.Checks {
     return {};
@@ -36,6 +45,7 @@ export class MyTapPlug extends EventEmitter implements Plugs.Sink.Tap {
               reject(new Error('Was rejected by my own'));
             }
           } else {
+            this.counter.inc({ plug: this.name });
             resolve();
           }
         });
@@ -47,5 +57,14 @@ export class MyTapPlug extends EventEmitter implements Plugs.Sink.Tap {
   }
   public stop(): Promise<void> {
     return Promise.resolve();
+  }
+  public get status(): Health.Status {
+    return Health.STATUS.PASS;
+  }
+  public close(): Promise<void> {
+    return this.stop();
+  }
+  public get metrics(): Registry {
+    return this.myMetrics;
   }
 }

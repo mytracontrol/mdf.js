@@ -1,15 +1,11 @@
 /**
- * Copyright 2022 Mytra Control S.L. All rights reserved.
+ * Copyright 2024 Mytra Control S.L. All rights reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be found in the LICENSE file
  * or at https://opensource.org/licenses/MIT.
  */
-process.env['CONFIG_SOURCE_PLUG_CHECK_UNCLEANED_INTERVAL'] = '1000';
-
-import { Health, Jobs } from '@mdf.js/core';
-import { Crash } from '@mdf.js/crash';
-import { Observability, ObservabilityOptions } from '@mdf.js/observability';
-import { v4 } from 'uuid';
+import { Jobs } from '@mdf.js/core';
+import { Crash, Multi } from '@mdf.js/crash';
 import { Firehose, Plugs } from '.';
 import {
   MyCreditsFlowPlug,
@@ -23,34 +19,21 @@ import {
   MyWindowPlug,
 } from './test';
 
-const config: ObservabilityOptions = {
-  name: 'myObservability',
-  version: '1',
-  description: 'myObservability service',
-  instanceId: v4(),
-  release: '1.0.0',
-  isCluster: false,
-};
-
 type OnlyForCoverage = Plugs.Sink.Jet;
 
 describe('#Firehose', () => {
   describe('#Happy path', () => {
     it('Should create a new Firehose with a Sequence Source and a Tap Sink, start it and check is working', done => {
-      const service = new Observability(config);
       const mySinkPlug = new MyTapPlug();
       const mySourcePlug = new MySequencePlug();
       const firehose = new Firehose('MyFirehose', {
         sources: [mySourcePlug],
         sinks: [mySinkPlug],
         bufferSize: 2,
-        metricsRegistry: service.metricsRegistry,
-        errorsRegistry: service.errorsRegistry,
       });
       expect(firehose).toBeDefined();
       expect(firehose.name).toEqual('MyFirehose');
       expect(firehose.componentId).toBeDefined();
-      service.healthRegistry.register(firehose);
       let jobEmitted = false;
       firehose.on('job', job => {
         expect(job).toBeDefined();
@@ -63,15 +46,14 @@ describe('#Firehose', () => {
         expect(job.options?.headers).toEqual({ 'x-my-header': 'my-header-value' });
         jobEmitted = true;
       });
-      firehose.on('done', async (uuid: string, result: Jobs.Result, error?: Crash) => {
+      firehose.on('done', async (uuid: string, result: Jobs.Result, error?: Crash | Multi) => {
         if (result.jobUserId === '4') {
-          const metrics = await service.metricsRegistry.metrics();
+          const metrics = await firehose.metrics.metrics();
           expect(metrics).toBeDefined();
-          expect(metrics.metrics).toBeDefined();
-          expect(metrics.metrics).toContain(`api_all_job_processed_total{type="myType"} 4`);
-          expect(metrics.metrics).toContain(`api_all_job_in_processing_total{type="myType"} 6`);
-          expect(service.errorsRegistry.size).toEqual(0);
-          const checks = service.healthRegistry.health.checks as Health.Checks;
+          expect(metrics).toContain(`my_counter{plug="MyTapPlug"} 4`);
+          expect(metrics).toContain(`api_all_job_processed_total{type="myType"} 4`);
+          expect(metrics).toContain(`api_all_job_in_processing_total{type="myType"} 6`);
+          const checks = firehose.checks;
           expect(checks['MyTapPlug:lastOperation'][0].status).toEqual('pass');
           expect(checks['MyTapPlug:lastOperation'][0].componentType).toEqual('plug');
           expect(checks['MyTapPlug:lastOperation'][0].observedValue).toEqual('ok');
@@ -88,32 +70,26 @@ describe('#Firehose', () => {
           );
           expect(checks['MySequencePlug:lastOperation'][0].time).toBeDefined();
           await firehose.close();
-          service.stop().then(() => {
-            if (jobEmitted) {
-              done();
-            } else {
-              done(new Error('Job not emitted'));
-            }
-          });
+          if (jobEmitted) {
+            done();
+          } else {
+            done(new Error('Job not emitted'));
+          }
         }
       });
       firehose.start().then();
     }, 300);
     it('Should create a new Firehose with a CreditFlow Source and a Tap Sink, start it and check is working', done => {
-      const service = new Observability(config);
       const mySinkPlug = new MyTapPlug();
       const mySourcePlug = new MyCreditsFlowPlug();
       const firehose = new Firehose('MyFirehose', {
         sources: [mySourcePlug],
         sinks: [mySinkPlug],
         bufferSize: 2,
-        metricsRegistry: service.metricsRegistry,
-        errorsRegistry: service.errorsRegistry,
       });
       expect(firehose).toBeDefined();
       expect(firehose.name).toEqual('MyFirehose');
       expect(firehose.componentId).toBeDefined();
-      service.healthRegistry.register(firehose);
       let jobEmitted = false;
       firehose.on('job', job => {
         expect(job).toBeDefined();
@@ -126,15 +102,13 @@ describe('#Firehose', () => {
         expect(job.options?.headers).toEqual({ 'x-my-header': 'my-header-value' });
         jobEmitted = true;
       });
-      firehose.on('done', async (uuid: string, result: Jobs.Result, error?: Crash) => {
+      firehose.on('done', async (uuid: string, result: Jobs.Result, error?: Crash | Multi) => {
         if (result.jobUserId === '4') {
-          const metrics = await service.metricsRegistry.metrics();
+          const metrics = await firehose.metrics.metrics();
           expect(metrics).toBeDefined();
-          expect(metrics.metrics).toBeDefined();
-          expect(metrics.metrics).toContain(`api_all_job_processed_total{type="myType"} 4`);
-          expect(metrics.metrics).toContain(`api_all_job_in_processing_total{type="myType"} 0`);
-          expect(service.errorsRegistry.size).toEqual(0);
-          const checks = service.healthRegistry.health.checks as Health.Checks;
+          expect(metrics).toContain(`api_all_job_processed_total{type="myType"} 4`);
+          expect(metrics).toContain(`api_all_job_in_processing_total{type="myType"} 0`);
+          const checks = firehose.checks;
           expect(checks['MyTapPlug:lastOperation'][0].status).toEqual('pass');
           expect(checks['MyTapPlug:lastOperation'][0].componentType).toEqual('plug');
           expect(checks['MyTapPlug:lastOperation'][0].observedValue).toEqual('ok');
@@ -151,13 +125,11 @@ describe('#Firehose', () => {
           );
           expect(checks['MyCreditsFlowPlug:lastOperation'][0].time).toBeDefined();
           await firehose.close();
-          service.stop().then(() => {
-            if (jobEmitted) {
-              done();
-            } else {
-              done(new Error('Job not emitted'));
-            }
-          });
+          if (jobEmitted) {
+            done();
+          } else {
+            done(new Error('Job not emitted'));
+          }
         }
       });
       firehose.start().then();
@@ -171,7 +143,7 @@ describe('#Firehose', () => {
         bufferSize: 2,
       });
       let unpipe = false;
-      firehose.on('done', async (uuid: string, result: Jobs.Result, error?: Crash) => {
+      firehose.on('done', async (uuid: string, result: Jobs.Result, error?: Crash | Multi) => {
         if (unpipe) {
           await firehose.stop();
           //@ts-ignore - Test environment
@@ -198,56 +170,47 @@ describe('#Firehose', () => {
       firehose.start().then();
     }, 300);
     it('Should create a new Firehose with a Window Source and a Tap Sink, start it and check is working', done => {
-      const service = new Observability(config);
       const mySinkPlug = new MyTapPlug();
       const mySourcePlug = new MyWindowPlug();
       const firehose = new Firehose('MyFirehose', {
         sources: [mySourcePlug],
         sinks: [mySinkPlug],
         bufferSize: 2,
-        metricsRegistry: service.metricsRegistry,
-        errorsRegistry: service.errorsRegistry,
       });
       expect(firehose).toBeDefined();
       expect(firehose.name).toEqual('MyFirehose');
       expect(firehose.componentId).toBeDefined();
-      service.healthRegistry.register(firehose);
-      firehose.on('done', async (uuid: string, result: Jobs.Result, error?: Crash) => {
+      firehose.on('done', async (uuid: string, result: Jobs.Result, error?: Crash | Multi) => {
         if (result.jobUserId === '10') {
-          const metrics = await service.metricsRegistry.metrics();
+          const metrics = await firehose.metrics.metrics();
           expect(metrics).toBeDefined();
-          expect(metrics.metrics).toBeDefined();
-          expect(metrics.metrics).toContain(`api_all_job_processed_total{type="myType"} 10`);
-          expect(metrics.metrics).toContain(`api_all_job_in_processing_total{type="myType"} 6`);
-          expect(metrics.metrics).toContain(
+          expect(metrics).toContain(`api_all_job_processed_total{type="myType"} 10`);
+          expect(metrics).toContain(`api_all_job_in_processing_total{type="myType"} 6`);
+          expect(metrics).toContain(
             `api_publishing_job_duration_milliseconds_bucket{le="10000",type="myType"} 10`
           );
-          expect(service.errorsRegistry.size).toEqual(0);
+
           await firehose.close();
-          service.stop().then(done);
+          done();
         }
         if (result.jobUserId === '11') {
           await firehose.close();
-          service.stop().then(() => done(new Error('Job should not be emitted')));
+          done(new Error('Job should not be emitted'));
         }
       });
       firehose.start().then();
     }, 300);
     it('Should create a new Firehose with a Flow Source and a Tap Sink, start it and check is working', done => {
-      const service = new Observability(config);
       const mySinkPlug = new MyTapPlug();
       const mySourcePlug = new MyFlowPlug();
       const firehose = new Firehose('MyFirehose', {
         sources: [mySourcePlug],
         sinks: [mySinkPlug],
         bufferSize: 4,
-        metricsRegistry: service.metricsRegistry,
-        errorsRegistry: service.errorsRegistry,
       });
       expect(firehose).toBeDefined();
       expect(firehose.name).toEqual('MyFirehose');
       expect(firehose.componentId).toBeDefined();
-      service.healthRegistry.register(firehose);
       firehose.on('job', job => {
         expect(job).toBeDefined();
         expect(job.data).toBeDefined();
@@ -258,109 +221,93 @@ describe('#Firehose', () => {
         expect(job.options?.headers).toBeDefined();
         expect(job.options?.headers).toEqual({ 'x-my-header': 'my-header-value' });
       });
-      firehose.on('done', async (uuid: string, result: Jobs.Result, error?: Crash) => {
+      firehose.on('done', async (uuid: string, result: Jobs.Result, error?: Crash | Multi) => {
         if (result.jobUserId === '10') {
-          const metrics = await service.metricsRegistry.metrics();
+          const metrics = await firehose.metrics.metrics();
           expect(metrics).toBeDefined();
-          expect(metrics.metrics).toBeDefined();
-          expect(metrics.metrics).toContain(`api_all_job_processed_total{type="myType"} 10`);
-          expect(service.errorsRegistry.size).toEqual(0);
+          expect(metrics).toContain(`api_all_job_processed_total{type="myType"} 10`);
+
           await firehose.close();
-          service.stop().then(done);
+          done();
         }
       });
       firehose.start();
     }, 300);
     it('Should create a new Firehose with a Sequence Source and a Jet Sink, start it and check is working', done => {
-      const service = new Observability(config);
       const mySinkPlug = new MyJetPlug();
       const mySourcePlug = new MySequencePlug();
       const firehose = new Firehose('MyFirehose', {
         sources: [mySourcePlug],
         sinks: [mySinkPlug],
         bufferSize: 5,
-        metricsRegistry: service.metricsRegistry,
-        errorsRegistry: service.errorsRegistry,
       });
       expect(firehose).toBeDefined();
       expect(firehose.name).toEqual('MyFirehose');
       expect(firehose.componentId).toBeDefined();
-      service.healthRegistry.register(firehose);
-      firehose.on('done', async (uuid: string, result: Jobs.Result, error?: Crash) => {
+      firehose.on('done', async (uuid: string, result: Jobs.Result, error?: Crash | Multi) => {
         if (result.jobUserId === '10') {
-          const metrics = await service.metricsRegistry.metrics();
+          const metrics = await firehose.metrics.metrics();
           expect(metrics).toBeDefined();
-          expect(metrics.metrics).toBeDefined();
-          expect(metrics.metrics).toContain(`api_all_job_processed_total{type="myType"} 10`);
-          expect(service.errorsRegistry.size).toEqual(0);
+          expect(metrics).toContain(`api_all_job_processed_total{type="myType"} 10`);
+
           await firehose.close();
-          service.stop().then(done);
+          done();
         }
       });
       firehose.start();
     }, 300);
     it('Should create a new Firehose with a Window Source and a Jet Sink, start it and check is working', done => {
-      const service = new Observability(config);
       const mySinkPlug = new MyJetPlug();
       const mySourcePlug = new MyWindowPlug();
       const firehose = new Firehose('MyFirehose', {
         sources: [mySourcePlug],
         sinks: [mySinkPlug],
         bufferSize: 2,
-        metricsRegistry: service.metricsRegistry,
-        errorsRegistry: service.errorsRegistry,
       });
       expect(firehose).toBeDefined();
       expect(firehose.name).toEqual('MyFirehose');
       expect(firehose.componentId).toBeDefined();
-      service.healthRegistry.register(firehose);
-      firehose.on('done', async (uuid: string, result: Jobs.Result, error?: Crash) => {
+      firehose.on('done', async (uuid: string, result: Jobs.Result, error?: Crash | Multi) => {
         if (result.jobUserId === '10') {
-          const metrics = await service.metricsRegistry.metrics();
+          const metrics = await firehose.metrics.metrics();
           expect(metrics).toBeDefined();
-          expect(metrics.metrics).toBeDefined();
-          expect(metrics.metrics).toContain(`api_all_job_processed_total{type="myType"} 10`);
-          expect(service.errorsRegistry.size).toEqual(0);
+          expect(metrics).toContain(`api_all_job_processed_total{type="myType"} 10`);
+
           await firehose.close();
-          service.stop().then(done);
+          done();
         }
         if (result.jobUserId === '11') {
           await firehose.close();
-          service.stop().then(() => done(new Error('Job should not be emitted')));
+          done(new Error('Job should not be emitted'));
         }
       });
       firehose.start();
     }, 300);
     it('Should create a new Firehose with a Flow Source and a Jet Sink, start it and check is working', done => {
-      const service = new Observability(config);
       const mySinkPlug = new MyJetPlug();
       const mySourcePlug = new MyFlowPlug();
       const firehose = new Firehose('MyFirehose', {
         sources: [mySourcePlug],
         sinks: [mySinkPlug],
         bufferSize: 4,
-        metricsRegistry: service.metricsRegistry,
-        errorsRegistry: service.errorsRegistry,
       });
       expect(firehose).toBeDefined();
       expect(firehose.name).toEqual('MyFirehose');
       expect(firehose.componentId).toBeDefined();
-      service.healthRegistry.register(firehose);
-      firehose.on('done', async (uuid: string, result: Jobs.Result, error?: Crash) => {
+
+      firehose.on('done', async (uuid: string, result: Jobs.Result, error?: Crash | Multi) => {
         if (result.jobUserId === '10') {
-          const metrics = await service.metricsRegistry.metrics();
+          const metrics = await firehose.metrics.metrics();
           expect(metrics).toBeDefined();
-          expect(metrics.metrics).toBeDefined();
-          expect(metrics.metrics).toContain(`api_all_job_processed_total{type="myType"} 10`);
-          expect(service.errorsRegistry.size).toEqual(0);
+          expect(metrics).toContain(`api_all_job_processed_total{type="myType"} 10`);
+
           await firehose.close();
-          service.stop().then(done);
+          done();
         }
       });
       firehose.start();
     }, 300);
     it('Should create a new Firehose with a Flow Source and 4 Jet/Tap Sink, start it and check is working', done => {
-      const service = new Observability(config);
       const mySinkPlug = new MyJetPlug();
       const myOtherSinkPlug = new MyTapPlug();
       const mySourcePlug = new MyFlowPlug();
@@ -368,28 +315,24 @@ describe('#Firehose', () => {
         sources: [mySourcePlug],
         sinks: [mySinkPlug, mySinkPlug, myOtherSinkPlug, myOtherSinkPlug],
         bufferSize: 4,
-        metricsRegistry: service.metricsRegistry,
-        errorsRegistry: service.errorsRegistry,
       });
       expect(firehose).toBeDefined();
       expect(firehose.name).toEqual('MyFirehose');
       expect(firehose.componentId).toBeDefined();
-      service.healthRegistry.register(firehose);
-      firehose.on('done', async (uuid: string, result: Jobs.Result, error?: Crash) => {
+
+      firehose.on('done', async (uuid: string, result: Jobs.Result, error?: Crash | Multi) => {
         if (result.jobUserId === '4') {
-          const metrics = await service.metricsRegistry.metrics();
+          const metrics = await firehose.metrics.metrics();
           expect(metrics).toBeDefined();
-          expect(metrics.metrics).toBeDefined();
-          expect(metrics.metrics).toContain(`api_all_job_processed_total{type="myType"} 4`);
-          expect(service.errorsRegistry.size).toEqual(0);
+          expect(metrics).toContain(`api_all_job_processed_total{type="myType"} 4`);
+
           await firehose.close();
-          service.stop().then(done);
+          done();
         }
       });
       firehose.start();
     }, 300);
     it('Should create a new Firehose with a Sequence Source and 4 Jet/Tap Sink, start it and check is working', done => {
-      const service = new Observability(config);
       const mySinkPlug = new MyJetPlug();
       const myOtherSinkPlug = new MyTapPlug();
       const mySourcePlug = new MySequencePlug();
@@ -397,28 +340,24 @@ describe('#Firehose', () => {
         sources: [mySourcePlug],
         sinks: [mySinkPlug, mySinkPlug, myOtherSinkPlug, myOtherSinkPlug],
         bufferSize: 2,
-        metricsRegistry: service.metricsRegistry,
-        errorsRegistry: service.errorsRegistry,
       });
       expect(firehose).toBeDefined();
       expect(firehose.name).toEqual('MyFirehose');
       expect(firehose.componentId).toBeDefined();
-      service.healthRegistry.register(firehose);
-      firehose.on('done', async (uuid: string, result: Jobs.Result, error?: Crash) => {
+
+      firehose.on('done', async (uuid: string, result: Jobs.Result, error?: Crash | Multi) => {
         if (result.jobUserId === '10') {
-          const metrics = await service.metricsRegistry.metrics();
+          const metrics = await firehose.metrics.metrics();
           expect(metrics).toBeDefined();
-          expect(metrics.metrics).toBeDefined();
-          expect(metrics.metrics).toContain(`api_all_job_processed_total{type="myType"} 10`);
-          expect(service.errorsRegistry.size).toEqual(0);
+          expect(metrics).toContain(`api_all_job_processed_total{type="myType"} 10`);
+
           await firehose.close();
-          service.stop().then(done);
+          done();
         }
       });
       firehose.start();
     }, 300);
     it('Should create a new Firehose with a Flow Source and a Jet Sink, start it and check is working with some strategies applied to jobs', done => {
-      const service = new Observability(config);
       const mySinkPlug = new MyTapPlug();
       jest.spyOn(mySinkPlug, 'single').mockImplementation(async (job: Jobs.JobObject<any>) => {
         return new Promise<void>((resolve, reject) => {
@@ -436,8 +375,7 @@ describe('#Firehose', () => {
         sources: [mySourcePlug],
         sinks: [mySinkPlug],
         bufferSize: 4,
-        metricsRegistry: service.metricsRegistry,
-        errorsRegistry: service.errorsRegistry,
+
         strategies: {
           myType: [new MyStrategy('myType', 1), new MyStrategy('myType', 2)],
           otherType: [new MyStrategy('myType', 4), new MyStrategy('myType', 8)],
@@ -446,17 +384,16 @@ describe('#Firehose', () => {
       expect(firehose).toBeDefined();
       expect(firehose.name).toEqual('MyFirehose');
       expect(firehose.componentId).toBeDefined();
-      service.healthRegistry.register(firehose);
-      firehose.on('done', async (uuid: string, result: Jobs.Result, error?: Crash) => {
+
+      firehose.on('done', async (uuid: string, result: Jobs.Result, error?: Crash | Multi) => {
         if (result.jobUserId === '10') {
           await firehose.close();
-          service.stop().then(done);
+          done();
         }
       });
       firehose.start();
     }, 300);
     it('Should add errors to the job if a strategy returns invalid data', done => {
-      const service = new Observability(config);
       const mySinkPlug = new MyTapPlug();
       jest.spyOn(mySinkPlug, 'single').mockImplementation(async (job: Jobs.JobObject<any>) => {
         return new Promise<void>((resolve, reject) => {
@@ -474,8 +411,7 @@ describe('#Firehose', () => {
         sources: [mySourcePlug],
         sinks: [mySinkPlug],
         bufferSize: 4,
-        metricsRegistry: service.metricsRegistry,
-        errorsRegistry: service.errorsRegistry,
+
         strategies: {
           myType: [new MyStrategy('myType', 1), new MyStrategy('myType', 'a')],
         },
@@ -483,27 +419,28 @@ describe('#Firehose', () => {
       expect(firehose).toBeDefined();
       expect(firehose.name).toEqual('MyFirehose');
       expect(firehose.componentId).toBeDefined();
-      service.healthRegistry.register(firehose);
-      firehose.on('done', async (uuid: string, result: Jobs.Result, error?: Crash) => {
+      const errors: (Crash | Multi)[] = [];
+      firehose.on('error', (error: Crash | Multi | Error) => {
+        errors.push(Crash.from(error));
+      });
+
+      firehose.on('done', async (uuid: string, result: Jobs.Result, error?: Crash | Multi) => {
         if (result.jobUserId === '4') {
-          expect(service.errorsRegistry.size).toEqual(4);
-          expect(service.errorsRegistry.errors[0].trace[0]).toContain(
-            'CrashError: Job finished with errors'
-          );
-          expect(service.errorsRegistry.errors[0].trace[1]).toContain(
+          expect(errors.length).toEqual(4);
+          expect(errors[0].trace()[0]).toContain('CrashError: Job finished with errors');
+          expect(errors[0].trace()[1]).toContain(
             'caused by ValidationError: Errors in job processing'
           );
-          expect(service.errorsRegistry.errors[0].trace[2]).toContain(
+          expect(errors[0].trace()[2]).toContain(
             'failed with CrashError: Strategy myType return an undefined job or a job with no data, it has not be applied'
           );
           await firehose.close();
-          service.stop().then(done);
+          done();
         }
       });
       firehose.start();
     }, 300);
     it('Should add errors to the job if a strategy throws', done => {
-      const service = new Observability(config);
       const mySinkPlug = new MyTapPlug();
       jest.spyOn(mySinkPlug, 'single').mockImplementation(async (job: Jobs.JobObject<any>) => {
         return new Promise<void>((resolve, reject) => {
@@ -521,8 +458,7 @@ describe('#Firehose', () => {
         sources: [mySourcePlug],
         sinks: [mySinkPlug],
         bufferSize: 4,
-        metricsRegistry: service.metricsRegistry,
-        errorsRegistry: service.errorsRegistry,
+
         strategies: {
           ///@ts-ignore - Test environment
           myType: [new MyStrategy('myType', 1), new MyStrategy('myType', [])],
@@ -531,22 +467,25 @@ describe('#Firehose', () => {
       expect(firehose).toBeDefined();
       expect(firehose.name).toEqual('MyFirehose');
       expect(firehose.componentId).toBeDefined();
-      service.healthRegistry.register(firehose);
-      firehose.on('done', async (uuid: string, result: Jobs.Result, error?: Crash) => {
+
+      const errors: (Crash | Multi)[] = [];
+      firehose.on('error', (error: Crash | Multi | Error) => {
+        errors.push(Crash.from(error));
+      });
+
+      firehose.on('done', async (uuid: string, result: Jobs.Result, error?: Crash | Multi) => {
         if (result.jobUserId === '4') {
-          expect(service.errorsRegistry.size).toEqual(4);
-          expect(service.errorsRegistry.errors[0].subject).toEqual('firehose');
-          expect(service.errorsRegistry.errors[0].trace[0]).toContain(
-            'CrashError: Job finished with errors'
-          );
-          expect(service.errorsRegistry.errors[0].trace[1]).toContain(
+          expect(errors.length).toEqual(4);
+          expect(errors[0].subject).toEqual('firehose');
+          expect(errors[0].trace()[0]).toContain('CrashError: Job finished with errors');
+          expect(errors[0].trace()[1]).toContain(
             'caused by ValidationError: Errors in job processing'
           );
-          expect(service.errorsRegistry.errors[0].trace[2]).toContain(
+          expect(errors[0].trace()[2]).toContain(
             'failed with CrashError: Strategy myType throw an error during process: Invalid count, it has not be applied'
           );
           await firehose.close();
-          service.stop().then(done);
+          done();
         }
       });
       firehose.start();
@@ -559,7 +498,7 @@ describe('#Firehose', () => {
           sources: [new MyFlowPlug()],
           sinks: [],
         });
-      }).toThrowError('Firehose must have at least one sink');
+      }).toThrow('Firehose must have at least one sink');
     }, 300);
     it(`Should throw an error if there is not source`, () => {
       expect(() => {
@@ -567,53 +506,47 @@ describe('#Firehose', () => {
           sources: [],
           sinks: [new MyTapPlug()],
         });
-      }).toThrowError('Firehose must have at least one source');
+      }).toThrow('Firehose must have at least one source');
     }, 300);
     it(`Should throw an error if there is a not valid source`, () => {
-      const fh = new Firehose('MyFirehose', {
-        //@ts-ignore - Test environment
-        sources: [new MyFlowPlug(), {}],
-        sinks: [new MyTapPlug()],
-      });
-      fh.start()
-        .then(() => {
-          throw new Error('Should not be here');
-        })
-        .catch(error => {
-          expect(error.message).toEqual('Source type not supported');
+      try {
+        const fh = new Firehose('MyFirehose', {
+          //@ts-ignore - Test environment
+          sources: [new MyFlowPlug(), {}],
+          sinks: [new MyTapPlug()],
         });
+      } catch (error) {
+        expect((error as Crash).message).toEqual('Source type not supported');
+      }
     }, 300);
     it(`Should throw an error if there is a not valid sink`, () => {
-      const fh = new Firehose('MyFirehose', {
-        sources: [new MyFlowPlug()],
-        //@ts-ignore - Test environment
-        sinks: [new MyTapPlug(), {}],
-      });
-      fh.start()
-        .then(() => {
-          throw new Error('Should not be here');
-        })
-        .catch(error => {
-          expect(error.message).toEqual('Sink type not supported');
+      try {
+        const fh = new Firehose('MyFirehose', {
+          sources: [new MyFlowPlug()],
+          //@ts-ignore - Test environment
+          sinks: [new MyTapPlug(), {}],
         });
+      } catch (error) {
+        expect((error as Crash).message).toEqual('Sink type not supported');
+      }
     }, 300);
     it(`Should emit an error if any of the streams/plugs emit an error`, done => {
-      const service = new Observability(config);
       const mySinkPlug = new MyTapPlug();
       const mySourcePlug = new MyFlowPlug();
       const myFirehose = new Firehose('MyFirehose', {
         sources: [mySourcePlug],
         sinks: [mySinkPlug],
       });
-      service.healthRegistry.register(myFirehose);
       let errorCount = 0;
+      const errors: (Crash | Multi)[] = [];
       myFirehose.on('error', (error: Error) => {
+        errors.push(Crash.from(error));
         expect(error.message).toContain('Error from stream');
         errorCount++;
         if (errorCount === 5) {
-          expect(service.errorsRegistry.errors.length).toEqual(5);
-          expect(service.errorsRegistry.errors[0].subject).toEqual('MyFirehose');
-          expect(service.errorsRegistry.errors[0].trace[0]).toContain('Error: Error from stream');
+          expect(errors.length).toEqual(5);
+          expect(errors[0].subject).toEqual('common');
+          expect(errors[0].trace()[0]).toContain('Error: Error from stream');
           myFirehose.close().then(done);
         }
       });
@@ -632,7 +565,6 @@ describe('#Firehose', () => {
       mySourcePlug.emit('error', new Error('Error from stream: source plug'));
     }, 300);
     it('Should increase the number of unknown jobs if the postConsume function resolve as undefined, but not more than 100', done => {
-      const service = new Observability(config);
       const mySinkPlug = new MyJetPlug();
       const mySourcePlug = new MyQuickSequencePlug();
       mySourcePlug.founded = false;
@@ -640,22 +572,20 @@ describe('#Firehose', () => {
         sources: [mySourcePlug],
         sinks: [mySinkPlug],
         bufferSize: 200,
-        metricsRegistry: service.metricsRegistry,
-        errorsRegistry: service.errorsRegistry,
       });
       expect(firehose).toBeDefined();
       expect(firehose.name).toEqual('MyFirehose');
       expect(firehose.componentId).toBeDefined();
-      service.healthRegistry.register(firehose);
+
       firehose.start();
-      firehose.on('done', async (uuid: string, result: Jobs.Result, error?: Crash) => {
+      firehose.on('done', async (uuid: string, result: Jobs.Result, error?: Crash | Multi) => {
         if (result.jobUserId === '101') {
-          const checks = service.healthRegistry.health.checks as Health.Checks;
+          const checks = firehose.checks;
           expect(checks['MySequencePlug:unknownJobsInPostConsume'][0].output?.length).toEqual(100);
           expect(checks['MySequencePlug:unknownJobsInPostConsume'][0].status).toEqual('fail');
         }
         if (result.jobUserId === '200') {
-          const checks = service.healthRegistry.health.checks as Health.Checks;
+          const checks = firehose.checks;
           expect(checks['MySequencePlug:stream'][0].observedUnit).toEqual('jobs');
           expect(checks['MySequencePlug:stream'][0].componentType).toEqual('stream');
           expect(checks['MySequencePlug:stream'][0].status).toEqual('pass');
@@ -682,12 +612,11 @@ describe('#Firehose', () => {
           expect(checks['engine:stream'][1].status).toEqual('pass');
           expect(checks['engine:stream'][1].observedValue).toEqual('0/200');
           await firehose.close();
-          service.stop().then(done);
+          done();
         }
       });
     }, 300);
     it('Should indicate a fail state in the window check if the window is not updated for any reason', done => {
-      const service = new Observability(config);
       const mySinkPlug = new MyTapPlug();
       jest.spyOn(mySinkPlug, 'single').mockImplementation(() => {
         return new Promise(() => {});
@@ -699,10 +628,10 @@ describe('#Firehose', () => {
         sinks: [mySinkPlug],
         bufferSize: 2,
       });
-      service.healthRegistry.register(firehose);
+
       firehose.on('job', job => {
         if (job.jobUserId === '8') {
-          const checks = service.healthRegistry.health.checks as Health.Checks;
+          const checks = firehose.checks;
           expect(checks['MyWindowPlug:window'][0].observedUnit).toEqual('pending windows jobs');
           expect(checks['MyWindowPlug:window'][0].componentType).toEqual('stream');
           expect(checks['MyWindowPlug:window'][0].status).toEqual('warn');
@@ -716,7 +645,6 @@ describe('#Firehose', () => {
       firehose.start();
     }, 300);
     it('Should increase the number of uncleaned jobs if the postConsume function rejects in the source side', done => {
-      const service = new Observability(config);
       const mySinkPlug = new MyJetPlug();
       const mySourcePlug = new MyQuickSequencePlug();
       mySourcePlug.shouldReject = 10;
@@ -724,8 +652,7 @@ describe('#Firehose', () => {
         sources: [mySourcePlug],
         sinks: [mySinkPlug],
         bufferSize: 200,
-        metricsRegistry: service.metricsRegistry,
-        errorsRegistry: service.errorsRegistry,
+
         postConsumeOptions: {
           checkUncleanedInterval: 20,
         },
@@ -733,15 +660,15 @@ describe('#Firehose', () => {
       expect(firehose).toBeDefined();
       expect(firehose.name).toEqual('MyFirehose');
       expect(firehose.componentId).toBeDefined();
-      service.healthRegistry.register(firehose);
+
       let statusCounter = 0;
       firehose.on('status', status => {
         expect(status).toBeDefined();
         statusCounter++;
       });
-      firehose.on('done', async (uuid: string, result: Jobs.Result, error?: Crash) => {
+      firehose.on('done', async (uuid: string, result: Jobs.Result, error?: Crash | Multi) => {
         if (result.jobUserId === '10') {
-          let checks = service.healthRegistry.health.checks as Health.Checks;
+          let checks = firehose.checks;
           expect(checks['MySequencePlug:unknownJobsInPostConsume'][0].output).toBeUndefined();
           expect(checks['MySequencePlug:unknownJobsInPostConsume'][0].status).toEqual('pass');
           expect(checks['MySequencePlug:unknownJobsInPostConsume'][0].componentType).toEqual(
@@ -770,21 +697,17 @@ describe('#Firehose', () => {
             'caused by CrashError: my reason to reject'
           );
           setTimeout(() => {
-            checks = service.healthRegistry.health.checks as Health.Checks;
+            checks = firehose.checks;
             expect(checks['MySequencePlug:uncleanedJobsInPostConsume'][0].output).toBeUndefined();
             expect(checks['MySequencePlug:uncleanedJobsInPostConsume'][0].status).toEqual('pass');
             expect(statusCounter).toEqual(5);
-            firehose
-              .close()
-              .then(() => service.stop())
-              .then(done);
+            firehose.close().then(done);
           }, 40);
         }
       });
       firehose.start();
     }, 300);
     it('Should indicate that the lastOperation was finished with error if single/multi rejects and not call done at all with default config', done => {
-      const service = new Observability(config);
       const mySinkPlug = new MyJetPlug();
       mySinkPlug.shouldReject = 10;
       const mySourcePlug = new MyQuickSequencePlug();
@@ -792,32 +715,26 @@ describe('#Firehose', () => {
         sources: [mySourcePlug],
         sinks: [mySinkPlug],
         bufferSize: 200,
-        metricsRegistry: service.metricsRegistry,
-        errorsRegistry: service.errorsRegistry,
       });
       expect(firehose).toBeDefined();
       expect(firehose.name).toEqual('MyFirehose');
       expect(firehose.componentId).toBeDefined();
-      service.healthRegistry.register(firehose);
+
       firehose.start();
-      firehose.on('done', async (uuid: string, result: Jobs.Result, error?: Crash) => {
+      firehose.on('done', async (uuid: string, result: Jobs.Result, error?: Crash | Multi) => {
         throw new Error('Expected to not receive any done event');
       });
       setTimeout(() => {
-        const checks = service.healthRegistry.health.checks as Health.Checks;
+        const checks = firehose.checks;
         expect((checks['MyJetPlug:lastOperation'][0].output as string[])[0]).toEqual(
           'Error: Was rejected by my own'
         );
         expect(checks['MyJetPlug:lastOperation'][0].status).toEqual('fail');
         expect(checks['MyJetPlug:lastOperation'][0].observedValue).toEqual('error');
-        firehose
-          .close()
-          .then(() => service.stop())
-          .then(done);
+        firehose.close().then(done);
       }, 200);
     }, 300);
     it('Should indicate that the lastOperation was finished with error if single rejects and call if the error is IrresolvableError with Sequence Source', done => {
-      const service = new Observability(config);
       const mySinkPlug = new MyTapPlug();
       mySinkPlug.shouldReject = 100000;
       mySinkPlug.irresolvable = true;
@@ -826,36 +743,30 @@ describe('#Firehose', () => {
         sources: [mySourcePlug],
         sinks: [mySinkPlug],
         bufferSize: 200,
-        metricsRegistry: service.metricsRegistry,
-        errorsRegistry: service.errorsRegistry,
       });
       expect(firehose).toBeDefined();
       expect(firehose.name).toEqual('MyFirehose');
       expect(firehose.componentId).toBeDefined();
-      service.healthRegistry.register(firehose);
+
       firehose.start();
-      firehose.once('done', async (uuid: string, result: Jobs.Result, error?: Crash) => {
+      firehose.once('done', async (uuid: string, result: Jobs.Result, error?: Crash | Multi) => {
         expect(error).toBeDefined();
         expect(error?.message).toEqual('Errors in job processing');
       });
       setTimeout(async () => {
-        const checks = service.healthRegistry.health.checks as Health.Checks;
+        const checks = firehose.checks;
         expect((checks['MyTapPlug:lastOperation'][0].output as string[])[0]).toEqual(
           'IrresolvableError: Was rejected by my own'
         );
         expect(checks['MyTapPlug:lastOperation'][0].status).toEqual('fail');
-        const metrics = await service.metricsRegistry.metrics();
+        const metrics = await firehose.metrics.metrics();
         expect(metrics).toBeDefined();
-        expect(metrics.metrics).toBeDefined();
-        expect(metrics.metrics).toContain(`api_all_errors_job_processing_total{type="myType"} 200`);
-        firehose
-          .close()
-          .then(() => service.stop())
-          .then(done);
+        expect(metrics).toBeDefined();
+        expect(metrics).toContain(`api_all_errors_job_processing_total{type="myType"} 200`);
+        firehose.close().then(done);
       }, 200);
     }, 300);
     it('Should indicate that the lastOperation was finished with error if single rejects and call if the error is IrresolvableError with a Flow Source', done => {
-      const service = new Observability(config);
       const mySinkPlug = new MyTapPlug();
       mySinkPlug.shouldReject = 100000;
       mySinkPlug.irresolvable = true;
@@ -864,38 +775,32 @@ describe('#Firehose', () => {
         sources: [mySourcePlug],
         sinks: [mySinkPlug],
         bufferSize: 200,
-        metricsRegistry: service.metricsRegistry,
-        errorsRegistry: service.errorsRegistry,
       });
       expect(firehose).toBeDefined();
       expect(firehose.name).toEqual('MyFirehose');
       expect(firehose.componentId).toBeDefined();
-      service.healthRegistry.register(firehose);
+
       firehose.start();
-      firehose.once('done', async (uuid: string, result: Jobs.Result, error?: Crash) => {
+      firehose.once('done', async (uuid: string, result: Jobs.Result, error?: Crash | Multi) => {
         expect(error).toBeDefined();
         expect(error?.message).toEqual('Errors in job processing');
       });
       setTimeout(async () => {
-        const checks = service.healthRegistry.health.checks as Health.Checks;
+        const checks = firehose.checks;
         expect((checks['MyTapPlug:lastOperation'][0].output as string[])[0]).toEqual(
           'IrresolvableError: Was rejected by my own'
         );
         expect(checks['MyTapPlug:lastOperation'][0].status).toEqual('fail');
         expect(checks['MyTapPlug:stream'][0].observedValue).toEqual('0/200');
-        const metrics = await service.metricsRegistry.metrics();
+        const metrics = await firehose.metrics.metrics();
         expect(metrics).toBeDefined();
-        expect(metrics.metrics).toBeDefined();
-        expect(metrics.metrics).toContain(`api_all_errors_job_processing_total{type="myType"} 200`);
-        expect(metrics.metrics).toContain(`api_publishing_throughput_sum{type="myType"} 492`);
-        firehose
-          .close()
-          .then(() => service.stop())
-          .then(done);
+        expect(metrics).toBeDefined();
+        expect(metrics).toContain(`api_all_errors_job_processing_total{type="myType"} 200`);
+        expect(metrics).toContain(`api_publishing_throughput_sum{type="myType"} 492`);
+        firehose.close().then(done);
       }, 200);
     }, 300);
     it('Should indicate that the lastOperation was finished with error if single/multi rejects and call if the error is IrresolvableError', done => {
-      const service = new Observability(config);
       const mySinkPlug = new MyJetPlug();
       let called = 0;
       mySinkPlug.shouldReject = 100000;
@@ -905,21 +810,19 @@ describe('#Firehose', () => {
         sources: [mySourcePlug],
         sinks: [mySinkPlug],
         bufferSize: 200,
-        metricsRegistry: service.metricsRegistry,
-        errorsRegistry: service.errorsRegistry,
       });
       expect(firehose).toBeDefined();
       expect(firehose.name).toEqual('MyFirehose');
       expect(firehose.componentId).toBeDefined();
-      service.healthRegistry.register(firehose);
+
       firehose.start();
-      firehose.on('done', async (uuid: string, result: Jobs.Result, error?: Crash) => {
+      firehose.on('done', async (uuid: string, result: Jobs.Result, error?: Crash | Multi) => {
         expect(error).toBeDefined();
         expect(error?.message).toEqual('Errors in job processing');
         called++;
       });
       setTimeout(() => {
-        const checks = service.healthRegistry.health.checks as Health.Checks;
+        const checks = firehose.checks;
         expect((checks['MyJetPlug:lastOperation'][0].output as string[])[0]).toEqual(
           'IrresolvableError: Was rejected by my own'
         );
@@ -928,10 +831,7 @@ describe('#Firehose', () => {
         if (called !== 200) {
           throw new Error('Expected to receive done event');
         }
-        firehose
-          .close()
-          .then(() => service.stop())
-          .then(done);
+        firehose.close().then(done);
       }, 200);
     }, 300);
   });

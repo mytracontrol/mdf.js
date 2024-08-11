@@ -1,10 +1,11 @@
 /**
- * Copyright 2022 Mytra Control S.L. All rights reserved.
+ * Copyright 2024 Mytra Control S.L. All rights reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be found in the LICENSE file
  * or at https://opensource.org/licenses/MIT.
  */
 
+import { Jobs } from '@mdf.js/core';
 import { Crash } from '@mdf.js/crash';
 import * as Sink from '../Sink';
 import * as Source from '../Source';
@@ -26,10 +27,11 @@ export class Helpers {
   public static IsFlowSource<
     Type extends string = string,
     Data = any,
-    CustomHeaders extends Record<string, any> = Record<string, any>
+    CustomHeaders extends Record<string, any> = Jobs.NoMoreHeaders,
+    CustomOptions extends Record<string, any> = Jobs.NoMoreOptions,
   >(
-    source: WrappableSourcePlug<Type, Data, CustomHeaders>
-  ): source is Plugs.Source.Flow<Type, Data, CustomHeaders> {
+    source: WrappableSourcePlug
+  ): source is Plugs.Source.Flow<Type, Data, CustomHeaders, CustomOptions> {
     return (
       typeof source.postConsume === 'function' &&
       typeof source.ingestData === 'undefined' &&
@@ -45,10 +47,11 @@ export class Helpers {
   public static IsSequenceSource<
     Type extends string = string,
     Data = any,
-    CustomHeaders extends Record<string, any> = Record<string, any>
+    CustomHeaders extends Record<string, any> = Jobs.NoMoreHeaders,
+    CustomOptions extends Record<string, any> = Jobs.NoMoreOptions,
   >(
-    source: WrappableSourcePlug<Type, Data, CustomHeaders>
-  ): source is Plugs.Source.Sequence<Type, Data, CustomHeaders> {
+    source: WrappableSourcePlug
+  ): source is Plugs.Source.Sequence<Type, Data, CustomHeaders, CustomOptions> {
     return typeof source.postConsume === 'function' && typeof source.ingestData === 'function';
   }
   /**
@@ -59,10 +62,11 @@ export class Helpers {
   public static IsCreditsFlowSource<
     Type extends string = string,
     Data = any,
-    CustomHeaders extends Record<string, any> = Record<string, any>
+    CustomHeaders extends Record<string, any> = Jobs.NoMoreHeaders,
+    CustomOptions extends Record<string, any> = Jobs.NoMoreOptions,
   >(
-    source: WrappableSourcePlug<Type, Data, CustomHeaders>
-  ): source is Plugs.Source.CreditsFlow<Type, Data, CustomHeaders> {
+    source: WrappableSourcePlug
+  ): source is Plugs.Source.CreditsFlow<Type, Data, CustomHeaders, CustomOptions> {
     return typeof source.postConsume === 'function' && typeof source.addCredits === 'function';
   }
   /**
@@ -73,10 +77,9 @@ export class Helpers {
   public static IsTapSink<
     Type extends string = string,
     Data = any,
-    CustomHeaders extends Record<string, any> = Record<string, any>
-  >(
-    sink: WrappableSinkPlug<Type, Data, CustomHeaders>
-  ): sink is Plugs.Sink.Tap<Type, Data, CustomHeaders> {
+    CustomHeaders extends Record<string, any> = Jobs.NoMoreHeaders,
+    CustomOptions extends Record<string, any> = Jobs.NoMoreOptions,
+  >(sink: WrappableSinkPlug): sink is Plugs.Sink.Tap<Type, Data, CustomHeaders, CustomOptions> {
     return typeof sink.single === 'function' && typeof sink.multi === 'undefined';
   }
   /**
@@ -87,10 +90,9 @@ export class Helpers {
   public static IsJetSink<
     Type extends string = string,
     Data = any,
-    CustomHeaders extends Record<string, any> = Record<string, any>
-  >(
-    sink: WrappableSinkPlug<Type, Data, CustomHeaders>
-  ): sink is Plugs.Sink.Jet<Type, Data, CustomHeaders> {
+    CustomHeaders extends Record<string, any> = Jobs.NoMoreHeaders,
+    CustomOptions extends Record<string, any> = Jobs.NoMoreOptions,
+  >(sink: WrappableSinkPlug): sink is Plugs.Sink.Jet<Type, Data, CustomHeaders, CustomOptions> {
     return typeof sink.multi === 'function' && typeof sink.single === 'function';
   }
   /**
@@ -103,17 +105,18 @@ export class Helpers {
   public static GetSourceStreamsFromPlugs<
     Type extends string = string,
     Data = any,
-    CustomHeaders extends Record<string, any> = Record<string, any>
+    CustomHeaders extends Record<string, any> = Jobs.NoMoreHeaders,
+    CustomOptions extends Record<string, any> = Jobs.NoMoreOptions,
   >(
-    sources: Plugs.Source.Any<Type, Data, CustomHeaders>[],
-    options: FirehoseOptions<Type, Data, CustomHeaders>,
+    sources: Plugs.Source.Any<Type, Data, CustomHeaders, CustomOptions>[],
+    options: FirehoseOptions<Type, Data, CustomHeaders, CustomOptions>,
     qos = 1
-  ): Sources<Type, Data, CustomHeaders>[] {
-    const sourceStreams: Sources<Type, Data, CustomHeaders>[] = [];
+  ): Sources[] {
+    const sourceStreams: Sources[] = [];
     for (const source of sources) {
       if (Helpers.IsFlowSource(source)) {
         sourceStreams.push(
-          new Source.Flow<Type, Data, CustomHeaders>(source, {
+          new Source.Flow(source, {
             retryOptions: options.retryOptions,
             qos,
             readableOptions: { highWaterMark: options.bufferSize },
@@ -123,7 +126,7 @@ export class Helpers {
         );
       } else if (Helpers.IsSequenceSource(source)) {
         sourceStreams.push(
-          new Source.Sequence<Type, Data, CustomHeaders>(source, {
+          new Source.Sequence(source, {
             retryOptions: options.retryOptions,
             qos,
             readableOptions: { highWaterMark: options.bufferSize },
@@ -133,7 +136,7 @@ export class Helpers {
         );
       } else if (Helpers.IsCreditsFlowSource(source)) {
         sourceStreams.push(
-          new Source.CreditsFlow<Type, Data, CustomHeaders>(source, {
+          new Source.CreditsFlow(source, {
             retryOptions: options.retryOptions,
             qos,
             readableOptions: { highWaterMark: options.bufferSize },
@@ -155,12 +158,13 @@ export class Helpers {
   public static GetSinkStreamsFromPlugs<
     Type extends string = string,
     Data = any,
-    CustomHeaders extends Record<string, any> = Record<string, any>
+    CustomHeaders extends Record<string, any> = Jobs.NoMoreHeaders,
+    CustomOptions extends Record<string, any> = Jobs.NoMoreOptions,
   >(
-    sinks: Plugs.Sink.Any<Type, Data, CustomHeaders>[],
-    options: FirehoseOptions<Type, Data, CustomHeaders>
-  ): Sinks<Type, Data, CustomHeaders>[] {
-    const sinkStreams: Sinks<Type, Data, CustomHeaders>[] = [];
+    sinks: Plugs.Sink.Any<Type, Data, CustomHeaders, CustomOptions>[],
+    options: FirehoseOptions<Type, Data, CustomHeaders, CustomOptions>
+  ): Sinks[] {
+    const sinkStreams: Sinks[] = [];
     for (const sink of sinks) {
       if (Helpers.IsJetSink(sink)) {
         sinkStreams.push(

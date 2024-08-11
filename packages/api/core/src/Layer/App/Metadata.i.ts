@@ -1,9 +1,11 @@
 /**
- * Copyright 2022 Mytra Control S.L. All rights reserved.
+ * Copyright 2024 Mytra Control S.L. All rights reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be found in the LICENSE file
  * or at https://opensource.org/licenses/MIT.
  */
+
+import { Namespace } from './Namespace.t';
 
 /** Application definition */
 export interface Metadata {
@@ -16,7 +18,7 @@ export interface Metadata {
    * Service description
    * @example `My own service description`
    */
-  description: string;
+  description?: string;
   /**
    * Service version
    * @example `1`
@@ -42,6 +44,13 @@ export interface Metadata {
    * @example `firehose`, `driver`
    */
   serviceGroupId?: string;
+  /**
+   * Service namespace, used to identify declare which namespace the service belongs to.
+   * It must start with `x-` as it is a custom namespace and will be used for custom headers,
+   * openc2 commands, etc.
+   * @example `x-mytra`
+   */
+  namespace?: Namespace;
   /**
    * List of string values that can be used to add service-level labels.
    * @example `["primary", "test"]`

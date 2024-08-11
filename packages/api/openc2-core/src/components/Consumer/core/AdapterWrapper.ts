@@ -1,18 +1,18 @@
 /**
- * Copyright 2022 Mytra Control S.L. All rights reserved.
+ * Copyright 2024 Mytra Control S.L. All rights reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be found in the LICENSE file
  * or at https://opensource.org/licenses/MIT.
  */
 
-import { Health } from '@mdf.js/core';
+import { Health, Layer } from '@mdf.js/core';
 import { Crash, Multi } from '@mdf.js/crash';
-import { retryBind, RetryOptions } from '@mdf.js/utils';
+import { RetryOptions, retryBind } from '@mdf.js/utils';
 import EventEmitter from 'events';
 import { merge } from 'lodash';
 import { ConsumerAdapter, OnCommandHandler } from '../../../types';
 
-export class AdapterWrapper extends EventEmitter implements Health.Component {
+export class AdapterWrapper extends EventEmitter implements Layer.App.Resource {
   /** Operation retry options */
   private readonly retryOptions: RetryOptions;
   /** Flag to indicate that an unhealthy status has been emitted recently */
@@ -30,7 +30,10 @@ export class AdapterWrapper extends EventEmitter implements Health.Component {
    * @param adapter - adapter instance
    * @param retryOptions - options for job retry operations
    */
-  constructor(private readonly adapter: ConsumerAdapter, retryOptions?: RetryOptions) {
+  constructor(
+    private readonly adapter: ConsumerAdapter,
+    retryOptions?: RetryOptions
+  ) {
     super();
     this.retryOptions = merge({ logger: this.onOperationError }, retryOptions);
     if (!this.adapter) {
@@ -58,6 +61,10 @@ export class AdapterWrapper extends EventEmitter implements Health.Component {
   /** Disconnect the OpenC2 Adapter to the underlayer transport system */
   public stop(): Promise<void> {
     return this.adapter.stop();
+  }
+  /** Close the OpenC2 Adapter to the underlayer transport system */
+  public close(): Promise<void> {
+    return this.adapter.close();
   }
   /**
    * Check if the adapter implements the mandatory methods
@@ -97,7 +104,7 @@ export class AdapterWrapper extends EventEmitter implements Health.Component {
     }
   }
   /** Overall component status */
-  private get status(): Health.Status {
+  public get status(): Health.Status {
     return Health.overallStatus(this.checks);
   }
   /** Emit the status if it's different from the last emitted status */

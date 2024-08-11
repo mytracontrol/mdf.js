@@ -1,5 +1,5 @@
 /**
- * Copyright 2022 Mytra Control S.L. All rights reserved.
+ * Copyright 2024 Mytra Control S.L. All rights reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be found in the LICENSE file
  * or at https://opensource.org/licenses/MIT.
@@ -18,22 +18,22 @@ import { Factory, FactoryOptions, PortConfigValidationStruct } from './types';
  * @param type - Provider type
  * @returns Factory class, with a static `create` methods to create a provider instances
  */
-export default function <PortClient, PortConfig, T extends Port<PortClient, PortConfig>>(
-  port: new (config: PortConfig, logger: LoggerInstance) => T,
+export default function <PortClient, PortConfig, PortInstance extends Port<PortClient, PortConfig>>(
+  port: new (config: PortConfig, logger: LoggerInstance) => PortInstance,
   validation: PortConfigValidationStruct<PortConfig>,
   defaultName: string,
   type: string
-): Factory<PortClient, PortConfig, T> {
+): Factory<PortClient, PortConfig, PortInstance> {
   return class MixinFactory {
     /** Provider */
-    private readonly provider: Manager<PortClient, PortConfig, T>;
+    private readonly provider: Manager<PortClient, PortConfig, PortInstance>;
     /**
      * Create a new provider
      * @param options - Provider configuration options
      */
-    public static create<P extends PortConfig>(
-      options?: FactoryOptions<P>
-    ): Manager<PortClient, PortConfig, T> {
+    public static create(
+      options?: FactoryOptions<PortConfig>
+    ): Manager<PortClient, PortConfig, PortInstance> {
       return new MixinFactory(options).provider;
     }
     /**
@@ -41,7 +41,7 @@ export default function <PortClient, PortConfig, T extends Port<PortClient, Port
      * @param options - Provider configuration options
      */
     private constructor(options?: FactoryOptions<PortConfig>) {
-      this.provider = new Manager<PortClient, PortConfig, T>(
+      this.provider = new Manager(
         port,
         {
           name: options?.name || defaultName,

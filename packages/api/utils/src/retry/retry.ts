@@ -1,40 +1,90 @@
 /**
- * Copyright 2022 Mytra Control S.L. All rights reserved.
+ * Copyright 2024 Mytra Control S.L. All rights reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be found in the LICENSE file
  * or at https://opensource.org/licenses/MIT.
  */
 
 import { Boom, Crash, Multi } from '@mdf.js/crash';
+import timers from 'timers/promises';
 
+/**
+ * The wait time in milliseconds for retrying an operation.
+ */
 export const WAIT_TIME = 100;
+/**
+ * Maximum wait time in milliseconds for retrying an operation.
+ */
 export const MAX_WAIT_TIME = 15000;
+/**
+ * Represents a function that logs errors.
+ * @param error - The error to be logged.
+ */
 export type LoggerFunction = (error: Crash | Multi | Boom) => void;
-const DEFAULT_RETRY_OPTIONS = {
+
+/**
+ * Type definition for the arguments of a task function.
+ */
+export type TaskArguments = any[];
+
+/**
+ * Represents a task that returns a promise.
+ * @template R The type of the result returned by the task.
+ */
+export type TaskAsPromise<R> = (...args: TaskArguments) => Promise<R>;
+
+/** Represents the options for retrying an operation */
+export interface RetryOptions {
+  /** The logger function used for logging retry attempts */
+  logger?: LoggerFunction;
+  /** The time to wait between retry attempts, in milliseconds */
+  waitTime?: number;
+  /** The maximum time to wait between retry attempts, in milliseconds */
+  maxWaitTime?: number;
+  /**
+   * A function that determines whether to interrupt the retry process
+   * Should return true to interrupt, false otherwise.
+   * @deprecated User `abortSignal` instead
+   */
+  interrupt?: () => boolean;
+  /** The signal to be used to interrupt the retry process */
+  abortSignal?: AbortSignal;
+  /** The maximum number of retry attempts. */
+  attempts?: number;
+  /** Timeout for each try */
+  timeout?: number;
+}
+
+/** Represents the parameters for retrying an operation */
+interface RetryParameters
+  extends Required<Omit<RetryOptions, 'logger' | 'interrupt' | 'timeout' | 'abortSignal'>> {
+  /** The logger function used for logging retry attempts */
+  logger?: LoggerFunction;
+  /**
+   * A function that determines whether to interrupt the retry process
+   * Should return true to interrupt, false otherwise.
+   * @deprecated User `abortSignal` instead
+   */
+  interrupt?: () => boolean;
+  /** The actual number of retry attempts. */
+  actualAttempt: number;
+  /** Timeout for each try */
+  timeout?: number;
+  /** The promise that will be rejected if the task is aborted */
+  abortPromise?: Promise<never> | null;
+}
+
+/** Default retry options for retrying operations */
+const DEFAULT_RETRY_OPTIONS: RetryParameters = {
   logger: undefined,
   waitTime: WAIT_TIME,
   maxWaitTime: MAX_WAIT_TIME,
   interrupt: undefined,
   attempts: Number.MAX_SAFE_INTEGER,
   actualAttempt: 1,
+  abortPromise: null,
+  timeout: undefined,
 };
-
-export interface RetryOptions {
-  logger?: LoggerFunction;
-  waitTime?: number;
-  maxWaitTime?: number;
-  interrupt?: () => boolean;
-  attempts?: number;
-}
-
-interface RetryParameters {
-  logger?: LoggerFunction;
-  waitTime: number;
-  maxWaitTime: number;
-  interrupt?: () => boolean;
-  attempts: number;
-  actualAttempt: number;
-}
 
 /**
  * Auxiliar function to perform the wait process
@@ -42,8 +92,9 @@ interface RetryParameters {
  * @returns
  */
 const wait = (delay: number): Promise<void> => {
-  return new Promise(resolve => setTimeout(resolve, delay));
+  return timers.setTimeout(delay);
 };
+
 /**
  * Log the error if there is an logger instance
  * @param error - error to be logged
@@ -53,6 +104,48 @@ const logging = (error: Crash | Multi | Boom, loggerFunc?: LoggerFunction) => {
   if (loggerFunc) {
     loggerFunc(error);
   }
+};
+
+/**
+ * Auxiliar function to create the watchdog promise for the timeout
+ * @param signal - signal to be used for the timeout
+ * @param attempts - actual function call attempts
+ * @param timeout - time in milliseconds to wait for retry
+ */
+const watchdog = (signal: AbortSignal, attempts: number, timeout?: number) => {
+  if (timeout === undefined) {
+    return null;
+  } else {
+    return timers.setTimeout(timeout, undefined, { signal }).then(() => {
+      throw new Crash(`The execution of the try number ${attempts} has timed out: ${timeout} ms`, {
+        name: 'TimeoutError',
+        info: { timeout },
+      });
+    });
+  }
+};
+
+/**
+ * Auxiliar function to create the abort promise
+ * @param attempts - actual function call attempts
+ * @param signal - signal to be used for the timeout
+ */
+const abortCancelSignal = (attempts: number, signal: AbortSignal): Promise<never> => {
+  return new Promise((resolve, reject) => {
+    signal.addEventListener(
+      'abort',
+      () => {
+        const cause = signal.reason ? Crash.from(signal.reason) : undefined;
+        reject(
+          new Crash(`The task was aborted externally in attempt number: ${attempts}`, {
+            name: 'AbortError',
+            cause,
+          })
+        );
+      },
+      { once: true }
+    );
+  });
 };
 
 /**
@@ -79,6 +172,9 @@ async function errorManagement(
 ): Promise<RetryParameters> {
   const error = Crash.from(rawError);
   logging(error, parameters.logger);
+  if (error.name === 'InterruptionError' || error.name === 'AbortError') {
+    throw error;
+  }
   if (parameters.interrupt && parameters.interrupt()) {
     throw new Crash(`The loop process was interrupted externally`, error.uuid, {
       name: 'InterruptionError',
@@ -117,15 +213,49 @@ async function errorManagement(
  * @returns
  */
 export const retryBind = async <T, U>(
-  task: (...args: any[]) => Promise<T>,
+  task: TaskAsPromise<T>,
   bindTo: U,
-  funcArgs: any[] = [],
+  funcArgs: TaskArguments = [],
   options: RetryOptions = {}
 ): Promise<T> => {
+  if (typeof task !== 'function') {
+    throw new Crash('The task must be a function', { name: 'TypeError' });
+  }
+  if (!Array.isArray(funcArgs)) {
+    throw new Crash('The arguments must be an array', { name: 'TypeError' });
+  }
+  if (options.interrupt && options.abortSignal) {
+    throw new Crash(
+      'The options `interrupt` and `abortSignal` are mutually exclusive, use only one of them',
+      { name: 'ArgumentError' }
+    );
+  }
   const parameters = { ...DEFAULT_RETRY_OPTIONS, ...options };
+  if (options.abortSignal && !parameters.abortPromise) {
+    if (!options.abortSignal.aborted) {
+      parameters.abortPromise = abortCancelSignal(parameters.actualAttempt, options.abortSignal);
+    } else {
+      parameters.abortPromise = Promise.reject(
+        new Crash(
+          `The task was aborted externally in attempt number: ${parameters.actualAttempt - 1}`,
+          { name: 'AbortError' }
+        )
+      );
+    }
+  }
+  const controller = new AbortController();
   try {
-    return await task.bind(bindTo).apply(task, funcArgs);
+    const result = await Promise.race(
+      [
+        parameters.abortPromise,
+        watchdog(controller.signal, parameters.actualAttempt, parameters.timeout),
+        task.bind(bindTo).apply(task, funcArgs),
+      ].filter(Boolean)
+    );
+    controller.abort();
+    return result as T;
   } catch (error) {
+    controller.abort();
     return retryBind(task, bindTo, funcArgs, await errorManagement(error, parameters));
   }
 };
@@ -138,14 +268,66 @@ export const retryBind = async <T, U>(
  * @returns
  */
 export const retry = async <T>(
-  task: (...args: any[]) => Promise<T>,
-  funcArgs: any[] = [],
+  task: TaskAsPromise<T>,
+  funcArgs: TaskArguments = [],
   options: RetryOptions = {}
 ): Promise<T> => {
+  if (typeof task !== 'function') {
+    throw new Crash('The task must be a function', { name: 'TypeError' });
+  }
+  if (!Array.isArray(funcArgs)) {
+    throw new Crash('The arguments must be an array', { name: 'TypeError' });
+  }
+  if (options.interrupt && options.abortSignal) {
+    throw new Crash(
+      'The options `interrupt` and `abortSignal` are mutually exclusive, use only one of them',
+      { name: 'ArgumentError' }
+    );
+  }
   const parameters = { ...DEFAULT_RETRY_OPTIONS, ...options };
+  if (options.abortSignal && !parameters.abortPromise) {
+    if (!options.abortSignal.aborted) {
+      parameters.abortPromise = abortCancelSignal(parameters.actualAttempt, options.abortSignal);
+    } else {
+      parameters.abortPromise = Promise.reject(
+        new Crash(
+          `The task was aborted externally in attempt number: ${parameters.actualAttempt - 1}`,
+          { name: 'AbortError' }
+        )
+      );
+    }
+  }
+  const controller = new AbortController();
   try {
-    return await task.apply(task, funcArgs);
+    const result = await Promise.race(
+      [
+        parameters.abortPromise,
+        watchdog(controller.signal, parameters.actualAttempt, parameters.timeout),
+        task.apply(task, funcArgs),
+      ].filter(Boolean)
+    );
+    controller.abort();
+    return result as T;
   } catch (error: unknown) {
+    controller.abort();
     return retry(task, funcArgs, await errorManagement(error, parameters));
   }
+};
+
+/**
+ * Wraps a task with retry functionality.
+ * @param task - The task to be executed.
+ * @param funcArgs - The arguments to be passed to the task.
+ * @param options - The options for retry behavior.
+ * @returns - A function that, when called, executes the task with retry.
+ */
+export const wrapOnRetry = <T>(
+  task: TaskAsPromise<T>,
+  funcArgs: TaskArguments = [],
+  options: RetryOptions = {}
+): (() => Promise<T>) => {
+  const parameters = { ...DEFAULT_RETRY_OPTIONS, ...options };
+  return async (): Promise<T> => {
+    return retry(task, funcArgs, parameters);
+  };
 };

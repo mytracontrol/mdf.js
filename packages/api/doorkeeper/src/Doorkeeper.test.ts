@@ -1,16 +1,14 @@
 /**
- * Copyright 2022 Mytra Control S.L. All rights reserved.
+ * Copyright 2024 Mytra Control S.L. All rights reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be found in the LICENSE file
  * or at https://opensource.org/licenses/MIT.
  */
-// *************************************************************************************************
+
 import { Crash, Multi } from '@mdf.js/crash';
-import { v4 } from 'uuid';
+import { v4, validate } from 'uuid';
 import { DoorKeeper } from '.';
-// #endregion
-// *************************************************************************************************
-// #region Arrange
+
 const dk = new DoorKeeper({ $data: true, strict: false });
 const FAKE_UUID = '213d630f-7517-4370-baae-d0a5862799f5';
 
@@ -18,12 +16,11 @@ const entity = {
   $schema: 'http://json-schema.org/draft-07/schema',
   $id: 'other.schema.json',
   title: 'Entity ID',
-  description: 'HW or SW Netin entity ID',
+  description: 'HW or SW entity ID',
   type: 'string',
   format: 'uuid',
   errorMessage: 'Entity must be a valid RFC4122 UUID',
 };
-
 const schema1 = {
   $schema: 'http://json-schema.org/draft-07/schema',
   $id: 'schema1.schema.json',
@@ -83,7 +80,21 @@ const schema5 = {
   required: ['schema1', 'schema2', 'schemaDeep'],
   additionalProperties: false,
 };
-
+const schema1Referenced = {
+  $schema: 'http://json-schema.org/draft-07/schema',
+  $id: 'schema1.referenced.schema.json',
+  $ref: 'schema2.referenced.schema.json#',
+};
+const schema2Referenced = {
+  $schema: 'http://json-schema.org/draft-07/schema',
+  $id: 'schema2.referenced.schema.json',
+  $ref: 'schema3.referenced.schema.json#',
+};
+const schema3Referenced = {
+  $schema: 'http://json-schema.org/draft-07/schema',
+  $id: 'schema3.referenced.schema.json',
+  type: 'number',
+};
 const schema6 = {
   $schema: 'http://json-schema.org/draft-07/schema',
   $id: 'schema6.schema.json',
@@ -117,16 +128,53 @@ const schema6 = {
     schema3: { $ref: 'schema3.schema.json#' },
     schema4: { $ref: 'schema4.schema.json#' },
     schema5: { $ref: 'schema5.schema.json#' },
+    schemaNestedReferenced: { $ref: 'schema1.referenced.schema.json#' },
   },
   required: ['schema1', 'schema2', 'schema3', 'schema4', 'schema5'],
   additionalProperties: false,
+};
+const schema7 = {
+  $schema: 'http://json-schema.org/draft-07/schema',
+  $id: 'schema7.schema.json',
+  title: 'Schema 7',
+  description: 'Schema 7',
+  type: 'object',
+  properties: {
+    schema1: {
+      $ref: 'schema1.schema.json#',
+      title: 'Inner Schema 1',
+      description: 'Inner Schema 1',
+    },
+  },
+};
+const resultSchema7Dereference = {
+  $schema: 'http://json-schema.org/draft-07/schema',
+  $id: 'schema7.schema.json',
+  title: 'Schema 7',
+  description: 'Schema 7',
+  type: 'object',
+  properties: {
+    schema1: {
+      title: 'Inner Schema 1',
+      description: 'Inner Schema 1',
+      type: 'number',
+      errorMessage: 'Schema 1 must be a number',
+    },
+  },
 };
 
 const schemas = {
   Schema1: schema1,
   Schema2: schema2,
 };
-const schemasArray = [schema3, schema4, schemaDeep];
+const schemasArray = [
+  schema3,
+  schema4,
+  schemaDeep,
+  schema3Referenced,
+  schema2Referenced,
+  schema1Referenced,
+];
 
 const artifact = {
   id: 'myArtifact',
@@ -149,8 +197,23 @@ const artifactSchema = {
   required: ['id', 'processId', 'release', 'version'],
   additionalProperties: false,
 };
+const myDynamicDefaultsSchema = {
+  $schema: 'http://json-schema.org/draft-07/schema',
+  $id: 'dynamicDefaults.schema.json',
+  title: 'Dynamic Defaults',
+  description: 'Dynamic Defaults',
+  type: 'object',
+  dynamicDefaults: {
+    id: 'uuid',
+  },
+  properties: {
+    id: { type: 'string', format: 'uuid' },
+    test: { type: 'string', default: 'myTest' },
+  },
+  additionalProperties: false,
+};
 dk.register('Config.Artifact', artifactSchema);
-const result = {
+const resultSchema6Dereference = {
   $schema: 'http://json-schema.org/draft-07/schema',
   $id: 'schema6.schema.json',
   title: 'Schema ',
@@ -241,13 +304,12 @@ const result = {
       required: ['schema1', 'schema2', 'schemaDeep'],
       additionalProperties: false,
     },
+    schemaNestedReferenced: { type: 'number' },
   },
   required: ['schema1', 'schema2', 'schema3', 'schema4', 'schema5'],
   additionalProperties: false,
 };
-// #endregion
-// *************************************************************************************************
-// #region Test Schemas
+
 describe('#DoorKeeper #package', () => {
   describe('#Happy path', () => {
     it(`Should create a valid instances with default config`, () => {
@@ -266,42 +328,50 @@ describe('#DoorKeeper #package', () => {
       expect(myDK.ajv.getKeyword('markdownDescription')).toBeDefined();
       //@ts-ignore - Test environment
       expect(myDK.ajv.getKeyword('defaultSnippets')).toBeDefined();
-    });
+    }, 300);
     it(`Should register all the schemas properly`, () => {
       const test = () => {
-        dk.register(schemasArray);
-        dk.register(schemas);
-        dk.register('other', entity);
-        dk.register('Schema5', schema5);
-        dk.register('Schema6', schema6);
-        expect(dk.isSchemaRegistered('other')).toBeTruthy();
-        expect(dk.isSchemaRegistered('Config.Artifact')).toBeTruthy();
-        expect(dk.isSchemaRegistered('Schema1')).toBeTruthy();
-        expect(dk.isSchemaRegistered('Schema2')).toBeTruthy();
-        expect(dk.isSchemaRegistered('schema3.schema.json#')).toBeTruthy();
-        expect(dk.isSchemaRegistered('schema4.schema.json#')).toBeTruthy();
-        expect(dk.dereference('Schema6')).toEqual(result);
+        try {
+          dk.register(schemasArray);
+          dk.register(schemas);
+          dk.register('other', entity);
+          dk.register('Schema5', schema5);
+          dk.register('Schema6', schema6);
+          dk.register('Schema7', schema7);
+          expect(dk.isSchemaRegistered('other')).toBeTruthy();
+          expect(dk.isSchemaRegistered('Config.Artifact')).toBeTruthy();
+          expect(dk.isSchemaRegistered('Schema1')).toBeTruthy();
+          expect(dk.isSchemaRegistered('Schema2')).toBeTruthy();
+          expect(dk.isSchemaRegistered('schema3.schema.json#')).toBeTruthy();
+          expect(dk.isSchemaRegistered('schema4.schema.json#')).toBeTruthy();
+          const schema6Dereference = dk.dereference('Schema6');
+          expect(schema6Dereference).toEqual(resultSchema6Dereference);
+          const schema7Dereference = dk.dereference('Schema7');
+          expect(schema7Dereference).toEqual(resultSchema7Dereference);
+        } catch (error) {
+          throw error;
+        }
       };
       expect(test).not.toThrow();
-    });
+    }, 300);
     it(`Should resolve a correct JSON object when try to validate a schema that is in the scope and is CORRECT`, async () => {
       await expect(dk.validate('Config.Artifact', artifact, v4())).resolves.toBe(artifact);
       await expect(dk.validate('Config.Artifact', artifact)).resolves.toBe(artifact);
-    });
+    }, 300);
     it(`Should invoke the callback a correct JSON object when try to validate a schema that is in the scope and is CORRECT`, done => {
       dk.validate('Config.Artifact', artifact, (error, result) => {
         expect(error).toBeUndefined();
         expect(result).toEqual(artifact);
         done();
       });
-    });
+    }, 300);
     it(`Should invoke the callback a correct JSON object when try to validate a schema that is in the scope and is CORRECT using external uuid`, done => {
       dk.validate('Config.Artifact', artifact, v4(), (error, result) => {
         expect(error).toBeUndefined();
         expect(result).toEqual(artifact);
         done();
       });
-    });
+    }, 300);
     it(`Should invoke the callback with an error when try to validate a schema that is in the scope and is INCORRECT`, done => {
       dk.validate('Config.Artifact', {}, (error, result) => {
         expect(error).toBeInstanceOf(Multi);
@@ -323,7 +393,7 @@ describe('#DoorKeeper #package', () => {
         expect(result).toEqual({});
         done();
       });
-    });
+    }, 300);
     it(`Should invoke the callback with an error when try to validate a schema that is in the scope and is INCORRECT using external uuid`, done => {
       dk.validate('Config.Artifact', {}, v4(), (error, result) => {
         expect(error).toBeInstanceOf(Multi);
@@ -345,18 +415,40 @@ describe('#DoorKeeper #package', () => {
         expect(result).toEqual({});
         done();
       });
-    });
+    }, 300);
     it(`Should resolve a correct JSON object when attempt to validate a schema that is in the scope and is CORRECT`, () => {
       expect(dk.attempt('Config.Artifact', artifact, v4())).toBe(artifact);
       expect(dk.attempt('Config.Artifact', artifact)).toBe(artifact);
-    });
+    }, 300);
     it(`Should return a TRUE value when try to check a schema that is in the scope and is CORRECT`, () => {
       expect(dk.check('Config.Artifact', artifact)).toBeTruthy();
       expect(dk.check('Config.Artifact', artifact, v4())).toBeTruthy();
-    });
+      expect(dk.is('Config.Artifact', artifact)).toBeTruthy();
+    }, 300);
     it(`Should return a FALSE value when try to check a schema that is in the scope and is INCORRECT`, () => {
       expect(dk.check('Config.Artifact', {})).toBeFalsy();
       expect(dk.check('Config.Artifact', {}, v4())).toBeFalsy();
+      expect(dk.is('Config.Artifact', {})).toBeFalsy();
+    }, 300);
+    it(`Should be able to use default and dynamic default properly`, () => {
+      const myDK = new DoorKeeper({
+        $data: true,
+        verbose: true,
+        coerceTypes: true,
+        useDefaults: true,
+        dynamicDefaults: {
+          uuid: () => v4,
+        },
+      });
+      myDK.register('Test', myDynamicDefaultsSchema);
+      try {
+        const result = myDK.attempt('Test', {});
+        expect(result).toHaveProperty('id');
+        expect(validate(result.id)).toBeTruthy();
+        expect(result).toHaveProperty('test', 'myTest');
+      } catch (error) {
+        throw error;
+      }
     });
   });
   describe('#Sad path', () => {
@@ -378,7 +470,7 @@ describe('#DoorKeeper #package', () => {
         );
         done();
       }
-    });
+    }, 300);
     it(`Should throw with a Crash error when we attempt to register an schema a ajv throw`, done => {
       try {
         const myDK = new DoorKeeper();
@@ -396,7 +488,7 @@ describe('#DoorKeeper #package', () => {
         expect((error as Crash).cause?.message).toEqual('Error');
         done();
       }
-    });
+    }, 300);
     it(`Should throw with a Crash error when we attempt to compile an schema a ajv throw`, done => {
       try {
         const myDK = new DoorKeeper();
@@ -414,14 +506,14 @@ describe('#DoorKeeper #package', () => {
         expect((error as Crash).cause?.message).toEqual('Error');
         done();
       }
-    });
+    }, 300);
     it(`Should throw with a Crash error when we attempt to compile an invalid schema`, () => {
       const test = () => {
         const myDK = new DoorKeeper();
         myDK.register([{ type: 'value' }]);
       };
       expect(test).toThrow();
-    });
+    }, 300);
     it(`Should reject with a Crash error when we try to validate a schema that is not in the scope`, async () => {
       try {
         await dk.validate('noRealSchema', {}, v4());
@@ -433,7 +525,7 @@ describe('#DoorKeeper #package', () => {
         expect((error as Crash).name).toEqual('ValidationError');
         expect((error as Crash).info).toHaveProperty('schema');
       }
-    });
+    }, 300);
     it(`Should call the callback with a Crash error when we try to validate a schema that is not in the scope`, done => {
       const callback = (error?: Crash | Multi, data?: any) => {
         expect(error).toBeInstanceOf(Crash);
@@ -447,7 +539,7 @@ describe('#DoorKeeper #package', () => {
       const myDK = new DoorKeeper();
       myDK.register(schemas);
       myDK.validate('noRealSchema', {}, v4(), callback);
-    });
+    }, 300);
     it(`Should call the callback with a Crash error when a unexpected problems occurs with ajv validation in a validation process`, () => {
       const callback = (error?: Crash | Multi, data?: any) => {
         expect(error).toBeInstanceOf(Crash);
@@ -470,7 +562,7 @@ describe('#DoorKeeper #package', () => {
       //@ts-ignore - Test environment
       jest.spyOn(myDK.ajv, 'getSchema').mockReturnValue(validator);
       myDK.validate('Schema1', {}, v4(), callback);
-    });
+    }, 300);
     it(`Should call the callback with a Crash error when a unexpected problems occurs with ajv validation in an attempt process`, done => {
       const myDK = new DoorKeeper();
       myDK.register(schemas);
@@ -495,7 +587,7 @@ describe('#DoorKeeper #package', () => {
         expect((error as Crash).info).toHaveProperty('data');
         done();
       }
-    });
+    }, 300);
     it(`Should throw with a Crash error when we attempt to validate a schema that is not in the scope`, done => {
       try {
         dk.attempt('noRealSchema', {}, v4());
@@ -508,7 +600,7 @@ describe('#DoorKeeper #package', () => {
         expect((error as Crash).info).toHaveProperty('schema');
         done();
       }
-    });
+    }, 300);
     it(`Should reject the validation process when try to validate a schema that is in the scope but is INCORRECT`, async () => {
       try {
         await dk.validate('Config.Artifact', { numHosts: 'badProperty' }, v4());
@@ -532,7 +624,7 @@ describe('#DoorKeeper #package', () => {
           'ValidationError: must NOT have additional properties - Property: [numHosts] - Value: [{"numHosts":"badProperty"}]',
         ]);
       }
-    });
+    }, 300);
     it(`Should throw the validation process when attempt to validate a schema that is in the scope but is INCORRECT`, done => {
       try {
         dk.attempt(
@@ -554,7 +646,6 @@ describe('#DoorKeeper #package', () => {
         expect((error as Multi).causes).toBeDefined();
         done();
       }
-    });
+    }, 300);
   });
 });
-// #endregion

@@ -1,10 +1,16 @@
 /**
- * Copyright 2022 Mytra Control S.L. All rights reserved.
+ * Copyright 2024 Mytra Control S.L. All rights reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be found in the LICENSE file
  * or at https://opensource.org/licenses/MIT.
  */
 
+/**
+ * De-cycle an object to a JSON-safe representation
+ * @param object - The object to be decycled
+ * @param replacer - A function that transforms the object before decycling
+ * @returns The decycled object
+ */
 export function deCycle(object: any, replacer?: (value: any) => any) {
   const seen = new WeakMap();
 
@@ -38,6 +44,12 @@ export function deCycle(object: any, replacer?: (value: any) => any) {
     return value;
   })(object, '$');
 }
+
+/**
+ * Re-cycle an object to its original form
+ * @param $ - The object to be recycled
+ * @returns The recycled object
+ */
 export function retroCycle($: any) {
   const px = /^\$(?:\[(?:\d+|"(?:[^\\"\u0000-\u001f]|\\(?:[\\"\/bfnrt]|u[0-9a-zA-Z]{4}))*")\])*$/;
   function processArray(value: any[]) {

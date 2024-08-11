@@ -1,5 +1,5 @@
 /**
- * Copyright 2022 Mytra Control S.L. All rights reserved.
+ * Copyright 2024 Mytra Control S.L. All rights reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be found in the LICENSE file
  * or at https://opensource.org/licenses/MIT.
@@ -9,7 +9,7 @@ import { Options, support } from 'fluent-logger';
 import Joi from 'joi';
 import { jsonFormat } from '../formats';
 import { Logger } from '../logger';
-import { LogLevel, LOG_LEVELS } from '../types';
+import { LOG_LEVELS, LogLevel } from '../types';
 const { winstonTransport } = support;
 
 const DEFAULT_TAG_PATH = 'netin.';

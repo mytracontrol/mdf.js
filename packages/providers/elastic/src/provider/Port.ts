@@ -1,5 +1,5 @@
 /**
- * Copyright 2022 Mytra Control S.L. All rights reserved.
+ * Copyright 2024 Mytra Control S.L. All rights reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be found in the LICENSE file
  * or at https://opensource.org/licenses/MIT.
@@ -78,7 +78,7 @@ export class Port extends Layer.Provider.Port<Client, Config> {
       .then((result: { [key: string]: any }) => {
         // Stryker disable next-line all
         this.logger.debug(`Health success`, this.uuid, this.name);
-        this.evaluateStats(result['body']);
+        this.evaluateStats(Array.isArray(result) ? result : result['body']);
       })
       .catch(rawError => {
         const error = Crash.from(rawError);
@@ -98,11 +98,18 @@ export class Port extends Layer.Provider.Port<Client, Config> {
   private evaluateStats(result: Status): Status {
     let message: string | undefined = undefined;
     let hasError = false;
-    const observedValue: Status = result;
-    const someServerWithError = result.some(entry => entry.status === 'red');
-    if (someServerWithError) {
-      message = `At least one of the nodes in the system is red state`;
+    let observedValue: Status;
+    if (!result || !Array.isArray(result)) {
+      observedValue = [];
+      message = `Unexpected response from the system`;
       hasError = true;
+    } else {
+      const someServerWithError = result.some(entry => entry.status === 'red');
+      if (someServerWithError) {
+        message = `At least one of the nodes in the system is red state`;
+        hasError = true;
+      }
+      observedValue = result;
     }
     this.addCheck('nodes', {
       componentId: this.uuid,

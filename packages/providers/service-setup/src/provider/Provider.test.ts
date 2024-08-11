@@ -1,5 +1,5 @@
 /**
- * Copyright 2022 Mytra Control S.L. All rights reserved.
+ * Copyright 2024 Mytra Control S.L. All rights reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be found in the LICENSE file
  * or at https://opensource.org/licenses/MIT.
@@ -7,14 +7,12 @@
 import { Layer } from '@mdf.js/core';
 import { Crash, Multi } from '@mdf.js/crash';
 import { LoggerInstance } from '@mdf.js/logger';
-import { undoMocks } from '@mdf.js/utils';
 import { ConfigManager } from '../Client';
 import { Factory } from './Factory';
 import { Port } from './Port';
 import { Config } from './types';
 
 const DEFAULT_CONFIG: Config = {
-  name: 'test',
   configFiles: ['src/Client/__mocks__/*.*'],
   presetFiles: ['src/Client/__mocks__/presets/*.*'],
   schemaFiles: ['src/Client/__mocks__/schemas/*.*'],
@@ -45,9 +43,6 @@ class FakeLogger {
 
 describe('#Port #ServiceConfig', () => {
   describe('#Happy path', () => {
-    afterEach(() => {
-      undoMocks();
-    });
     it('Should create provider using the factory instance with default configuration', () => {
       const provider = Factory.create();
       expect(provider).toBeDefined();
@@ -61,7 +56,7 @@ describe('#Port #ServiceConfig', () => {
         'config:status': [
           {
             componentId: checks['config:status'][0].componentId,
-            componentType: 'service',
+            componentType: 'setup service',
             observedValue: 'stopped',
             output: undefined,
             status: 'warn',
@@ -76,7 +71,6 @@ describe('#Port #ServiceConfig', () => {
         name: 'test',
         logger: new FakeLogger() as LoggerInstance,
         config: {
-          name: 'test',
           configFiles: ['src/Client/__mocks__/*.*'],
           presetFiles: ['src/Client/__mocks__/presets/*.*'],
           schemaFiles: ['src/Client/__mocks__/schemas/*.*'],
@@ -95,7 +89,7 @@ describe('#Port #ServiceConfig', () => {
         'test:status': [
           {
             componentId: checks['test:status'][0].componentId,
-            componentType: 'service',
+            componentType: 'setup service',
             observedValue: 'stopped',
             output: undefined,
             status: 'warn',
@@ -112,7 +106,7 @@ describe('#Port #ServiceConfig', () => {
       expect(port.checks).toEqual({});
     }, 300);
     it('Should start/stop the client on request', done => {
-      const port = new Port({ name: 'myApp' }, new FakeLogger() as LoggerInstance);
+      const port = new Port({}, new FakeLogger() as LoggerInstance);
       expect(port).toBeDefined();
       port.on('error', error => {
         throw error;
@@ -137,7 +131,6 @@ describe('#Port #ServiceConfig', () => {
     it('Should emit unhealthy events if there configuration is wrong', done => {
       const port = new Port(
         {
-          name: 'test',
           configFiles: ['src/Client/__mocks__/*.*'],
           presetFiles: ['src/Client/__mocks__/wrong/*.preset.*.*'],
           schemaFiles: ['src/Client/__mocks__/schemas/*.*'],

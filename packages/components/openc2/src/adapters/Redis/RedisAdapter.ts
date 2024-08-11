@@ -1,17 +1,17 @@
 /**
- * Copyright 2022 Mytra Control S.L. All rights reserved.
+ * Copyright 2024 Mytra Control S.L. All rights reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be found in the LICENSE file
  * or at https://opensource.org/licenses/MIT.
  */
 
-import { Health } from '@mdf.js/core';
+import { Health, Layer } from '@mdf.js/core';
 import { Crash } from '@mdf.js/crash';
 import { Redis } from '@mdf.js/redis-provider';
 import { AdapterOptions } from '../../types';
 import { Adapter } from '../Adapter';
 
-export abstract class RedisAdapter extends Adapter implements Health.Component {
+export abstract class RedisAdapter extends Adapter implements Layer.App.Resource {
   /** Redis instance used as publisher */
   protected readonly publisher: Redis.Provider;
   /** Redis instance used as subscriber */
@@ -36,6 +36,10 @@ export abstract class RedisAdapter extends Adapter implements Health.Component {
       config: { ...redisOptions, connectionName: `${this.name}-subscriber`, disableChecks: true },
       name: `${this.name}-subscriber`,
     });
+  }
+  /** Adapter health status */
+  public get status(): Health.Status {
+    return Health.overallStatus(this.checks);
   }
   /** Component checks */
   public get checks(): Health.Checks {
@@ -72,6 +76,18 @@ export abstract class RedisAdapter extends Adapter implements Health.Component {
         error.uuid,
         { cause: error }
       );
+    }
+  }
+  /** Disconnect the OpenC2 Adapter to the underlayer transport system */
+  public async close(): Promise<void> {
+    try {
+      await this.publisher.close();
+      await this.subscriber.close();
+    } catch (rawError) {
+      const error = Crash.from(rawError);
+      throw new Crash(`Error closing the OpenC2 adapter: ${error.message}`, error.uuid, {
+        cause: error,
+      });
     }
   }
 }

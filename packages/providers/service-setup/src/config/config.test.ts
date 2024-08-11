@@ -1,5 +1,5 @@
 /**
- * Copyright 2022 Mytra Control S.L. All rights reserved.
+ * Copyright 2024 Mytra Control S.L. All rights reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be found in the LICENSE file
  * or at https://opensource.org/licenses/MIT.
@@ -7,7 +7,7 @@
 // *************************************************************************************************
 // #region Arrange
 import { defaultConfig } from './default';
-import { CONFIG_ARTIFACT_ID, CONFIG_PROVIDER_BASE_NAME } from './utils';
+import { CONFIG_PROVIDER_BASE_NAME } from './utils';
 // #endregion
 // *************************************************************************************************
 // #region Redis config
@@ -27,7 +27,6 @@ describe(`#Config #${CONFIG_PROVIDER_BASE_NAME.toLocaleUpperCase()}`, () => {
       expect(configFiles[0]).toContain('/config/*.*');
       expect(schemaFiles[0]).toContain('/config/schemas/*.*');
       expect(presetFiles[0]).toContain('/config/presets/*.*');
-      expect(defaultConfig.name).toBe(CONFIG_ARTIFACT_ID);
     }, 1000);
   });
 });

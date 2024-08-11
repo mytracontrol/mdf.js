@@ -1,5 +1,5 @@
 /**
- * Copyright 2022 Mytra Control S.L. All rights reserved.
+ * Copyright 2024 Mytra Control S.L. All rights reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be found in the LICENSE file
  * or at https://opensource.org/licenses/MIT.
@@ -102,5 +102,12 @@ export class DebugLogger implements LoggerInstance {
     for (const entry of error.trace()) {
       this.logger.extend('error')(entry);
     }
+  };
+  /** Stream logger */
+  stream: { write: (message: string) => void } = {
+    write: (message: string) => {
+      const data = JSON.parse(message);
+      this.logger.extend(data.level)(data.message);
+    },
   };
 }

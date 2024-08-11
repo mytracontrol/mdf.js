@@ -1,5 +1,5 @@
 /**
- * Copyright 2022 Mytra Control S.L. All rights reserved.
+ * Copyright 2024 Mytra Control S.L. All rights reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be found in the LICENSE file
  * or at https://opensource.org/licenses/MIT.
@@ -7,7 +7,6 @@
 import { Layer } from '@mdf.js/core';
 import { Crash } from '@mdf.js/crash';
 import { LoggerInstance } from '@mdf.js/logger';
-import { mockProperty, undoMocks } from '@mdf.js/utils';
 import IORedis from 'ioredis';
 import { ReplyError } from 'redis-errors';
 import { Factory } from './Factory';
@@ -88,7 +87,7 @@ describe('#Port #Redis', () => {
   describe('#Happy path', () => {
     afterEach(() => {
       jest.clearAllMocks();
-      undoMocks();
+      jest.restoreAllMocks();
     });
     it('Should create provider using the factory instance with default configuration', () => {
       const provider = Factory.create();
@@ -163,14 +162,14 @@ describe('#Port #Redis', () => {
               componentId: checks['memory'][0].componentId,
               observedUnit: 'used memory / max memory',
               observedValue: '1090104 / 0',
-              output: undefined,
+              output: `The system is using 0% of the available memory`,
               status: 'pass',
               time: checks['memory'][0].time,
             },
           ],
         });
         // @ts-ignore - Test environment
-        mockProperty(port.instance, 'status', 'ready');
+        jest.replaceProperty(port.instance, 'status', 'ready');
         // This is to test that can not wrap method twice
         port.start().then();
         expect(port.state).toBeTruthy();
@@ -179,7 +178,6 @@ describe('#Port #Redis', () => {
         expect(port.client.listenerCount('connect')).toEqual(1);
         port.close().then();
         expect(port.client.listenerCount('connect')).toEqual(0);
-        undoMocks();
         done();
       });
       port.start().then(() => {
@@ -268,8 +266,8 @@ describe('#Port #Redis', () => {
       try {
         const port = new Port(DEFAULT_CONFIG, new FakeLogger() as LoggerInstance);
         expect(port).toBeDefined();
-        //@ts-ignore - Test environment
-        mockProperty(port, 'connected', true);
+        // @ts-ignore - Test environment
+        jest.replaceProperty(port, 'connected', true);
         const mock = jest
           .spyOn(port.client, 'quit')
           .mockRejectedValue(new Error('Connection is closed.'));
@@ -285,7 +283,7 @@ describe('#Port #Redis', () => {
   describe('#Sad path', () => {
     afterEach(() => {
       jest.clearAllMocks();
-      undoMocks();
+      jest.restoreAllMocks();
     });
     it('Should rejects if try to connect and the methods rejects', async () => {
       const port = new Port(DEFAULT_CONFIG, new FakeLogger() as LoggerInstance);
@@ -305,14 +303,13 @@ describe('#Port #Redis', () => {
         );
         expect(rawError.cause).toBeInstanceOf(Error);
         expect(rawError.cause?.message).toEqual('myError');
-        undoMocks();
       }
     }, 300);
     it('Should rejects if try to disconnect and the methods rejects', async () => {
       const port = new Port(DEFAULT_CONFIG, new FakeLogger() as LoggerInstance);
       expect(port).toBeDefined();
-      //@ts-ignore - Test environment
-      mockProperty(port, 'connected', true);
+      // @ts-ignore - Test environment
+      jest.replaceProperty(port, 'connected', true);
       jest.spyOn(port.client, 'quit').mockRejectedValue(new Error('myError'));
       try {
         await port.stop();
@@ -324,21 +321,26 @@ describe('#Port #Redis', () => {
         );
         expect(rawError.cause).toBeInstanceOf(Error);
         expect(rawError.cause?.message).toEqual('myError');
-        undoMocks();
       }
     }, 300);
     it('Should emit healthy and unhealthy events properly', done => {
       const port = new Port(
-        { ...DEFAULT_CONFIG, checkInterval: 50 },
+        { ...DEFAULT_CONFIG, lazyConnect: false, checkInterval: 50 },
         new FakeLogger() as LoggerInstance
       );
       jest.spyOn(port.client, 'connect').mockResolvedValue();
       jest.spyOn(port.client, 'quit').mockResolvedValue('OK');
-      jest
-        .spyOn(port.client, 'info')
-        .mockResolvedValueOnce(memory)
-        .mockResolvedValueOnce(memoryProblem)
-        .mockResolvedValue(memory);
+      let count = 0;
+      jest.spyOn(port.client, 'info').mockImplementation(() => {
+        count++;
+        if (count === 1 || count === 2 || count === 3 || count > 4) {
+          return Promise.resolve(memory);
+        } else if (count === 4) {
+          return Promise.resolve(memoryProblem);
+        } else {
+          return Promise.resolve(memory);
+        }
+      });
       port.on('error', error => {
         throw error;
       });

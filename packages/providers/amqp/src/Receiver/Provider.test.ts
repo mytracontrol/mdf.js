@@ -1,5 +1,5 @@
 /**
- * Copyright 2022 Mytra Control S.L. All rights reserved.
+ * Copyright 2024 Mytra Control S.L. All rights reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be found in the LICENSE file
  * or at https://opensource.org/licenses/MIT.
@@ -7,7 +7,6 @@
 import { Layer } from '@mdf.js/core';
 import { Crash } from '@mdf.js/crash';
 import { LoggerInstance } from '@mdf.js/logger';
-import { undoMocks } from '@mdf.js/utils';
 import { EventEmitter } from 'events';
 import { ReceiverEvents } from 'rhea-promise';
 import { Factory } from './Factory';
@@ -102,7 +101,6 @@ class FakeReceiver extends EventEmitter {
 describe('#Port #AMQP #Receiver', () => {
   describe('#Happy path', () => {
     afterEach(() => {
-      undoMocks();
       jest.clearAllMocks();
     });
     it('Should create provider using the factory instance with default configuration', () => {
@@ -199,7 +197,7 @@ describe('#Port #AMQP #Receiver', () => {
               {
                 componentId: checks['credits'][0].componentId,
                 observedUnit: 'credits',
-                observedValue: 20,
+                observedValue: 10,
                 output: undefined,
                 status: 'pass',
                 time: checks['credits'][0].time,

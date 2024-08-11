@@ -1,10 +1,11 @@
 /**
- * Copyright 2022 Mytra Control S.L. All rights reserved.
+ * Copyright 2024 Mytra Control S.L. All rights reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be found in the LICENSE file
  * or at https://opensource.org/licenses/MIT.
  */
 
+import { Health } from '@mdf.js/core';
 import { Crash } from '@mdf.js/crash';
 import EventEmitter from 'events';
 import { v4 } from 'uuid';
@@ -47,6 +48,7 @@ class MyProducerAdapter extends EventEmitter implements ProducerAdapter {
   name = 'myAdapter';
   componentId = v4();
   checks = {};
+  status = Health.STATUS.PASS;
   publish(
     message: Control.CommandMessage
   ): Promise<Control.ResponseMessage | Control.ResponseMessage[] | void> {
@@ -59,6 +61,9 @@ class MyProducerAdapter extends EventEmitter implements ProducerAdapter {
   stop(): Promise<void> {
     return Promise.resolve();
   }
+  close(): Promise<void> {
+    return Promise.resolve();
+  }
   subcomponents = [];
   publishers = [];
   subscribers = [];
@@ -66,6 +71,7 @@ class MyProducerAdapter extends EventEmitter implements ProducerAdapter {
 class MyConsumerAdapter extends EventEmitter implements ConsumerAdapter {
   name = 'myAdapter';
   componentId = v4();
+  status = Health.STATUS.PASS;
   checks = {};
   handler?: OnCommandHandler;
   subscribe(handler: OnCommandHandler): Promise<void> {
@@ -80,6 +86,9 @@ class MyConsumerAdapter extends EventEmitter implements ConsumerAdapter {
     return Promise.resolve();
   }
   stop(): Promise<void> {
+    return Promise.resolve();
+  }
+  close(): Promise<void> {
     return Promise.resolve();
   }
   subcomponents = [];

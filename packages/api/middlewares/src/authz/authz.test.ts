@@ -1,12 +1,8 @@
 /**
- * Copyright 2020 Netin System S.L. All rights reserved.
- * Note: All information contained herein is, and remains the property of Netin System S.L. and its
- * suppliers, if any. The intellectual and technical concepts contained herein are property of
- * Netin System S.L. and its suppliers and may be covered by European and Foreign patents, patents
- * in process, and are protected by trade secret or copyright.
+ * Copyright 2024 Mytra Control S.L. All rights reserved.
  *
- * Dissemination of this information or the reproduction of this material is strictly forbidden
- * unless prior written permission is obtained from Netin System S.L.
+ * Use of this source code is governed by an MIT-style license that can be found in the LICENSE file
+ * or at https://opensource.org/licenses/MIT.
  */
 // *************************************************************************************************
 // #region Build my own Express app for testing, including the mandatory middleware
@@ -14,8 +10,9 @@ import mylogger from '@mdf.js/logger';
 import express from 'express';
 import jwt from 'jsonwebtoken';
 import supertest from 'supertest';
+import { v4 } from 'uuid';
 import { Middleware } from '..';
-const secret = process.env['CONFIG_JWT_TOKEN_SECRET'] as string;
+const secret = v4();
 const TOKEN = jwt.sign({ user: 'myUser', role: 'myRole' }, secret);
 const BAD_TOKEN = jwt.sign({ user: 'myUser', role: 'myRole' }, 'badPass');
 let lastString: string;
@@ -36,13 +33,13 @@ app.use(Middleware.BodyParser.JSONParserHandler());
 app.use(Middleware.BodyParser.URLEncodedParserHandler());
 app.use(Middleware.BodyParser.TextParserHandler());
 // Include all your endpoints paths
-app.get('/test', Middleware.AuthZ.handler('myRole'), (req, res, next) => {
+app.get('/test', Middleware.AuthZ.handler({ role: 'myRole', secret }), (req, res, next) => {
   res.status(200).send();
 });
-app.get('/test2', Middleware.AuthZ.handler(), (req, res, next) => {
+app.get('/test2', Middleware.AuthZ.handler({ secret }), (req, res, next) => {
   res.status(200).send();
 });
-app.get('/test3', Middleware.AuthZ.handler(['myRole']), (req, res, next) => {
+app.get('/test3', Middleware.AuthZ.handler({ role: ['myRole'], secret }), (req, res, next) => {
   res.status(200).send();
 });
 //@ts-ignore - Test environment
@@ -53,7 +50,7 @@ app.get('/wrongTest', Middleware.AuthZ.handler(true), (req, res, next) => {
 app.get('/wrongTest2', Middleware.AuthZ.handler(['myRole', true]), (req, res, next) => {
   res.status(200).send();
 });
-app.get('/fail', Middleware.AuthZ.handler('otherRole'), (req, res, next) => {
+app.get('/fail', Middleware.AuthZ.handler({ role: 'otherRole', secret }), (req, res, next) => {
   res.status(200).send();
 });
 // Don't forget to include the errorHandled middleware at the end
@@ -120,7 +117,7 @@ describe('#Middleware #authz', () => {
         .get('/fail')
         .set('Authorization', `Bearer ${TOKEN}`)
         .expect(401);
-      expect(response.body.detail).toEqual('You are not authorized');
+      expect(response.body.detail).toEqual('Not authorized');
       expect(response.body.code).toEqual('HTTP');
       expect(response.body.title).toEqual('Unauthorized');
       expect(response.body.status).toEqual(401);
@@ -152,7 +149,7 @@ describe('#Middleware #authz', () => {
     }, 300);
     it('Should response 400 if there is not a token', async () => {
       const response = await request.get('/test').expect(400);
-      expect(response.body.detail).toEqual('Malformed request, no present authorization token');
+      expect(response.body.detail).toEqual('No present authorization information');
       expect(response.body.code).toEqual('HTTP');
       expect(response.body.title).toEqual('Bad Request');
       expect(response.body.status).toEqual(400);
@@ -167,10 +164,8 @@ describe('#Middleware #authz', () => {
       expect(response.body.uuid).toBeDefined();
     }, 300);
     it('Should response 500 if there is an error decoding the token', async () => {
-      const mock = (token: any, secret: any, cb?: any) => {
-        if (cb) {
-          cb(null, undefined);
-        }
+      const mock = (token: any, secret: any, options: any) => {
+        return;
       };
       jest.spyOn(jwt, 'verify').mockImplementation(mock);
       const response = await request
@@ -184,10 +179,8 @@ describe('#Middleware #authz', () => {
       expect(response.body.uuid).toBeDefined();
     }, 300);
     it('Should response 500 if there is not a valid user in the token', async () => {
-      const mock = (token: any, secret: any, cb?: any) => {
-        if (cb) {
-          cb(null, { user: undefined, role: 'myRole' });
-        }
+      const mock = (token: any, secret: any, options: any) => {
+        return { user: undefined, role: 'myRole' };
       };
       jest.spyOn(jwt, 'verify').mockImplementation(mock);
       const response = await request
@@ -201,10 +194,8 @@ describe('#Middleware #authz', () => {
       expect(response.body.uuid).toBeDefined();
     }, 300);
     it('Should response 500 if there is not a valid role in the token', async () => {
-      const mock = (token: any, secret: any, cb?: any) => {
-        if (cb) {
-          cb(null, { user: 'myUser', role: undefined });
-        }
+      const mock = (token: any, secret: any, options: any) => {
+        return { user: 'myUser', role: undefined };
       };
       jest.spyOn(jwt, 'verify').mockImplementation(mock);
       const response = await request
@@ -218,10 +209,8 @@ describe('#Middleware #authz', () => {
       expect(response.body.uuid).toBeDefined();
     }, 300);
     it('Should response 400 if the token is decoded as a string', async () => {
-      const mock = (token: any, secret: any, cb?: any) => {
-        if (cb) {
-          cb(null, 'decoded');
-        }
+      const mock = (token: any, secret: any, options: any) => {
+        return 'decoded';
       };
       jest.spyOn(jwt, 'verify').mockImplementation(mock);
       const response = await request

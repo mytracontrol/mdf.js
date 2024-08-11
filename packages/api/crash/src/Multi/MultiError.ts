@@ -1,5 +1,5 @@
 /**
- * Copyright 2022 Mytra Control S.L. All rights reserved.
+ * Copyright 2024 Mytra Control S.L. All rights reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be found in the LICENSE file
  * or at https://opensource.org/licenses/MIT.
@@ -92,7 +92,7 @@ export class Multi extends Base {
     return this._isMulti;
   }
   /** Causes source of error */
-  get causes(): Array<Cause> | undefined {
+  get causes(): Cause[] | undefined {
     return this._causes;
   }
   /** Return the number of causes of this error */

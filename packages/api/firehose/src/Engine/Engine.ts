@@ -1,17 +1,16 @@
 /**
- * Copyright 2022 Mytra Control S.L. All rights reserved.
+ * Copyright 2024 Mytra Control S.L. All rights reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be found in the LICENSE file
  * or at https://opensource.org/licenses/MIT.
  */
-import { Health, Jobs } from '@mdf.js/core';
+import { Health, Layer } from '@mdf.js/core';
 import { Crash, Multi } from '@mdf.js/crash';
 import { DebugLogger, LoggerInstance, SetContext } from '@mdf.js/logger';
 import { get, merge } from 'lodash';
 import { Readable, Transform } from 'stream';
 import { v4 } from 'uuid';
-import { EngineOptions } from '../types';
-
+import { EngineOptions, OpenJobHandler, OpenStrategy } from '../types';
 import { DEFAULT_TRANSFORM_OPTIONS } from './const';
 
 export declare interface Engine {
@@ -41,14 +40,7 @@ export declare interface Engine {
   on(event: 'unpipe', listener: (source: Readable) => void): this;
 }
 
-export class Engine<
-    Type extends string = string,
-    Data = any,
-    CustomHeaders extends Record<string, any> = Record<string, any>
-  >
-  extends Transform
-  implements Health.Component
-{
+export class Engine extends Transform implements Layer.App.Component {
   /** Provider unique identifier for trace purposes */
   readonly componentId: string = v4();
   /** Debug logger for development and deep troubleshooting */
@@ -62,7 +54,7 @@ export class Engine<
    */
   constructor(
     public readonly name: string,
-    private readonly options?: EngineOptions<Type, Data, CustomHeaders>
+    private readonly options?: EngineOptions
   ) {
     super(merge(DEFAULT_TRANSFORM_OPTIONS, options?.transformOptions));
     // Stryker disable next-line all
@@ -78,7 +70,7 @@ export class Engine<
    * @param job - publication job object
    */
   override _transform(
-    job: Jobs.JobHandler<Type, Data, CustomHeaders>,
+    job: OpenJobHandler,
     encoding: string,
     callback: (error?: Crash, chunk?: any) => void
   ): void {
@@ -107,10 +99,7 @@ export class Engine<
    * @param strategy - strategy to be applied
    * @returns
    */
-  private executeStrategy(
-    job: Jobs.JobHandler<Type, Data, CustomHeaders>,
-    strategy: Jobs.Strategy<Type, Data, CustomHeaders>
-  ): Jobs.JobHandler<Type, Data, CustomHeaders> {
+  private executeStrategy(job: OpenJobHandler, strategy: OpenStrategy): OpenJobHandler {
     try {
       const result = strategy.do(job.toObject());
       if (!result || result.data === undefined || result.data === null) {

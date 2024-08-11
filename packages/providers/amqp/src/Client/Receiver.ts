@@ -1,5 +1,5 @@
 /**
- * Copyright 2022 Mytra Control S.L. All rights reserved.
+ * Copyright 2024 Mytra Control S.L. All rights reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be found in the LICENSE file
  * or at https://opensource.org/licenses/MIT.
@@ -11,8 +11,8 @@ import {
   AmqpError,
   ConnectionOptions,
   EventContext,
-  Receiver as RheaReceiver,
   ReceiverEvents,
+  Receiver as RheaReceiver,
 } from 'rhea-promise';
 import { inspect } from 'util';
 import { Container } from './Container';
@@ -159,7 +159,6 @@ export class Receiver extends Container {
       return this.start();
     }
     try {
-      const actualCredits = this.receiver.credit;
       const newReceiver = await this.connection.createReceiver();
       this.receiverEventsUnwrapping(this.receiver);
       this.receiverEventsWrapping(newReceiver);
@@ -172,7 +171,6 @@ export class Receiver extends Container {
       }
       await this.receiver.close({ closeSession: true });
       this.receiver = newReceiver;
-      this.receiver.addCredit(actualCredits);
       return undefined;
     } catch (rawError) {
       const error = Crash.from(rawError, this.componentId);

@@ -1,5 +1,5 @@
 /**
- * Copyright 2022 Mytra Control S.L. All rights reserved.
+ * Copyright 2024 Mytra Control S.L. All rights reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be found in the LICENSE file
  * or at https://opensource.org/licenses/MIT.
@@ -8,7 +8,7 @@
 import { v4, validate } from 'uuid';
 import { CONFIG_MAX_ERROR_MESSAGE_LENGTH } from './const';
 import { BaseObject, BaseOptions } from './types';
-/** Class Base, manages errors in Netin Systems */
+/** Class Base, manages errors in MDF Systems */
 export class Base extends Error {
   /** Base error options */
   protected _options?: BaseOptions;

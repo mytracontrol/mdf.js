@@ -1,11 +1,11 @@
 /**
- * Copyright 2022 Mytra Control S.L. All rights reserved.
+ * Copyright 2024 Mytra Control S.L. All rights reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be found in the LICENSE file
  * or at https://opensource.org/licenses/MIT.
  */
 
-import { Crash } from '@mdf.js/crash';
+import { Crash, Multi } from '@mdf.js/crash';
 import { LoggerInstance, SetContext } from '@mdf.js/logger';
 import { EventEmitter } from 'events';
 import { v4 } from 'uuid';
@@ -13,25 +13,99 @@ import { Health } from '../..';
 
 export declare interface Port<PortClient, PortConfig> {
   /**
-   * Emitted if an error occurs on the port side
+   * Add a listener for the `error` event, emitted when the component detects an error.
+   * @param event - `error` event
+   * @param listener - Error event listener
    * @event
    */
-  on(event: 'error', listener: (error: Crash) => void): this;
+  on(event: 'error', listener: (error: Crash | Multi) => void): this;
   /**
-   * Emitted when the port resources are no longer available
+   * Add a listener for the `error` event, emitted when the component detects an error. This is a
+   * one-time event, the listener will be removed after the first emission.
+   * @param event - `error` event
+   * @param listener - Error event listener
    * @event
    */
-  on(event: 'closed', listener: (error?: Crash) => void): this;
+  once(event: 'error', listener: (error: Crash | Multi) => void): this;
   /**
-   * Emitted when the port has limited access to the resources
+   * Emit an `error` event, to notify errors in the resource management or access, this will change
+   * the provider state by the upper manager.
+   * @param event - `error` event
+   * @param error - Error to be notified to the upper manager
    * @event
    */
-  on(event: 'unhealthy', listener: (error: Crash) => void): this;
+  emit(event: 'error', error: Crash | Multi): boolean;
   /**
-   * Emitted when the port has recovered the access to the resources
+   * Add a listener for the `closed` event, emitted when the port resources are no longer available
+   * @param event - `closed` event
+   * @param listener - Closed event listener
+   * @event
+   */
+  on(event: 'closed', listener: (error?: Crash | Multi) => void): this;
+  /**
+   * Add a listener for the `closed` event, emitted when the port resources are no longer available.
+   * This is a one-time event, the listener will be removed after the first emission.
+   * @param event - `closed` event
+   * @param listener - Closed event listener
+   * @event
+   */
+  once(event: 'closed', listener: (error?: Crash | Multi) => void): this;
+  /**
+   * Emit a `closed` event, to notify that the access to the resources is not longer possible. This
+   * event should not be emitted if {@link Port.stop} or {@link Port.close } methods are used. This
+   * event will change the provider state by the upper manager.
+   * @param event - `closed` event
+   * @param error - Error to be notified to the upper manager, if any
+   * @event
+   */
+  emit(event: 'closed', error?: Crash | Multi): boolean;
+  /**
+   * Add a listener for the `unhealthy` event, emitted when the port has limited access to the
+   * resources
+   * @param event - `unhealthy` event
+   * @param listener - Unhealthy event listener
+   * @event
+   */
+  on(event: 'unhealthy', listener: (error: Crash | Multi) => void): this;
+  /**
+   * Add a listener for the `unhealthy` event, emitted when the port has limited access to the
+   * resources. This is a one-time event, the listener will be removed after the first emission.
+   * @param event - `unhealthy` event
+   * @param listener - Unhealthy event listener
+   * @event
+   */
+  once(event: 'unhealthy', listener: (error: Crash | Multi) => void): this;
+  /**
+   * Emit an `unhealthy` event, to notify that the port has limited access to the resources. This
+   * event will change the provider state by the upper manager.
+   * @param event - `unhealthy` event
+   * @param error - Error to be notified to the upper manager
+   * @event
+   */
+  emit(event: 'unhealthy', error: Crash | Multi): boolean;
+  /**
+   * Add a listener for the `healthy` event, emitted when the port has recovered the access to the
+   * resources
+   * @param event - `healthy` event
+   * @param listener - Healthy event listener
    * @event
    */
   on(event: 'healthy', listener: () => void): this;
+  /**
+   * Add a listener for the `healthy` event, emitted when the port has recovered the access to the
+   * resources. This is a one-time event, the listener will be removed after the first emission.
+   * @param event - `healthy` event
+   * @param listener - Healthy event listener
+   * @event
+   */
+  once(event: 'healthy', listener: () => void): this;
+  /**
+   * Emit a `healthy` event, to notify that the port has recovered the access to the resources. This
+   * event will change the provider state by the upper manager.
+   * @param event - `healthy` event
+   * @event
+   */
+  emit(event: 'healthy'): boolean;
 }
 /**
  * This is the class that should be extended to implement a new specific Port.
@@ -61,7 +135,7 @@ export declare interface Port<PortClient, PortConfig> {
  * - The {@link Port.client} property, that return the _**PortClient**_ instance that is used to
  * interact with the resources.
  *
- * ![class diagram](../media/Provider-Class-Hierarchy.png)
+ * ![class diagram](media/Provider-Class-Hierarchy.png)
  *
  * In the other hand, this class extends the {@link EventEmitter} class, so it's possible to emit
  * events to notify the status of the port:
@@ -73,7 +147,7 @@ export declare interface Port<PortClient, PortConfig> {
  * - _**unhealthy**_: should be emitted when the port has limited access to the resources.
  * - _**healthy**_: should be emitted when the port has recovered the access to the resources.
  *
- * ![class diagram](../media/Provider-States-Events.png)
+ * ![class diagram](media/Provider-States-Events.png)
  *
  * Check some examples of implementation in:
  *
@@ -87,12 +161,8 @@ export declare interface Port<PortClient, PortConfig> {
 export abstract class Port<PortClient, PortConfig> extends EventEmitter {
   /** Port unique identifier for trace purposes */
   public readonly uuid: string = v4();
-  /** Port name, to be used as identifier */
-  protected readonly name: string;
   /** Port logger, to be used internally */
   protected readonly logger: LoggerInstance;
-  /** Port configuration options */
-  public readonly config: PortConfig;
   /** Port diagnostic checks */
   private readonly checksMap: Map<string, Health.Check[]> = new Map();
   /**
@@ -101,10 +171,12 @@ export abstract class Port<PortClient, PortConfig> extends EventEmitter {
    * @param logger - Port logger, to be used internally
    * @param name - Port name, to be used as identifier
    */
-  constructor(config: PortConfig, logger: LoggerInstance, name: string) {
+  constructor(
+    public readonly config: PortConfig,
+    logger: LoggerInstance,
+    public readonly name: string
+  ) {
     super();
-    this.config = config;
-    this.name = name;
     this.logger = SetContext(logger, this.name, this.uuid);
   }
   /**
@@ -126,7 +198,7 @@ export abstract class Port<PortClient, PortConfig> extends EventEmitter {
    */
   protected addCheck(measure: string, check: Health.Check): boolean {
     if (
-      (check.status && !Health.STATUS.includes(check.status)) ||
+      (check.status && !Health.STATUSES.includes(check.status)) ||
       typeof check.componentId !== 'string' ||
       this.checksMap.size >= 100
     ) {

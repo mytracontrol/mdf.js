@@ -1,5 +1,5 @@
 /**
- * Copyright 2022 Mytra Control S.L. All rights reserved.
+ * Copyright 2024 Mytra Control S.L. All rights reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be found in the LICENSE file
  * or at https://opensource.org/licenses/MIT.
@@ -10,26 +10,33 @@ import { Socket } from 'socket.io';
 import { v4 } from 'uuid';
 import { SocketIOMiddleware, SocketIONextFunction, transformError } from '..';
 
-const CONFIG_JWT_TOKEN_SECRET = process.env['CONFIG_JWT_TOKEN_SECRET'] || v4();
-process.env['CONFIG_JWT_TOKEN_SECRET'] = CONFIG_JWT_TOKEN_SECRET;
+const DEFAULT_CONFIG_JWT_TOKEN_SECRET = v4();
+const DEFAULT_CONFIG_JWT_TOKEN_ALGORITHMS: Algorithm[] = ['HS256'];
+const DEFAULT_CONFIG_JWT_ON_AUTHORIZATION = () => Promise.resolve();
 
+/** Options for configuring authorization middleware */
 export type AuthZOptions = {
+  /** The secret used to sign and verify JWT tokens */
   secret?: string;
+  /** The algorithms used for JWT token verification */
   algorithms?: Algorithm[];
+  /**
+   * A callback function called when authorization is successful.
+   * @param decodedToken - The decoded JWT payload.
+   */
   onAuthorization?: (decodedToken: JwtPayload) => Promise<void>;
 };
 /**
  * Check the token of the request
- * @param role - role to be checked
+ * @param options - authorization options
  * @returns
  */
 function authZ(options: AuthZOptions = {}): SocketIOMiddleware {
   return (socket: Socket, next: SocketIONextFunction) => {
     const token = socket.handshake.auth['token'];
-    const secret = options.secret || CONFIG_JWT_TOKEN_SECRET;
-    const algorithms = options.algorithms || ['HS256'];
-    const defaultOnAuthorization = () => Promise.resolve();
-    const onAuthorization = options.onAuthorization || defaultOnAuthorization;
+    const secret = options.secret || DEFAULT_CONFIG_JWT_TOKEN_SECRET;
+    const algorithms = options.algorithms || DEFAULT_CONFIG_JWT_TOKEN_ALGORITHMS;
+    const onAuthorization = options.onAuthorization || DEFAULT_CONFIG_JWT_ON_AUTHORIZATION;
     const requestId = v4();
 
     hasValidAuthenticationInformation(token, requestId)
@@ -67,7 +74,7 @@ function verify(
   token: string,
   options: Required<Omit<AuthZOptions, 'onAuthorization'>>,
   uuid: string
-): Promise<jwt.JwtPayload> {
+): Promise<JwtPayload> {
   return new Promise((resolve, reject) => {
     jwt.verify(token, options.secret, { algorithms: options.algorithms }, (error, decoded) => {
       if (error) {

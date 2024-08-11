@@ -1,13 +1,12 @@
 /**
- * Copyright 2022 Mytra Control S.L. All rights reserved.
+ * Copyright 2024 Mytra Control S.L. All rights reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be found in the LICENSE file
  * or at https://opensource.org/licenses/MIT.
  */
 import { Layer } from '@mdf.js/core';
-import { Crash } from '@mdf.js/crash';
+import { Crash, Multi } from '@mdf.js/crash';
 import { LoggerInstance } from '@mdf.js/logger';
-import { undoMocks } from '@mdf.js/utils';
 import { Factory } from './Factory';
 import { Port } from './Port';
 import { Config } from './types';
@@ -565,7 +564,6 @@ class FakeLogger {
 describe('#Port #Kafka #Consumer', () => {
   describe('#Happy path', () => {
     afterEach(() => {
-      undoMocks();
       jest.clearAllMocks();
     });
     it('Should create provider using the factory instance with default configuration', () => {
@@ -731,10 +729,10 @@ describe('#Port #Kafka #Consumer', () => {
       jest.spyOn(port.instance.admin, 'disconnect').mockResolvedValue();
       //@ts-ignore - Test environment
       jest.spyOn(port.instance.admin, 'fetchTopicMetadata').mockRejectedValue(new Error('myError'));
-      port.on('error', (error: Crash) => {
+      port.on('error', (error: Crash | Multi) => {
         expect(error).toBeDefined();
         expect(error.message).toEqual('Error checking the system: myError');
-        expect(error.cause?.message).toEqual('myError');
+        expect((error.cause as Crash).message).toEqual('myError');
         const checks = port.checks;
         expect(checks).toEqual({
           topics: [
@@ -780,13 +778,13 @@ describe('#Port #Kafka #Consumer', () => {
         //@ts-ignore - Test environment
         .mockResolvedValue(KAFKA_RESPONSE_DESCRIBE_GROUPS);
       let step = 0;
-      port.on('error', (error: Crash) => {
+      port.on('error', (error: Crash | Multi) => {
         expect(port.state).toBeFalsy();
         expect(step).toEqual(0);
         step++;
         expect(error).toBeDefined();
         expect(error.message).toEqual('Error checking the system: myError');
-        expect(error.cause?.message).toEqual('myError');
+        expect((error.cause as Crash).message).toEqual('myError');
         const checks = port.checks;
         expect(checks).toEqual({
           topics: [
@@ -801,13 +799,13 @@ describe('#Port #Kafka #Consumer', () => {
           ],
         });
       });
-      port.on('unhealthy', (error: Crash) => {
+      port.on('unhealthy', (error: Crash | Multi) => {
         expect(port.state).toBeFalsy();
         expect(step).toEqual(1);
         step++;
         expect(error).toBeDefined();
         expect(error.message).toEqual('Error checking the system: myError');
-        expect(error.cause?.message).toEqual('myError');
+        expect((error.cause as Crash).message).toEqual('myError');
         const checks = port.checks;
         expect(checks).toEqual({
           topics: [
@@ -845,10 +843,10 @@ describe('#Port #Kafka #Consumer', () => {
     }, 300);
     it(`Should emit a error if the consumer transmit an error to start if admin client rejects`, done => {
       const port = new Port(DEFAULT_CONFIG, new FakeLogger() as LoggerInstance);
-      port.on('error', error => {
+      port.on('error', (error: Crash | Multi) => {
         expect(error).toBeDefined();
         expect(error.message).toEqual('Fixable error in Kafka interface: myError');
-        expect(error.cause?.message).toEqual('myError');
+        expect((error.cause as Crash).message).toEqual('myError');
         done();
       });
       //@ts-ignore - Test environment
@@ -862,14 +860,16 @@ describe('#Port #Kafka #Consumer', () => {
       try {
         await port.start();
         throw new Error('Should not be here');
-      } catch (error: any) {
-        expect(error.message).toEqual(
+      } catch (error) {
+        expect((error as Crash).message).toEqual(
           'Error in port initialization: Error in initial connection process: Error setting the monitoring client: myError'
         );
-        expect(error.cause.message).toEqual(
+        expect(((error as Crash).cause as Crash).message).toEqual(
           'Error in initial connection process: Error setting the monitoring client: myError'
         );
+        //@ts-ignore - Test environment
         expect(error.cause.cause.message).toEqual('Error setting the monitoring client: myError');
+        //@ts-ignore - Test environment
         expect(error.cause.cause.cause.message).toEqual('myError');
       }
     }, 300);
@@ -881,14 +881,18 @@ describe('#Port #Kafka #Consumer', () => {
       try {
         await port.start();
         throw new Error('Should not be here');
-      } catch (error: any) {
+      } catch (error) {
+        //@ts-ignore - Test environment
         expect(error.message).toEqual(
           'Error in port initialization: Error in initial connection process: Error setting the monitoring client: myError'
         );
+        //@ts-ignore - Test environment
         expect(error.cause.message).toEqual(
           'Error in initial connection process: Error setting the monitoring client: myError'
         );
+        //@ts-ignore - Test environment
         expect(error.cause.cause.message).toEqual('Error setting the monitoring client: myError');
+        //@ts-ignore - Test environment
         expect(error.cause.cause.cause.message).toEqual('myError');
       }
     }, 300);
@@ -916,16 +920,20 @@ describe('#Port #Kafka #Consumer', () => {
       try {
         await port.close();
         throw new Error('Should have failed');
-      } catch (error: any) {
+      } catch (error) {
+        //@ts-ignore - Test environment
         expect(error.message).toEqual(
           'Error in port disconnection: Error in disconnection process: Error in disconnection process of monitor client: myError'
         );
+        //@ts-ignore - Test environment
         expect(error.cause.message).toEqual(
           'Error in disconnection process: Error in disconnection process of monitor client: myError'
         );
+        //@ts-ignore - Test environment
         expect(error.cause.cause.message).toEqual(
           'Error in disconnection process of monitor client: myError'
         );
+        //@ts-ignore - Test environment
         expect(error.cause.cause.cause.message).toEqual('myError');
       }
     }, 300);
@@ -955,11 +963,14 @@ describe('#Port #Kafka #Consumer', () => {
       try {
         await port.close();
         throw new Error('Should have failed');
-      } catch (error: any) {
+      } catch (error) {
+        //@ts-ignore - Test environment
         expect(error.message).toEqual(
           'Error in port disconnection: Error in disconnection process: myError'
         );
+        //@ts-ignore - Test environment
         expect(error.cause.message).toEqual('Error in disconnection process: myError');
+        //@ts-ignore - Test environment
         expect(error.cause.cause.message).toEqual('myError');
       }
     }, 300);

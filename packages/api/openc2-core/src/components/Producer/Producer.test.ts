@@ -1,10 +1,11 @@
 /**
- * Copyright 2022 Mytra Control S.L. All rights reserved.
+ * Copyright 2024 Mytra Control S.L. All rights reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be found in the LICENSE file
  * or at https://opensource.org/licenses/MIT.
  */
 
+import { Health } from '@mdf.js/core';
 import EventEmitter from 'events';
 import { v4 } from 'uuid';
 import { Control, ProducerAdapter, ProducerOptions } from '../../types';
@@ -19,6 +20,7 @@ const options: ProducerOptions = {
 class MyAdapter extends EventEmitter implements ProducerAdapter {
   name = 'myAdapter';
   componentId = v4();
+  status = Health.STATUS.PASS;
   checks = {};
   publish(
     message: Control.CommandMessage
@@ -30,6 +32,9 @@ class MyAdapter extends EventEmitter implements ProducerAdapter {
     return Promise.resolve();
   }
   stop(): Promise<void> {
+    return Promise.resolve();
+  }
+  close(): Promise<void> {
     return Promise.resolve();
   }
   subcomponents = [];

@@ -1,5 +1,6 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /**
- * Copyright 2022 Mytra Control S.L. All rights reserved.
+ * Copyright 2024 Mytra Control S.L. All rights reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be found in the LICENSE file
  * or at https://opensource.org/licenses/MIT.
@@ -13,6 +14,8 @@ import { AnyValidateFunction } from 'ajv/dist/core';
 import { get } from 'jsonpointer';
 import { cloneDeep, forOwn, omit } from 'lodash';
 import { v4 } from 'uuid';
+
+import DynamicDefaults, { DynamicDefaultFunc } from 'ajv-keywords/dist/definitions/dynamicDefaults';
 
 const DEFAULT_SNIPPET_META_SCHEMA = {
   title: 'Default snippets',
@@ -29,17 +32,29 @@ const DEFAULT_SNIPPET_META_SCHEMA = {
   },
 };
 
-type SchemaSelector<T> = T extends void ? string : keyof T & string;
-type ValidatedOutput<T, K> = K extends keyof T ? T[K] : any;
+export type { JSONSchemaType, SchemaObject } from 'ajv';
+export type SchemaSelector<T> = T extends void ? string : keyof T & string;
+export type ValidatedOutput<T, K> = K extends keyof T ? T[K] : any;
 
-/** AJV options but all errors must be true */
-export type DoorkeeperOptions = Options;
-export { JSONSchemaType } from 'ajv';
+/**
+ * This is the AJV Options object, but `allErrors` property is always true by default
+ *
+ * See [AJV Options](https://ajv.js.org/options.html) for more information
+ */
+export interface DoorkeeperOptions extends Omit<Options, 'allErrors'> {
+  /** Dynamic defaults to be used in the schemas */
+  dynamicDefaults?: Record<string, DynamicDefaultFunc>;
+}
 
 /** Callback function for the validation process */
 export type ResultCallback<T, K> = (error?: Crash | Multi, result?: ValidatedOutput<T, K>) => void;
 
-/** Wrapping class for AJV */
+/**
+ * Doorkeeper is a wrapper for AJV that allows us to validate JSONs against schemas.
+ * It also allows us to register schemas and retrieve them later.
+ * @category Doorkeeper
+ * @public
+ */
 export class DoorKeeper<T = void> {
   readonly uuid = v4();
   /** AJV instance*/
@@ -49,14 +64,22 @@ export class DoorKeeper<T = void> {
    * @param options - Doorkeeper options
    */
   constructor(public readonly options?: DoorkeeperOptions) {
-    this.options = options ? { ...options, allErrors: true } : { allErrors: true };
-    this.ajv = AJVFormats(AJVKeyWords(AJVError(new AJV(this.options))));
+    const AJVOptions: Options = this.options
+      ? { ...this.options, allErrors: true }
+      : { allErrors: true };
+    if (this.options?.dynamicDefaults) {
+      for (const [key, func] of Object.entries(this.options.dynamicDefaults)) {
+        DynamicDefaults.DEFAULTS[key] = func;
+      }
+    }
+    this.ajv = AJVFormats(AJVKeyWords(AJVError(new AJV(AJVOptions))));
     this.ajv.addKeyword({ keyword: 'markdownDescription', schemaType: 'string', valid: true });
     this.ajv.addKeyword({
       keyword: 'defaultSnippets',
       metaSchema: DEFAULT_SNIPPET_META_SCHEMA,
       valid: true,
     });
+    this.options = AJVOptions;
   }
   /**
    * Add a new schema to the ajv collection
@@ -289,7 +312,6 @@ export class DoorKeeper<T = void> {
    * Validate an Object against the input schema
    * @param schema - The schema we want to validate
    * @param data - Object to be validated
-   * @param uuid - unique identifier for this operation
    */
   public validate<K extends SchemaSelector<T>>(
     schema: K,
@@ -366,6 +388,15 @@ export class DoorKeeper<T = void> {
     }
   }
   /**
+   * Checks if the given data matches the specified schema.
+   * @param schema - The schema to check against.
+   * @param data - The data to validate.
+   * @returns A boolean indicating whether the data matches the schema.
+   */
+  public is<K extends SchemaSelector<T>>(schema: K, data: any): data is ValidatedOutput<T, K> {
+    return this.check(schema, data);
+  }
+  /**
    * Return a dereferenced schema with all the $ref resolved
    * @param schema - The schema we want to dereference
    * @param uuid - unique identifier for this operation
@@ -383,18 +414,26 @@ export class DoorKeeper<T = void> {
     }
     const _schema = cloneDeep(validatorSchema.schema);
     const iterator = (
-      entry: Record<string, any>,
-      key: string,
-      parentSchema: Record<string, any>
+      propertyValue: Record<string, any> | string,
+      propertyKey: string,
+      parentObject: Record<string, any>
     ) => {
-      if (entry['$ref']) {
-        const refSchema = this.getSchema(entry['$ref'], uuid);
-        parentSchema[key] = forOwn(
-          omit(cloneDeep(refSchema.schema) as object, ['$id', '$schema']),
-          iterator
-        );
-      } else if (typeof entry === 'object') {
-        parentSchema[key] = forOwn(entry, iterator);
+      if (typeof propertyValue === 'string' && propertyKey === '$ref') {
+        const refSchema = this.getSchema(propertyValue as SchemaSelector<T>, uuid);
+        const copyOfRefSchema = omit(cloneDeep(refSchema.schema) as object, ['$id', '$schema']);
+        const dereferencedSchema = forOwn(copyOfRefSchema, iterator);
+        Object.assign(parentObject, omit(dereferencedSchema, ['$ref']));
+      } else if (typeof propertyValue === 'object' && propertyValue['$ref']) {
+        const refSchema = this.getSchema(propertyValue['$ref'], uuid);
+        const copyOfRefSchema = omit(cloneDeep(refSchema.schema) as object, ['$id', '$schema']);
+        const copyOfEntry = omit(cloneDeep(propertyValue), ['$ref']);
+        const dereferencedSchema = {
+          ...forOwn(copyOfRefSchema, iterator),
+          ...copyOfEntry,
+        };
+        parentObject[propertyKey] = omit(dereferencedSchema, ['$ref']);
+      } else if (typeof propertyValue === 'object') {
+        parentObject[propertyKey] = forOwn(propertyValue, iterator);
       }
     };
     return forOwn(_schema, iterator);

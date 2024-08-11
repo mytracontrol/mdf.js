@@ -1,5 +1,5 @@
 /**
- * Copyright 2022 Mytra Control S.L. All rights reserved.
+ * Copyright 2024 Mytra Control S.L. All rights reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be found in the LICENSE file
  * or at https://opensource.org/licenses/MIT.
@@ -28,7 +28,7 @@ describe(`#Config #${CONFIG_PROVIDER_BASE_NAME.toLocaleUpperCase()} Sender`, () 
         },
         reconnect: 5000,
         transport: 'tcp',
-        username: 'producer',
+        username: 'mdf-amqp',
       });
     }, 300);
   });

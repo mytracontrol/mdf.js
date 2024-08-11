@@ -1,6 +1,6 @@
 /* eslint-disable max-len */
 /**
- * Copyright 2022 Mytra Control S.L. All rights reserved.
+ * Copyright 2024 Mytra Control S.L. All rights reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be found in the LICENSE file
  * or at https://opensource.org/licenses/MIT.
@@ -13,7 +13,7 @@ export interface Options {
    */
   readonly pascalCase?: boolean;
   /**
-   * Preserve consecutive uppercase characters: `foo-BAR` → `FooBAR`.
+   * Preserve consecutive uppercase characters: `foo-BAR` → `fooBAR`.
    * @default false
    */
   readonly preserveConsecutiveUppercase?: boolean;

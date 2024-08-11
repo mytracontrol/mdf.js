@@ -1,19 +1,23 @@
 /**
- * Copyright 2022 Mytra Control S.L. All rights reserved.
+ * Copyright 2024 Mytra Control S.L. All rights reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be found in the LICENSE file
  * or at https://opensource.org/licenses/MIT.
  */
 
-import { Health } from '@mdf.js/core';
+import { Health, Layer } from '@mdf.js/core';
+import { overallStatus } from '@mdf.js/core/dist/Health';
 import { Crash } from '@mdf.js/crash';
 import EventEmitter from 'events';
 import { v4 } from 'uuid';
 import { HealthWrapper } from '.';
 
-class MyHealthComponent extends EventEmitter implements Health.Component {
+class MyHealthComponent extends EventEmitter implements Layer.App.Resource {
   componentId = v4();
   name = 'MyHealth';
+  public get status(): Health.Status {
+    return overallStatus(this.checks);
+  }
   public get checks(): Health.Checks {
     return {};
   }
@@ -22,6 +26,15 @@ class MyHealthComponent extends EventEmitter implements Health.Component {
   }
   emitStatus(status: Health.Status): void {
     this.emit('status', status);
+  }
+  public async start(): Promise<void> {
+    return;
+  }
+  public async stop(): Promise<void> {
+    return;
+  }
+  public async close(): Promise<void> {
+    return;
   }
 }
 

@@ -1,8 +1,20 @@
 {
   "entryPoints": [
-    "packages/**/*"
+    "packages/api/*",
+    "packages/components/*",
+    "packages/providers/*",
+    "packages/registries/*",
   ],
   "entryPointStrategy": "packages",
   "name": "@mdf.js",
-  "includeVersion": false
+  "includeVersion": false,
+  "readme": "README.md",
+  "plugin": [],
+  "navigation": {
+    "includeCategories": false,
+    "includeGroups": false,
+    "includeFolders": false
+  },
+  "categorizeByGroup": true,
+  "logLevel": "Info",
 }
