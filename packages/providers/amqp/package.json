@@ -37,7 +37,7 @@
     "joi": "^17.13.3",
     "lodash": "^4.17.21",
     "rhea-promise": "^3.0.3",
-    "tslib": "^2.6.3",
+    "tslib": "^2.7.0",
     "uuid": "^10.0.0"
   },
   "devDependencies": {

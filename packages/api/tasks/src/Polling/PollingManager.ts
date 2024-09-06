@@ -192,6 +192,16 @@ export class PollingManager extends EventEmitter {
   }
   /** Return the stats of the polling manager */
   public get check(): Health.Check {
-    return this.pollingStats.check;
+    const _check = {
+      ...this.pollingStats.check,
+      observedValue: {
+        ...this.pollingStats.check.observedValue,
+        inFastCycleTasks: this.fastEntries.size,
+        inSlowCycleTasks: this.slowEntries.size,
+        inOffCycleTasks: this.offEntries.size,
+        pendingTasks: this.pending.size,
+      },
+    };
+    return _check;
   }
 }

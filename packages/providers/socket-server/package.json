@@ -40,7 +40,7 @@
     "express": "^4.19.2",
     "joi": "^17.13.3",
     "socket.io": "^4.7.5",
-    "tslib": "^2.6.3"
+    "tslib": "^2.7.0"
   },
   "devDependencies": {
     "@mdf.js/repo-config": "*",

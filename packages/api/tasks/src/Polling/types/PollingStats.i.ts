@@ -22,8 +22,12 @@ export interface PollingStats {
   minCycleDuration: number;
   /** Last cycle duration in milliseconds */
   lastCycleDuration: number;
-  /** Number of tasks included on the cycle */
-  tasks: number;
+  /** Number of tasks included on the fast cycle (normal cycle) */
+  inFastCycleTasks: number;
+  /** Number of tasks included on the slow cycle */
+  inSlowCycleTasks: number;
   /** Number of tasks not included on the cycle */
-  tasksOffCycle: number;
+  inOffCycleTasks: number;
+  /** Number of pending tasks */
+  pendingTasks: number;
 }

@@ -144,6 +144,7 @@ export class PollingMetricsHandler {
         : Health.STATUS.WARN;
     const _check: Health.Check = {
       componentId: this.componentId,
+      resource: this.resource,
       pollingGroup: this.pollingGroup,
       componentType: 'pollingGroup',
       observedValue: this.pollingStats,
