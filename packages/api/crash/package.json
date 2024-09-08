@@ -35,7 +35,7 @@
     "test": "jest --detectOpenHandles --config ./jest.config.js"
   },
   "dependencies": {
-    "tslib": "^2.6.3",
+    "tslib": "^2.7.0",
     "uuid": "^10.0.0"
   },
   "devDependencies": {

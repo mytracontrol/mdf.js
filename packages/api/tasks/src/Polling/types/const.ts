@@ -27,6 +27,8 @@ export const DEFAULT_POLLING_STATS: PollingStats = {
   maxCycleDuration: 0,
   minCycleDuration: Infinity,
   lastCycleDuration: 0,
-  tasks: 0,
-  tasksOffCycle: 0,
+  inFastCycleTasks: 0,
+  inSlowCycleTasks: 0,
+  inOffCycleTasks: 0,
+  pendingTasks: 0,
 };
