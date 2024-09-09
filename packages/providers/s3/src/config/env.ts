@@ -5,6 +5,9 @@
  * or at https://opensource.org/licenses/MIT.
  */
 
+import { NodeHttpHandler, NodeHttpHandlerOptions } from '@smithy/node-http-handler';
+import { HttpProxyAgent } from 'http-proxy-agent';
+import { HttpsProxyAgent } from 'https-proxy-agent';
 import { Config } from '../provider';
 import { DEFAULT_CONFIG_S3_ACCESS_KEY_ID, DEFAUTLT_CONFIG_S3_SECRET_ACCESS_KEY } from './default';
 
@@ -19,6 +22,22 @@ const CONFIG_S3_ACCESS_KEY_ID = process.env['CONFIG_S3_ACCESS_KEY_ID'];
 const CONFIG_S3_SECRET_ACCESS_KEY = process.env['CONFIG_S3_SECRET_ACCESS_KEY'];
 /** S3 unique service identifier */
 const CONFIG_S3_SERVICE_ID = process.env['CONFIG_S3_SERVICE_ID'];
+/** HTTP Proxy URI */
+const CONFIG_S3_PROXY_HTTP = process.env['CONFIG_S3_PROXY_HTTP'];
+/** HTTPS Proxy URI */
+const CONFIG_S3_PROXY_HTTPS = process.env['CONFIG_S3_PROXY_HTTPS'];
+
+const requestHandlerConfig: NodeHttpHandlerOptions = {};
+if (CONFIG_S3_PROXY_HTTP) {
+  requestHandlerConfig.httpAgent = new HttpProxyAgent(CONFIG_S3_PROXY_HTTP);
+}
+if (CONFIG_S3_PROXY_HTTPS) {
+  requestHandlerConfig.httpsAgent = new HttpsProxyAgent(CONFIG_S3_PROXY_HTTPS);
+}
+let requestHandler: NodeHttpHandler | undefined = undefined;
+if (requestHandlerConfig.httpAgent || requestHandlerConfig.httpsAgent) {
+  requestHandler = new NodeHttpHandler(requestHandlerConfig);
+}
 
 export const envBasedConfig: Config = {
   region: CONFIG_S3_REGION,
@@ -27,5 +46,6 @@ export const envBasedConfig: Config = {
     secretAccessKey: CONFIG_S3_SECRET_ACCESS_KEY ?? DEFAUTLT_CONFIG_S3_SECRET_ACCESS_KEY,
   },
   serviceId: CONFIG_S3_SERVICE_ID,
+  requestHandler,
 };
 // #endregion
