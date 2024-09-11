@@ -6,6 +6,9 @@
  */
 // *************************************************************************************************
 // #region Arrange
+process.env['CONFIG_S3_PROXY_HTTP'] = 'http://localhost:8080';
+process.env['CONFIG_S3_PROXY_HTTPS'] = 'https://localhost:443';
+
 import { CONFIG_PROVIDER_BASE_NAME } from '.';
 import { defaultConfig } from './default';
 // #endregion
