@@ -6,4 +6,4 @@
  */
 
 export { FileSystemManager } from './Client';
-export * as Setup from './provider';
+export * as FileSystem from './provider';
