@@ -11,7 +11,13 @@ import fs from 'fs';
 import _ from 'lodash';
 import { EventEmitter } from 'stream';
 import { v4 } from 'uuid';
-import { CopyOptions, FileSystemManagerOptions, ReadOptions, WriteOptions } from './types';
+import {
+  CopyOptions,
+  FileSystemManagerOptions,
+  ReadDirOptions,
+  ReadOptions,
+  WriteOptions,
+} from './types';
 
 export declare interface FileSystemManager {
   /**
@@ -150,17 +156,10 @@ export class FileSystemManager extends EventEmitter {
    *
    * @param source - The path of the file to be moved.
    * @param destination - The destination path where the file will be moved to.
-   * @param copyOptions - The copy options to be used during the move operation (optiional). If not provided,
-   * the default copy options are used. Otherwise, the provided options are merged with the default ones.
    */
-  public moveFile(source: string, destination: string, copyOptions?: CopyOptions): void {
+  public moveFile(source: string, destination: string): void {
     try {
-      const mergedOptions: CopyOptions = _.merge(
-        _.cloneDeep(this.options.copyOptions),
-        copyOptions
-      );
-      fs.copyFileSync(source, destination, mergedOptions.mode);
-      fs.unlinkSync(source);
+      fs.renameSync(source, destination);
       this.resetError();
     } catch (error) {
       const cause = Crash.from(error);
@@ -187,6 +186,30 @@ export class FileSystemManager extends EventEmitter {
     } catch (error) {
       const cause = Crash.from(error);
       const crash = new Crash(`Error reading file`, { cause });
+      this.addError(crash);
+      throw crash;
+    }
+  }
+
+  /**
+   * Reads the contents of a directory.
+   *
+   * @param path - The path of the directory to read.
+   * @param options - The options for reading the directory (optional).
+   * @returns An array of strings, buffers, or fs.Dirent objects representing the contents of the directory.
+   */
+  public readDirectory(path: string, options?: ReadDirOptions): string[] | Buffer[] {
+    try {
+      const mergedOptions: ReadDirOptions = _.merge(
+        _.cloneDeep(this.options.readDirOptions),
+        options
+      );
+      const result = fs.readdirSync(path, mergedOptions);
+      this.resetError();
+      return result;
+    } catch (error) {
+      const cause = Crash.from(error);
+      const crash = new Crash(`Error reading directory`, { cause });
       this.addError(crash);
       throw crash;
     }

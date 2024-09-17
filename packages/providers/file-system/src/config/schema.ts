@@ -28,4 +28,8 @@ export const schema = Joi.object({
   copyOptions: Joi.object({
     mode: Joi.number().optional(),
   }),
+  readDirOptions: Joi.object({
+    encoding: Joi.string().optional(),
+    recursive: Joi.boolean().optional(),
+  }),
 }).unknown(true);

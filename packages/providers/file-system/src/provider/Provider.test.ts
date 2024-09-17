@@ -17,6 +17,7 @@ const DEFAULT_CONFIG: Config = {
   readOptions: { encoding: 'utf-8', flag: 'r' },
   writeOptions: { encoding: 'utf-8', flag: 'a' },
   copyOptions: { mode: 1 },
+  readDirOptions: { encoding: 'utf8', recursive: false },
 };
 class FakeLogger {
   public entry?: string;

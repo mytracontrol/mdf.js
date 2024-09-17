@@ -17,9 +17,11 @@ describe(`#Config #file-system`, () => {
       expect(defaultConfig.readOptions).toBeDefined();
       expect(defaultConfig.writeOptions).toBeDefined();
       expect(defaultConfig.copyOptions).toBeDefined();
+      expect(defaultConfig.readDirOptions).toBeDefined();
       const readOptions = defaultConfig.readOptions;
       const writeOptions = defaultConfig.writeOptions;
       const copyOptions = defaultConfig.copyOptions;
+      const readDirOptions = defaultConfig.readDirOptions;
       expect(readOptions).toHaveProperty('encoding', 'utf-8');
       expect(readOptions).toHaveProperty('flag', 'r');
       expect(writeOptions).toHaveProperty('encoding', 'utf-8');
@@ -27,6 +29,8 @@ describe(`#Config #file-system`, () => {
       expect(writeOptions).toHaveProperty('mode', 0o666);
       expect(writeOptions).toHaveProperty('flush', false);
       expect(copyOptions).toHaveProperty('mode', 1);
+      expect(readDirOptions).toHaveProperty('encoding', 'utf8');
+      expect(readDirOptions).toHaveProperty('recursive', false);
     }, 1000);
   });
 });

@@ -108,6 +108,10 @@ The configuration options (`config`) are the following:
     copyOptions: {
       mode: fs.constants.COPYFILE_EXCL
     }
+    readDirOptions: {
+      encoding: 'utf-8',
+      recursive: false,
+    }
   }
   ```
 For more details about options, see https://nodejs.org/api/fs.html
@@ -129,6 +133,10 @@ For more details about options, see https://nodejs.org/api/fs.html
     copyOptions: {
       mode: process.env['CONFIG_COPY_OPTIONS_MODE'],
     }
+    readDirOptions: {
+      encoding: process.env['CONFIG_READ_DIR_OPTIONS_ENCODING'],
+      recursive: process.env['CONFIG_READ_DIR_OPTIONS_RECURSIVE'],
+    }
   }
   ```
 
@@ -141,11 +149,14 @@ For more details about options, see https://nodejs.org/api/fs.html
 -  **CONFIG\_WRITE\_OPTIONS\_FLAG** (default: `a`): The flag for reading files. 
 -  **CONFIG\_WRITE\_OPTIONS\_FLUSH** (default: `false`): Whether to flush the underlaying descriptor of a file before clising it or not.
 -  **CONFIG_COPY_OPTIONS_MODE** (default: `fs.constants.COPYFILE_EXCL = 1`): The mode for reading files.
+-  **CONFIG\_READ\_DIR\_OPTIONS\_ENCODING** (default: `utf-8`): The encoding for reading directories.
+-  **CONFIG\_READ\_DIR\_OPTIONS\_RECURSIVE** (default: `false`): Whether to read the contents of the directory recursively. In recursive mode, it will list all files, sub files, and directories.
 
 For possible values, check the following documentation:
 -  [**fs readFileSync**](https://nodejs.org/api/fs.html#fsreadfilesyncpath-options)
 -  [**fs appendFileSync**](https://nodejs.org/api/fs.html#fsappendfilesyncpath-data-options)
 -  [**fs copyFileSync**](https://nodejs.org/api/fs.html#fscopyfilesyncsrc-dest-mode)
+-  [**fs readDirSync**](https://nodejs.org/api/fs.html#fsreaddirsyncpath-options)
 
 ## **License**
 

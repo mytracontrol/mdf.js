@@ -27,9 +27,16 @@ export interface CopyOptions {
 /** Represents the options for writing a file. See Node fs WriteFileOptions */
 export type WriteOptions = fs.WriteFileOptions;
 
+/** Represents the options for reading a directory */
+export interface ReadDirOptions {
+  encoding?: BufferEncoding;
+  recursive?: boolean;
+}
+
 /** Represents the options for the FileSystemManager */
 export interface FileSystemManagerOptions {
   readOptions: ReadOptions;
   writeOptions: WriteOptions;
   copyOptions: CopyOptions;
+  readDirOptions: ReadDirOptions;
 }

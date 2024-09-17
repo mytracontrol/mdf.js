@@ -15,6 +15,10 @@ describe('#FileSystemManager', () => {
       encoding: 'utf-8',
       flag: 'r',
     },
+    readDirOptions: {
+      encoding: 'utf-8',
+      recursive: false,
+    },
   };
 
   let manager: FileSystemManager;
@@ -55,11 +59,9 @@ describe('#FileSystemManager', () => {
     it('Should move a file', () => {
       const source = 'source.txt';
       const destination = 'destination.txt';
-      const copySpy = jest.spyOn(fs, 'copyFileSync').mockReturnValue();
-      const unlinkSpy = jest.spyOn(fs, 'unlinkSync').mockReturnValue();
+      const spy = jest.spyOn(fs, 'renameSync').mockReturnValue();
       manager.moveFile(source, destination);
-      expect(copySpy).toHaveBeenCalledWith(source, destination, 0);
-      expect(unlinkSpy).toHaveBeenCalledWith(source);
+      expect(spy).toHaveBeenCalledWith(source, destination);
     });
 
     it('Should read a file', () => {
@@ -69,6 +71,14 @@ describe('#FileSystemManager', () => {
       const result = manager.readFile(path);
       expect(spy).toHaveBeenCalledWith(path, options.readOptions);
       expect(result).toBe(data);
+    });
+    it('Should read a directory', () => {
+      const path = 'test-dir';
+      const dirContent = ['file1', 'file2'];
+      const spy = jest.spyOn(fs, 'readdirSync').mockReturnValue(dirContent as any);
+      const result = manager.readDirectory(path);
+      expect(spy).toHaveBeenCalledWith(path, options.readDirOptions);
+      expect(result).toBe(dirContent);
     });
   });
 
@@ -160,6 +170,22 @@ describe('#FileSystemManager', () => {
         const trace = manager.error?.trace() || [];
         expect(trace[0]).toEqual('CrashError: Error reading file');
         expect(trace[1]).toEqual('caused by Error: read error');
+      }
+    });
+    it('Should handle error when reading a directory', () => {
+      const path = 'test-dir';
+      jest.spyOn(fs, 'readdirSync').mockImplementation(() => {
+        throw new Error('readdir error');
+      });
+      try {
+        const result = manager.readDirectory(path);
+      } catch (error) {
+        expect(error).toBeDefined();
+        expect(manager.isErrored).toBeTruthy();
+        expect(manager.error?.message).toEqual('Error in file system operation');
+        const trace = manager.error?.trace() || [];
+        expect(trace[0]).toEqual('CrashError: Error reading directory');
+        expect(trace[1]).toEqual('caused by Error: readdir error');
       }
     });
   });

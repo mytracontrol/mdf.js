@@ -30,5 +30,9 @@ export const defaultConfig: Config = {
   copyOptions: {
     mode: COPY_OPTIONS_MODE,
   },
+  readDirOptions: {
+    encoding: 'utf8',
+    recursive: false,
+  },
 };
 // #endregion
