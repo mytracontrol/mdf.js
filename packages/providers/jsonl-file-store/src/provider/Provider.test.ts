@@ -8,16 +8,19 @@ import { Layer } from '@mdf.js/core';
 import { Crash, Multi } from '@mdf.js/crash';
 import { LoggerInstance } from '@mdf.js/logger';
 import fs from 'fs';
-import { FileSystemManager } from '../Client';
+import { JsonlFileStoreManager } from '../Client';
 import { Factory } from './Factory';
 import { Port } from './Port';
 import { Config } from './types';
 
 const DEFAULT_CONFIG: Config = {
-  readOptions: { encoding: 'utf-8', flag: 'r' },
   writeOptions: { encoding: 'utf-8', flag: 'a' },
-  copyOptions: { mode: 1 },
-  readDirOptions: { encoding: 'utf8', recursive: false },
+  rotationOptions: {
+    interval: 600000,
+    openFilesFolderPath: './data/open',
+    closedFilesFolderPath: './data/closed',
+    retryOptions: { attempts: 3, timeout: 5000 },
+  },
 };
 class FakeLogger {
   public entry?: string;
@@ -41,29 +44,38 @@ class FakeLogger {
   }
 }
 
-describe('#Port #FileSystem', () => {
+describe('#Port #jsonl-file-store', () => {
+  beforeEach(() => {
+    jest.spyOn(fs, 'readdirSync').mockReturnValue([]);
+    jest.spyOn(fs, 'writeFileSync').mockReturnValue();
+  });
+  afterEach(() => {
+    jest.clearAllMocks();
+    jest.restoreAllMocks();
+  });
   describe('#Happy path', () => {
     it('Should create provider using the factory instance with default configuration', () => {
       const provider = Factory.create();
       expect(provider).toBeDefined();
       expect(provider).toBeInstanceOf(Layer.Provider.Manager);
-      expect(provider.client).toBeInstanceOf(FileSystemManager);
+      expect(provider.client).toBeInstanceOf(JsonlFileStoreManager);
       expect(provider.state).toEqual('stopped');
       //@ts-ignore - Test environment
       expect(provider.options.useEnvironment).toBeTruthy();
       const checks = provider.checks;
       expect(checks).toEqual({
-        'file-system:status': [
+        'jsonl-file-store:status': [
           {
-            componentId: checks['file-system:status'][0].componentId,
+            componentId: checks['jsonl-file-store:status'][0].componentId,
             componentType: 'service',
             observedValue: 'stopped',
             output: undefined,
             status: 'warn',
-            time: checks['file-system:status'][0].time,
+            time: checks['jsonl-file-store:status'][0].time,
           },
         ],
       });
+      provider.client.stopRotationTimer();
     }, 300);
     it('Should create provider using the factory instance with a configuration', () => {
       const provider = Factory.create({
@@ -71,9 +83,13 @@ describe('#Port #FileSystem', () => {
         name: 'test',
         logger: new FakeLogger() as LoggerInstance,
         config: {
-          readOptions: { encoding: 'ascii', flag: 'r+' },
           writeOptions: { encoding: 'ascii', flag: 'w+', mode: 0 },
-          copyOptions: { mode: 0 },
+          rotationOptions: {
+            interval: 9000,
+            openFilesFolderPath: './custom/open',
+            closedFilesFolderPath: './custom/closed',
+            retryOptions: { attempts: 1, timeout: 9000 },
+          },
         },
       });
       expect(provider).toBeDefined();
@@ -95,6 +111,7 @@ describe('#Port #FileSystem', () => {
           },
         ],
       });
+      provider.client.stopRotationTimer();
     }, 300);
     it('Should create the instance with default configuration', () => {
       const port = new Port(DEFAULT_CONFIG, new FakeLogger() as LoggerInstance);
@@ -102,6 +119,7 @@ describe('#Port #FileSystem', () => {
       expect(port.client).toBeDefined();
       expect(port.state).toBeFalsy();
       expect(port.checks).toEqual({});
+      port.client.stopRotationTimer();
     }, 300);
     it('Should start/stop the client on request', done => {
       const port = new Port(DEFAULT_CONFIG, new FakeLogger() as LoggerInstance);
@@ -119,6 +137,7 @@ describe('#Port #FileSystem', () => {
         .then(() => port.close())
         .then(() => {
           expect(port.state).toBeFalsy();
+          port.client.stopRotationTimer();
           process.nextTick(done);
         })
         .catch(error => {
@@ -127,7 +146,7 @@ describe('#Port #FileSystem', () => {
     }, 300);
   });
   describe('#Sad path', () => {
-    it('Should emit unhealthy event if there is an error in a file system operation', done => {
+    it('Should emit unhealthy event if there is an error in a jsonl file storage operation', done => {
       const port = new Port(DEFAULT_CONFIG, new FakeLogger() as LoggerInstance);
       const eventsEmitted: string[] = [];
       jest.spyOn(fs, 'appendFileSync').mockImplementation(() => {
@@ -137,23 +156,28 @@ describe('#Port #FileSystem', () => {
       port.on('unhealthy', error => {
         expect(error).toBeDefined();
         expect(error).toBeInstanceOf(Multi);
-        expect(error.message).toEqual('Error in file system operation');
+        expect(error.message).toEqual('Error in jsonl file store operation');
         const trace = error.trace();
-        expect(trace[0]).toEqual(`CrashError: Error appending data to file`);
-        expect(trace[1]).toEqual(`caused by Error: append error`);
+        expect(trace[0]).toContain(`CrashError: Execution error in task`);
+        expect(trace[2]).toEqual(`caused by CrashError: Error appending data to file`);
+        expect(trace[3]).toEqual(`caused by Error: append error`);
         eventsEmitted.push('unhealthy');
       });
       port
         .start()
         .then(() => {
-          port.client.appendFile('test.txt', 'Hello, World!', 'utf-8');
+          return port.client.append('Hello');
+        })
+        .then(() => {
+          throw new Error('Should not be here');
         })
         .catch(error => {
           expect(eventsEmitted).toEqual(['unhealthy']);
+          port.client.stopRotationTimer();
           done();
         });
     }, 300);
-    it('Should emit healthy event if there is a recovery from previous error in a file system operation', done => {
+    it('Should emit healthy event if there is a recovery from previous error in a jsonl file storage operation', done => {
       const port = new Port(DEFAULT_CONFIG, new FakeLogger() as LoggerInstance);
       const eventsEmitted: string[] = [];
       jest
@@ -174,13 +198,14 @@ describe('#Port #FileSystem', () => {
       port
         .start()
         .then(() => {
-          port.client.appendFile('test.txt', 'Hello, World!', 'utf-8');
+          return port.client.append('Hello, World!');
         })
         .catch(error => {
-          port.client.appendFile('test.txt', 'Bye, World!', 'utf-8');
+          return port.client.append('Bye, World!');
         })
         .finally(() => {
           expect(eventsEmitted).toEqual(['unhealthy', 'healthy']);
+          port.client.stopRotationTimer();
           done();
         });
     }, 300);

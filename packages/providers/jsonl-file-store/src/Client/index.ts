@@ -5,4 +5,5 @@
  * or at https://opensource.org/licenses/MIT.
  */
 
-export { FileSystemManager as Client } from '../../Client';
+export * from './JsonlFileStoreManager';
+export * from './types';

@@ -10,27 +10,25 @@ import { defaultConfig } from './default';
 // #endregion
 // *************************************************************************************************
 // #region config
-describe(`#Config #file-system`, () => {
+describe(`#Config #jsonl-file-store`, () => {
   describe('#Happy path', () => {
-    it(`Should has a default config`, () => {
+    it(`Should have a default config`, () => {
       expect(defaultConfig).toBeDefined();
-      expect(defaultConfig.readOptions).toBeDefined();
       expect(defaultConfig.writeOptions).toBeDefined();
-      expect(defaultConfig.copyOptions).toBeDefined();
-      expect(defaultConfig.readDirOptions).toBeDefined();
-      const readOptions = defaultConfig.readOptions;
+      expect(defaultConfig.rotationOptions).toBeDefined();
       const writeOptions = defaultConfig.writeOptions;
-      const copyOptions = defaultConfig.copyOptions;
-      const readDirOptions = defaultConfig.readDirOptions;
-      expect(readOptions).toHaveProperty('encoding', 'utf-8');
-      expect(readOptions).toHaveProperty('flag', 'r');
+      const rotationOptions = defaultConfig.rotationOptions;
       expect(writeOptions).toHaveProperty('encoding', 'utf-8');
       expect(writeOptions).toHaveProperty('flag', 'a');
       expect(writeOptions).toHaveProperty('mode', 0o666);
       expect(writeOptions).toHaveProperty('flush', false);
-      expect(copyOptions).toHaveProperty('mode', 1);
-      expect(readDirOptions).toHaveProperty('encoding', 'utf8');
-      expect(readDirOptions).toHaveProperty('recursive', false);
+      expect(rotationOptions).toHaveProperty('interval');
+      expect(rotationOptions).toHaveProperty('openFilesFolderPath', './data/open');
+      expect(rotationOptions).toHaveProperty('closedFilesFolderPath', './data/closed');
+      expect(rotationOptions).toHaveProperty('retryOptions');
+      const retryOptions = rotationOptions.retryOptions;
+      expect(retryOptions).toHaveProperty('attempts', 3);
+      expect(retryOptions).toHaveProperty('timeout', 5000);
     }, 1000);
   });
 });

@@ -14,7 +14,7 @@ export class Port extends Layer.Provider.Port<Client, Config> {
   /** Configuration loader handler */
   private readonly instance: Client;
   /**
-   * Implementation of functionalities of an Elastic port instance.
+   * Implementation of functionalities of an Jsonl File Store port instance.
    * @param config - Port configuration options
    * @param logger - Port logger, to be used internally
    * @param name - Port name, to be used internally
@@ -35,17 +35,21 @@ export class Port extends Layer.Provider.Port<Client, Config> {
   }
   /** Initialize the port instance */
   public async start(): Promise<void> {
-    this.instance.on('error', () => {
+    this.instance.on('errored', () => {
+      this.logger.info(`Jsonl-file-store port instance is unhealthy`);
       if (this.instance.error) {
         this.emit('unhealthy', this.instance.error);
       }
     });
-    this.instance.on('no-error', () => {
+    this.instance.on('no-errored', () => {
       this.emit('healthy');
     });
   }
   /** Stop the port instance */
   public async stop(): Promise<void> {
+    this.logger.info(`Stopping jsonl-file-store port instance`);
+    this.instance.stopRotationTimer();
+    this.instance.removeAllListeners();
     return;
   }
   /** Close the port instance */

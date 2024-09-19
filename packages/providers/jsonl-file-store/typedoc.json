@@ -18,11 +18,11 @@
   "excludeInternal": true,
   "includes": [],
   "media": "media",
-  "out": "../../../docs/providers/file-system-provider",
+  "out": "../../../docs/providers/jsonl-file-store-provider",
   "markedOptions": {
     "gfm": true
   },
-  "name": "@mdf.js/file-system-provider",
+  "name": "@mdf.js/jsonl-file-store-provider",
   "includeVersion": false,
   "disableSources": true,
   "excludeTags": [],
