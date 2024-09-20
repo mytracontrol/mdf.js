@@ -14,4 +14,5 @@ export const schema = Joi.object({
     secretAccessKey: Joi.string().required(),
   }),
   serviceId: Joi.string().optional(),
+  requestHandler: Joi.any().optional(),
 }).unknown(true);
