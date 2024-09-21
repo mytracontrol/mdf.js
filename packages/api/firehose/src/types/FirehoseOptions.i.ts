@@ -32,4 +32,6 @@ export interface FirehoseOptions<
   atLeastOne?: boolean;
   /** Logger instance for deep debugging tasks */
   logger?: LoggerInstance;
+  /** Maximum time of inactivity before the firehose notify that is hold */
+  maxInactivityTime?: number;
 }

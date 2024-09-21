@@ -38,6 +38,8 @@ export declare interface Engine {
   on(event: 'pipe', listener: (source: Readable) => void): this;
   /** Emitted when the stream is piped with a readable stream */
   on(event: 'unpipe', listener: (source: Readable) => void): this;
+  /** Emitted when the inactivity time exceeds the limit */
+  on(event: 'hold', listener: () => void): this;
 }
 
 export class Engine extends Transform implements Layer.App.Component {
@@ -47,6 +49,8 @@ export class Engine extends Transform implements Layer.App.Component {
   private readonly logger: LoggerInstance;
   /** Store the last error emitted by the super class */
   private error?: Crash | Multi;
+  /** Inactivity timer */
+  private inactivityTimer?: NodeJS.Timeout;
   /**
    * Create a new instance of the datapoint filter stream
    * @param name - name of the transform
@@ -68,12 +72,15 @@ export class Engine extends Transform implements Layer.App.Component {
   /**
    * Perform the filter strategy depending of the job type
    * @param job - publication job object
+   * @param encoding - encoding of the job
+   * @param callback - callback to return the job
    */
   override _transform(
     job: OpenJobHandler,
     encoding: string,
     callback: (error?: Crash, chunk?: any) => void
   ): void {
+    this.restartTimer();
     // Stryker disable next-line all
     this.logger.debug(`Appling filters to a ${job.type} - ${job.uuid}`);
     const strategies = get(this.options?.strategies, job.type, []);
@@ -124,35 +131,6 @@ export class Engine extends Transform implements Layer.App.Component {
     }
     return job;
   }
-  /**
-   * Return the status of the stream in a standard format
-   * @returns _check object_ as defined in the draft standard
-   * https://datatracker.ietf.org/doc/html/draft-inadarei-api-health-check-05
-   */
-  public get checks(): Health.Checks {
-    return {
-      [`engine:stream`]: [
-        {
-          status: this.ownStatus,
-          componentId: this.componentId,
-          componentType: 'stream',
-          observedValue: `${this.writableLength}/${this.writableHighWaterMark}`,
-          observedUnit: 'writable jobs',
-          time: new Date().toISOString(),
-          output: this.detailedOutput(),
-        },
-        {
-          status: this.ownStatus,
-          componentId: this.componentId,
-          componentType: 'stream',
-          observedValue: `${this.readableLength}/${this.readableHighWaterMark}`,
-          observedUnit: 'readable jobs',
-          time: new Date().toISOString(),
-          output: this.detailedOutput(),
-        },
-      ],
-    };
-  }
   /** Return the status of the stream in the standard format */
   private get ownStatus(): Health.Status {
     if (!this.writable || !this.readable) {
@@ -199,11 +177,85 @@ export class Engine extends Transform implements Layer.App.Component {
     this.logger.debug(`Engine stream ${this.name} has been paused`);
     this.emit('status', this.ownStatus);
   };
+  /** Restart event handler */
+  private readonly onHoldEvent = () => {
+    // Stryker disable next-line all
+    this.logger.warn(
+      `Engine stream ${this.name} reached the inactivity limit ${this.options?.maxInactivityTime} ms`
+    );
+    clearTimeout(this.inactivityTimer);
+    if (this.options?.maxInactivityTime) {
+      this.inactivityTimer = setTimeout(this.onHoldEvent, this.options.maxInactivityTime);
+    }
+    this.emit('hold');
+  };
   /** Wrap super and plug events in the same to aggregate them in one component */
   private wrappingEvents(): void {
     super.on('error', this.onErrorEvent);
     super.on('close', this.onCloseEvent);
     super.on('drain', this.onDrainEvent);
     super.on('pause', this.onPauseEvent);
+  }
+  /** Restart the inactivity timer */
+  private restartTimer(): void {
+    if (this.inactivityTimer) {
+      clearTimeout(this.inactivityTimer);
+    }
+    if (this.options?.maxInactivityTime) {
+      this.inactivityTimer = setTimeout(this.onHoldEvent, this.options.maxInactivityTime);
+    }
+  }
+  /**
+   * Return the status of the stream in a standard format
+   * @returns _check object_ as defined in the draft standard
+   * https://datatracker.ietf.org/doc/html/draft-inadarei-api-health-check-05
+   */
+  public get checks(): Health.Checks {
+    return {
+      [`engine:stream`]: [
+        {
+          status: this.ownStatus,
+          componentId: this.componentId,
+          componentType: 'stream',
+          observedValue: `${this.writableLength}/${this.writableHighWaterMark}`,
+          observedUnit: 'writable jobs',
+          time: new Date().toISOString(),
+          output: this.detailedOutput(),
+        },
+        {
+          status: this.ownStatus,
+          componentId: this.componentId,
+          componentType: 'stream',
+          observedValue: `${this.readableLength}/${this.readableHighWaterMark}`,
+          observedUnit: 'readable jobs',
+          time: new Date().toISOString(),
+          output: this.detailedOutput(),
+        },
+      ],
+    };
+  }
+  /** Start the stream */
+  public start(): void {
+    if (this.options?.maxInactivityTime) {
+      this.inactivityTimer = setTimeout(this.onHoldEvent, this.options.maxInactivityTime);
+    }
+  }
+  /** Stop the stream */
+  public stop(): void {
+    if (this.inactivityTimer) {
+      clearTimeout(this.inactivityTimer);
+      this.inactivityTimer = undefined;
+    }
+  }
+  /** Close the stream and release resources */
+  public close(): void {
+    if (this.inactivityTimer) {
+      clearTimeout(this.inactivityTimer);
+      this.inactivityTimer = undefined;
+    }
+    super.unpipe();
+    super.end();
+    super.destroy();
+    super.removeAllListeners();
   }
 }

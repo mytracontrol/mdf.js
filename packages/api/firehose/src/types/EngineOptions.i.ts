@@ -18,4 +18,6 @@ export interface EngineOptions {
   transformOptions?: TransformOptions;
   /** Debug logger for development and deep troubleshooting */
   logger?: LoggerInstance;
+  /** Maximum time of inactivity before the firehose notify that is hold */
+  maxInactivityTime?: number;
 }

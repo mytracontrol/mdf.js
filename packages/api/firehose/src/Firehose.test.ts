@@ -14,6 +14,7 @@ import {
   MyQuickFlowPlug,
   MyQuickSequencePlug,
   MySequencePlug,
+  MySlowTapPlug,
   MyStrategy,
   MyTapPlug,
   MyWindowPlug,
@@ -79,6 +80,64 @@ describe('#Firehose', () => {
       });
       firehose.start().then();
     }, 300);
+    it('Should create a new Firehose with a Sequence Source and a Tap Sink, start-stop-start it and check is working', done => {
+      const mySinkPlug = new MyTapPlug();
+      const mySourcePlug = new MySequencePlug();
+      const firehose = new Firehose('MyFirehose', {
+        sources: [mySourcePlug],
+        sinks: [mySinkPlug],
+        bufferSize: 2,
+      });
+      expect(firehose).toBeDefined();
+      expect(firehose.name).toEqual('MyFirehose');
+      expect(firehose.componentId).toBeDefined();
+      let hasBeenStopped = false;
+      let hasBeenStarted = false;
+      firehose.on('done', async (uuid: string, result: Jobs.Result, error?: Crash | Multi) => {
+        if (!hasBeenStopped) {
+          firehose.stop().then(() => {
+            hasBeenStopped = true;
+            setTimeout(() => {
+              firehose.start().then(() => {
+                hasBeenStarted = true;
+              });
+            }, 150);
+          });
+        } else if (hasBeenStarted) {
+          firehose.close().then(done);
+        }
+      });
+      firehose.start().then();
+    }, 300);
+    it('Should create a new Firehose with a Sequence Source and a Tap Sink, start-restart it and check is working', done => {
+      const mySinkPlug = new MyTapPlug();
+      const mySourcePlug = new MySequencePlug();
+      const firehose = new Firehose('MyFirehose', {
+        sources: [mySourcePlug],
+        sinks: [mySinkPlug],
+        bufferSize: 2,
+      });
+      expect(firehose).toBeDefined();
+      expect(firehose.name).toEqual('MyFirehose');
+      expect(firehose.componentId).toBeDefined();
+      let hasBeenStopped = false;
+      let hasBeenRestarted = false;
+      const onRestart = () => {
+        return new Promise<void>((resolve, reject) => {
+          hasBeenRestarted = true;
+          setTimeout(resolve, 150);
+        });
+      };
+      firehose.on('done', async (uuid: string, result: Jobs.Result, error?: Crash | Multi) => {
+        if (!hasBeenStopped) {
+          hasBeenStopped = true;
+          firehose.restart().then(onRestart);
+        } else if (hasBeenRestarted) {
+          firehose.close().then(done);
+        }
+      });
+      firehose.start().then();
+    }, 450);
     it('Should create a new Firehose with a CreditFlow Source and a Tap Sink, start it and check is working', done => {
       const mySinkPlug = new MyTapPlug();
       const mySourcePlug = new MyCreditsFlowPlug();
@@ -147,16 +206,18 @@ describe('#Firehose', () => {
         if (unpipe) {
           await firehose.stop();
           //@ts-ignore - Test environment
-          expect(firehose.stopping).toEqual(true);
-          //@ts-ignore - Test environment
           expect(firehose.engine.destroyed).toEqual(false);
           //@ts-ignore - Test environment
           expect(firehose.engine.readableFlowing).toEqual(false);
           //@ts-ignore - Test environment
+          expect(firehose.sinks.length).toEqual(1);
+          //@ts-ignore - Test environment
+          expect(firehose.sources.length).toEqual(1);
+          await firehose.close();
+          //@ts-ignore - Test environment
           expect(firehose.sinks.length).toEqual(0);
           //@ts-ignore - Test environment
           expect(firehose.sources.length).toEqual(0);
-          await firehose.close();
           //@ts-ignore - Test environment
           expect(firehose.engine.destroyed).toEqual(true);
           done();
@@ -490,6 +551,23 @@ describe('#Firehose', () => {
       });
       firehose.start();
     }, 300);
+    it(`Should notify that the firehose is hold if there is no activity for 100ms`, done => {
+      const mySinkPlug = new MySlowTapPlug();
+      const mySourcePlug = new MySequencePlug();
+      const firehose = new Firehose('MyFirehose', {
+        sources: [mySourcePlug],
+        sinks: [mySinkPlug],
+        bufferSize: 2,
+        maxInactivityTime: 100,
+      });
+      expect(firehose).toBeDefined();
+      expect(firehose.name).toEqual('MyFirehose');
+      expect(firehose.componentId).toBeDefined();
+      firehose.on('hold', () => {
+        firehose.close().then(done);
+      });
+      firehose.start().then();
+    });
   });
   describe('#Sad Path', () => {
     it(`Should throw an error if there is not sinks`, () => {
