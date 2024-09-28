@@ -47,7 +47,7 @@
     "@mdf.js/repo-config": "*",
     "@types/debug": "^4.1.8",
     "@types/glob": "^8.1.0",
-    "@types/lodash": "^4.17.7",
+    "@types/lodash": "^4.17.9",
     "@types/uuid": "^10.0.0"
   },
   "engines": {

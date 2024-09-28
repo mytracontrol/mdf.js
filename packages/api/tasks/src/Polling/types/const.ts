@@ -11,6 +11,8 @@ import { PollingStats } from './PollingStats.i';
 export const DEFAULT_MAX_CONSECUTIVE_SCAN_OVERRUNS = 3;
 /** Default scan cycles on stats */
 export const DEFAULT_SCAN_CYCLES_ON_STATS = 10;
+/** Default slow cycle ratio */
+export const DEFAULT_SLOW_CYCLE_RATIO = 3;
 
 /** Default maximum retries for a task */
 export const DEFAULT_MAX_RETRY_FACTOR = 3;

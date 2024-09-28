@@ -101,7 +101,7 @@ describe('#Scheduler', () => {
           .then(done);
       }, 225);
     }, 300);
-    it(`Should create a new instance of Scheduler with a simple task and try to executed several time event if the task always rejects`, done => {
+    it(`Should create a new instance of Scheduler with a simple task and try to executed several time even if the task always rejects`, done => {
       const results: number[] = [];
       const cycles: number[] = [0];
       const scheduler = new Scheduler<any, any, '50ms'>('myScheduler', {
@@ -122,6 +122,7 @@ describe('#Scheduler', () => {
           },
         },
         limiterOptions: { concurrency: 2, delay: 0 },
+        slowCycleRatio: 2,
       });
       scheduler.on(
         'done',
@@ -140,7 +141,7 @@ describe('#Scheduler', () => {
       expect(scheduler).toBeInstanceOf(Scheduler);
       scheduler.start();
       setTimeout(() => {
-        expect(cycles).toEqual([5]);
+        expect(cycles).toEqual([3]);
         scheduler.stop().then(done);
       }, 225);
     }, 300);
@@ -485,6 +486,7 @@ describe('#Scheduler', () => {
           },
         },
         limiterOptions: { concurrency: 6, delay: 0 },
+        slowCycleRatio: 2,
       });
       scheduler.on(
         'done',
@@ -509,7 +511,7 @@ describe('#Scheduler', () => {
       expect(scheduler).toBeInstanceOf(Scheduler);
       scheduler.start();
       setTimeout(() => {
-        expect(cycles).toEqual([5, 3, 5, 5, 3, 3]);
+        expect(cycles).toEqual([5, 3, 5, 3, 3, 3]);
         scheduler.stop();
         done();
       }, 225);

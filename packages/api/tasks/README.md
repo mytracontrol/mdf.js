@@ -439,6 +439,8 @@ limiter.execute(task2).then(result => {
 
 The `Scheduler` class allows to schedule the execution of tasks based on **resources** and a **polling times**, this means periodically, controlling the execution of the tasks by the use of a `Limiter` instance per **resource**, piped with a `Limiter` for the `Scheduler` instance.
 
+The `Scheduler` creates two types of cycles, a **fast cycle** and a **slow cycle**, per polling group and resource. The fast cycle is executed every time the polling group is reached, and the slow cycle is executed after `slowCycleRatio` fast cycles. The `Scheduler` class allows to control the execution of the tasks, and provides a set of metrics to monitor the execution of the tasks.
+
 #### **Create a new scheduler (`SchedulerOptions`)**
 
 In order to create a new `Scheduler` instance, the constructor accepts the next parameters:
@@ -465,6 +467,8 @@ In order to create a new `Scheduler` instance, the constructor accepts the next 
           - `post` (`SingleTaskBaseConfig[]`): The tasks to be executed after the main task, if the main task fails, the post tasks will not be executed.
           - `finally` (`SingleTaskBaseConfig[]`): The tasks to be executed at the end of the sequence, even if the main task fails.
         - **`options`** (`TaskOptions`): a `TaskOptions` object where the `id` property is mandatory.
+  - **`slowCycleRatio`** (`number`): number of fast cycles to be executed before a slow cycle is executed. Default is `3`.
+  - **`cyclesOnStats`** (`number`): number of cycles to be included in the statistics. Default is `10`.
 
 The `Scheduler` has generic parameters in order to be typed:
 
@@ -670,8 +674,10 @@ The `Scheduler` class implements the `Layer.App.Service` interface, so it can be
 - **`maxCycleDuration`** (`number`): The maximum cycle duration in milliseconds.
 - **`minCycleDuration`** (`number`): The minimum cycle duration in milliseconds.
 - **`lastCycleDuration`** (`number`): The last cycle duration in milliseconds.
-- **`tasks`** (`number`): The number of tasks included on the cycle.
-- **`tasksOffCycle`** (`number`): The number of tasks not included on the cycle.
+- **`inFastCycleTasks`** (`number`): The number of tasks included on the regular cycle.
+- **`inSlowCycleTasks`** (`number`): The number of tasks included on the slow cycle. This cycle is executed after `slowCycleRatio` fast cycles.
+- **`inOffCycleTasks`** (`number`): The number of tasks included on the off cycle, these are not executed.
+- **`pendingTasks`** (`number`): The number of tasks in execution in this moment.
 
 ## **License**
 

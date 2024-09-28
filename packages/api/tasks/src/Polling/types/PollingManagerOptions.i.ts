@@ -16,10 +16,18 @@ export interface PollingManagerOptions {
   resource: string;
   /** Polling group assigned to this manager */
   pollingGroup: PollingGroup;
-  /** Number of cycles on stats */
-  cyclesOnStats?: number;
   /** Logger instance */
   logger?: LoggerInstance;
   /** Tasks configuration */
   entries: TaskBaseConfig[];
+  /**
+   * Number of fast cycles to run per slow cycle
+   * @default 3
+   */
+  slowCycleRatio?: number;
+  /**
+   * Number of cycles on stats
+   * @default 10
+   */
+  cyclesOnStats?: number;
 }

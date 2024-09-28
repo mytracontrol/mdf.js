@@ -219,6 +219,8 @@ export class Scheduler<
             pollingGroup: period as PollingGroup,
             entries: tasks as TaskBaseConfig<Result, Binding>[],
             logger: this.logger,
+            cyclesOnStats: this.options.cyclesOnStats,
+            slowCycleRatio: this.options.slowCycleRatio,
           },
           limiter,
           this.metricsDefinitions

@@ -7,8 +7,7 @@
 
 import { LoggerInstance } from '@mdf.js/logger';
 import { LimiterOptions } from '../../Limiter';
-import { DefaultPollingGroups, PollingGroup } from '../../Polling';
-import { TaskBaseConfig } from '../../Polling/types/TaskBaseConfig.i';
+import { DefaultPollingGroups, PollingGroup, TaskBaseConfig } from '../../Polling';
 
 /** Represents the resource configuration */
 export interface ResourceConfigEntry<
@@ -47,4 +46,14 @@ export interface SchedulerOptions<
   resources?: ResourcesConfigObject<Result, Binding, PollingGroups>;
   /** The limiter options */
   limiterOptions?: LimiterOptions;
+  /**
+   * Number of fast cycles to run per slow cycle
+   * @default 3
+   */
+  slowCycleRatio?: number;
+  /**
+   * Number of cycles on stats
+   * @default 10
+   */
+  cyclesOnStats?: number;
 }
