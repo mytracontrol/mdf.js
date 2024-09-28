@@ -122,7 +122,7 @@ describe('#Scheduler', () => {
           },
         },
         limiterOptions: { concurrency: 2, delay: 0 },
-        slowCycleRatio: 2,
+        slowCycleRatio: 3,
       });
       scheduler.on(
         'done',
@@ -141,10 +141,10 @@ describe('#Scheduler', () => {
       expect(scheduler).toBeInstanceOf(Scheduler);
       scheduler.start();
       setTimeout(() => {
-        expect(cycles).toEqual([2]);
+        expect(cycles).toEqual([3]);
         scheduler.stop().then(done);
-      }, 225);
-    }, 300);
+      }, 325);
+    }, 400);
     it(`Should create a new instance of Scheduler with a simple task and try to executed several moving the task between fast and slow cycle if the task rejects and resolves`, done => {
       const results: number[] = [];
       let cycles = 0;
