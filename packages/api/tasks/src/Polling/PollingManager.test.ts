@@ -12,6 +12,7 @@ import { Limiter } from '../Limiter';
 import { STRATEGY } from '../Limiter/types';
 import { MetaData } from '../Tasks';
 import { PollingExecutor } from './PollingExecutor';
+import { PollingManager } from './PollingManager';
 import { METRICS_DEFINITIONS } from './types';
 describe('#PollingManager', () => {
   describe('#Happy path', () => {
@@ -45,6 +46,37 @@ describe('#PollingManager', () => {
     });
   });
   describe('#Sad path', () => {
+    it(`Should throw an error if try to create an instance wih bat slow cycle ratio`, () => {
+      expect(() => {
+        const limiter = new Limiter({ delay: 10 });
+        new PollingManager(
+          {
+            componentId: 'test',
+            entries: [
+              {
+                task: () => Promise.resolve(),
+                options: {
+                  id: 'test1',
+                },
+              },
+              {
+                task: () => Promise.resolve(),
+                options: {
+                  id: 'test2',
+                },
+              },
+            ],
+            pollingGroup: '10ms',
+            resource: 'test',
+            logger: new DebugLogger('test'),
+            slowCycleRatio: 0,
+          },
+          limiter,
+          new DebugLogger('test'),
+          METRICS_DEFINITIONS(new Registry())
+        );
+      }).toThrow('Invalid slow cycle ratio: 0');
+    });
     it('Should emit an error event if the task is not well configured', done => {
       const limiter = new Limiter({ delay: 10 });
       const pollingManager = new PollingExecutor(

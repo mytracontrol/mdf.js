@@ -73,8 +73,11 @@ export class PollingManager extends EventEmitter {
     private readonly metrics: MetricsDefinitions
   ) {
     super();
-    this.factCycleToSlowCycleRatio = options.slowCycleRatio || DEFAULT_SLOW_CYCLE_RATIO;
-    if (typeof this.factCycleToSlowCycleRatio !== 'number' || this.factCycleToSlowCycleRatio < 1) {
+    this.factCycleToSlowCycleRatio =
+      typeof options.slowCycleRatio === 'number'
+        ? options.slowCycleRatio
+        : DEFAULT_SLOW_CYCLE_RATIO;
+    if (this.factCycleToSlowCycleRatio < 1) {
       throw new Crash(`Invalid slow cycle ratio: ${this.factCycleToSlowCycleRatio}`);
     }
     this.pollingStats = new PollingMetricsHandler(
@@ -213,14 +216,22 @@ export class PollingManager extends EventEmitter {
     this.pollingStats.initializeCycle();
     this.emit('startCycle');
     this.fastCycleRatioCounter++;
+    let _scheduled = 0;
     for (const task of this.fastEntries.values()) {
       this.scheduleTask(this.wrappedCreatedTaskInstance(task));
+      _scheduled++;
     }
     if (this.fastCycleRatioCounter >= this.factCycleToSlowCycleRatio) {
       this.fastCycleRatioCounter = 0;
       for (const task of this.slowEntries.values()) {
         this.scheduleTask(this.wrappedCreatedTaskInstance(task));
+        _scheduled++;
       }
+    }
+    if (_scheduled === 0) {
+      this.logger.debug(`Polling group ${this.options.pollingGroup} has no tasks to execute`);
+      this.pollingStats.finalizeCycle();
+      this.emit('endCycle', this.pollingStats.check);
     }
   }
   /** Return the stats of the polling manager */

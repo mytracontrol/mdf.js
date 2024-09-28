@@ -141,10 +141,48 @@ describe('#Scheduler', () => {
       expect(scheduler).toBeInstanceOf(Scheduler);
       scheduler.start();
       setTimeout(() => {
-        expect(cycles).toEqual([3]);
+        expect(cycles).toEqual([2]);
         scheduler.stop().then(done);
       }, 225);
     }, 300);
+    it(`Should create a new instance of Scheduler with a simple task and try to executed several moving the task between fast and slow cycle if the task rejects and resolves`, done => {
+      const results: number[] = [];
+      let cycles = 0;
+      let hasFailed = false;
+      const scheduler = new Scheduler<any, any, '50ms'>('myScheduler', {
+        resources: {
+          myResource1: {
+            pollingGroups: {
+              '50ms': [
+                {
+                  taskArgs: [],
+                  task: () => {
+                    cycles += 1;
+                    if (hasFailed) {
+                      return Promise.resolve();
+                    }
+                    hasFailed = true;
+                    return Promise.reject(new Error(`myError`));
+                  },
+                  options: {
+                    id: 'myTask1',
+                  },
+                },
+              ],
+            },
+            limiterOptions: { concurrency: 2, delay: 0 },
+          },
+        },
+        limiterOptions: { concurrency: 2, delay: 0 },
+        slowCycleRatio: 3,
+      });
+      expect(scheduler).toBeInstanceOf(Scheduler);
+      setTimeout(() => {
+        expect(cycles).toEqual(4);
+        scheduler.stop().then(done);
+      }, 225);
+      scheduler.start();
+    });
     it('Should create a new instance of Scheduler with single, grouped and sequence task and executed more than one cycle', done => {
       const results: number[] = [];
       const cycles: number[] = [0, 0, 0, 0, 0, 0];
