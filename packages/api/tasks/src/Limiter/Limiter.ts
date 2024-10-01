@@ -57,7 +57,13 @@ export class Limiter extends LimiterStateHandler {
     taskArgs?: TaskArguments,
     options?: TaskOptions<U>
   ): string | undefined {
-    const handler = task instanceof TaskHandler ? task : new Single(task, taskArgs, options);
+    const handler =
+      task instanceof TaskHandler
+        ? task
+        : new Single(task, taskArgs, {
+            ...options,
+            retryOptions: options?.retryOptions || this.options.retryOptions,
+          });
     let unScheduled = false;
     const onDone = (uuid: string, result: T, meta: MetaData, error?: Crash) => {
       if (!unScheduled) {
@@ -97,7 +103,13 @@ export class Limiter extends LimiterStateHandler {
     options?: TaskOptions<U>
   ): Promise<T> {
     return new Promise((resolve, reject) => {
-      const handler = task instanceof TaskHandler ? task : new Single(task, taskArgs, options);
+      const handler =
+        task instanceof TaskHandler
+          ? task
+          : new Single(task, taskArgs, {
+              ...options,
+              retryOptions: options?.retryOptions || this.options.retryOptions,
+            });
       let unScheduled = false;
       const onDone = (uuid: string, result: T, meta: MetaData, error?: Crash) => {
         if (error) {
