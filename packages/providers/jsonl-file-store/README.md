@@ -35,11 +35,11 @@
 
 ## **Introduction**
 
-**@mdf.js/jsonl-file-store-provider** is a tool designed for managing the storage of jsonl files in Node.js applications`, including operations such as read, append to, copy, move, and delete files.
+**@mdf.js/jsonl-file-store-provider** is a tool designed for managing the storage of jsonl files in Node.js applications`. It allows to append data to mmultiple files, maintaining the append and rotation processes independent for each file.
 
 ### **What does this module want to solve?**
 
-This module is designed and developed to facilitate the storage of jsonl files, integrating error handling for metrics and state information.
+This module is designed and developed to facilitate the storage of jsonl files, integrating error handling for metrics and files statistics information.
 
 ### **Features**
 
@@ -91,59 +91,57 @@ The configuration options (`config`) are the following:
 
   ```typescript
   {
-    writeOptions: {
-      encoding: 'utf-8',
-      mode: 0o666 (readable and writable)
-      flag: 'a',
-      flush: false
-    },
-      rotationOptions: {
-    interval: 600000 /* 10 minutes */,
     openFilesFolderPath: './data/open',
     closedFilesFolderPath: './data/closed',
-    retryOptions: {
+    fileEncoding: 'utf-8',
+    createFolders: true,
+    rotationInterval: 600000 /* 10 minutes */,
+    failOnStartSetup: true,
+    appendRetryOptions: {
+      timeout: 5000; /* 5 seconds */
       attempts: 3,
-      timeout: 5000,
     },
-  },
+    rotationRetryOptions: {
+      timeout: 5000; /* 5 seconds */
+      attempts: 3,
+    },
   }
   ```
-For more details about options, see https://nodejs.org/api/fs.html
 
 - **Environment**: remember to set the `useEnvironment` flag to `true` to use these environment variables.
 
   ```typescript
   { 
-    writeOptions: {
-      encoding: process.env['CONFIG_WRITE_OPTIONS_ENCODING'],
-      mode: process.env['CONFIG_WRITE_OPTIONS_MODE'],
-      flag: process.env['CONFIG_WRITE_OPTIONS_FLAG'],
-      flush: process.env['CONFIG_WRITE_OPTIONS_FLUSH'],
+    openFilesFolderPath: process.env['CONFIG_OPEN_FILES_FOLDER_PATH'],
+    closedFilesFolderPath: process.env['CONFIG_CLOSED_FILES_FOLDER_PATH'],
+    fileEncoding: process.env['CONFIG_FILE_ENCODING'],
+    createFolders: process.env['CONFIG_CREATE_FOLDERS'],  /* boolean */
+    rotationInterval: process.env['CONFIG_ROTATION_INTERVAL'],  /* number */
+    failOnStartSetup: process.env['CONFIG_FAIL_ON_START_SETUP'],  /* boolean */
+    appendRetryOptions: {
+      timeout: process.env['CONFIG_APPEND_RETRY_OPTIONS_TIMEOUT'],  /* number */
+      attempts: process.env['CONFIG_APPEND_RETRY_OPTIONS_ATTEMPTS'],  /* number */
     },
-    rotationOptions: {
-      interval: CONFIG_ROTATION_OPTIONS_INTERVAL,
-      openFilesFolderPath: CONFIG_ROTATION_OPTIONS_OPEN_FILES_FOLDER_PATH,
-      closedFilesFolderPath: CONFIG_ROTATION_OPTIONS_CLOSED_FILES_FOLDER_PATH,
-      retryOptions: {
-        attempts: CONFIG_ROTATION_OPTIONS_RETRY_OPTIONS_ATTEMPTS,
-        timeout: CONFIG_ROTATION_OPTIONS_RETRY_OPTIONS_TIMEOUT,
-      },
+    rotationRetryOptions: {
+      timeout: process.env['CONFIG_ROTATION_RETRY_OPTIONS_TIMEOUT'],  /* number */
+      attempts: process.env['CONFIG_ROTATION_RETRY_OPTIONS_ATTEMPTS'],  /* number */
     },
   }
   ```
 
 ## **Environment variables**
 
--  **CONFIG\_WRITE\_OPTIONS\_ENCODING** (default: `utf-8`): The encoding for writting files, including, appending data to them.
--  **CONFIG\_WRITE\_OPTIONS\_MODE** (default: `0o666`): The mode for reading files.
--  **CONFIG\_WRITE\_OPTIONS\_FLAG** (default: `a`): The flag for reading files. 
--  **CONFIG\_WRITE\_OPTIONS\_FLUSH** (default: `false`): Whether to flush the underlaying descriptor of a file before clising it or not.
+- **CONFIG\_OPEN\_FILES\_FOLDER\_PATH** (default: `./data/open`): The folder path where open files are stored, i.e., the folder for the file that is being written currently.
+- **CONFIG\_CLOSED\_FILES\_FOLDER\_PATH** (default: `./data/closed`): The directory path where closed files will be stored, i.e., the to which files are moved when the timeout is reached. Then, a new file is created to start writting in it in the open files folder.
+-  **CONFIG\_FILE\_ENCODING** (default: `utf-8`): The encoding for writting (appending) data to files.
+- **CONFIG\_CREATE\_FOLDERS** (default: `true`): It indicates whether to create open and closed files folders if they do not exist.
 - **CONFIG\_ROTATION\_OPTIONS\_INTERVAL** (default: `600000`): The interval (in milliseconds) at which the file rotation should occur.
-- **CONFIG\_ROTATION\_OPTIONS\_OPEN\_FILES\_FOLDER\_PATH** (default: `./data/open`): The folder path where open files are stored, i.e., the folder for the file that is being written currently.
-- **CONFIG\_ROTATION\_OPTIONS\_CLOSED\_FILES\_FOLDER\_PATH** (default: `./data/closed`): The directory path where closed files will be stored, i.e., the to which files are moved when the timeout is reached. Then, a new file is created to start writting in it in the open files folder.
+- **CONFIG\_FAIL\_ON\_START\_SETUP** (default: `true`): It indicates if the provider should fail in case any error occurs on start setup. For example, if this variable is `true`, and `CONFIG\_CREATE\_FOLDERS` is `false` when the folders does not previously exist, the provider will throw an error on start.
+- **CONFIG\_APPEND\_RETRY\_OPTIONS\_TIMEOUT** (default: `5000`): Maximum time, in milliseconds, for an append operation to complete (the first attempt as well as retries).
+- **CONFIG\_APPEND\_RETRY\_OPTIONS\_ATTEMPTS** (default: `3`): Maximum number of attempts for an append operation, including the first execution before retries.
+- **CONFIG\_ROTATION\_RETRY\_OPTIONS\_TIMEOUT** (default: `5000`): Maximum time, in milliseconds, for an rotation operation to complete (the first attempt as well as retries).
+- **CONFIG\_ROTATION\_RETRY\_OPTIONS\_ATTEMPTS** (default: `3`): Maximum number of attempts for a rotate operation, including the first execution before retries.
 
-For possible values related to write options, check the following documentation:
--  [**fs appendFileSync**](https://nodejs.org/api/fs.html#fsappendfilesyncpath-data-options)
 
 ## **License**
 

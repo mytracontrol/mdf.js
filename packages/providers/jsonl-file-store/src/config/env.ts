@@ -11,43 +11,39 @@ import { defaultConfig } from './default';
 // *************************************************************************************************
 // #region Environment variables
 
-const CONFIG_WRITE_OPTIONS_ENCODING = process.env['CONFIG_WRITE_OPTIONS_ENCODING'];
-const CONFIG_WRITE_OPTIONS_MODE = process.env['CONFIG_WRITE_OPTIONS_MODE'];
-const CONFIG_WRITE_OPTIONS_FLAG = process.env['CONFIG_WRITE_OPTIONS_FLAG'];
-const CONFIG_WRITE_OPTIONS_FLUSH = coerce<boolean>(process.env['CONFIG_WRITE_OPTIONS_FLUSH']);
-const CONFIG_ROTATION_OPTIONS_INTERVAL = coerce<number>(
-  process.env['CONFIG_ROTATION_OPTIONS_INTERVAL']
+const CONFIG_OPEN_FILES_FOLDER_PATH = process.env['CONFIG_OPEN_FILES_FOLDER_PATH'];
+const CONFIG_CLOSED_FILES_FOLDER_PATH = process.env['CONFIG_CLOSED_FILES_FOLDER_PATH'];
+const CONFIG_FILE_ENCODING = process.env['CONFIG_FILE_ENCODING'];
+const CONFIG_CREATE_FOLDERS = coerce<boolean>(process.env['CONFIG_CREATE_FOLDERS']);
+const CONFIG_ROTATION_INTERVAL = coerce<number>(process.env['CONFIG_ROTATION_INTERVAL']);
+const CONFIG_FAIL_ON_START_SETUP = coerce<boolean>(process.env['CONFIG_FAIL_ON_START_SETUP']);
+const CONFIG_APPEND_RETRY_OPTIONS_TIMEOUT = coerce<number>(
+  process.env['CONFIG_APPEND_RETRY_OPTIONS_TIMEOUT']
 );
-const CONFIG_ROTATION_OPTIONS_OPEN_FILES_FOLDER_PATH =
-  process.env['CONFIG_ROTATION_OPTIONS_OPEN_FILES_FOLDER_PATH'];
-const CONFIG_ROTATION_OPTIONS_CLOSED_FILES_FOLDER_PATH =
-  process.env['CONFIG_ROTATION_OPTIONS_CLOSED_FILES_FOLDER_PATH'];
-const CONFIG_ROTATION_OPTIONS_RETRY_OPTIONS_ATTEMPTS = coerce<number>(
-  process.env['CONFIG_ROTATION_OPTIONS_RETRY_OPTIONS_ATTEMPTS']
+const CONFIG_APPEND_RETRY_OPTIONS_ATTEMPTS = coerce<number>(
+  process.env['CONFIG_APPEND_RETRY_OPTIONS_ATTEMPTS']
 );
-const CONFIG_ROTATION_OPTIONS_RETRY_OPTIONS_TIMEOUT = coerce<number>(
-  process.env['CONFIG_ROTATION_OPTIONS_RETRY_OPTIONS_TIMEOUT']
+const CONFIG_ROTATION_RETRY_OPTIONS_TIMEOUT = coerce<number>(
+  process.env['CONFIG_ROTATION_RETRY_OPTIONS_TIMEOUT']
+);
+const CONFIG_ROTATION_RETRY_OPTIONS_ATTEMPTS = coerce<number>(
+  process.env['CONFIG_ROTATION_RETRY_OPTIONS_ATTEMPTS']
 );
 
 export const envBasedConfig: Config = {
-  writeOptions: {
-    encoding: CONFIG_WRITE_OPTIONS_ENCODING as BufferEncoding,
-    mode: CONFIG_WRITE_OPTIONS_MODE,
-    flag: CONFIG_WRITE_OPTIONS_FLAG,
-    flush: CONFIG_WRITE_OPTIONS_FLUSH,
+  openFilesFolderPath: CONFIG_OPEN_FILES_FOLDER_PATH ?? defaultConfig.openFilesFolderPath,
+  closedFilesFolderPath: CONFIG_CLOSED_FILES_FOLDER_PATH ?? defaultConfig.closedFilesFolderPath,
+  fileEncoding: CONFIG_FILE_ENCODING as BufferEncoding,
+  createFolders: CONFIG_CREATE_FOLDERS ?? defaultConfig.createFolders,
+  rotationInterval: CONFIG_ROTATION_INTERVAL ?? defaultConfig.rotationInterval,
+  failOnStartSetup: CONFIG_FAIL_ON_START_SETUP ?? defaultConfig.failOnStartSetup,
+  appendRetryOptions: {
+    timeout: CONFIG_APPEND_RETRY_OPTIONS_TIMEOUT,
+    attempts: CONFIG_APPEND_RETRY_OPTIONS_ATTEMPTS,
   },
-  rotationOptions: {
-    interval: CONFIG_ROTATION_OPTIONS_INTERVAL ?? defaultConfig.rotationOptions.interval,
-    openFilesFolderPath:
-      CONFIG_ROTATION_OPTIONS_OPEN_FILES_FOLDER_PATH ??
-      defaultConfig.rotationOptions.openFilesFolderPath,
-    closedFilesFolderPath:
-      CONFIG_ROTATION_OPTIONS_CLOSED_FILES_FOLDER_PATH ??
-      defaultConfig.rotationOptions.closedFilesFolderPath,
-    retryOptions: {
-      attempts: CONFIG_ROTATION_OPTIONS_RETRY_OPTIONS_ATTEMPTS,
-      timeout: CONFIG_ROTATION_OPTIONS_RETRY_OPTIONS_TIMEOUT,
-    },
+  rotationRetryOptions: {
+    timeout: CONFIG_ROTATION_RETRY_OPTIONS_TIMEOUT,
+    attempts: CONFIG_ROTATION_RETRY_OPTIONS_ATTEMPTS,
   },
 };
 // #endregion

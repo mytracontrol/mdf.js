@@ -8,19 +8,18 @@
 import Joi from 'joi';
 
 export const schema = Joi.object({
-  writeOptions: Joi.object({
-    mode: Joi.number().optional(),
-    flag: Joi.string().optional(),
-    flush: Joi.boolean().optional(),
-    encoding: Joi.string().optional(),
+  openFilesFolderPath: Joi.string(),
+  closedFilesFolderPath: Joi.string(),
+  createFolders: Joi.boolean(),
+  fileEncoding: Joi.string(),
+  rotationInterval: Joi.number(),
+  failOnStartSetup: Joi.boolean(),
+  appendRetryOptions: Joi.object({
+    timeout: Joi.number().optional(),
+    attempts: Joi.number().optional(),
   }),
-  rotationOptions: Joi.object({
-    interval: Joi.number().required(),
-    openFilesFolderPath: Joi.string().required(),
-    closedFilesFolderPath: Joi.string().required(),
-    retryOptions: Joi.object({
-      attempts: Joi.number(),
-      timeout: Joi.number(),
-    }).optional(),
+  rotationRetryOptions: Joi.object({
+    timeout: Joi.number().optional(),
+    attempts: Joi.number().optional(),
   }),
 }).unknown(true);

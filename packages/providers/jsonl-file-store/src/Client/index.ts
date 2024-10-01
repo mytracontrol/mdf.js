@@ -6,4 +6,5 @@
  */
 
 export * from './JsonlFileStoreManager';
+export * from './SingleJsonlFileManager';
 export * from './types';

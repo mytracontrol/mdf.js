@@ -14,21 +14,20 @@ describe(`#Config #jsonl-file-store`, () => {
   describe('#Happy path', () => {
     it(`Should have a default config`, () => {
       expect(defaultConfig).toBeDefined();
-      expect(defaultConfig.writeOptions).toBeDefined();
-      expect(defaultConfig.rotationOptions).toBeDefined();
-      const writeOptions = defaultConfig.writeOptions;
-      const rotationOptions = defaultConfig.rotationOptions;
-      expect(writeOptions).toHaveProperty('encoding', 'utf-8');
-      expect(writeOptions).toHaveProperty('flag', 'a');
-      expect(writeOptions).toHaveProperty('mode', 0o666);
-      expect(writeOptions).toHaveProperty('flush', false);
-      expect(rotationOptions).toHaveProperty('interval');
-      expect(rotationOptions).toHaveProperty('openFilesFolderPath', './data/open');
-      expect(rotationOptions).toHaveProperty('closedFilesFolderPath', './data/closed');
-      expect(rotationOptions).toHaveProperty('retryOptions');
-      const retryOptions = rotationOptions.retryOptions;
-      expect(retryOptions).toHaveProperty('attempts', 3);
-      expect(retryOptions).toHaveProperty('timeout', 5000);
+      expect(defaultConfig).toHaveProperty('openFilesFolderPath', './data/open');
+      expect(defaultConfig).toHaveProperty('closedFilesFolderPath', './data/closed');
+      expect(defaultConfig).toHaveProperty('createFolders', true);
+      expect(defaultConfig).toHaveProperty('fileEncoding', 'utf-8');
+      expect(defaultConfig).toHaveProperty('rotationInterval', 600000);
+      expect(defaultConfig).toHaveProperty('failOnStartSetup', true);
+      expect(defaultConfig).toHaveProperty('appendRetryOptions');
+      expect(defaultConfig.appendRetryOptions).toBeDefined();
+      expect(defaultConfig.appendRetryOptions).toHaveProperty('timeout', 5000);
+      expect(defaultConfig.appendRetryOptions).toHaveProperty('attempts', 3);
+      expect(defaultConfig).toHaveProperty('rotationRetryOptions');
+      expect(defaultConfig.rotationRetryOptions).toBeDefined();
+      expect(defaultConfig.rotationRetryOptions).toHaveProperty('timeout', 5000);
+      expect(defaultConfig.rotationRetryOptions).toHaveProperty('attempts', 3);
     }, 1000);
   });
 });

@@ -6,20 +6,20 @@
  */
 
 import { RetryOptions } from '@mdf.js/utils';
-import fs from 'fs';
-
-/** Represents the options for writing a file. See Node fs WriteFileOptions */
-export type WriteOptions = fs.WriteFileOptions & { retryOptions?: RetryOptions };
-
-export interface RotationOptions {
-  interval: number;
-  openFilesFolderPath: string;
-  closedFilesFolderPath: string;
-  retryOptions?: RetryOptions;
-}
 
 /** Represents the options for the JsonlFileStoreManager */
 export interface JsonlFileStoreManagerOptions {
-  writeOptions: WriteOptions;
-  rotationOptions: RotationOptions;
+  openFilesFolderPath: string;
+  closedFilesFolderPath: string;
+  createFolders: boolean;
+  fileEncoding: BufferEncoding;
+  rotationInterval: number;
+  failOnStartSetup: boolean;
+  appendRetryOptions: RetryOptions;
+  rotationRetryOptions: RetryOptions;
+}
+
+/** Represents the options for the SingleJsonlFileManager */
+export interface SingleJsonlFileManagerOptions extends JsonlFileStoreManagerOptions {
+  baseFilename: string;
 }
