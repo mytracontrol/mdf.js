@@ -32,12 +32,9 @@
   "dependencies": {
     "@mdf.js/core": "*",
     "@mdf.js/crash": "*",
-    "@mdf.js/doorkeeper": "*",
     "@mdf.js/logger": "*",
     "@mdf.js/utils": "*",
-    "dotenv": "^16.4.5",
-    "lodash": "^4.17.21",
-    "tslib": "^2.7.0",
+    "@mdf.js/tasks": "*",
     "uuid": "^10.0.0"
   },
   "devDependencies": {
