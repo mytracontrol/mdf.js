@@ -60,12 +60,8 @@ export class SingleJsonlFileManager extends EventEmitter {
   public append(data: string): Promise<void> {
     const appendTask = async () => {
       try {
-        this.logger.debug(`[${new Date().toISOString()}][${this.name}] Appending`);
         await this.appendData(data);
-        // await waitFor(5000);
-        this.logger.debug(`[${new Date().toISOString()}][${this.name}] Appended`);
         if (!this._rotationTimer) {
-          this.logger.debug(`[${new Date().toISOString()}][${this.name}] Starting rotation timer`);
           this._rotationTimer = setTimeout(this.rotate, this.options.rotationInterval);
         }
       } catch (error) {
@@ -110,13 +106,10 @@ export class SingleJsonlFileManager extends EventEmitter {
    * at a time (concurrency=1) and to retry the rotate operation if necessary
    */
   private rotate = async (): Promise<void> => {
-    this.logger.debug(`[${new Date().toISOString()}][${this.name}] Rotation triggered`);
     try {
-      this.logger.debug(`[${new Date().toISOString()}][${this.name}] Rotating`);
       await this.limiter.execute(
         new Single(this.rotateFile, { retryOptions: this.options.rotationRetryOptions })
       );
-      this.logger.debug(`[${new Date().toISOString()}][${this.name}] Rotated`);
     } catch (error) {
       const cause = Crash.from(error);
       this.emit('error', new Crash(`Rotation error`, { cause }));
