@@ -1,3 +1,10 @@
+/**
+ * Copyright 2024 Mytra Control S.L. All rights reserved.
+ *
+ * Use of this source code is governed by an MIT-style license that can be found in the LICENSE file
+ * or at https://opensource.org/licenses/MIT.
+ */
+
 import { Crash } from '@mdf.js/crash';
 import { LoggerInstance, SetContext } from '@mdf.js/logger';
 import { Limiter, Single } from '@mdf.js/tasks';
@@ -87,7 +94,7 @@ export class SingleJsonlFileManager extends EventEmitter {
           const openFilePath = path.join(this.options.openFilesFolderPath, this.currentFileName);
           this.currentFileStream = fs.createWriteStream(openFilePath, { flags: 'a' });
         }
-        this.currentFileStream.write(data, this.options.fileEncoding, err => {
+        this.currentFileStream.write(data + '\n', this.options.fileEncoding, err => {
           if (err) {
             reject(err);
           } else {

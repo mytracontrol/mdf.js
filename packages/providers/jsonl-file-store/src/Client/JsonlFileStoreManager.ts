@@ -129,7 +129,9 @@ export class JsonlFileStoreManager extends EventEmitter {
   /**
    * Appends data to a jsonl file.
    * @param data - Data to append
-   * @param filename - Name of the file to append data to
+   * @param filename - Base name of the file to append data to. This is not the real file name,
+   * but the base name used by the SingleJsonlFileManager to create unique names in order to
+   * internally perform the rotation process in a proper manner.
    */
   public async append(data: string, filename: string): Promise<void> {
     try {
