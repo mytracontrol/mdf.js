@@ -24,7 +24,7 @@ describe('#Source #PlugWrapper', () => {
           return Promise.resolve();
         },
         addCredits: () => {
-          return Promise.resolve();
+          return Promise.resolve(1);
         },
         start: () => {
           return Promise.resolve();
@@ -41,7 +41,7 @@ describe('#Source #PlugWrapper', () => {
       //@ts-ignore - Test environment
       expect(wrapper.ingestData()).resolves.toEqual(undefined);
       //@ts-ignore - Test environment
-      expect(wrapper.addCredits()).resolves.toEqual(undefined);
+      expect(wrapper.addCredits()).resolves.toEqual(1);
       //@ts-ignore - Test environment
       expect(wrapper.start()).resolves.toEqual(undefined);
       //@ts-ignore - Test environment
