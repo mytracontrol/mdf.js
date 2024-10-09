@@ -68,35 +68,6 @@ Checks included in the provider:
 
 ## **Environment variables**
 
-- **CONFIG\_KAFKA\_PRODUCER\_\_METADATA\_MAX\_AGE**: undefined
-- **CONFIG\_KAFKA\_PRODUCER\_\_ALLOW\_AUTO\_TOPIC\_CREATION**: undefined
-- **CONFIG\_KAFKA\_PRODUCER\_\_TRANSACTION\_TIMEOUT**: undefined
-- **CONFIG\_KAFKA\_PRODUCER\_\_IDEMPOTENT**: undefined
-- **CONFIG\_KAFKA\_PRODUCER\_\_TRANSACTIONAL\_ID**: undefined
-- **CONFIG\_KAFKA\_PRODUCER\_\_MAX\_IN\_FLIGHT\_REQUEST**: undefined
-- **CONFIG\_KAFKA\_PRODUCER\_\_RETRY\_\_MAX\_RETRY\_TIME**: undefined
-- **CONFIG\_KAFKA\_PRODUCER\_\_RETRY\_\_INITIAL\_RETRY\_TIME**: undefined
-- **CONFIG\_KAFKA\_PRODUCER\_\_RETRY\_\_FACTOR**: undefined
-- **CONFIG\_KAFKA\_PRODUCER\_\_RETRY\_\_MULTIPLIER**: undefined
-- **CONFIG\_KAFKA\_PRODUCER\_\_RETRY\_\_RETRIES**: undefined
-- **CONFIG\_KAFKA\_CONSUMER\_\_GROUP\_ID**: undefined
-- **CONFIG\_KAFKA\_CONSUMER\_\_SESSION\_TIMEOUT**: undefined
-- **CONFIG\_KAFKA\_CONSUMER\_\_REBALANCE\_TIMEOUT**: undefined
-- **CONFIG\_KAFKA\_CONSUMER\_\_HEARTBEAT\_INTERVAL**: undefined
-- **CONFIG\_KAFKA\_CONSUMER\_\_METADATA\_MAX\_AGE**: undefined
-- **CONFIG\_KAFKA\_CONSUMER\_\_ALLOW\_AUTO\_TOPIC\_CREATION**: undefined
-- **CONFIG\_KAFKA\_CONSUMER\_\_MAX\_BYTES\_PER\_PARTITION**: undefined
-- **CONFIG\_KAFKA\_CONSUMER\_\_MIN\_BYTES**: undefined
-- **CONFIG\_KAFKA\_CONSUMER\_\_MAX\_BYTES**: undefined
-- **CONFIG\_KAFKA\_CONSUMER\_MAX\_WAIT\_TIME\_IN\_MS**: undefined
-- **CONFIG\_KAFKA\_CONSUMER\_\_RETRY\_\_MAX\_RETRY\_TIME**: undefined
-- **CONFIG\_KAFKA\_CONSUMER\_\_RETRY\_\_INITIAL\_RETRY\_TIME**: undefined
-- **CONFIG\_KAFKA\_CONSUMER\_\_RETRY\_\_FACTOR**: undefined
-- **CONFIG\_KAFKA\_CONSUMER\_\_RETRY\_\_MULTIPLIER**: undefined
-- **CONFIG\_KAFKA\_CONSUMER\_\_RETRY\_\_RETRIES**: undefined
-- **CONFIG\_KAFKA\_CONSUMER\_\_READ\_UNCOMMITTED**: undefined
-- **CONFIG\_KAFKA\_CONSUMER\_\_MAX\_IN\_FLIGHT\_REQUEST**: undefined
-- **CONFIG\_KAFKA\_CONSUMER\_\_RACK\_ID**: undefined
 - **CONFIG\_KAFKA\_LOG\_LEVEL** (default: `` `error` ``): Define the log level for the kafka provider, possible values are: - \`error\` - \`warn\` - \`info\` - \`debug\` - \`trace\`
 - **CONFIG\_KAFKA\_CLIENT\_\_CLIENT\_ID** (default: `hostname`): Client identifier
 - **CONFIG\_KAFKA\_CLIENT\_\_BROKERS** (default: `'127.0.0.1:9092'`): Kafka brokers

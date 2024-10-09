@@ -32,3 +32,4 @@ export const schema = Joi.object({
   checkInterval: Joi.number().positive(),
   disableChecks: Joi.boolean(),
 }).unknown(true);
+

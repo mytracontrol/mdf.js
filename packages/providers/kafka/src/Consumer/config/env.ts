@@ -88,3 +88,4 @@ export const envBasedConfig: ConsumerConfig = {
     rackId: CONFIG_KAFKA_CONSUMER__RACK_ID,
   },
 };
+

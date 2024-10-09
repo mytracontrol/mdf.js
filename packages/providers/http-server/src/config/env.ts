@@ -26,3 +26,4 @@ export const envBasedConfig: Config = {
   host: CONFIG_SERVER_HOST,
 };
 // #endregion
+

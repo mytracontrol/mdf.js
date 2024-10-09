@@ -26,3 +26,4 @@ export const defaultConfig: Config = {
   name: ELASTIC_NAME,
 };
 // #endregion
+

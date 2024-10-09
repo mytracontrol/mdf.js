@@ -125,3 +125,4 @@ export const envBasedConfig: Config = {
   proxy: CONFIG_ELASTIC_PROXY,
 };
 // #endregion
+

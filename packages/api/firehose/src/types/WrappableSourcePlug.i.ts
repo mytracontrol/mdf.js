@@ -28,7 +28,7 @@ export interface WrappableSourcePlug extends EventEmitter, Layer.App.Resource {
    * Add new credits to the source
    * @param credits - Credits to be added to the source
    */
-  addCredits?: (credits: number) => Promise<void>;
+  addCredits?: (credits: number) => Promise<number>;
   /** Enable consuming process */
   init?: () => void;
   /** Stop consuming process */
@@ -40,3 +40,4 @@ export interface WrappableSourcePlug extends EventEmitter, Layer.App.Resource {
   /** Metrics registry for this component */
   readonly metrics?: Registry;
 }
+

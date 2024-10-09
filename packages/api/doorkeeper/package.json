@@ -44,7 +44,7 @@
   },
   "devDependencies": {
     "@mdf.js/repo-config": "*",
-    "@types/lodash": "^4.17.9",
+    "@types/lodash": "^4.17.10",
     "@types/supertest": "^6.0.2",
     "@types/uuid": "^10.0.0"
   },

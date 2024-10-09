@@ -61,3 +61,4 @@ export const envBasedConfig: Config = {
   envPrefix: CONFIG_SERVICE_SETUP_ENV_PREFIX,
 };
 // #endregion
+

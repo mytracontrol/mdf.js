@@ -15,3 +15,4 @@ export const schema = Joi.object({
   cert: Joi.string(),
   key: Joi.string(),
 }).unknown(true);
+

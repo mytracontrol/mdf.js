@@ -94,3 +94,4 @@ export const DEFAULT_SERVICE_REGISTRY_OPTIONS: ServiceRegistrySettings = {
   loggerOptions: DEFAULT_LOGGER_OPTIONS,
   configLoaderOptions: DEFAULT_CUSTOM_CONFIG_LOADER_OPTIONS,
 };
+

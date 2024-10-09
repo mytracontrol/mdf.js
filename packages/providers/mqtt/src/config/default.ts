@@ -24,3 +24,4 @@ export const defaultConfig: Config = {
   keepalive: CONFIG_MQTT_KEEPALIVE,
 };
 // #endregion
+

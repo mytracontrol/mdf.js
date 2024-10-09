@@ -639,7 +639,6 @@ scheduler.dropResource('resource3');
 scheduler.cleanup();
 ```
 
-
 #### **Start and stop the scheduler**
 
 The `Scheduler` class allows to start and stop the scheduler, controlling the execution of the tasks:

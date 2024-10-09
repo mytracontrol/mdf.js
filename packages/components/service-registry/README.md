@@ -372,12 +372,6 @@ This interface are based on the two modules of **@mdf.js**:
 
 Please check the documentation of the packages [@mdf.js/openc2](https://www.npmjs.com/package/@mdf.js/openc2) and [@mdf.js/openc2-core](https://www.npmjs.com/package/@mdf.js/openc2-core), and the OpenC2 specification for more details.
 
-## **Environment variables**
-
-- **CONFIG\_CUSTOM\_PRESET**: Default custom config loader options
-- **CONFIG\_SERVICE\_REGISTRY\_PRESET**: Default service registry config loader options
-- **NODE\_APP\_INSTANCE**: Create a new instance of MetricsAggregator @param logger - Instance for logging @param port - Optional AggregatorRegistry for cluster metrics
-
 ## **License**
 
 Copyright 2024 Mytra Control S.L. All rights reserved.
