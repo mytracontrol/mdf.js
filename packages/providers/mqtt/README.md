@@ -67,15 +67,15 @@ Checks included in the provider:
 
 ## **Environment variables**
 
-- **CONFIG\_MQTT\_URL**: undefined
-- **CONFIG\_MQTT\_PROTOCOL**: undefined
-- **CONFIG\_MQTT\_USERNAME**: undefined
-- **CONFIG\_MQTT\_PASSWORD**: undefined
-- **CONFIG\_MQTT\_CLIENT\_ID**: undefined
-- **CONFIG\_MQTT\_KEEPALIVE**: undefined
-- **CONFIG\_MQTT\_CLIENT\_CA\_PATH**: undefined
-- **CONFIG\_MQTT\_CLIENT\_CLIENT\_CERT\_PATH**: undefined
-- **CONFIG\_MQTT\_CLIENT\_CLIENT\_KEY\_PATH**: undefined
+- **CONFIG\_MQTT\_URL** (default: `'mqtt://localhost:1883'`): URL of the server
+- **CONFIG\_MQTT\_PROTOCOL** (default: `'mqtt'`): Protocol to use
+- **CONFIG\_MQTT\_USERNAME** (default: `undefined`): Username
+- **CONFIG\_MQTT\_PASSWORD** (default: `undefined`): Password
+- **CONFIG\_MQTT\_CLIENT\_ID** (default: `'mqtt-client'`): Client ID
+- **CONFIG\_MQTT\_KEEPALIVE** (default: `60`): Keepalive in seconds
+- **CONFIG\_MQTT\_CLIENT\_CA\_PATH** (default: `undefined`): CA file path
+- **CONFIG\_MQTT\_CLIENT\_CLIENT\_CERT\_PATH** (default: `undefined`): Client cert file path
+- **CONFIG\_MQTT\_CLIENT\_CLIENT\_KEY\_PATH** (default: `undefined`): Client key file path
 - **NODE\_APP\_INSTANCE**: undefined
 
 ## **License**

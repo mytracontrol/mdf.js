@@ -12,22 +12,55 @@ import { logger } from './utils';
 
 // *************************************************************************************************
 // #region Environment variables
+/**
+ * URL of the server
+ * @defaultValue 'mqtt://localhost:1883'
+ */
 const CONFIG_MQTT_URL = process.env['CONFIG_MQTT_URL'];
+/**
+ * Protocol to use
+ * @defaultValue 'mqtt'
+ */
 const CONFIG_MQTT_PROTOCOL = process.env['CONFIG_MQTT_PROTOCOL'] as MqttProtocol;
+/**
+ * Username
+ * @defaultValue undefined
+ */
 const CONFIG_MQTT_USERNAME = process.env['CONFIG_MQTT_USERNAME'];
+/**
+ * Password
+ * @defaultValue undefined
+ */
 const CONFIG_MQTT_PASSWORD = process.env['CONFIG_MQTT_PASSWORD'];
+/**
+ * Client ID
+ * @defaultValue 'mqtt-client'
+ */
 const CONFIG_MQTT_CLIENT_ID = process.env['CONFIG_MQTT_CLIENT_ID'];
+/**
+ * Keepalive in seconds
+ * @defaultValue 60
+ */
 const CONFIG_MQTT_KEEPALIVE = coerce<number>(process.env['CONFIG_MQTT_KEEPALIVE']);
 
-const CONFIG_MQTT_CLIENT_CA = loadFile(process.env['CONFIG_MQTT_CLIENT_CA_PATH'], logger);
-const CONFIG_MQTT_CLIENT_CLIENT_CERT = loadFile(
-  process.env['CONFIG_MQTT_CLIENT_CLIENT_CERT_PATH'],
-  logger
-);
-const CONFIG_MQTT_CLIENT_CLIENT_KEY = loadFile(
-  process.env['CONFIG_MQTT_CLIENT_CLIENT_KEY_PATH'],
-  logger
-);
+/**
+ * CA file path
+ * @defaultValue undefined
+ */
+const CONFIG_MQTT_CLIENT_CA_PATH = process.env['CONFIG_MQTT_CLIENT_CA_PATH'];
+const CONFIG_MQTT_CLIENT_CA = loadFile(CONFIG_MQTT_CLIENT_CA_PATH, logger);
+/**
+ * Client cert file path
+ * @defaultValue undefined
+ */
+const CONFIG_MQTT_CLIENT_CLIENT_CERT_PATH = process.env['CONFIG_MQTT_CLIENT_CLIENT_CERT_PATH'];
+const CONFIG_MQTT_CLIENT_CLIENT_CERT = loadFile(CONFIG_MQTT_CLIENT_CLIENT_CERT_PATH, logger);
+/**
+ * Client key file path
+ * @defaultValue undefined
+ */
+const CONFIG_MQTT_CLIENT_CLIENT_KEY_PATH = process.env['CONFIG_MQTT_CLIENT_CLIENT_KEY_PATH'];
+const CONFIG_MQTT_CLIENT_CLIENT_KEY = loadFile(CONFIG_MQTT_CLIENT_CLIENT_KEY_PATH, logger);
 // #endregion
 
 export const envBasedConfig: Config = {
@@ -42,4 +75,3 @@ export const envBasedConfig: Config = {
   keepalive: CONFIG_MQTT_KEEPALIVE,
 };
 // #endregion
-

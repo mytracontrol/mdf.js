@@ -61,12 +61,12 @@ Checks included in the provider:
 
 ## **Environment variables**
 
-- **CONFIG\_SOCKET\_IO\_SERVER\_PORT**: undefined
-- **CONFIG\_SOCKET\_IO\_SERVER\_HOST**: undefined
-- **CONFIG\_SOCKET\_IO\_SERVER\_PATH**: undefined
-- **CONFIG\_SOCKET\_IO\_SERVER\_ENABLE\_UI**: undefined
-- **CONFIG\_SOCKET\_IO\_SERVER\_CORS\_\_ORIGIN**: undefined
-- **CONFIG\_SOCKET\_IO\_SERVER\_CORS\_\_CREDENTIALS**: undefined
+- **CONFIG\_SOCKET\_IO\_SERVER\_PORT** (default: `8080`): Port where the server will listen
+- **CONFIG\_SOCKET\_IO\_SERVER\_HOST** (default: `'localhost'`): Host where the server will listen
+- **CONFIG\_SOCKET\_IO\_SERVER\_PATH** (default: `'/socket.io'`): Path where the server will listen
+- **CONFIG\_SOCKET\_IO\_SERVER\_ENABLE\_UI** (default: `true`): Enable the UI
+- **CONFIG\_SOCKET\_IO\_SERVER\_CORS\_\_ORIGIN** (default: `` `/[\s\S]*\/` ``): CORS origin
+- **CONFIG\_SOCKET\_IO\_SERVER\_CORS\_\_CREDENTIALS** (default: `true`): CORS credentials
 
 ## **License**
 

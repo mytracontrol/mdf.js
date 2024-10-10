@@ -7,7 +7,6 @@
 
 import { coerce } from '@mdf.js/utils';
 import { Config } from '../provider';
-import { defaultConfig } from './default';
 // *************************************************************************************************
 // #region Environment variables
 
@@ -60,12 +59,12 @@ const CONFIG_JSONL_ARCHIVER_ROTATION_LINES = coerce<number>(
 );
 
 export const envBasedConfig: Config = {
-  workingFolderPath: CONFIG_JSONL_ARCHIVER_WORKING_FOLDER_PATH || defaultConfig.workingFolderPath,
-  archiveFolderPath: CONFIG_JSONL_ARCHIVER_ARCHIVE_FOLDER_PATH || defaultConfig.archiveFolderPath,
-  fileEncoding: CONFIG_JSONL_ARCHIVER_FILE_ENCODING || defaultConfig.fileEncoding,
-  createFolders: CONFIG_JSONL_ARCHIVER_CREATE_FOLDERS || defaultConfig.createFolders,
-  rotationInterval: CONFIG_JSONL_ARCHIVER_ROTATION_INTERVAL || defaultConfig.rotationInterval,
-  rotationSize: CONFIG_JSONL_ARCHIVER_ROTATION_SIZE || defaultConfig.rotationSize,
-  rotationLines: CONFIG_JSONL_ARCHIVER_ROTATION_LINES || defaultConfig.rotationLines,
+  workingFolderPath: CONFIG_JSONL_ARCHIVER_WORKING_FOLDER_PATH,
+  archiveFolderPath: CONFIG_JSONL_ARCHIVER_ARCHIVE_FOLDER_PATH,
+  fileEncoding: CONFIG_JSONL_ARCHIVER_FILE_ENCODING,
+  createFolders: CONFIG_JSONL_ARCHIVER_CREATE_FOLDERS,
+  rotationInterval: CONFIG_JSONL_ARCHIVER_ROTATION_INTERVAL,
+  rotationSize: CONFIG_JSONL_ARCHIVER_ROTATION_SIZE,
+  rotationLines: CONFIG_JSONL_ARCHIVER_ROTATION_LINES,
 };
 // #endregion
