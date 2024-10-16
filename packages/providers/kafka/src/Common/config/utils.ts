@@ -96,3 +96,4 @@ export const defaultLogCreator: logCreator = (level: logLevel) => (entry: LogEnt
   }
 };
 // #endregion
+

@@ -56,13 +56,14 @@ Check information about **@mdf.js** providers in the documentation of the core m
 
 ## **Environment variables**
 
-- **CONFIG\_S3\_ACCESS\_KEY\_ID**: S3 AWS region to which send requests
-- **CONFIG\_S3\_ACCESS\_KEY\_ID**: S3 AWS connection access key identifier
-- **CONFIG\_S3\_SECRET\_ACCESS\_KEY**: S3 AWS connection secret access key
-- **CONFIG\_S3\_SERVICE\_ID**: S3 unique service identifier
-- **CONFIG\_S3\_PROXY\_HTTP**: HTTP Proxy URI
-- **CONFIG\_S3\_PROXY\_HTTP**: HTTPs Proxy URI
-- **NODE\_APP\_INSTANCE**: undefined
+- **CONFIG\_S3\_REGION** (default: `'eu-central-1'`): S3 AWS region to which send requests
+- **CONFIG\_S3\_ACCESS\_KEY\_ID** (default: `'MY_ACCESS_KEY_ID'`): S3 AWS connection access key identifier
+- **CONFIG\_S3\_SECRET\_ACCESS\_KEY** (default: `'MY_SECRET_ACCESS_KEY'`): S3 AWS connection secret access key
+- **NODE\_APP\_INSTANCE** (default: `'MY_SECRET_ACCESS_KEY'`): S3 AWS connection secret access key
+- **CONFIG\_S3\_SERVICE\_ID** (default: `process.env['NODE_APP_INSTANCE'] || CONFIG_ARTIFACT_ID`): S3 unique service identifier
+- **CONFIG\_S3\_PROXY\_HTTP** (default: `undefined`): HTTP Proxy URI
+- **CONFIG\_S3\_PROXY\_HTTPS** (default: `undefined`): HTTPS Proxy URI
+- **NODE\_APP\_INSTANCE**: Default S3 unique service identifier
 
 ## **License**
 

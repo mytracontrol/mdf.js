@@ -13,3 +13,4 @@ export const schema = Joi.object({
   path: Joi.string(),
   enableUI: Joi.boolean(),
 }).unknown(true);
+

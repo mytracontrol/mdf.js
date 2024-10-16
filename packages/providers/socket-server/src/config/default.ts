@@ -29,3 +29,4 @@ export const defaultConfig: Config = {
   perMessageDeflate: CONFIG_SOCKET_IO_SERVER_PER_MESSAGE_DEFLATE,
 };
 // #endregion
+

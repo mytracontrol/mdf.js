@@ -155,3 +155,4 @@ export class PollingMetricsHandler {
     return _check;
   }
 }
+

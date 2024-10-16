@@ -148,3 +148,4 @@ export class PollingExecutor extends EventEmitter {
     return this.manager.check;
   }
 }
+

@@ -11,29 +11,60 @@ import { CONFIG_ARTIFACT_ID, reconnectOnError, retryStrategy } from './utils';
 
 // *************************************************************************************************
 // #region Environment variables
-/** Default REDIS connection host */
+
+/**
+ * REDIS connection host
+ * @defaultValue '127.0.0.1'
+ */
 const CONFIG_REDIS_HOST = process.env['CONFIG_REDIS_HOST'];
-/** Default REDIS connection port */
+/**
+ * REDIS connection port
+ * @defaultValue 6379
+ */
 const CONFIG_REDIS_PORT = coerce<number>(process.env['CONFIG_REDIS_PORT']);
-/** Default REDIS connection database */
+/**
+ * REDIS connection database
+ * @defaultValue 0
+ */
 const CONFIG_REDIS_DB = coerce<number>(process.env['CONFIG_REDIS_DB']);
-/** Default REDIS connection password */
+/**
+ * REDIS connection password
+ * @defaultValue undefined
+ */
 const CONFIG_REDIS_PASSWORD = process.env['CONFIG_REDIS_PASSWORD'];
-/** Default REDIS connection retry delay factor */
+/**
+ * REDIS connection retry delay factor
+ * @defaultValue 2000
+ */
 const CONFIG_REDIS_RETRY_DELAY_FACTOR = coerce<number>(
   process.env['CONFIG_REDIS_RETRY_DELAY_FACTOR']
 );
-/** Default REDIS connection retry delay max*/
+/**
+ * REDIS connection retry delay max
+ * @defaultValue 60000
+ */
 const CONFIG_REDIS_RETRY_DELAY_MAX = coerce<number>(process.env['CONFIG_REDIS_RETRY_DELAY_MAX']);
-/** Default REDIS connection keepAlive */
+/**
+ * REDIS connection keepAlive
+ * @defaultValue 10000
+ */
 const CONFIG_REDIS_KEEPALIVE = coerce<number>(process.env['CONFIG_REDIS_KEEPALIVE']);
-/** Default REDIS connection keepAlive */
+/**
+ * REDIS connection keepAlive
+ * @defaultValue 10000
+ */
 const CONFIG_REDIS_CONNECTION_TIMEOUT = coerce<number>(
   process.env['CONFIG_REDIS_CONNECTION_TIMEOUT']
 );
-/** Default REDIS status check interval */
+/**
+ * REDIS status check interval
+ * @defaultValue 60000
+ */
 const CONFIG_REDIS_CHECK_INTERVAL = coerce<number>(process.env['CONFIG_REDIS_CHECK_INTERVAL']);
-/** Disable Redis checks */
+/**
+ * Disable Redis checks
+ * @defaultValue false
+ */
 const CONFIG_REDIS_DISABLE_CHECKS = coerce<boolean>(process.env['CONFIG_REDIS_DISABLE_CHECKS']);
 
 export const envBasedConfig: Config = {

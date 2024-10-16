@@ -262,6 +262,11 @@ Checks included in the provider:
 - **CONFIG\_AMQP\_CLIENT\_KEY\_PATH** (default: `undefined`): The path to the client key file
 - **CONFIG\_AMQP\_REQUEST\_CERT** (default: `false`): If true the server will request a certificate from clients that connect and attempt to verify that certificate. Defaults to false.
 - **CONFIG\_AMQP\_REJECT\_UNAUTHORIZED** (default: `true`): If true the server will reject any connection which is not authorized with the list of supplied CAs. This option only has an effect if requestCert is true.
+- **CONFIG\_AMQP\_IDLE\_TIME\_OUT** (default: `5000`): The maximum period in milliseconds between activity (frames) on the connection that is desired from the peer. The open frame carries the idle-time-out field for this purpose. To avoid spurious timeouts, the value in idle\_time\_out is set to be half of the peer’s actual timeout threshold.
+- **CONFIG\_AMQP\_KEEP\_ALIVE** (default: `true`): If true the server will send a keep-alive packet to maintain the connection alive.
+- **CONFIG\_AMQP\_KEEP\_ALIVE\_INITIAL\_DELAY** (default: `2000`): The initial delay in milliseconds for the keep-alive packet.
+- **CONFIG\_AMQP\_TIMEOUT** (default: `10000`): The time in milliseconds to wait for the connection to be established.
+- **CONFIG\_AMQP\_ALL\_ERRORS\_NON\_FATAL** (default: `true`): Determines if rhea's auto-reconnect should attempt reconnection on all fatal errors
 - **NODE\_APP\_INSTANCE** (default: `undefined`): Used as default container id, receiver name, sender name, etc. in cluster configurations.
 
 ## **License**

@@ -21,9 +21,9 @@ export class CreditsFlow extends Base<Plugs.Source.CreditsFlow> {
   }
   /** Perform the read of data from the source */
   _read(size: number): void {
-    this.plug.addCredits(size).then(() => {
+    this.plug.addCredits(size).then(result => {
       // Stryker disable next-line all
-      this.logger.verbose(`${size} credits has been added`);
+      this.logger.verbose(`${result} credits has been added to ${this.plug.name}`);
     });
   }
   /**

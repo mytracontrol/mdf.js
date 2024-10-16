@@ -16,11 +16,11 @@
   "excludePrivate": true,
   "excludeProtected": true,
   "excludeInternal": true,
-  "includes": [],
-  "media": "media",
+
   "out": "../../../docs/providers/http-client",
-  "markedOptions": {
-    "gfm": true
+  "markdownItOptions": {
+    "html": true,
+    "linkify": true,
   },
   "name": "@mdf.js/http-client-provider",
   "includeVersion": false,

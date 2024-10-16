@@ -9,22 +9,40 @@ import { NodeHttpHandler, NodeHttpHandlerOptions } from '@smithy/node-http-handl
 import { HttpProxyAgent } from 'http-proxy-agent';
 import { HttpsProxyAgent } from 'https-proxy-agent';
 import { Config } from '../provider';
-import { DEFAULT_CONFIG_S3_ACCESS_KEY_ID, DEFAUTLT_CONFIG_S3_SECRET_ACCESS_KEY } from './default';
+import { DEFAULT_CONFIG_S3_ACCESS_KEY_ID, DEFAULT_CONFIG_S3_SECRET_KEY } from './default';
 
 // *************************************************************************************************
 // #region Environment variables
 /**
- * S3 AWS region to which send requests */
+ *
+ * S3 AWS region to which send requests
+ * @defaultValue 'eu-central-1'
+ */
 const CONFIG_S3_REGION = process.env['CONFIG_S3_REGION'];
-/** S3 AWS connection access key identifier */
+/**
+ * S3 AWS connection access key identifier
+ * @defaultValue 'MY_ACCESS_KEY_ID'
+ */
 const CONFIG_S3_ACCESS_KEY_ID = process.env['CONFIG_S3_ACCESS_KEY_ID'];
-/** S3 AWS connection secret access key */
+/**
+ * S3 AWS connection secret access key
+ * @defaultValue 'MY_SECRET_ACCESS_KEY'
+ */
 const CONFIG_S3_SECRET_ACCESS_KEY = process.env['CONFIG_S3_SECRET_ACCESS_KEY'];
-/** S3 unique service identifier */
+/**
+ * S3 unique service identifier
+ * @defaultValue process.env['NODE_APP_INSTANCE'] || CONFIG_ARTIFACT_ID
+ */
 const CONFIG_S3_SERVICE_ID = process.env['CONFIG_S3_SERVICE_ID'];
-/** HTTP Proxy URI */
+/**
+ * HTTP Proxy URI
+ * @defaultValue undefined
+ */
 const CONFIG_S3_PROXY_HTTP = process.env['CONFIG_S3_PROXY_HTTP'];
-/** HTTPS Proxy URI */
+/**
+ * HTTPS Proxy URI
+ * @defaultValue undefined
+ */
 const CONFIG_S3_PROXY_HTTPS = process.env['CONFIG_S3_PROXY_HTTPS'];
 
 const requestHandlerConfig: NodeHttpHandlerOptions = {};
@@ -43,7 +61,7 @@ export const envBasedConfig: Config = {
   region: CONFIG_S3_REGION,
   credentials: {
     accessKeyId: CONFIG_S3_ACCESS_KEY_ID ?? DEFAULT_CONFIG_S3_ACCESS_KEY_ID,
-    secretAccessKey: CONFIG_S3_SECRET_ACCESS_KEY ?? DEFAUTLT_CONFIG_S3_SECRET_ACCESS_KEY,
+    secretAccessKey: CONFIG_S3_SECRET_ACCESS_KEY ?? DEFAULT_CONFIG_S3_SECRET_KEY,
   },
   serviceId: CONFIG_S3_SERVICE_ID,
   requestHandler,

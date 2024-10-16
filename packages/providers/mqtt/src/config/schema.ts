@@ -30,3 +30,4 @@ export const schema = Joi.object({
   cert: Joi.binary(),
   key: Joi.binary(),
 }).unknown(true);
+

@@ -169,11 +169,20 @@ if (CONFIG_KAFKA_CLIENT_SSL_ENABLED && isSSLConfig) {
 
 /**
  * SASL mechanism, supported mechanisms are: plain, scram-sha-256, scram-sha-512
+ * @defaultValue undefined
  */
 const CONFIG_KAFKA_CLIENT__SASL_MECHANISM = process.env[
   'CONFIG_KAFKA_CLIENT__SASL_MECHANISM'
 ] as AllowedMechanisms;
+/**
+ * SASL username
+ * @defaultValue undefined
+ */
 const CONFIG_KAFKA_CLIENT__SASL_USERNAME = process.env['CONFIG_KAFKA_CLIENT__SASL_USERNAME'];
+/**
+ * SASL password
+ * @defaultValue undefined
+ */
 const CONFIG_KAFKA_CLIENT__SASL_PASSWORD = process.env['CONFIG_KAFKA_CLIENT__SASL_PASSWORD'];
 let CONFIG_KAFKA_CLIENT_SASL:
   | SASLMechanismOptions<'plain' | 'scram-sha-256' | 'scram-sha-512'>

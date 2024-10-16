@@ -74,3 +74,4 @@ export const defaultConfig: Config = {
   disableChecks: CONFIG_REDIS_DISABLE_CHECKS,
 };
 // #endregion
+

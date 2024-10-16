@@ -95,12 +95,16 @@ function findAllEnvironmentVariablesInFile(fileContent, path) {
   for (let index = 0; index < lines.length; index++) {
     const matches = lines[index].match(envVarRegex);
     if (matches && matches.groups && matches.groups['varName']) {
-      let comment = findUpperCommentInFile(lines, index);
-      const defaultValue = getDefaultValueFromComment(comment);
-      if (defaultValue) {
-        comment = comment.replace(defaultValueRegex, '').trim();
+      try {
+        let comment = findUpperCommentInFile(lines, index);
+        const defaultValue = getDefaultValueFromComment(comment);
+        if (defaultValue) {
+          comment = comment.replace(defaultValueRegex, '').trim();
+        }
+        variables.push({ name: matches.groups['varName'], comment, path, defaultValue });
+      } catch (error) { 
+        console.log(`ERROR: Error while processing file ${path}: ${error.message}`);
       }
-      variables.push({ name: matches.groups['varName'], comment, path, defaultValue });
     }
   }
 }

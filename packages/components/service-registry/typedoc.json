@@ -16,11 +16,11 @@
   "excludePrivate": true,
   "excludeProtected": true,
   "excludeInternal": true,
-  "includes": [],
-  "media": "media",
+
   "out": "../../../docs/components/service-registry",
-  "markedOptions": {
-    "gfm": true
+  "markdownItOptions": {
+    "html": true,
+    "linkify": true,
   },
   "name": "@mdf.js/service-registry",
   "includeVersion": false,

@@ -61,12 +61,12 @@ Checks included in the provider:
 
 ## **Environment variables**
 
-- **CONFIG\_SOCKET\_IO\_CLIENT\_URL**: undefined
-- **CONFIG\_SOCKET\_IO\_CLIENT\_PATH**: undefined
-- **CONFIG\_SOCKET\_IO\_CLIENT\_TRANSPORTS**: undefined
-- **CONFIG\_SOCKET\_IO\_CLIENT\_CA\_PATH**: undefined
-- **CONFIG\_SOCKET\_IO\_CLIENT\_CLIENT\_CERT\_PATH**: undefined
-- **CONFIG\_SOCKET\_IO\_CLIENT\_CLIENT\_KEY\_PATH**: undefined
+- **CONFIG\_SOCKET\_IO\_CLIENT\_URL** (default: `'http://localhost:8080'`): URL of the server
+- **CONFIG\_SOCKET\_IO\_CLIENT\_PATH** (default: `'/socket.io'`): Path where the server will listen
+- **CONFIG\_SOCKET\_IO\_CLIENT\_TRANSPORTS** (default: `['websocket']`): Transports to use
+- **CONFIG\_SOCKET\_IO\_CLIENT\_CA\_PATH** (default: `undefined`): CA file path
+- **CONFIG\_SOCKET\_IO\_CLIENT\_CLIENT\_CERT\_PATH** (default: `undefined`): Client cert file path
+- **CONFIG\_SOCKET\_IO\_CLIENT\_CLIENT\_KEY\_PATH** (default: `undefined`): Client key file path
 
 ## **License**
 

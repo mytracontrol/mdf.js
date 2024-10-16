@@ -15,3 +15,4 @@ export const schema = Joi.object({
   configFiles: Joi.array().items(Joi.string()),
   envPrefix: Joi.alternatives().try(Joi.string(), Joi.array().items(Joi.string()), Joi.object()),
 }).unknown(true);
+

@@ -11,3 +11,4 @@ import { Config } from '../provider';
 // #region Default values
 export const defaultConfig: Config = {};
 // #endregion
+

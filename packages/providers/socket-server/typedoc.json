@@ -16,11 +16,11 @@
   "excludePrivate": true,
   "excludeProtected": true,
   "excludeInternal": true,
-  "includes": [],
-  "media": "media",
+
   "out": "../../../docs/providers/socket-server",
-  "markedOptions": {
-    "gfm": true
+  "markdownItOptions": {
+    "html": true,
+    "linkify": true,
   },
   "name": "@mdf.js/socket-server-provider",
   "includeVersion": false,

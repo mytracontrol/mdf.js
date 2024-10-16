@@ -68,35 +68,35 @@ Checks included in the provider:
 
 ## **Environment variables**
 
-- **CONFIG\_KAFKA\_PRODUCER\_\_METADATA\_MAX\_AGE**: undefined
-- **CONFIG\_KAFKA\_PRODUCER\_\_ALLOW\_AUTO\_TOPIC\_CREATION**: undefined
-- **CONFIG\_KAFKA\_PRODUCER\_\_TRANSACTION\_TIMEOUT**: undefined
-- **CONFIG\_KAFKA\_PRODUCER\_\_IDEMPOTENT**: undefined
-- **CONFIG\_KAFKA\_PRODUCER\_\_TRANSACTIONAL\_ID**: undefined
-- **CONFIG\_KAFKA\_PRODUCER\_\_MAX\_IN\_FLIGHT\_REQUEST**: undefined
-- **CONFIG\_KAFKA\_PRODUCER\_\_RETRY\_\_MAX\_RETRY\_TIME**: undefined
-- **CONFIG\_KAFKA\_PRODUCER\_\_RETRY\_\_INITIAL\_RETRY\_TIME**: undefined
-- **CONFIG\_KAFKA\_PRODUCER\_\_RETRY\_\_FACTOR**: undefined
-- **CONFIG\_KAFKA\_PRODUCER\_\_RETRY\_\_MULTIPLIER**: undefined
-- **CONFIG\_KAFKA\_PRODUCER\_\_RETRY\_\_RETRIES**: undefined
-- **CONFIG\_KAFKA\_CONSUMER\_\_GROUP\_ID**: undefined
-- **CONFIG\_KAFKA\_CONSUMER\_\_SESSION\_TIMEOUT**: undefined
-- **CONFIG\_KAFKA\_CONSUMER\_\_REBALANCE\_TIMEOUT**: undefined
-- **CONFIG\_KAFKA\_CONSUMER\_\_HEARTBEAT\_INTERVAL**: undefined
-- **CONFIG\_KAFKA\_CONSUMER\_\_METADATA\_MAX\_AGE**: undefined
-- **CONFIG\_KAFKA\_CONSUMER\_\_ALLOW\_AUTO\_TOPIC\_CREATION**: undefined
-- **CONFIG\_KAFKA\_CONSUMER\_\_MAX\_BYTES\_PER\_PARTITION**: undefined
-- **CONFIG\_KAFKA\_CONSUMER\_\_MIN\_BYTES**: undefined
-- **CONFIG\_KAFKA\_CONSUMER\_\_MAX\_BYTES**: undefined
-- **CONFIG\_KAFKA\_CONSUMER\_MAX\_WAIT\_TIME\_IN\_MS**: undefined
-- **CONFIG\_KAFKA\_CONSUMER\_\_RETRY\_\_MAX\_RETRY\_TIME**: undefined
-- **CONFIG\_KAFKA\_CONSUMER\_\_RETRY\_\_INITIAL\_RETRY\_TIME**: undefined
-- **CONFIG\_KAFKA\_CONSUMER\_\_RETRY\_\_FACTOR**: undefined
-- **CONFIG\_KAFKA\_CONSUMER\_\_RETRY\_\_MULTIPLIER**: undefined
-- **CONFIG\_KAFKA\_CONSUMER\_\_RETRY\_\_RETRIES**: undefined
-- **CONFIG\_KAFKA\_CONSUMER\_\_READ\_UNCOMMITTED**: undefined
-- **CONFIG\_KAFKA\_CONSUMER\_\_MAX\_IN\_FLIGHT\_REQUEST**: undefined
-- **CONFIG\_KAFKA\_CONSUMER\_\_RACK\_ID**: undefined
+- **CONFIG\_KAFKA\_PRODUCER\_\_METADATA\_MAX\_AGE** (default: `300000`): Maximum time in ms that the producer will wait for metadata
+- **CONFIG\_KAFKA\_PRODUCER\_\_ALLOW\_AUTO\_TOPIC\_CREATION** (default: `true`): Allow auto topic creation
+- **CONFIG\_KAFKA\_PRODUCER\_\_TRANSACTION\_TIMEOUT** (default: `60000`): Transaction timeout in ms
+- **CONFIG\_KAFKA\_PRODUCER\_\_IDEMPOTENT** (default: `false`): Idempotent producer
+- **CONFIG\_KAFKA\_PRODUCER\_\_TRANSACTIONAL\_ID** (default: `undefined`): Transactional id
+- **CONFIG\_KAFKA\_PRODUCER\_\_MAX\_IN\_FLIGHT\_REQUEST** (default: `undefined`): Maximum number of in-flight requests
+- **CONFIG\_KAFKA\_PRODUCER\_\_RETRY\_\_MAX\_RETRY\_TIME** (default: `300000`): Maximum time in ms that the producer will wait for metadata
+- **CONFIG\_KAFKA\_PRODUCER\_\_RETRY\_\_INITIAL\_RETRY\_TIME** (default: `300`): Initial value used to calculate the retry in milliseconds (This is still randomized following the randomization factor)
+- **CONFIG\_KAFKA\_PRODUCER\_\_RETRY\_\_FACTOR** (default: `0.2`): A multiplier to apply to the retry time
+- **CONFIG\_KAFKA\_PRODUCER\_\_RETRY\_\_MULTIPLIER** (default: `2`): A multiplier to apply to the retry time
+- **CONFIG\_KAFKA\_PRODUCER\_\_RETRY\_\_RETRIES** (default: `5`): Maximum number of retries per call
+- **CONFIG\_KAFKA\_CONSUMER\_\_GROUP\_ID** (default: `'hostname()'`): Consumer group id
+- **CONFIG\_KAFKA\_CONSUMER\_\_SESSION\_TIMEOUT** (default: `30000`): The timeout used to detect consumer failures when using Kafka's group management facility. The consumer sends periodic heartbeats to indicate its liveness to the broker. If no heartbeats are received by the broker before the expiration of this session timeout, then the broker will remove this consumer from the group and initiate a rebalance.
+- **CONFIG\_KAFKA\_CONSUMER\_\_REBALANCE\_TIMEOUT** (default: `60000`): The maximum time that the coordinator will wait for each member to rejoin when rebalancing the group.
+- **CONFIG\_KAFKA\_CONSUMER\_\_HEARTBEAT\_INTERVAL** (default: `3000`): The expected time between heartbeats to the consumer coordinator when using Kafka's group management facility. Heartbeats are used to ensure that the consumer's session stays active and to facilitate rebalancing when new consumers join or leave the group. The value must be set lower than \`sessionTimeout\`, but typically should be set no higher than 1/3 of that value. It can be adjusted even lower to control the expected time for normal rebalances.
+- **CONFIG\_KAFKA\_CONSUMER\_\_METADATA\_MAX\_AGE** (default: `300000`): The period of time in milliseconds after which we force a refresh of metadata even if we haven't seen any partition leadership changes to proactively discover any new brokers or partitions.
+- **CONFIG\_KAFKA\_CONSUMER\_\_ALLOW\_AUTO\_TOPIC\_CREATION** (default: `true`): Allow automatic topic creation on the broker when subscribing to or assigning non-existing topics.
+- **CONFIG\_KAFKA\_CONSUMER\_\_MAX\_BYTES\_PER\_PARTITION** (default: `1048576`): The maximum amount of data per-partition the server will return.
+- **CONFIG\_KAFKA\_CONSUMER\_\_MIN\_BYTES** (default: `1`): Minimum amount of data the server should return for a fetch request. If insufficient data is available the request will wait until some is available.
+- **CONFIG\_KAFKA\_CONSUMER\_\_MAX\_BYTES** (default: `10485760`): The maximum amount of data the server should return for a fetch request.
+- **CONFIG\_KAFKA\_CONSUMER\_MAX\_WAIT\_TIME\_IN\_MS** (default: `5000`): The maximum amount of time the server will block before answering the fetch request if there isn't sufficient data to immediately satisfy \`minBytes\`.
+- **CONFIG\_KAFKA\_CONSUMER\_\_RETRY\_\_MAX\_RETRY\_TIME** (default: `30000`): Maximum time in milliseconds to wait for a successful retry
+- **CONFIG\_KAFKA\_CONSUMER\_\_RETRY\_\_INITIAL\_RETRY\_TIME** (default: `300`): Initial value used to calculate the retry in milliseconds (This is still randomized following the randomization factor)
+- **CONFIG\_KAFKA\_CONSUMER\_\_RETRY\_\_FACTOR** (default: `0.2`): A multiplier to apply to the retry time
+- **CONFIG\_KAFKA\_CONSUMER\_\_RETRY\_\_MULTIPLIER** (default: `2`): A multiplier to apply to the retry time
+- **CONFIG\_KAFKA\_CONSUMER\_\_RETRY\_\_RETRIES** (default: `5`): Maximum number of retries per call
+- **CONFIG\_KAFKA\_CONSUMER\_\_READ\_UNCOMMITTED** (default: `false`): Whether to read uncommitted messages
+- **CONFIG\_KAFKA\_CONSUMER\_\_MAX\_IN\_FLIGHT\_REQUEST** (default: `undefined`): Maximum number of in-flight requests
+- **CONFIG\_KAFKA\_CONSUMER\_\_RACK\_ID** (default: `undefined`): The consumer will only be assigned partitions from the leader of the partition to which it is assigned.
 - **CONFIG\_KAFKA\_LOG\_LEVEL** (default: `` `error` ``): Define the log level for the kafka provider, possible values are: - \`error\` - \`warn\` - \`info\` - \`debug\` - \`trace\`
 - **CONFIG\_KAFKA\_CLIENT\_\_CLIENT\_ID** (default: `hostname`): Client identifier
 - **CONFIG\_KAFKA\_CLIENT\_\_BROKERS** (default: `'127.0.0.1:9092'`): Kafka brokers
@@ -117,8 +117,8 @@ Checks included in the provider:
 - **CONFIG\_KAFKA\_CLIENT\_SSL\_CA\_PATH** (default: `undefined`): Path to the CA certificate.
 - **CONFIG\_KAFKA\_CLIENT\_SSL\_CERT\_PATH** (default: `undefined`): Path to the client certificate.
 - **CONFIG\_KAFKA\_CLIENT\_SSL\_KEY\_PATH** (default: `undefined`): Path to the client key.
-- **CONFIG\_KAFKA\_CLIENT\_\_SASL\_USERNAME**: undefined
-- **CONFIG\_KAFKA\_CLIENT\_\_SASL\_PASSWORD**: undefined
+- **CONFIG\_KAFKA\_CLIENT\_\_SASL\_USERNAME** (default: `undefined`): SASL username
+- **CONFIG\_KAFKA\_CLIENT\_\_SASL\_PASSWORD** (default: `undefined`): SASL password
 - **NODE\_APP\_INSTANCE**: undefined
 
 ## **License**

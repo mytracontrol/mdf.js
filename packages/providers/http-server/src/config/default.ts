@@ -21,3 +21,4 @@ export const defaultConfig: Config = {
   app: SERVER_DEFAULT_APP,
 };
 // #endregion
+

@@ -19,3 +19,4 @@ export const defaultConfig: Config = {
   transports: CONFIG_SOCKET_IO_CLIENT_TRANSPORTS,
 };
 // #endregion
+

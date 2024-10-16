@@ -65,16 +65,16 @@ Checks included in the provider:
 
 ## **Environment variables**
 
-- **CONFIG\_REDIS\_HOST**: Default REDIS connection host
-- **CONFIG\_REDIS\_PORT**: Default REDIS connection port
-- **CONFIG\_REDIS\_DB**: Default REDIS connection database
-- **CONFIG\_REDIS\_PASSWORD**: Default REDIS connection password
-- **CONFIG\_REDIS\_RETRY\_DELAY\_FACTOR**: Default REDIS connection retry delay factor
-- **CONFIG\_REDIS\_RETRY\_DELAY\_MAX**: Default REDIS connection retry delay max
-- **CONFIG\_REDIS\_KEEPALIVE**: Default REDIS connection keepAlive
-- **CONFIG\_REDIS\_CONNECTION\_TIMEOUT**: Default REDIS connection keepAlive
-- **CONFIG\_REDIS\_CHECK\_INTERVAL**: Default REDIS status check interval
-- **CONFIG\_REDIS\_DISABLE\_CHECKS**: Disable Redis checks
+- **CONFIG\_REDIS\_HOST** (default: `'127.0.0.1'`): REDIS connection host
+- **CONFIG\_REDIS\_PORT** (default: `6379`): REDIS connection port
+- **CONFIG\_REDIS\_DB** (default: `0`): REDIS connection database
+- **CONFIG\_REDIS\_PASSWORD** (default: `undefined`): REDIS connection password
+- **CONFIG\_REDIS\_RETRY\_DELAY\_FACTOR** (default: `2000`): REDIS connection retry delay factor
+- **CONFIG\_REDIS\_RETRY\_DELAY\_MAX** (default: `60000`): REDIS connection retry delay max
+- **CONFIG\_REDIS\_KEEPALIVE** (default: `10000`): REDIS connection keepAlive
+- **CONFIG\_REDIS\_CONNECTION\_TIMEOUT** (default: `10000`): REDIS connection keepAlive
+- **CONFIG\_REDIS\_CHECK\_INTERVAL** (default: `60000`): REDIS status check interval
+- **CONFIG\_REDIS\_DISABLE\_CHECKS** (default: `false`): Disable Redis checks
 - **NODE\_APP\_INSTANCE**: undefined
 
 ## **License**

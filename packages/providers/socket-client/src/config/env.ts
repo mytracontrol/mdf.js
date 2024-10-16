@@ -11,17 +11,46 @@ import { logger } from './utils';
 
 // *************************************************************************************************
 // #region Environment variables
+/**
+ * URL of the server
+ * @defaultValue 'http://localhost:8080'
+ */
 const CONFIG_SOCKET_IO_CLIENT_URL = process.env['CONFIG_SOCKET_IO_CLIENT_URL'];
+/**
+ * Path where the server will listen
+ * @defaultValue '/socket.io'
+ */
 const CONFIG_SOCKET_IO_CLIENT_PATH = process.env['CONFIG_SOCKET_IO_CLIENT_PATH'];
+/**
+ * Transports to use
+ * @defaultValue ['websocket']
+ */
 const CONFIG_SOCKET_IO_CLIENT_TRANSPORTS = process.env['CONFIG_SOCKET_IO_CLIENT_TRANSPORTS'];
 
-const CONFIG_SOCKET_IO_CLIENT_CA = loadFile(process.env['CONFIG_SOCKET_IO_CLIENT_CA_PATH'], logger);
+/**
+ * CA file path
+ * @defaultValue undefined
+ */
+const CONFIG_SOCKET_IO_CLIENT_CA_PATH = process.env['CONFIG_SOCKET_IO_CLIENT_CA_PATH'];
+const CONFIG_SOCKET_IO_CLIENT_CA = loadFile(CONFIG_SOCKET_IO_CLIENT_CA_PATH, logger);
+/**
+ * Client cert file path
+ * @defaultValue undefined
+ */
+const CONFIG_SOCKET_IO_CLIENT_CLIENT_CERT_PATH =
+  process.env['CONFIG_SOCKET_IO_CLIENT_CLIENT_CERT_PATH'];
 const CONFIG_SOCKET_IO_CLIENT_CLIENT_CERT = loadFile(
-  process.env['CONFIG_SOCKET_IO_CLIENT_CLIENT_CERT_PATH'],
+  CONFIG_SOCKET_IO_CLIENT_CLIENT_CERT_PATH,
   logger
 );
+/**
+ * Client key file path
+ * @defaultValue undefined
+ */
+const CONFIG_SOCKET_IO_CLIENT_CLIENT_KEY_PATH =
+  process.env['CONFIG_SOCKET_IO_CLIENT_CLIENT_KEY_PATH'];
 const CONFIG_SOCKET_IO_CLIENT_CLIENT_KEY = loadFile(
-  process.env['CONFIG_SOCKET_IO_CLIENT_CLIENT_KEY_PATH'],
+  CONFIG_SOCKET_IO_CLIENT_CLIENT_KEY_PATH,
   logger
 );
 

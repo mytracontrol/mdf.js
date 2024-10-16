@@ -75,7 +75,8 @@
     "limiter",
     "general",
     "tasks",
-    "elastic-provider"
+    "elastic-provider",
+    "jsonl-archiver"
   ],
 
 }

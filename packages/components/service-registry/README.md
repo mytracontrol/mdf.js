@@ -377,6 +377,8 @@ Please check the documentation of the packages [@mdf.js/openc2](https://www.npmj
 - **CONFIG\_CUSTOM\_PRESET**: Default custom config loader options
 - **CONFIG\_SERVICE\_REGISTRY\_PRESET**: Default service registry config loader options
 - **NODE\_APP\_INSTANCE**: Create a new instance of MetricsAggregator @param logger - Instance for logging @param port - Optional AggregatorRegistry for cluster metrics
+- **NODE\_APP\_INSTANCE**: Create a new instance of MetricsAggregator @param logger - Instance for logging @param port - Optional AggregatorRegistry for cluster metrics
+- **NODE\_APP\_INSTANCE**: Create a new instance of MetricsAggregator @param logger - Instance for logging @param port - Optional AggregatorRegistry for cluster metrics
 
 ## **License**
 

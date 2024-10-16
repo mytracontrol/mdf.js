@@ -11,3 +11,4 @@ export interface Config extends BaseConfig {
   /** Kafka consumer configuration options */
   consumer: ConsumerConfig;
 }
+

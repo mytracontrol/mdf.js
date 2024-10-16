@@ -64,6 +64,13 @@ export declare interface Firehose<
    */
   on(event: 'done', listener: Jobs.DoneEventHandler<Type>): this;
   /**
+   * Register an event listener over the `hold` event, which is emitted when the engine is paused due
+   * to inactivity.
+   * @param event - `restart` event
+   * @event
+   */
+  on(event: 'hold', listener: () => void): this;
+  /**
    * Register an event listener over the `done` event, which is emitted when a job has ended, either
    * due to completion or failure.
    * @param event - `done` event
@@ -150,13 +157,13 @@ export class Firehose<
   /** Provider unique identifier for trace purposes */
   readonly componentId: string = v4();
   /** Engine stream */
-  private readonly engine: Engine;
+  private engine: Engine;
   /** Sink streams */
-  private readonly sinks: Sinks[] = [];
+  private sinks: Sinks[];
   /** Source streams */
-  private readonly sources: Sources[] = [];
+  private sources: Sources[];
   /** Metrics handler */
-  private metricsHandler = new MetricsHandler();
+  private metricsHandler: MetricsHandler;
   /** Flag to indicate that an stop request has been received */
   private stopping: boolean;
   /**
@@ -171,7 +178,7 @@ export class Firehose<
     super();
     // Stryker disable next-line all
     this.logger = SetContext(
-      options?.logger || new DebugLogger(`mdf:firehose:${this.name}`),
+      this.options?.logger || new DebugLogger(`mdf:firehose:${this.name}`),
       this.name,
       this.componentId
     );
@@ -181,14 +188,19 @@ export class Firehose<
     if (this.options.sources.length < 1) {
       throw new Crash(`Firehose must have at least one source`, this.componentId);
     }
-    this.bootstrap();
-    this.engine = new Engine(this.name, {
-      strategies: this.options.strategies,
-      transformOptions: { highWaterMark: this.options.bufferSize },
-      logger: this.options.logger,
-    });
+    const { sinks, sources, engine, metricsHandler } = this.bootstrap();
+    this.sinks = sinks;
+    this.sources = sources;
+    this.engine = engine;
+    this.metricsHandler = metricsHandler;
     this.stopping = false;
   }
+  /** Engine hold event handler */
+  private readonly onHoldEvent = async () => {
+    // Stryker disable next-line all
+    this.logger.warn(`Hold time reached, informing to the upper layers ...`);
+    this.emit('hold');
+  };
   /** Sink/Source/Engine/Plug error event handler */
   private readonly onErrorEvent = (error: Error | Crash) => {
     // Stryker disable next-line all
@@ -251,6 +263,7 @@ export class Firehose<
     }
     this.engine.on('error', this.onErrorEvent);
     this.engine.on('status', this.onStatusEvent);
+    this.engine.on('hold', this.onHoldEvent);
   }
   /** Perform the unsubscription to the events from sources, sinks and engine */
   private unWrappingEvents(): void {
@@ -272,48 +285,35 @@ export class Firehose<
     }
     this.engine.off('error', this.onErrorEvent);
     this.engine.off('status', this.onStatusEvent);
-  }
-  /** Overall component status */
-  public get status(): Health.Status {
-    return Health.overallStatus(this.checks);
-  }
-  /**
-   * Return the status of the firehose in a standard format
-   * @returns _check object_ as defined in the draft standard
-   * https://datatracker.ietf.org/doc/html/draft-inadarei-api-health-check-05
-   */
-  public get checks(): Health.Checks {
-    let overallChecks: Health.Checks = {};
-    for (const source of this.sources) {
-      overallChecks = { ...source.checks, ...overallChecks };
-    }
-    for (const sink of this.sinks) {
-      overallChecks = { ...sink.checks, ...overallChecks };
-    }
-    return { ...this.engine.checks, ...overallChecks };
-  }
-  /** Return the metrics registry */
-  public get metrics(): Registry {
-    return this.metricsHandler.registry;
+    this.engine.off('hold', this.onHoldEvent);
   }
   /** Perform the bootstrapping of the firehose */
-  private bootstrap(): void {
-    this.sinks.push(...Helpers.GetSinkStreamsFromPlugs(this.options.sinks, this.options));
-    this.sources.push(
-      ...Helpers.GetSourceStreamsFromPlugs(
-        this.options.sources,
-        this.options,
-        this.options.atLeastOne ? 1 : this.sinks.length
-      )
+  private bootstrap(): {
+    sinks: Sinks[];
+    sources: Sources[];
+    engine: Engine;
+    metricsHandler: MetricsHandler;
+  } {
+    const _sinks = Helpers.GetSinkStreamsFromPlugs(this.options.sinks, this.options);
+    const _sources = Helpers.GetSourceStreamsFromPlugs(
+      this.options.sources,
+      this.options,
+      this.options.atLeastOne ? 1 : _sinks.length
     );
-    if (this.metricsHandler) {
-      for (const source of this.sources) {
-        this.metricsHandler.enroll(source);
-      }
-      for (const sink of this.sinks) {
-        this.metricsHandler.enroll(sink);
-      }
+    const _metricHandler = new MetricsHandler();
+    for (const sink of _sinks) {
+      _metricHandler.enroll(sink);
     }
+    for (const source of _sources) {
+      _metricHandler.enroll(source);
+    }
+    const _engine = new Engine(this.name, {
+      strategies: this.options.strategies,
+      transformOptions: { highWaterMark: this.options.bufferSize },
+      logger: this.options.logger,
+      maxInactivityTime: this.options.maxInactivityTime,
+    });
+    return { sinks: _sinks, sources: _sources, engine: _engine, metricsHandler: _metricHandler };
   }
   /** Perform the piping of all the streams */
   public async start(): Promise<void> {
@@ -343,6 +343,7 @@ export class Firehose<
       for (const source of this.sources) {
         source.pipe(this.engine);
       }
+      this.engine.start();
     } catch (rawError) {
       const error = Crash.from(rawError);
       // Stryker disable next-line all
@@ -359,32 +360,70 @@ export class Firehose<
       throw error;
     }
   }
-  /** Perform the unpipe of all the streams */
+  /** Stop the active sink and source and unpipe them from the engine */
   public async stop(): Promise<void> {
     this.stopping = true;
     this.unWrappingEvents();
+    this.engine.stop();
     for (const sink of this.sinks) {
       await sink.stop();
       this.engine.unpipe(sink);
+    }
+    for (const source of this.sources) {
+      await source.stop();
+      source.unpipe(this.engine);
+    }
+    this.stopping = false;
+  }
+  /** Stop and close all the streams */
+  public async close(): Promise<void> {
+    await this.stop();
+    this.metricsHandler.registry.clear();
+    this.engine.close();
+
+    for (const sink of this.sinks) {
       sink.end();
       sink.destroy();
       sink.removeAllListeners();
     }
     for (const source of this.sources) {
-      await source.stop();
-      source.unpipe(this.engine);
       source.destroy();
       source.removeAllListeners();
     }
     this.sinks.length = 0;
     this.sources.length = 0;
   }
-  /** Stop and close all the streams */
-  public async close(): Promise<void> {
-    await this.stop();
-    this.metricsHandler.registry.clear();
-    this.engine.end();
-    this.engine.destroy();
-    this.engine.removeAllListeners();
+  /** Perform the restart of the firehose */
+  public async restart(): Promise<void> {
+    await this.close();
+    const { sinks, sources, engine, metricsHandler } = this.bootstrap();
+    this.sinks = sinks;
+    this.sources = sources;
+    this.engine = engine;
+    this.metricsHandler = metricsHandler;
+    await this.start();
+  }
+  /** Overall component status */
+  public get status(): Health.Status {
+    return Health.overallStatus(this.checks);
+  }
+  /**
+   * Return the status of the firehose in a standard format
+   * @returns _check object_ as defined in the draft standard
+   * https://datatracker.ietf.org/doc/html/draft-inadarei-api-health-check-05
+   */
+  public get checks(): Health.Checks {
+    let overallChecks: Health.Checks = {};
+    for (const source of this.sources) {
+      overallChecks = { ...source.checks, ...overallChecks };
+    }
+    for (const sink of this.sinks) {
+      overallChecks = { ...sink.checks, ...overallChecks };
+    }
+    return { ...this.engine.checks, ...overallChecks };
+  }
+  /** Return the metrics registry */
+  public get metrics(): Registry {
+    return this.metricsHandler.registry;
   }
 }

@@ -14,13 +14,23 @@ import { Limiter } from '../Limiter';
 import { Group, MetaData, Sequence, SequencePattern, Single, TaskHandler } from '../Tasks';
 import { PollingMetricsHandler } from './PollingStatsManager';
 import { RetryManager } from './RetryManager';
-import { MetricsDefinitions, PollingManagerOptions, PollingStats, TaskBaseConfig } from './types';
+import {
+  DEFAULT_SLOW_CYCLE_RATIO,
+  MetricsDefinitions,
+  PollingManagerOptions,
+  PollingStats,
+  TaskBaseConfig,
+} from './types';
 
 export declare interface PollingManager {
   /** Emitted on every error */
   on(event: 'error', listener: (error: Crash | Multi) => void): this;
   /** Emitted when a task is passed to off, this means that the task has been disabled */
   on(event: 'off', listener: (taskId: string, task: TaskBaseConfig) => void): this;
+  /** Emitted when a task is passed to slow cycle */
+  on(event: 'slow', listener: (taskId: string, task: TaskBaseConfig) => void): this;
+  /** Emitted when a task is passed to fast cycle */
+  on(event: 'fast', listener: (taskId: string, task: TaskBaseConfig) => void): this;
   /** Emitted when a task has ended */
   on(
     event: 'done',
@@ -45,6 +55,10 @@ export class PollingManager extends EventEmitter {
   private readonly retryManager: RetryManager;
   /** Metrics definitions */
   private readonly pollingStats: PollingMetricsHandler;
+  /** Fast cycle ratio counter */
+  private fastCycleRatioCounter = 0;
+  /** Ratio of fast cycles to slow cycles */
+  private factCycleToSlowCycleRatio;
   /**
    * Create a polling manager
    * @param options - Polling manager options
@@ -59,6 +73,13 @@ export class PollingManager extends EventEmitter {
     private readonly metrics: MetricsDefinitions
   ) {
     super();
+    this.factCycleToSlowCycleRatio =
+      typeof options.slowCycleRatio === 'number'
+        ? options.slowCycleRatio
+        : DEFAULT_SLOW_CYCLE_RATIO;
+    if (this.factCycleToSlowCycleRatio < 1) {
+      throw new Crash(`Invalid slow cycle ratio: ${this.factCycleToSlowCycleRatio}`);
+    }
     this.pollingStats = new PollingMetricsHandler(
       options.componentId,
       options.resource,
@@ -127,9 +148,11 @@ export class PollingManager extends EventEmitter {
       }
       if (this.fastEntries.has(config.options.id)) {
         this.fastEntries.delete(config.options.id);
-        this.offEntries.set(config.options.id, config);
-        this.emit('off', config.options.id, config);
+      } else if (this.slowEntries.has(config.options.id)) {
+        this.slowEntries.delete(config.options.id);
       }
+      this.offEntries.set(config.options.id, config);
+      this.emit('off', config.options.id, config);
       throw error;
     }
   }
@@ -167,6 +190,15 @@ export class PollingManager extends EventEmitter {
         task.options = this.retryManager.slowCycleRetryOptions(task.options);
         this.slowEntries.set(meta.taskId, task);
         this.fastEntries.delete(meta.taskId);
+        this.emit('slow', meta.taskId, task);
+      }
+    } else {
+      const task = this.slowEntries.get(meta.taskId);
+      if (task) {
+        task.options = this.retryManager.fastCycleRetryOptions(task.options);
+        this.fastEntries.set(meta.taskId, task);
+        this.slowEntries.delete(meta.taskId);
+        this.emit('fast', meta.taskId, task);
       }
     }
     if (this.pending.size === 0) {
@@ -183,11 +215,23 @@ export class PollingManager extends EventEmitter {
     this.logger.debug(`Starting polling group ${this.options.pollingGroup}`);
     this.pollingStats.initializeCycle();
     this.emit('startCycle');
+    this.fastCycleRatioCounter++;
+    let _scheduled = 0;
     for (const task of this.fastEntries.values()) {
       this.scheduleTask(this.wrappedCreatedTaskInstance(task));
+      _scheduled++;
     }
-    for (const task of this.slowEntries.values()) {
-      this.scheduleTask(this.wrappedCreatedTaskInstance(task));
+    if (this.fastCycleRatioCounter >= this.factCycleToSlowCycleRatio) {
+      this.fastCycleRatioCounter = 0;
+      for (const task of this.slowEntries.values()) {
+        this.scheduleTask(this.wrappedCreatedTaskInstance(task));
+        _scheduled++;
+      }
+    }
+    if (_scheduled === 0) {
+      this.logger.debug(`Polling group ${this.options.pollingGroup} has no tasks to execute`);
+      this.pollingStats.finalizeCycle();
+      this.emit('endCycle', this.pollingStats.check);
     }
   }
   /** Return the stats of the polling manager */

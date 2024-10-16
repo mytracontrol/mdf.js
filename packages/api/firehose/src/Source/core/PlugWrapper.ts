@@ -39,7 +39,7 @@ export class PlugWrapper extends EventEmitter implements Layer.App.Component {
   /** Plug ingest data operation */
   private ingestDataOriginal?: (size: number) => Promise<OpenJobRequest | OpenJobRequest[]>;
   /** Plug ingest addCredits operation */
-  private addCreditsOriginal?: (size: number) => Promise<void>;
+  private addCreditsOriginal?: (size: number) => Promise<number>;
   /** Plug start operation original */
   private readonly startOriginal: () => Promise<void>;
   /** Plug stop operation original */
@@ -253,11 +253,11 @@ export class PlugWrapper extends EventEmitter implements Layer.App.Component {
    * Add new credits to the source
    * @param credits - Credits to be added to the source
    */
-  private readonly addCredits = async (credits: number): Promise<void> => {
+  private readonly addCredits = async (credits: number): Promise<number> => {
     if (!this.addCreditsOriginal) {
       throw new Crash(`Plug ${this.plug.name} does not implement the addCredits method`);
     }
-    await this.wrappedOperation(this.addCreditsOriginal, [credits], this.retryOptions);
+    return await this.wrappedOperation(this.addCreditsOriginal, [credits], this.retryOptions);
   };
   /** Start the Plug and the underlayer resources, making it available */
   private readonly start = async (): Promise<void> => {
