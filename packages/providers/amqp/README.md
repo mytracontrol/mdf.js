@@ -267,7 +267,6 @@ Checks included in the provider:
 - **CONFIG\_AMQP\_KEEP\_ALIVE\_INITIAL\_DELAY** (default: `2000`): The initial delay in milliseconds for the keep-alive packet.
 - **CONFIG\_AMQP\_TIMEOUT** (default: `10000`): The time in milliseconds to wait for the connection to be established.
 - **CONFIG\_AMQP\_ALL\_ERRORS\_NON\_FATAL** (default: `true`): Determines if rhea's auto-reconnect should attempt reconnection on all fatal errors
-- **NODE\_APP\_INSTANCE** (default: `undefined`): Used as default container id, receiver name, sender name, etc. in cluster configurations.
 
 ## **License**
 

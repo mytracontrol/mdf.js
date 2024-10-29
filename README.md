@@ -59,9 +59,11 @@ The complete framework is composed of the following packages:
   - [**@mdf.js/doorkeeper**](https://www.npmjs.com/package/@mdf.js/doorkeeper): Package for managing the validation of json schemas, based on [**ajv**](https://ajv.js.org).
   - [**@mdf.js/faker**](https://www.npmjs.com/package/@mdf.js/faker): Package for generating fake data for testing.
   - [**@mdf.js/firehose**](https://www.npmjs.com/package/@mdf.js/firehose): Package for data ETL pipelines creation and management. Works together with the providers.
+  - [**@mdf.js/file-flinger**](https://wwww.npmjs.com/package/@mdf.js/file-flinger): Package for managing file processing and uploading.
   - [**@mdf.js/logger**](https://www.npmjs.com/package/@mdf.js/logger): Package for logging management.
   - [**@mdf.js/middlewares**](https://www.npmjs.com/package/@mdf.js/middlewares): Package with a set of middlewares for express applications.
   - [**@mdf.js/openc2-core**](https://www.npmjs.com/package/@mdf.js/openc2-core): Package for managing the OpenC2 protocol, internally used by [**@mdf.js/openc2**](https://www.npmjs.com/package/@mdf.js/openc2).
+  - [**@mdf.js/tasks**](https://www.npmjs.com/package/@mdf.js/tasks): Package for managing tasks execution: tasks limiter and tasks scheduler.
   - [**@mdf.js/utils**](https://www.npmjs.com/package/@mdf.js/utils): Package with a set of utilities for development:
     - coerce: Functions for data type coercion, specially useful for environment variables and configuration files.
     - retry: Functions for retrying functions.
@@ -78,12 +80,14 @@ The complete framework is composed of the following packages:
   - [**@mdf.js/elastic-provider**](https://www.npmjs.com/package/@mdf.js/elastic-provider): Package for managing Elastic connections, based on [**@elastic/elasticsearch**](https://www.npmjs.com/package/@elastic/elasticsearch).
   - [**@mdf.js/http-client-provider**](https://www.npmjs.com/package/@mdf.js/http-client-provider): Package for managing HTTP connections, based on [**axios**](https://www.npmjs.com/package/axios).
   - [**@mdf.js/http-server-provider**](https://www.npmjs.com/package/@mdf.js/http-server-provider): Package for managing HTTP servers, based on [**express**](https://www.npmjs.com/package/express).
+  - [**@mdf.js/jsonl-archiver**](https://www.npmjs.com/package/@mdf.js/jsonl-archiver): Package for managing JSONL archiving.
   - [**@mdf.js/kafka-provider**](https://www.npmjs.com/package/@mdf.js/kafka-provider): Package for managing Kafka connections, based on [**kafkajs**](https://www.npmjs.com/package/kafkajs).
   - [**@mdf.js/mongo-provider**](https://www.npmjs.com/package/@mdf.js/mongo-provider): Package for managing Mongo connections, based on [**mongodb**](https://www.npmjs.com/package/mongodb).
   - [**@mdf.js/redis-provider**](https://www.npmjs.com/package/@mdf.js/redis-provider): Package for managing Redis connections, based on [**ioredis**](https://www.npmjs.com/package/ioredis).
+  - [**@mdf.js/s3-provider**](https://www.npmjs.com/package/@mdf.js/s3-provider): Package for managing S3 connections, based on [**aws-sdk/client-s3**](https://www.npmjs.com/package/@aws-sdk/client-s3).
+  - [@mdf.js/service-setup](https://www.npmjs.com/package/@mdf.js/service-setup): Package for managing the setup of the services in edge environments.
   - [**@mdf.js/socket-client-provider**](https://www.npmjs.com/package/@mdf.js/socket-client-provider): Package for managing **socket.io** connections, based on [**socket.io**](https://www.npmjs.com/package/socket.io)
   - [**@mdf.js/socket-server-provider**](https://www.npmjs.com/package/@mdf.js/socket-server-provider): Package for managing **socket.io** servers, based on [**socket.io**](https://www.npmjs.com/package/socket.io)
-  - [**@mdf.js/s3-provider**](https://www.npmjs.com/package/@mdf.js/s3-provider): Package for managing S3 connections, based on [**aws-sdk/client-s3**](https://www.npmjs.com/package/@aws-sdk/client-s3).
 - Components:
   - [**@mdf.js/openc2**](https://www.npmjs.com/package/@mdf.js/openc2): Package for managing the OpenC2 protocol.
   - [**@mdf.js/service-registry**](https://www.npmjs.com/package/@mdf.js/service-registry): Package for managing the observability of the services.
