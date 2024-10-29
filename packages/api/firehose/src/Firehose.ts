@@ -15,15 +15,7 @@ import { v4 } from 'uuid';
 import { Engine } from './Engine';
 import { Helpers } from './helpers';
 import { MetricsHandler } from './metrics';
-import { FirehoseOptions, Sinks, Sources } from './types';
-
-/** Firehose `job` event handler */
-export type JobEventHandler<
-  Type extends string = string,
-  Data = any,
-  CustomHeaders extends Record<string, any> = Jobs.NoMoreHeaders,
-  CustomOptions extends Record<string, any> = Jobs.NoMoreOptions,
-> = (job: Jobs.JobObject<Type, Data, CustomHeaders, CustomOptions>) => void;
+import { FirehoseOptions, JobEventHandler, Sinks, Sources } from './types';
 
 export declare interface Firehose<
   Type extends string = string,

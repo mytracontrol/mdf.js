@@ -30,6 +30,7 @@ export class Group<T, U> extends TaskHandler<(T | null)[], U> {
   }
   /** Execute the task */
   protected async _execute(): Promise<(T | null)[]> {
+    this.error = undefined;
     for (const task of this.tasks) {
       await this.unitaryExecution(task);
     }
@@ -71,3 +72,4 @@ export class Group<T, U> extends TaskHandler<(T | null)[], U> {
     }
   }
 }
+

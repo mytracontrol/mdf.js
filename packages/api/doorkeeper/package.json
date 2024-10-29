@@ -39,14 +39,13 @@
     "ajv-keywords": "^5.1.0",
     "jsonpointer": "^5.0.0",
     "lodash": "^4.17.21",
-    "tslib": "^2.7.0",
-    "uuid": "^10.0.0"
+    "tslib": "^2.8.0",
+    "uuid": "^11.0.2"
   },
   "devDependencies": {
     "@mdf.js/repo-config": "*",
-    "@types/lodash": "^4.17.10",
-    "@types/supertest": "^6.0.2",
-    "@types/uuid": "^10.0.0"
+    "@types/lodash": "^4.17.12",
+    "@types/supertest": "^6.0.2"
   },
   "engines": {
     "node": ">=16.14.2"

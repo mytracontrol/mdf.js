@@ -38,7 +38,7 @@
     "ioredis": "^5.4.1",
     "joi": "^17.13.3",
     "redis-errors": "^1.2.0",
-    "tslib": "^2.7.0"
+    "tslib": "^2.8.0"
   },
   "devDependencies": {
     "@mdf.js/repo-config": "*",

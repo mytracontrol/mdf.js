@@ -88,7 +88,7 @@ export class PlugWrapper extends EventEmitter implements Layer.App.Component {
    * @param task - promise to execute
    * @param funcArgs - promise arguments
    * @param options - control execution options
-   * @returns
+   * @returns promise result
    */
   private async wrappedOperation<T = any>(
     task: (...args: any[]) => Promise<T>,
