@@ -152,7 +152,7 @@ describe('#Component #metrics', () => {
             },
           });
           expect(response.body.meta).toEqual({
-            '0': 'ValidationError: Should be a boolean - Path: [/json] - Value: [3]',
+            '0': 'ValidationError: Should be a boolean - Path: [/json] - Value: ["3"]',
           });
           done();
         })
@@ -215,3 +215,4 @@ describe('#Component #metrics', () => {
   });
 });
 // #endregion
+
