@@ -1,22 +1,22 @@
 steps:
-- task: SonarQubePrepare@6
+- task: SonarQubePrepare@7
   displayName: 'Setting Sonarqube analysis'
   inputs:
     SonarQube: 'NetinSystems-SonarQube Endpoint-MytraManagementSystem'
     scannerMode: 'CLI'
-    cliVersion: '6.1.0.4477'
+    cliVersion: '6.2.1.4610'
     configMode: 'file'
     configFile: './.config/sonar-project.properties'
     projectVersion: $(Build.BuildNumber)
     extraProperties:
       sonar.projectVersion=$(Build.BuildNumber)
 
-- task: SonarQubeAnalyze@6
+- task: SonarQubeAnalyze@7
   displayName: 'Run Code Analysis'
   inputs:
     jdkversion: 'JAVA_HOME_17_X64'
 
-- task: SonarQubePublish@6
+- task: SonarQubePublish@7
   displayName: 'Publish Quality Gate Result'
   inputs:
     pollingTimeoutSec: '300'
