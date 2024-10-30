@@ -22,7 +22,7 @@ const ELASTIC_MAX_RETRIES = 5;
 const ELASTIC_REQUEST_TIMEOUT = 30000;
 const ELASTIC_PING_TIMEOUT = 3000;
 const ELASTIC_RESURRECT_STRATEGY: 'ping' | 'optimistic' | 'none' = 'ping';
-const ELASTIC_NAME = NODE_APP_INSTANCE || CONFIG_ARTIFACT_ID;
+const ELASTIC_NAME = NODE_APP_INSTANCE ?? CONFIG_ARTIFACT_ID;
 
 export const defaultConfig: Config = {
   nodes: ELASTIC_NODES,

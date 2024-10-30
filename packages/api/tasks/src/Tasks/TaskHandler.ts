@@ -132,10 +132,10 @@ export abstract class TaskHandler<Result = any, Binded = any> extends EventEmitt
     this.createdAt = new Date();
     this.priority = options.priority ?? DEFAULT_PRIORITY;
     this.weight = options.weight ?? DEFAULT_WEIGHT;
-    this.taskId = options.id || v4();
-    this.retryOptions = options.retryOptions || DEFAULT_RETRY_OPTIONS;
+    this.taskId = options.id ?? v4();
+    this.retryOptions = options.retryOptions ?? DEFAULT_RETRY_OPTIONS;
     this.context = options.bind;
-    this.strategy = options.retryStrategy || DEFAULT_RETRY_STRATEGY;
+    this.strategy = options.retryStrategy ?? DEFAULT_RETRY_STRATEGY;
   }
   /**
    * Get the cause of the error
@@ -175,6 +175,7 @@ export abstract class TaskHandler<Result = any, Binded = any> extends EventEmitt
             { info: this.metadata }
           )
         );
+        break;
       case RETRY_STRATEGY.NOT_EXEC_AFTER_SUCCESS:
         if (this.status === TASK_STATE.COMPLETED) {
           return false;
@@ -244,7 +245,7 @@ export abstract class TaskHandler<Result = any, Binded = any> extends EventEmitt
   private get duration(): number {
     const executedAt = this.executedAt?.getTime();
     const completedAt =
-      this.completedAt?.getTime() || this.cancelledAt?.getTime() || this.failedAt?.getTime();
+      this.completedAt?.getTime() ?? this.cancelledAt?.getTime() ?? this.failedAt?.getTime();
     if (!executedAt || !completedAt) {
       return -1;
     }

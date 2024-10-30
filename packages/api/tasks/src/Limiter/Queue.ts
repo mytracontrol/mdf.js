@@ -162,28 +162,23 @@ export class Queue extends EventEmitter {
    * @param options - The options to check
    */
   private checkOptions(options: ConsolidatedQueueOptions): void {
-    if (
-      typeof options.highWater !== 'number' ||
-      options.highWater < 1 ||
-      Number.isNaN(options.highWater)
-    ) {
+    const isNotNumberInRange = (value: number, min?: number, max?: number): boolean => {
+      return (
+        typeof value !== 'number' ||
+        Number.isNaN(value) ||
+        (min !== undefined && value < min) ||
+        (max !== undefined && value > max)
+      );
+    };
+    if (isNotNumberInRange(options.highWater, 1)) {
       throw new Crash('The highWater should be a number greater than 0', {
         name: 'ValidationError',
       });
     }
-    if (
-      typeof options.bucketSize !== 'number' ||
-      options.bucketSize < 0 ||
-      Number.isNaN(options.bucketSize)
-    ) {
+    if (isNotNumberInRange(options.bucketSize, 0)) {
       throw new Crash('The bucketSize should be a number', { name: 'ValidationError' });
     }
-    if (
-      typeof options.interval !== 'number' ||
-      options.interval < 0 ||
-      Number.isNaN(options.interval) ||
-      !Number.isFinite(options.interval)
-    ) {
+    if (isNotNumberInRange(options.interval, 0) || !Number.isFinite(options.interval)) {
       throw new Crash('The interval should be a number greater than or equal to 0', {
         name: 'ValidationError',
       });
@@ -194,21 +189,14 @@ export class Queue extends EventEmitter {
       });
     }
     if (
-      typeof options.tokensPerInterval !== 'number' ||
-      options.tokensPerInterval < 0 ||
-      Number.isNaN(options.tokensPerInterval) ||
+      isNotNumberInRange(options.tokensPerInterval, 0) ||
       !Number.isFinite(options.tokensPerInterval)
     ) {
       throw new Crash('The tokensPerInterval should be a number greater than 0', {
         name: 'ValidationError',
       });
     }
-    if (
-      typeof options.penalty !== 'number' ||
-      options.penalty < 0 ||
-      Number.isNaN(options.penalty) ||
-      !Number.isFinite(options.penalty)
-    ) {
+    if (isNotNumberInRange(options.penalty, 0) || !Number.isFinite(options.penalty)) {
       throw new Crash('The penalty should be a number', {
         name: 'ValidationError',
       });
@@ -248,7 +236,7 @@ export class Queue extends EventEmitter {
     while (count > 0) {
       const step = Math.trunc(count / 2);
       let it = first + step;
-      if (comparator(array[it]!, value) <= 0) {
+      if (comparator(array[it], value) <= 0) {
         first = ++it;
         count -= step + 1;
       } else {

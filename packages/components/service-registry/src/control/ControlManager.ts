@@ -153,7 +153,7 @@ export class ControlManager extends EventEmitter {
     options: ServiceRegistryOptions,
     defaultResolver?: ResolverMap
   ): ConsumerOptions | undefined {
-    const _id = options.consumerOptions?.id || options.metadata?.name;
+    const _id = options.consumerOptions?.id ?? options.metadata?.name;
     const _resolver = merge(defaultResolver, options.consumerOptions?.resolver);
     const _actionTargetPairs = this.getActionTargetPairs(options);
     const _logger = this.logger;
@@ -261,3 +261,4 @@ export class ControlManager extends EventEmitter {
     await this.instance?.stop();
   }
 }
+

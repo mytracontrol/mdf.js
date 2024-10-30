@@ -24,7 +24,7 @@ export class Validator {
         { name: 'ValidationError' }
       );
       const jsonFormatError = new Crash(
-        `Should be a boolean - Path: [/json] - Value: [${request.query['json']}]`,
+        `Should be a boolean - Path: [/json] - Value: [${JSON.stringify(request.query['json'])}]`,
         request.uuid,
         { name: 'ValidationError' }
       );
@@ -35,3 +35,4 @@ export class Validator {
     }
   }
 }
+

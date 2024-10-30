@@ -19,7 +19,7 @@ import {
 
 export class PollingMetricsHandler {
   /** Polling stats */
-  private pollingStats: PollingStats = { ...DEFAULT_POLLING_STATS };
+  private readonly pollingStats: PollingStats = { ...DEFAULT_POLLING_STATS };
   /** Scan cycles duration in milliseconds */
   private readonly scanCyclesDuration: number[] = [];
   /** Metrics labels */
@@ -155,4 +155,3 @@ export class PollingMetricsHandler {
     return _check;
   }
 }
-

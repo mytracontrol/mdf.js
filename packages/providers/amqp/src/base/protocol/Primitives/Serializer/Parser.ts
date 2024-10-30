@@ -54,7 +54,7 @@ export class Parser {
       case Types.Primitive.USHORT:
         Parser.isRange(value, 0, 65535);
         buffer = Buffer.alloc(2);
-        buffer.writeUInt16BE(value as number);
+        buffer.writeUInt16BE(value);
         break;
       // size: 5, code: 0x71
       case Types.Primitive.UINT:
@@ -63,7 +63,7 @@ export class Parser {
         buffer.writeUInt32BE(value);
         break;
       // size: 9, code: 0x81
-      case Types.Primitive.ULONG:
+      case Types.Primitive.ULONG: {
         const bigIntValue = Parser.getAsBigInt(value);
         if (bigIntValue < BigInt(0)) {
           throw new Crash(`Expected a positive number, got ${bigIntValue}`, {
@@ -73,6 +73,7 @@ export class Parser {
         buffer = Buffer.alloc(8);
         buffer.writeBigUInt64BE(bigIntValue);
         break;
+      }
       // size: 5, code: 0x72
       case Types.Primitive.BYTE:
       // size: 2, code: 0x54
@@ -86,7 +87,7 @@ export class Parser {
       // size: 3, code: 0x61
       case Types.Primitive.SHORT:
         Parser.isNumber(value);
-        Parser.isRange(value as number, -32768, 32767);
+        Parser.isRange(value, -32768, 32767);
         buffer = Buffer.alloc(2);
         buffer.writeInt16BE(value);
         break;
@@ -97,11 +98,12 @@ export class Parser {
         buffer.writeInt32BE(value);
         break;
       // size: 9, code: 0x81
-      case Types.Primitive.LONG:
+      case Types.Primitive.LONG: {
         const bigintValue: bigint = Parser.getAsBigInt(value);
         buffer = Buffer.alloc(8);
         buffer.writeBigInt64BE(bigintValue);
         break;
+      }
       // size: 5, code: 0x72
       case Types.Primitive.FLOAT:
         Parser.isFloat(value);
@@ -128,7 +130,7 @@ export class Parser {
         buffer.writeUInt32BE(value.charCodeAt(0));
         break;
       // size: 5, code: 0x83
-      case Types.Primitive.TIMESTAMP:
+      case Types.Primitive.TIMESTAMP: {
         if (!(value instanceof Date)) {
           throw new Crash(`Expected a date, got ${typeof value}`, {
             name: 'ProtocolError',
@@ -138,6 +140,7 @@ export class Parser {
         buffer = Buffer.alloc(8);
         buffer.writeBigUInt64BE(_time);
         break;
+      }
       // size: 17, code: 0x98
       case Types.Primitive.UUID:
         Parser.isString(value, 36);

@@ -29,7 +29,7 @@ export class RateLimiter {
   constructor(configuration: RateLimitConfig) {
     this.config = configuration;
     this.enable = this.config.enabled;
-    if (this.config.rates && this.config.rates.length) {
+    if (this.config.rates?.length) {
       this.config.rates.forEach((rate: any) => {
         const label = Object.keys(rate)[0];
         const handler = this.requestHandler(rate[label].maxRequests, rate[label].timeWindow);
@@ -69,3 +69,4 @@ export class RateLimiter {
     }
   }
 }
+

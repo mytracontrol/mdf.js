@@ -31,7 +31,9 @@ export class ObservabilityAppManager {
   /** HTTP server */
   private _server?: HTTP.Provider;
   /** Options for the observability service */
-  private _options: ObservabilityOptions & { service: { primaryPort: number; port: number } };
+  private readonly _options: ObservabilityOptions & {
+    service: { primaryPort: number; port: number };
+  };
   /**
    * Create an instance of observability service
    * @param options - observability options
@@ -205,3 +207,4 @@ export class ObservabilityAppManager {
     }
   }
 }
+

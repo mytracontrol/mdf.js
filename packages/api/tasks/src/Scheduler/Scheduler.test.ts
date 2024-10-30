@@ -920,7 +920,7 @@ describe('#Scheduler', () => {
       } catch (error) {
         expect(error).toBeInstanceOf(Crash);
         expect((error as Crash).message).toBe(
-          'Pattern should be an object an object with the task property: {\n  "pattern": []\n}'
+          'Pattern should be an object with the task property: {\n  "pattern": []\n}'
         );
       }
       try {

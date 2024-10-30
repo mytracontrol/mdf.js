@@ -333,12 +333,10 @@ export class DoorKeeper<T = void> {
     }
     if (callback) {
       callback(error, data);
+    } else if (error) {
+      return Promise.reject(error);
     } else {
-      if (error) {
-        return Promise.reject(error);
-      } else {
-        return Promise.resolve(data);
-      }
+      return Promise.resolve(data);
     }
   }
   /**

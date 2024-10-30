@@ -58,7 +58,7 @@ export class PollingManager extends EventEmitter {
   /** Fast cycle ratio counter */
   private fastCycleRatioCounter = 0;
   /** Ratio of fast cycles to slow cycles */
-  private factCycleToSlowCycleRatio;
+  private readonly factCycleToSlowCycleRatio: number;
   /**
    * Create a polling manager
    * @param options - Polling manager options
@@ -161,7 +161,9 @@ export class PollingManager extends EventEmitter {
    * @param config - Task configuration
    * @returns A task handler instance
    */
-  private wrappedCreatedTaskInstance = (config: TaskBaseConfig): TaskHandler | undefined => {
+  private readonly wrappedCreatedTaskInstance = (
+    config: TaskBaseConfig
+  ): TaskHandler | undefined => {
     try {
       return this.createTaskInstance(config);
     } catch (error) {
@@ -175,7 +177,7 @@ export class PollingManager extends EventEmitter {
    * @param meta - Task metadata
    * @param error - Task error
    */
-  private onDoneTaskHandler = (
+  private readonly onDoneTaskHandler = (
     uuid: string,
     result: any,
     meta: MetaData,

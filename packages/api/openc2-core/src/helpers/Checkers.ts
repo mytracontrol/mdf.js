@@ -179,9 +179,7 @@ export class Checkers {
     const action = command.content.action;
     const targetType = new RegExp(`^${Accessors.getTargetFromCommandMessage(command)}$`);
     const supportedActions = get(pairs, action);
-    return (
-      supportedActions !== undefined && supportedActions.some(target => targetType.test(target))
-    );
+    return supportedActions?.some(target => targetType.test(target)) ?? false;
   }
   /**
    * Check if the command only request an ack as response
@@ -214,9 +212,9 @@ export class Checkers {
    * @param command - message to be processed
    */
   public static isDelayDefinedOnCommand(command: Control.Command): boolean {
-    const startTimeIsDefined = get(command, 'args.start_time', undefined) ? true : false;
-    const stopTimeIsDefined = get(command, 'args.stop_time', undefined) ? true : false;
-    const durationIsDefined = get(command, 'args.duration', undefined) ? true : false;
+    const startTimeIsDefined = Boolean(get(command, 'args.start_time', undefined));
+    const stopTimeIsDefined = Boolean(get(command, 'args.stop_time', undefined));
+    const durationIsDefined = Boolean(get(command, 'args.duration', undefined));
     const basedInDuration = startTimeIsDefined && durationIsDefined;
     const basedInStopTime = stopTimeIsDefined;
     return basedInStopTime !== basedInDuration;

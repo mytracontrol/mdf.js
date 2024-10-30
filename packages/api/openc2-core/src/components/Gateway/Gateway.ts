@@ -344,11 +344,11 @@ export class Gateway extends EventEmitter implements Layer.App.Service {
    */
   private getArgs(command: Control.CommandMessage): Control.Arguments {
     const actualDelay = Accessors.getDelayFromCommandMessage(command);
-    if (actualDelay - (this.options.delay || MIN_GATEWAY_DELAY) > 0) {
+    if (actualDelay - (this.options.delay ?? MIN_GATEWAY_DELAY) > 0) {
       return {
         start_time: command.content.args?.start_time,
         stop_time: undefined,
-        duration: actualDelay - (this.options.delay || MIN_GATEWAY_DELAY),
+        duration: actualDelay - (this.options.delay ?? MIN_GATEWAY_DELAY),
         response_requested: command.content.args?.response_requested,
       };
     } else {
@@ -414,3 +414,4 @@ export class Gateway extends EventEmitter implements Layer.App.Service {
     }
   }
 }
+

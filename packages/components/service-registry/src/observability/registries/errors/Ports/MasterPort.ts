@@ -72,7 +72,7 @@ export class MasterPort extends Port {
    */
   public clear(): void {
     for (const worker of Object.values(this.workers)) {
-      if (worker && worker.isConnected()) {
+      if (worker?.isConnected()) {
         // Stryker disable next-line all
         this.logger.debug(`Sending an clear register request to worker [${worker.process.pid}]`);
         worker.send({
@@ -128,7 +128,7 @@ export class MasterPort extends Port {
     timeOutHandler = setTimeout(onTimeOut, this.interval * 0.9);
     cluster.on('message', onWorkerResponse);
     for (const worker of Object.values(this.workers)) {
-      if (worker && worker.isConnected()) {
+      if (worker?.isConnected()) {
         // Stryker disable next-line all
         this.logger.debug(
           `Sending an errors register update request to worker [${worker.process.pid}]`

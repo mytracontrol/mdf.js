@@ -18,7 +18,7 @@ const VERSION_REVISION_OFFSET = 7;
 /** Serializer for the Version packet */
 export class Serializer {
   /** Buffer to store the serialized data */
-  private buffer: Buffer;
+  private readonly buffer: Buffer;
   /**
    * Serialize a Version object into a buffer
    * @param packet - packet to be serialized
@@ -36,3 +36,4 @@ export class Serializer {
     return this.buffer;
   }
 }
+

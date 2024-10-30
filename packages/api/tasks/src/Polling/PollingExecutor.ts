@@ -34,7 +34,7 @@ export class PollingExecutor extends EventEmitter {
   /** Scan timer */
   private scanTimer: NodeJS.Timeout | undefined;
   /** Polling period in ms */
-  private pollingPeriod: number;
+  private readonly pollingPeriod: number;
   /** Polling manager stats */
   private readonly manager: PollingManager;
   /** Cycle timer */
@@ -64,7 +64,7 @@ export class PollingExecutor extends EventEmitter {
     this.pollingPeriod = ms(this.options.pollingGroup);
   }
   /** Include all the task entries in the limiter */
-  private performScan = (): void => {
+  private readonly performScan = (): void => {
     this.logger.debug(`Starting polling group ${this.options.pollingGroup}`);
     if (!this.cycleTimer) {
       this.cycleTimer = process.hrtime();
@@ -87,7 +87,7 @@ export class PollingExecutor extends EventEmitter {
    * Event handler for the end of a cycle event
    * @param check - Health check
    */
-  private onEndCycle = (check: Health.Check): void => {
+  private readonly onEndCycle = (check: Health.Check): void => {
     this.logger.debug(`Polling group ${this.options.pollingGroup} ended`);
     this.logger.debug(
       `Polling group ${this.options.pollingGroup} stats: ${JSON.stringify(check, null, 2)}`
@@ -100,7 +100,7 @@ export class PollingExecutor extends EventEmitter {
    * Event handler for error events
    * @param error - Error event
    */
-  private onError = (error: Crash | Multi): void => {
+  private readonly onError = (error: Crash | Multi): void => {
     if (this.listenerCount('error') > 0) {
       this.emit('error', error);
     }
@@ -112,7 +112,12 @@ export class PollingExecutor extends EventEmitter {
    * @param meta - Task metadata
    * @param error - Task error
    */
-  private onDone = (uuid: string, result: any, meta: MetaData, error?: Crash | Multi): void => {
+  private readonly onDone = (
+    uuid: string,
+    result: any,
+    meta: MetaData,
+    error?: Crash | Multi
+  ): void => {
     this.emit('done', uuid, result, meta, error);
   };
   /** Attach the event listeners */
@@ -148,4 +153,3 @@ export class PollingExecutor extends EventEmitter {
     return this.manager.check;
   }
 }
-

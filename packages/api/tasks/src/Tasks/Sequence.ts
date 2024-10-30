@@ -30,7 +30,7 @@ export class Sequence<T, U> extends TaskHandler<T, U> {
       await this.executePhase(this.pattern.post, 'post');
       return result;
     } catch (error) {
-      throw error;
+      throw Crash.from(error);
     } finally {
       await this.executePhase(this.pattern.finally, 'finally');
     }
@@ -49,3 +49,4 @@ export class Sequence<T, U> extends TaskHandler<T, U> {
     }
   }
 }
+

@@ -383,9 +383,6 @@ export class Consumer extends Component<AdapterWrapper, ConsumerOptions> {
   private getResolver(message: Control.CommandMessage): Resolver | undefined {
     const target = Accessors.getTargetFromCommand(message.content);
     const entry = `${message.content.action}:${target}` as ResolverEntry;
-    if (this.options.resolver && this.options.resolver[entry]) {
-      return this.options.resolver[entry];
-    }
-    return undefined;
+    return this.options.resolver?.[entry];
   }
 }

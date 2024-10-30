@@ -75,7 +75,7 @@ export const DEFAULT_CUSTOM_CONFIG_LOADER_OPTIONS: Setup.Config = {
   configFiles: ['./config/custom/*.*'],
   presetFiles: ['./config/custom/presets/*.*'],
   schemaFiles: ['./config/custom/schemas/*.*'],
-  preset: process.env['CONFIG_CUSTOM_PRESET'] || process.env['CONFIG_SERVICE_REGISTRY_PRESET'],
+  preset: process.env['CONFIG_CUSTOM_PRESET'] ?? process.env['CONFIG_SERVICE_REGISTRY_PRESET'],
 };
 
 /** Default service registry config loader options */
@@ -94,4 +94,3 @@ export const DEFAULT_SERVICE_REGISTRY_OPTIONS: ServiceRegistrySettings = {
   loggerOptions: DEFAULT_LOGGER_OPTIONS,
   configLoaderOptions: DEFAULT_CUSTOM_CONFIG_LOADER_OPTIONS,
 };
-

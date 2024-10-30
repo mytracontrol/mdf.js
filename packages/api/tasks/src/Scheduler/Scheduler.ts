@@ -143,7 +143,7 @@ export class Scheduler<
    * Event handler for error events
    * @param error - Error event
    */
-  private onError = (error: Crash | Multi): void => {
+  private readonly onError = (error: Crash | Multi): void => {
     if (this.listenerCount('error') > 0) {
       this.emit('error', error);
     }
@@ -155,7 +155,12 @@ export class Scheduler<
    * @param meta - Task metadata
    * @param error - Task error
    */
-  private onDone = (uuid: string, result: any, meta: MetaData, error?: Crash | Multi): void => {
+  private readonly onDone = (
+    uuid: string,
+    result: any,
+    meta: MetaData,
+    error?: Crash | Multi
+  ): void => {
     this.emit('done', uuid, result, meta, error);
   };
   /**
@@ -283,7 +288,7 @@ export class Scheduler<
     }
     for (const resource of this.pollingExecutors.values()) {
       for (const manager of resource.values()) {
-        await manager.stop();
+        manager.stop();
         manager.off('error', this.onError);
         manager.off('done', this.onDone);
       }
