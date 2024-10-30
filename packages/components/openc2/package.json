@@ -36,7 +36,6 @@
     "@mdf.js/redis-provider": "*",
     "@mdf.js/socket-client-provider": "*",
     "@mdf.js/socket-server-provider": "*",
-    "@mdf.js/utils": "*",
     "jsonwebtoken": "^9.0.0",
     "socket.io": "^4.8.1",
     "uuid": "^11.0.2"

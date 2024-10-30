@@ -1,4 +1,4 @@
-# **@mdf.js**
+# **@mdf.js/firehose**
 
 [![Node Version](https://img.shields.io/static/v1?style=flat\&logo=node.js\&logoColor=green\&label=node\&message=%3E=20\&color=blue)](https://nodejs.org/en/)
 [![Typescript Version](https://img.shields.io/static/v1?style=flat\&logo=typescript\&label=Typescript\&message=5.4\&color=blue)](https://www.typescriptlang.org/)
@@ -12,8 +12,8 @@
   </div>
 </p>
 
-<h1 style="text-align:center;margin-bottom:0">Mytra Development Framework - @mdf.js </h1>
-<h5 style="text-align:center;margin-top:0">Typescript tools for development</h5>
+<h1 style="text-align:center;margin-bottom:0">Mytra Development Framework - @mdf.js/firehose</h1>
+<h5 style="text-align:center;margin-top:0">Module designed to facilitate the creation of data streams from multiple sources to multiple destinations.</h5>
 
 <!-- markdownlint-enable MD033 -->
 
@@ -21,7 +21,7 @@
 
 ## **Table of contents**
 
-- [**@mdf.js**](#mdfjs)
+- [**@mdf.js/firehose**](#mdfjsfirehose)
   - [**Table of contents**](#table-of-contents)
   - [**Introduction**](#introduction)
   - [**Installation**](#installation)

@@ -35,6 +35,7 @@
     "@mdf.js/logger": "*",
     "@mdf.js/tasks": "*",
     "@mdf.js/utils": "*",
+    "joi": "^17.13.3",
     "lodash": "^4.17.21",
     "uuid": "^11.0.2"
   },
