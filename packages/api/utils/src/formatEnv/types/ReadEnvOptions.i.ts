@@ -8,8 +8,13 @@
 import { Format } from './Format.t';
 import { FormatFunction } from './FormatFunction.t';
 
+/** Read environment options */
 export interface ReadEnvOptions {
+  /** Environment variable separator */
   separator: string;
+  /** Include prefix */
   includePrefix: boolean;
+  /** Format */
   format: Format | FormatFunction;
 }
+

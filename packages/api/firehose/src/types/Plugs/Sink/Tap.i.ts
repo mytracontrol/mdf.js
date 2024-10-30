@@ -8,9 +8,13 @@
 import { Jobs } from '@mdf.js/core';
 import { Base } from './Base.i';
 
-export type Tap<
+/**
+ * Tap Sink interface definition
+ * A Tap is a Sink that only allows to manage one Job at a time using the `single` method
+ */
+export interface Tap<
   Type extends string = string,
   Data = any,
   CustomHeaders extends Record<string, any> = Jobs.AnyHeaders,
   CustomOptions extends Record<string, any> = Jobs.AnyOptions,
-> = Base<Type, Data, CustomHeaders, CustomOptions>;
+> extends Base<Type, Data, CustomHeaders, CustomOptions> {}

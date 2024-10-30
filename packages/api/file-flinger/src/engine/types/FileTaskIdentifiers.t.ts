@@ -5,13 +5,11 @@
  * or at https://opensource.org/licenses/MIT.
  */
 
-import { PostProcessingStrategy } from './PostProcessingStrategy.t';
-
 /** File task identifiers */
 export enum FileTaskIdentifiers {
   ERRORED = 'errored',
   PUSH = 'push',
-  DELETE = PostProcessingStrategy.DELETE,
-  ARCHIVE = PostProcessingStrategy.ARCHIVE,
-  ZIP = PostProcessingStrategy.ZIP,
+  DELETE = 'delete',
+  ARCHIVE = 'archive',
+  ZIP = 'zip',
 }

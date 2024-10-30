@@ -144,7 +144,6 @@ export class MetricsMiddleware {
   private readonly metrics: MetricInstances;
   /**
    * Return a metrics middleware instance
-   * @param registry - Metrics registry interface
    * @param prefix - Metrics prefix
    */
   public static handler(prefix?: string): RequestHandler;
@@ -248,3 +247,4 @@ export class MetricsMiddleware {
     };
   }
 }
+

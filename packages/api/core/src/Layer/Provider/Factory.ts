@@ -44,7 +44,7 @@ export default function <PortClient, PortConfig, PortInstance extends Port<PortC
       this.provider = new Manager(
         port,
         {
-          name: options?.name || defaultName,
+          name: options?.name ?? defaultName,
           type,
           validation,
           useEnvironment: options?.useEnvironment ?? true,
@@ -55,3 +55,4 @@ export default function <PortClient, PortConfig, PortInstance extends Port<PortC
     }
   };
 }
+

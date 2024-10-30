@@ -41,7 +41,7 @@
   },
   "devDependencies": {
     "@mdf.js/repo-config": "*",
-    "@types/lodash": "^4.17.12"
+    "@types/lodash": "^4.17.13"
   },
   "engines": {
     "node": ">=16.14.2"

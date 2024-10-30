@@ -41,7 +41,7 @@ export declare interface Firehose<
    * Register an event listener over the `job` event, which is emitted when a new job is received
    * from a source.
    * @param event - `job` event
-   * @param job - Job object
+   * @param listener - Job event listener
    * @event
    */
   on(event: 'job', listener: JobEventHandler<Type, Data, CustomHeaders, CustomOptions>): this;
@@ -49,9 +49,7 @@ export declare interface Firehose<
    * Register an event listener over the `done` event, which is emitted when a job has ended, either
    * due to completion or failure.
    * @param event - `done` event
-   * @param uuid - Unique job processing identification
-   * @param result - Job {@link Result}
-   * @param error - Error raised during job processing, if any
+   * @param listener - Done event listener
    * @event
    */
   on(event: 'done', listener: Jobs.DoneEventHandler<Type>): this;
@@ -59,6 +57,7 @@ export declare interface Firehose<
    * Register an event listener over the `hold` event, which is emitted when the engine is paused due
    * to inactivity.
    * @param event - `restart` event
+   * @param listener - Hold event listener
    * @event
    */
   on(event: 'hold', listener: () => void): this;
@@ -66,9 +65,7 @@ export declare interface Firehose<
    * Register an event listener over the `done` event, which is emitted when a job has ended, either
    * due to completion or failure.
    * @param event - `done` event
-   * @param uuid - Unique job processing identification
-   * @param result - Job {@link Result}
-   * @param error - Error raised during job processing, if any
+   * @param listener - Done event listener
    * @event
    */
   addListener(event: 'done', listener: Jobs.DoneEventHandler<Type>): this;
@@ -76,9 +73,7 @@ export declare interface Firehose<
    * Registers a event listener over the `done` event, at the beginning of the listeners array,
    * which is emitted when a job has ended, either due to completion or failure.
    * @param event - `done` event
-   * @param uuid - Unique job processing identification
-   * @param result - Job {@link Result}
-   * @param error - Error raised during job processing, if any
+   * @param listener - Done event listener
    * @event
    */
   prependListener(event: 'done', listener: Jobs.DoneEventHandler<Type>): this;
@@ -86,9 +81,7 @@ export declare interface Firehose<
    * Registers a one-time event listener over the `done` event, which is emitted when a job has
    * ended, either due to completion or failure.
    * @param event - `done` event
-   * @param uuid - Unique job processing identification
-   * @param result - Job {@link Result}
-   * @param error - Error raised during job processing, if any
+   * @param listener - Done event listener
    * @event
    */
   once(event: 'done', listener: Jobs.DoneEventHandler<Type>): this;
@@ -96,9 +89,7 @@ export declare interface Firehose<
    * Registers a one-time event listener over the `done` event, at the beginning of the listeners
    * array, which is emitted when a job has ended, either due to completion or failure.
    * @param event - `done` event
-   * @param uuid - Unique job processing identification
-   * @param result - Job {@link Result}
-   * @param error - Error raised during job processing, if any
+   * @param listener - Done event listener
    * @event
    */
   prependOnceListener(event: 'done', listener: Jobs.DoneEventHandler<Type>): this;

@@ -6,15 +6,18 @@
  */
 import { CrashObject, MultiObject } from '@mdf.js/crash';
 
-interface ExtendedCrashObject extends CrashObject {
+/** Extended Crash object including workerId, workerPid and stack */
+export interface ExtendedCrashObject extends CrashObject {
   workerId?: number;
   workerPid?: number;
   stack?: string;
 }
-interface ExtendedMultiObject extends MultiObject {
+/** Extended Multi object including workerId, workerPid and stack */
+export interface ExtendedMultiObject extends MultiObject {
   workerId?: number;
   workerPid?: number;
   stack?: string;
 }
 
+/** Error record */
 export type ErrorRecord = ExtendedCrashObject | ExtendedMultiObject;

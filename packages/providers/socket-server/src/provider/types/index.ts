@@ -8,3 +8,5 @@
 export * from './Client.t';
 export * from './Config.t';
 export * from './ConnectionError.i';
+export * from './InstrumentOptions.i';
+

@@ -29,6 +29,7 @@
     "clean": "rimraf \"{tsconfig.build.tsbuildinfo,dist}\"",
     "doc": "typedoc --options typedoc.json",
     "envDoc": "node ../../../.config/envDoc.mjs",
+    "owasp": "owasp-dependency-check --scan ./ --out ../../../dependency-check-report/api/core --format JSON --format HTML --bin ../../../tmp --data ../../../tmp --log ../../../tmp/logs/owasp.log",
     "licenses": "license-checker --start ./ --production --csv --out ../../../licenses/api/core/licenses.csv --customPath ../../../.config/customFormat.json",
     "mutants": "stryker run stryker.conf.js",
     "test": "jest --detectOpenHandles --config ./jest.config.js"
@@ -47,7 +48,7 @@
   },
   "devDependencies": {
     "@mdf.js/repo-config": "*",
-    "@types/lodash": "^4.17.12"
+    "@types/lodash": "^4.17.13"
   },
   "engines": {
     "node": ">=16.14.2"

@@ -6,6 +6,7 @@
  */
 
 export {
+  ConsolidatedLimiterOptions,
   Limiter,
   LimiterOptions,
   LimiterState,
@@ -22,9 +23,11 @@ export {
   PollingGroup,
   PollingManagerOptions,
   PollingStats,
+  ScanMetricsDefinitions,
   SequenceTaskBaseConfig,
   SingleTaskBaseConfig,
   TaskBaseConfig,
+  TaskMetricsDefinitions,
   WellIdentifiedTaskOptions,
 } from './Polling';
 export {

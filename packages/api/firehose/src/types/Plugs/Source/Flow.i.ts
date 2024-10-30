@@ -8,6 +8,11 @@
 import { Jobs } from '@mdf.js/core';
 import { Base } from './Base.i';
 
+/**
+ * Flow Source interface definition
+ * A Flow is a Source that allows to manage the flow of Jobs using `init`/pause" methods to control
+ * the rate of Jobs that can be processed
+ */
 export interface Flow<
   Type extends string = string,
   Data = any,
@@ -19,3 +24,4 @@ export interface Flow<
   /** Stop consuming process */
   pause(): void;
 }
+

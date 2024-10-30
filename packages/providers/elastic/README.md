@@ -156,7 +156,7 @@ Checks included in the provider:
 - **CONFIG\_ELASTIC\_TLS\_SERVER\_NAME** (default: `undefined`): Server name for the TLS certificate.
 - **CONFIG\_ELASTIC\_AUTH\_USERNAME** (default: `undefined`): Username for the Elasticsearch cluster. If this is set, a password must also be provided.
 - **CONFIG\_ELASTIC\_AUTH\_PASSWORD** (default: `undefined`): Password for the Elasticsearch cluster. If this is set, a username must also be provided.
-- **NODE\_APP\_INSTANCE**: undefined
+- **NODE\_APP\_INSTANCE** (default: `undefined`): Used as default container id, receiver name, sender name, etc. in cluster configurations.
 
 ## **License**
 

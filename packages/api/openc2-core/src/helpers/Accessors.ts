@@ -14,6 +14,7 @@ export class Accessors {
   /**
    * Return the target of the actual message
    * @param command - message to be processed
+   * @returns target
    */
   public static getTargetFromCommandMessage(command: Control.CommandMessage): string {
     return Object.keys(command.content.target)[0];
@@ -21,6 +22,7 @@ export class Accessors {
   /**
    * Return the target of the actual command
    * @param command - command to be processed
+   * @returns target
    */
   public static getTargetFromCommand(command: Control.Command): string {
     return Object.keys(command.target)[0];
@@ -28,6 +30,7 @@ export class Accessors {
   /**
    * Return the action of the actual message
    * @param command - message to be processed
+   * @returns action
    */
   public static getActionFromCommandMessage(command: Control.CommandMessage): Control.Action {
     return command.content.action;
@@ -35,6 +38,7 @@ export class Accessors {
   /**
    * Return the action of the actual command
    * @param command - command to be processed
+   * @returns action
    */
   public static getActionFromCommand(command: Control.Command): Control.Action {
     return command.action;
@@ -42,6 +46,7 @@ export class Accessors {
   /**
    * Return the actuators in the command message
    * @param command - message to be processed
+   * @returns actuators
    */
   public static getActuatorsFromCommandMessage(command: Control.CommandMessage): string[] {
     return this.getActuatorsFromCommand(command.content);
@@ -49,6 +54,7 @@ export class Accessors {
   /**
    * Return the actuators in the command
    * @param command - command to be processed
+   * @returns actuators
    */
   public static getActuatorsFromCommand(command: Control.Command): string[] {
     const actuators = get(command, 'actuator', {});
@@ -58,7 +64,7 @@ export class Accessors {
    * Return the a property from actuators in the command
    * @param command - command to be processed
    * @param profile - actuator profile to find
-   * @param property - property to find
+   * @returns property value
    */
   public static getActuatorAssetId(command: Control.Command, profile: string): any {
     return get(command, ['actuator', profile, 'asset_id'], undefined);
@@ -66,6 +72,7 @@ export class Accessors {
   /**
    * Return the delay allowed from command message
    * @param command - message to be processed
+   * @returns delay in milliseconds
    */
   public static getDelayFromCommandMessage(command: Control.CommandMessage): number {
     return this.getDelayFromCommand(command.content);
@@ -73,6 +80,7 @@ export class Accessors {
   /**
    * Return the delay allowed from command
    * @param command - message to be processed
+   * @returns delay in milliseconds
    */
   public static getDelayFromCommand(command: Control.Command): number {
     const startTime = get(command, 'args.start_time', undefined);
@@ -90,8 +98,8 @@ export class Accessors {
   }
   /**
    * Convert consumer status to Subcomponent status
-   * @param status - consumer status
-   * @returns
+   * @param response - response message to be processed
+   * @returns Subcomponent status
    */
   public static getStatusFromResponseMessage(response: Control.ResponseMessage): Health.Status {
     if (response.status >= 500) {

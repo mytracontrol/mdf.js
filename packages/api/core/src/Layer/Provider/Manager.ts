@@ -110,7 +110,7 @@ export declare interface Manager<
  * - The state of the provider, represented by the {@link Manager.state} property, and managed by
  * the {@link Manager.start}, {@link Manager.stop} and {@link Manager.fail} methods.
  *
- * ![class diagram](media/Provider-States-Methods.png)
+ * ![class diagram](../../../media/Provider-States-Methods.png)
  *
  * - Merge and validate the configuration of the provider represented by the generic type
  * _**PortConfig**_. The manager configuration object {@link ProviderOptions} has a _**validation**_
@@ -379,7 +379,7 @@ export class Manager<PortClient, PortConfig, PortInstance extends Port<PortClien
     if (typeof this.options.useEnvironment === 'boolean' && this.options.useEnvironment) {
       envConfig = this.options.validation.envBasedConfig;
     } else if (typeof this.options.useEnvironment === 'string') {
-      envConfig = formatEnv(this.options.useEnvironment) as Partial<PortConfig>;
+      envConfig = formatEnv(this.options.useEnvironment);
     } else {
       envConfig = {};
     }

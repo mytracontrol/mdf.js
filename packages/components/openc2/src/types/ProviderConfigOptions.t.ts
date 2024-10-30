@@ -9,6 +9,10 @@ import { Redis } from '@mdf.js/redis-provider';
 import { SocketIOClient } from '@mdf.js/socket-client-provider';
 import { SocketIOServer } from '@mdf.js/socket-server-provider';
 
+/** Redis client options */
 export type RedisClientOptions = Redis.Config;
+/** SocketIO client options */
 export type SocketIOClientOptions = SocketIOClient.Config;
+/** SocketIO server options */
 export type SocketIOServerOptions = SocketIOServer.Config;
+

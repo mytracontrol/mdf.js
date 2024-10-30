@@ -6,4 +6,6 @@
  */
 
 export { Factory } from './Factory';
+export { Port } from './Port';
 export { Config, Consumer, ProviderInstance as Provider } from './types';
+

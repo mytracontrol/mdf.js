@@ -7,6 +7,12 @@
 
 import { Jobs } from '@mdf.js/core';
 import { Base } from './Base.i';
+
+/**
+ * Sequence Source interface definition
+ * A Sequence is a Source that allows to manage the flow of Jobs using the `ingestData` method to control
+ * the rate of Jobs that can be processed
+ */
 export interface Sequence<
   Type extends string = string,
   Data = any,

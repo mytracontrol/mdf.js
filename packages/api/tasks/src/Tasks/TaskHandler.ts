@@ -29,63 +29,61 @@ export declare interface TaskHandler<Result, Binded> {
   /**
    * Register an event listener over the `done` event, which is emitted when a task has ended, either
    * due to completion or failure.
-   * @param uuid - The unique identifier of the task
-   * @param result - The result of the task
-   * @param meta - The {@link MetaData} information of the task, including all the relevant information
-   * @param error - The error of the task, if any
+   * @param event - `done` event
+   * @param listener - Done event handler
+   * @event
    */
   on(event: 'done', listener: DoneEventHandler<Result>): this;
   /**
    * Register an event listener over the `done` event, which is emitted when a task has ended, either
    * due to completion or failure.
-   * @param uuid - The unique identifier of the task
-   * @param result - The result of the task
-   * @param meta - The {@link MetaData} information of the task, including all the relevant information
-   * @param error - The error of the task, if any
+   * @param event - `done` event
+   * @param listener - Done event handler
+   * @event
    */
   addListener(event: 'done', listener: DoneEventHandler<Result>): this;
   /**
    * Registers a event listener over the `done` event, at the beginning of the listeners array,
    * which is emitted when a task has ended, either due to completion or failure.
-   * @param uuid - The unique identifier of the task
-   * @param result - The result of the task
-   * @param meta - The {@link MetaData} information of the task, including all the relevant information
-   * @param error - The error of the task, if any
+   * @param event - `done` event
+   * @param listener - Done event handler
+   * @event
    */
   prependListener(event: 'done', listener: DoneEventHandler<Result>): this;
   /**
    * Registers a one-time event listener over the `done` event, which is emitted when a task has
    * ended, either due to completion or failure.
-   * @param uuid - The unique identifier of the task
-   * @param result - The result of the task
-   * @param meta - The {@link MetaData} information of the task, including all the relevant information
-   * @param error - The error of the task, if any
+   * @param event - `done` event
+   * @param listener - Done event handler
+   * @event
    */
   once(event: 'done', listener: DoneEventHandler<Result>): this;
   /**
    * Registers a one-time event listener over the `done` event, at the beginning of the listeners
    * array, which is emitted when a task has ended, either due to completion or failure.
-   * @param uuid - The unique identifier of the task
-   * @param result - The result of the task
-   * @param meta - The {@link MetaData} information of the task, including all the relevant information
-   * @param error - The error of the task, if any
+   * @param event - `done` event
+   * @param listener - Done event handler
+   * @event
    */
   prependOnceListener(event: 'done', listener: DoneEventHandler<Result>): this;
   /**
    * Removes the specified listener from the listener array for the `done` event.
    * @param event - `done` event
-   * @param listener - The listener function to remove
+   * @param listener - Done event handler
+   * @event
    */
   removeListener(event: 'done', listener: DoneEventHandler<Result>): this;
   /**
    * Removes the specified listener from the listener array for the `done` event.
    * @param event - `done` event
-   * @param listener - The listener function to remove
+   * @param listener - Done event handler
+   * @event
    */
   off(event: 'done', listener: DoneEventHandler<Result>): this;
   /**
    * Removes all listeners, or those of the specified event.
    * @param event - `done` event
+   * @event
    */
   removeAllListeners(event?: 'done'): this;
 }

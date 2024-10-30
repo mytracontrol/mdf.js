@@ -21,6 +21,7 @@ import {
   FileStats,
 } from './types';
 
+/** Class responsible of managing jsonl file store operations */
 export declare interface ArchiverManager {
   /**
    * Add a listener for the `error` event, emitted when there is an error in a file handler
@@ -120,7 +121,6 @@ export class ArchiverManager extends EventEmitter {
   /**
    * Appends data to a JSONL file.
    * @param data - Data to append
-   * @param filename - Name of the file to append data to
    */
   public async append(data: Record<string, any> | Record<string, any>[]): Promise<AppendResult>;
   /**

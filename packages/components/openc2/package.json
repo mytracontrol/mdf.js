@@ -45,7 +45,7 @@
     "@mdf.js/repo-config": "*",
     "@types/express": "^4.17.21",
     "@types/jsonwebtoken": "^9.0.2",
-    "@types/lodash": "^4.17.12",
+    "@types/lodash": "^4.17.13",
     "@types/supertest": "^6.0.2"
   },
   "engines": {

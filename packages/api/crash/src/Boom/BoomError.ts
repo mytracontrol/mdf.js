@@ -47,7 +47,7 @@ export class Boom extends Base {
    */
   constructor(message: string, uuid: string, code = 500, options?: BoomOptions) {
     super(message, uuid, {
-      name: options?.cause?.name || 'HTTP',
+      name: options?.cause?.name ?? 'HTTP',
       info: options?.info,
     });
     // *****************************************************************************************
@@ -77,7 +77,7 @@ export class Boom extends Base {
       links: this._links,
       status: this._code,
       code: this.name,
-      title: HTTP_CODES.get(this._code) || 'Undefined error',
+      title: HTTP_CODES.get(this._code) ?? 'Undefined error',
       detail: this.message,
       source: this._source,
       meta: this._options?.info,
@@ -142,7 +142,6 @@ export class Boom extends Base {
   /**
    * Transform joi Validation error in a Boom error
    * @param error - `ValidationError` from a Joi validation process
-   * @param uuid - unique identifier for this particular occurrence of the problem
    */
   public Boomify(error: ValidationError): void {
     if (error.name === 'ValidationError') {
@@ -182,7 +181,7 @@ export class Boom extends Base {
       let check = true;
       for (const key of Object.keys(links)) {
         if (typeof links[key] === 'object') {
-          check = this.typeSafeContextLinks(links[key] as ContextLink);
+          check = this.typeSafeContextLinks(links[key]);
         } else if (typeof links[key] !== 'string') {
           check = false;
         }

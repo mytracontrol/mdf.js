@@ -11,6 +11,9 @@ export {
   DEFAULT_CONFIG_REGISTER_INCLUDE_STACK,
   DEFAULT_CONFIG_REGISTER_MAX_LIST_SIZE,
   ErrorRecord,
+  ExtendedCrashObject,
+  ExtendedMultiObject,
   Metrics,
 } from './registries';
 export { DEFAULT_PRIMARY_PORT, ObservabilityOptions, ObservabilityServiceOptions } from './types';
+

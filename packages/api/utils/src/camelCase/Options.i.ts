@@ -9,12 +9,12 @@
 export interface Options {
   /**
    * Uppercase the first character: `foo-bar` → `FooBar`.
-   * @default false
+   * @defaultValue false
    */
   readonly pascalCase?: boolean;
   /**
    * Preserve consecutive uppercase characters: `foo-BAR` → `fooBAR`.
-   * @default false
+   * @defaultValue false
    */
   readonly preserveConsecutiveUppercase?: boolean;
   /**
@@ -40,3 +40,4 @@ export interface Options {
    */
   readonly locale?: string | string[];
 }
+

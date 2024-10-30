@@ -40,9 +40,9 @@ export class Crash extends Base {
     if (error instanceof Crash || error instanceof Multi) {
       return error;
     } else if (error instanceof Error) {
-      return new Crash(error.message, uuid || v4(), { name: error.name });
+      return new Crash(error.message, uuid ?? v4(), { name: error.name });
     } else if (typeof error === 'string') {
-      return new Crash(error, uuid || v4());
+      return new Crash(error, uuid ?? v4());
     } else if (
       error &&
       typeof error === 'object' &&
@@ -50,7 +50,7 @@ export class Crash extends Base {
     ) {
       return new Crash((error as Record<string, any>)['message']);
     } else {
-      return new Crash(`Unexpected error type`, uuid || v4(), {
+      return new Crash(`Unexpected error type`, uuid ?? v4(), {
         info: { error },
       });
     }
@@ -83,7 +83,7 @@ export class Crash extends Base {
     super(message, uuid, options);
     // *****************************************************************************************
     // #region options type safe
-    if (this._options && this._options['cause']) {
+    if (this._options?.['cause']) {
       if (this._options['cause'] instanceof Crash || this._options['cause'] instanceof Error) {
         this._cause = this._options['cause'];
       } else {

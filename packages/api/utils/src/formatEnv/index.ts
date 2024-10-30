@@ -6,3 +6,5 @@
  */
 
 export * from './formatEnv';
+export * from './types';
+

@@ -119,7 +119,7 @@ Checks included in the provider:
 - **CONFIG\_KAFKA\_CLIENT\_SSL\_KEY\_PATH** (default: `undefined`): Path to the client key.
 - **CONFIG\_KAFKA\_CLIENT\_\_SASL\_USERNAME** (default: `undefined`): SASL username
 - **CONFIG\_KAFKA\_CLIENT\_\_SASL\_PASSWORD** (default: `undefined`): SASL password
-- **NODE\_APP\_INSTANCE**: undefined
+- **NODE\_APP\_INSTANCE** (default: `undefined`): Used as default container id, receiver name, sender name, etc. in cluster configurations.
 
 ## **License**
 

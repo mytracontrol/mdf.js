@@ -75,7 +75,7 @@ Checks included in the provider:
 - **CONFIG\_REDIS\_CONNECTION\_TIMEOUT** (default: `10000`): REDIS connection keepAlive
 - **CONFIG\_REDIS\_CHECK\_INTERVAL** (default: `60000`): REDIS status check interval
 - **CONFIG\_REDIS\_DISABLE\_CHECKS** (default: `false`): Disable Redis checks
-- **NODE\_APP\_INSTANCE**: undefined
+- **NODE\_APP\_INSTANCE** (default: `undefined`): Used as default container id, receiver name, sender name, etc. in cluster configurations.
 
 ## **License**
 

@@ -56,7 +56,7 @@ export class Watcher extends EventEmitter implements Layer.App.Resource {
   /** Flag to indicate if the watcher is ready */
   private ready: boolean = false;
   /** The error stack for the watcher */
-  private errorStacks: string[] = [];
+  private readonly errorStacks: string[] = [];
   /**
    * Create a new watcher instance with the given options
    * @param options - The watcher options
@@ -87,7 +87,7 @@ export class Watcher extends EventEmitter implements Layer.App.Resource {
       if (typeof folderPath !== 'string') {
         throw new Crash(`Invalid watch path: ${folderPath}`, this.options.componentId);
       }
-      const completePath = path.resolve(this.options.cwd || '', folderPath);
+      const completePath = path.resolve(this.options.cwd ?? '', folderPath);
       // Path must exist
       if (!existsSync(completePath)) {
         throw new Crash(`Watch path does not exist: ${completePath}`, this.options.componentId);

@@ -22,12 +22,12 @@ export interface PollingManagerOptions {
   entries: TaskBaseConfig[];
   /**
    * Number of fast cycles to run per slow cycle
-   * @default 3
+   * @defaultValue 3
    */
   slowCycleRatio?: number;
   /**
    * Number of cycles on stats
-   * @default 10
+   * @defaultValue 10
    */
   cyclesOnStats?: number;
 }

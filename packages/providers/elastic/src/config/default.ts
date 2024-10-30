@@ -10,12 +10,19 @@ import { CONFIG_ARTIFACT_ID } from './utils';
 
 // *************************************************************************************************
 // #region Default values
+
+/**
+ * Used as default container id, receiver name, sender name, etc. in cluster configurations.
+ * @defaultValue undefined
+ */
+export const NODE_APP_INSTANCE = process.env['NODE_APP_INSTANCE'];
+
 const ELASTIC_NODES = ['http://localhost:9200'];
 const ELASTIC_MAX_RETRIES = 5;
 const ELASTIC_REQUEST_TIMEOUT = 30000;
 const ELASTIC_PING_TIMEOUT = 3000;
 const ELASTIC_RESURRECT_STRATEGY: 'ping' | 'optimistic' | 'none' = 'ping';
-const ELASTIC_NAME = process.env['NODE_APP_INSTANCE'] || CONFIG_ARTIFACT_ID;
+const ELASTIC_NAME = NODE_APP_INSTANCE || CONFIG_ARTIFACT_ID;
 
 export const defaultConfig: Config = {
   nodes: ELASTIC_NODES,
@@ -26,4 +33,3 @@ export const defaultConfig: Config = {
   name: ELASTIC_NAME,
 };
 // #endregion
-

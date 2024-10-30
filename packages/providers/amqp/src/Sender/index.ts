@@ -6,4 +6,5 @@
  */
 
 export { Factory } from './Factory';
+export type { Port } from './Port';
 export { AwaitableSender, Config, ProviderInstance as Provider } from './types';

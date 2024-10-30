@@ -6,28 +6,30 @@
  */
 import { InMemoryStore, RedisStore } from '@socket.io/admin-ui';
 
-interface BasicAuthentication {
+/** The basic authentication method */
+export interface BasicAuthentication {
   type: 'basic';
   username: string;
   password: string;
 }
 
+/** The instrument options */
 export interface InstrumentOptions {
   /**
    * The name of the admin namespace
-   * @default "/admin"
+   * @defaultValue "/admin"
    */
   namespaceName: string;
   /** The authentication method */
   auth?: false | BasicAuthentication;
   /**
    * Whether updates are allowed
-   * @default false
+   * @defaultValue false
    */
   readonly: boolean;
   /**
    * The unique ID of the server
-   * @default `require("os").hostname()`
+   * @defaultValue `require("os").hostname()`
    */
   serverId?: string;
   /** The store */

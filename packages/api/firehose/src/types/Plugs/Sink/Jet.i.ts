@@ -7,6 +7,11 @@
 import { Jobs } from '@mdf.js/core';
 import { Base } from './Base.i';
 
+/**
+ * Jet Sink interface definition
+ * A Jet is a Sink that allows to manage multiple Jobs at a time using the `multi` method or one Job
+ * using the `single` method
+ */
 export interface Jet<
   Type extends string = string,
   Data = any,
@@ -19,3 +24,4 @@ export interface Jet<
    */
   multi: (jobs: Jobs.JobObject<Type, Data, CustomHeaders, CustomOptions>[]) => Promise<void>;
 }
+

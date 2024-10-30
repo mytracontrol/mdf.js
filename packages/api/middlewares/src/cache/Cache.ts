@@ -116,7 +116,7 @@ export class Cache {
     // Stryker disable next-line all
     logger.debug(`The response was cached`, request.uuid, this.context);
     // Stryker disable next-line all
-    logger.silly(`${cachedResponse}`, request.uuid, this.context);
+    logger.silly(`${JSON.stringify(cachedResponse, null, 2)}`, request.uuid, this.context);
     this.removeCacheHeaders(response);
     const headers = this.filterHeaders(options.headersBlacklist, response.getHeaders());
     Object.assign(headers, cachedResponse.headers, {

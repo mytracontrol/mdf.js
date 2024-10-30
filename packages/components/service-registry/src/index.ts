@@ -10,9 +10,15 @@ export { LoggerConfig, LoggerInstance } from '@mdf.js/logger';
 export { CommandJobHandler, ConsumerOptions, Control, ResolverMap } from '@mdf.js/openc2';
 export { Setup } from '@mdf.js/service-setup-provider';
 export { RetryOptions } from '@mdf.js/utils';
+export {
+  ErrorRecord,
+  ExtendedCrashObject,
+  ExtendedMultiObject,
+  ObservabilityServiceOptions,
+} from './observability';
 export { ServiceRegistry } from './ServiceRegistry';
-export { ErrorRecord, ObservabilityServiceOptions } from './observability';
 export type {
+  BootstrapOptions,
   ConsumerAdapterOptions,
   CustomSetting,
   CustomSettings,

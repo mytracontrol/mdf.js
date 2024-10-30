@@ -5,5 +5,5 @@
  * or at https://opensource.org/licenses/MIT.
  */
 
-export { ArchiveOptions, ArchiverManager, FileStats } from './Client';
+export { AppendResult, ArchiveOptions, ArchiverManager, FileStats } from './Client';
 export * as JSONLArchiver from './provider';

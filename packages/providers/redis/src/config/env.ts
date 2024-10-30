@@ -67,6 +67,12 @@ const CONFIG_REDIS_CHECK_INTERVAL = coerce<number>(process.env['CONFIG_REDIS_CHE
  */
 const CONFIG_REDIS_DISABLE_CHECKS = coerce<boolean>(process.env['CONFIG_REDIS_DISABLE_CHECKS']);
 
+/**
+ * Used as default container id, receiver name, sender name, etc. in cluster configurations.
+ * @defaultValue undefined
+ */
+export const NODE_APP_INSTANCE = process.env['NODE_APP_INSTANCE'];
+
 export const envBasedConfig: Config = {
   /** Default Redis instance port */
   port: CONFIG_REDIS_PORT,
@@ -81,7 +87,7 @@ export const envBasedConfig: Config = {
   /** TCP KeepAlive in ms. Set to a non-number value to disable keepAlive */
   keepAlive: CONFIG_REDIS_KEEPALIVE,
   /** Connection name*/
-  connectionName: process.env['NODE_APP_INSTANCE'] || CONFIG_ARTIFACT_ID,
+  connectionName: NODE_APP_INSTANCE ?? CONFIG_ARTIFACT_ID,
   /** Enabled the ready event form Redis instance */
   enableReadyCheck: true,
   /** Enable to send command even when the server is not still ready */

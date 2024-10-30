@@ -7,4 +7,6 @@
 
 export { Collection, CreateCollectionOptions, IndexDescription } from 'mongodb';
 export { Factory } from './Factory';
+export { Port } from './Port';
 export { Client, Collections, Config, ProviderInstance as Provider } from './types';
+

@@ -36,9 +36,10 @@ const envVarRegex = /process\.env\[['"](?<varName>[^'"]+)['"]\]/;
 const defaultValueRegex = /(default:|@defaultValue) (?<defaultValue>[^,]+)/;
 
 const srcFiles = glob.sync(SOURCE_FILES, {
-  nodir: true, ignore: {
+  nodir: true,
+  ignore: {
     ignored: p => /\.test.ts$/.test(p.name),
-  }
+  },
 });
 const variables = [];
 
@@ -102,7 +103,7 @@ function findAllEnvironmentVariablesInFile(fileContent, path) {
           comment = comment.replace(defaultValueRegex, '').trim();
         }
         variables.push({ name: matches.groups['varName'], comment, path, defaultValue });
-      } catch (error) { 
+      } catch (error) {
         console.log(`ERROR: Error while processing file ${path}: ${error.message}`);
       }
     }
@@ -159,7 +160,9 @@ function findUpperCommentInFile(lines, index) {
   } else {
     const firstLine = lines[startOfComment].replace('/**', '');
     const lastLine = lines[endOfComment].replace('*/', '');
-    const middleLines = lines.slice(startOfComment + 1, endOfComment).map(line => line.replace('*', ''));
+    const middleLines = lines
+      .slice(startOfComment + 1, endOfComment)
+      .map(line => line.replace('*', ''));
     comment = [firstLine, ...middleLines, lastLine].join(' ');
   }
   // Clean spaces if there are more than one space between words or at the beginning or end of the comment
@@ -191,7 +194,7 @@ function isConstantDeclaration(line) {
 }
 /**
  * Finds and removes the section containing environment variables from a given Markdown document.
- * 
+ *
  * @param {object} readMeMD - The Markdown document object.
  */
 function findAndRemoveEnvironmentVariablesSection(readMeMD) {
@@ -220,7 +223,7 @@ function findAndRemoveEnvironmentVariablesSection(readMeMD) {
 }
 /**
  * Finds, removes, and returns the license section from the given readMeMD object.
- * 
+ *
  * @param {Object} readMeMD - The readMeMD object.
  * @returns {Array} - An array of nodes representing the license section.
  */
@@ -268,7 +271,7 @@ function deletePositionPropertyRecursively(nodes) {
 }
 /**
  * Generates a table of environment variables.
- * 
+ *
  * @param {Array<Object>} envVariables - An array of environment variables.
  * @returns {Array<Object>} - An array representing the table of environment variables.
  */
@@ -306,7 +309,7 @@ function generateTableOfEnvironmentVariables(envVariables) {
 }
 /**
  * Generates a list of environment variables.
- * 
+ *
  * @param {Array<Object>} envVariables - The array of environment variables.
  * @returns {Array<Object>} - The list of environment variables in a specific format.
  */
@@ -324,14 +327,17 @@ function generateListOfEnvironmentVariables(envVariables) {
   };
   for (const envVariable of envVariables) {
     if (!envVariable.comment) {
-      console.log(`WARNING: No comment found for environment variable ${envVariable.name} in file ${envVariable.path}`);
-    };
+      console.log(
+        `WARNING: No comment found for environment variable ${envVariable.name} in file ${envVariable.path}`
+      );
+    }
     let defaultValue = [];
     if (envVariable.defaultValue) {
       defaultValue = [
-        { type: 'text', value: ' (default: ', },
+        { type: 'text', value: ' (default: ' },
         { type: 'inlineCode', value: envVariable.defaultValue },
-        { type: 'text', value: `): ${envVariable.comment}` }];
+        { type: 'text', value: `): ${envVariable.comment}` },
+      ];
     } else {
       defaultValue = [{ type: 'text', value: `: ${envVariable.comment}` }];
     }
@@ -339,18 +345,20 @@ function generateListOfEnvironmentVariables(envVariables) {
       type: 'listItem',
       spread: false,
       checked: null,
-      children: [{
-        type: 'paragraph',
-        children: [
-          {
-            type: 'strong', children: [
-              { type: 'text', value: envVariable.name },
-            ]
-          },
-          ...defaultValue,
-        ],
-      }],
+      children: [
+        {
+          type: 'paragraph',
+          children: [
+            {
+              type: 'strong',
+              children: [{ type: 'text', value: envVariable.name }],
+            },
+            ...defaultValue,
+          ],
+        },
+      ],
     });
   }
   return [envVariablesTitle, envVariablesList];
 }
+

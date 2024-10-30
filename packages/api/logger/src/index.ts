@@ -12,5 +12,5 @@ export { DebugLogger } from './debug';
 export { FileTransportConfig } from './file';
 export { FluentdTransportConfig } from './fluentd';
 export { Logger, LoggerConfig } from './logger';
-export { LoggerInstance } from './types';
-export { SetContext } from './wrapper';
+export { LOG_LEVELS, LoggerFunction, LoggerInstance, LogLevel } from './types';
+export { SetContext, WrapperLogger } from './wrapper';

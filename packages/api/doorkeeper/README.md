@@ -118,7 +118,7 @@ const myNewAddress = await checker.validate('Address', address); // myNewAddress
 
 ## **API**
 
-- {@link Doorkeeper<T>}
+- {@link Doorkeeper}
 
 ## **License**
 

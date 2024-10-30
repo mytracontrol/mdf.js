@@ -148,7 +148,6 @@ export class Producer extends Component<AdapterWrapper, ProducerOptions> {
    * broadcasted even if it include the '*' symbol.
    * @param to - Consumer objetive of this command
    * @param content - Command to be issued
-   * @param id - producer identification
    * @returns
    */
   public async command(to: string[], content: Control.Command): Promise<Control.ResponseMessage[]>;
@@ -519,3 +518,4 @@ export class Producer extends Component<AdapterWrapper, ProducerOptions> {
     this.onErrorHandler(processingError);
   };
 }
+

@@ -5,12 +5,13 @@
  * or at https://opensource.org/licenses/MIT.
  */
 
-type Coerceable = boolean | number | Record<string, any> | any[] | null;
+/** Coercible types */
+export type Coercible = boolean | number | Record<string, any> | any[] | null;
 /**
  * Coerce an environment variable
  * @param env - Environment
  */
-export function coerce(env: string | undefined): Coerceable;
+export function coerce(env: string | undefined): Coercible;
 /**
  * Coerce an environment variable to a boolean value
  * @param env - Environment
@@ -42,14 +43,14 @@ export function coerce(env: string | undefined, alternative: any[]): any[];
  * Coerce an environment variable to a valid value
  * @param env - Environment
  */
-export function coerce<T extends Coerceable>(env: string | undefined): T | undefined;
+export function coerce<T extends Coercible>(env: string | undefined): T | undefined;
 /**
  * Coerce an environment variable to a valid value
  * @param env - Environment
  * @param alternative - default value
  */
 export function coerce(env: string | undefined, alternative: any): any;
-export function coerce(env: string | undefined, alternative?: Coerceable): Coerceable | undefined {
+export function coerce(env: string | undefined, alternative?: Coercible): Coercible | undefined {
   if (typeof env !== 'string') {
     return alternative;
   } else if (env.toLowerCase() === 'true') {

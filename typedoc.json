@@ -3,7 +3,6 @@
     "packages/api/*",
     "packages/components/*",
     "packages/providers/*",
-    "packages/registries/*",
   ],
   "entryPointStrategy": "packages",
   "name": "@mdf.js",

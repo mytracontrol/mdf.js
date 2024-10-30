@@ -129,19 +129,19 @@ export class DoorKeeper<T = void> {
     data: any,
     stackableError?: Multi
   ): Multi {
-    const validationError = stackableError
-      ? stackableError
-      : new Multi(`Errors during the schema validation process`, uuid, {
-          name: 'ValidationError',
-          info: { data, schema },
-        });
+    const validationError =
+      stackableError ??
+      new Multi(`Errors during the schema validation process`, uuid, {
+        name: 'ValidationError',
+        info: { data, schema },
+      });
     for (const error of errors) {
       if ('emUsed' in error && error.emUsed) {
         continue;
       }
       const message = this.errorFormatter(error, data);
       validationError.push(new Crash(message, uuid, { name: 'ValidationError', info: error }));
-      if (error.params && error.params['errors']) {
+      if (error.params?.['errors']) {
         this.multify(error.params['errors'], schema, uuid, data, validationError);
       }
     }

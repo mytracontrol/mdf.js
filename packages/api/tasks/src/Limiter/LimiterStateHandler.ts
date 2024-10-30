@@ -16,113 +16,119 @@ export declare interface LimiterStateHandler {
   /**
    * Register an event listener over the `done` event, which is emitted when a task has ended, either
    * due to completion or failure.
-   * @param uuid - The unique identifier of the task
-   * @param result - The result of the task
-   * @param meta - The {@link MetaData} information of the task, including all the relevant information
-   * @param error - The error of the task, if any
+   * @param event - `done` event
+   * @param listener - Done event listener
+   * @event
    */
   on(event: 'done' | string, listener: DoneEventHandler): this;
   /**
    * Register an event listener over the `done` event, which is emitted when a task has ended, either
    * due to completion or failure.
-   * @param uuid - The unique identifier of the task
-   * @param result - The result of the task
-   * @param meta - The {@link MetaData} information of the task, including all the relevant information
-   * @param error - The error of the task, if any
+   * @param event - `done` event
+   * @param listener - Done event listener
+   * @event
    */
   addListener(event: 'done' | string, listener: DoneEventHandler): this;
   /**
    * Registers a event listener over the `done` event, at the beginning of the listeners array,
    * which is emitted when a task has ended, either due to completion or failure.
-   * @param uuid - The unique identifier of the task
-   * @param result - The result of the task
-   * @param meta - The {@link MetaData} information of the task, including all the relevant information
-   * @param error - The error of the task, if any
+   * @param event - `done` event
+   * @param listener - Done event listener
+   * @event
    */
   prependListener(event: 'done' | string, listener: DoneEventHandler): this;
   /**
    * Registers a one-time event listener over the `done` event, which is emitted when a task has
    * ended, either due to completion or failure.
-   * @param uuid - The unique identifier of the task
-   * @param result - The result of the task
-   * @param meta - The {@link MetaData} information of the task, including all the relevant information
-   * @param error - The error of the task, if any
+   * @param event - `done` event
+   * @param listener - Done event listener
+   * @event
    */
   once(event: 'done' | string, listener: DoneEventHandler): this;
   /**
    * Registers a one-time event listener over the `done` event, at the beginning of the listeners
    * array, which is emitted when a task has ended, either due to completion or failure.
-   * @param uuid - The unique identifier of the task
-   * @param result - The result of the task
-   * @param meta - The {@link MetaData} information of the task, including all the relevant information
-   * @param error - The error of the task, if any
+   * @param event - `done` event
+   * @param listener - Done event listener
+   * @event
    */
   prependOnceListener(event: 'done' | string, listener: DoneEventHandler): this;
   /**
    * Removes the specified listener from the listener array for the `done` event.
    * @param event - `done` event
    * @param listener - The listener function to remove
+   * @event
    */
   removeListener(event: 'done' | string, listener: DoneEventHandler): this;
   /**
    * Removes the specified listener from the listener array for the `done` event.
    * @param event - `done` event
    * @param listener - The listener function to remove
+   * @event
    */
   off(event: 'done' | string, listener: DoneEventHandler): this;
   /**
    * Removes all listeners, or those of the specified event.
    * @param event - `done` event
+   * @event
    */
   removeAllListeners(event?: 'done'): this;
   /**
    * Register an event listener over the `refill` event, which is emitted when queue bucket is refilled
    * @param event - `refill` event
-   * @param listener - The listener function to add
+   * @param listener - Refill event listener
+   * @event
    */
   on(event: 'refill', listener: () => void): this;
   /**
    * Register an event listener over the `refill` event, which is emitted when queue bucket is refilled
    * @param event - `refill` event
-   * @param listener - The listener function to add
+   * @param listener - Refill event listener
+   * @event
    */
   addListener(event: 'refill', listener: () => void): this;
   /**
    * Registers a event listener over the `refill` event, at the beginning of the listeners array,
    * which is emitted when queue bucket is refilled
    * @param event - `refill` event
-   * @param listener - The listener function to add
+   * @param listener - Refill event listener
+   * @event
    */
   prependListener(event: 'refill', listener: () => void): this;
   /**
    * Registers a one-time event listener over the `refill` event, which is emitted when queue bucket
    * is refilled
    * @param event - `refill` event
-   * @param listener - The listener function to add
+   * @param listener - Refill event listener
+   * @event
    */
   once(event: 'refill', listener: () => void): this;
   /**
    * Registers a one-time event listener over the `refill` event, at the beginning of the listeners
    * array, which is emitted when queue bucket is refilled
    * @param event - `refill` event
-   * @param listener - The listener function to add
+   * @param listener - Refill event listener
+   * @event
    */
   prependOnceListener(event: 'refill', listener: () => void): this;
   /**
    * Removes the specified listener from the listener array for the `refill` event.
    * @param event - `refill` event
    * @param listener - The listener function to remove
+   * @event
    */
   removeListener(event: 'refill', listener: () => void): this;
   /**
    * Removes the specified listener from the listener array for the `refill` event.
    * @param event - `refill` event
    * @param listener - The listener function to remove
+   * @event
    */
   off(event: 'refill', listener: () => void): this;
   /**
    * Removes all listeners, or those of the specified event.
    * @param event - `refill` event
+   * @event
    */
   removeAllListeners(event?: 'refill'): this;
   /**
@@ -130,6 +136,7 @@ export declare interface LimiterStateHandler {
    * new task is added
    * @param event - `seed` event
    * @param listener - The listener function to add
+   * @event
    */
   on(event: 'seed', listener: () => void): this;
   /**
@@ -137,6 +144,7 @@ export declare interface LimiterStateHandler {
    * new task is added
    * @param event - `seed` event
    * @param listener - The listener function to add
+   * @event
    */
   addListener(event: 'seed', listener: () => void): this;
   /**
@@ -144,6 +152,7 @@ export declare interface LimiterStateHandler {
    * is emitted when queue is empty and a new task is added
    * @param event - `seed` event
    * @param listener - The listener function to add
+   * @event
    */
   prependListener(event: 'seed', listener: () => void): this;
   /**
@@ -151,6 +160,7 @@ export declare interface LimiterStateHandler {
    * and a new task is added
    * @param event - `seed` event
    * @param listener - The listener function to add
+   * @event
    */
   once(event: 'seed', listener: () => void): this;
   /**
@@ -158,23 +168,27 @@ export declare interface LimiterStateHandler {
    * array, which is emitted when queue is empty and a new task is added
    * @param event - `seed` event
    * @param listener - The listener function to add
+   * @event
    */
   prependOnceListener(event: 'seed', listener: () => void): this;
   /**
    * Removes the specified listener from the listener array for the `seed` event.
    * @param event - `seed` event
    * @param listener - The listener function to remove
+   * @event
    */
   removeListener(event: 'seed', listener: () => void): this;
   /**
    * Removes the specified listener from the listener array for the `seed` event.
    * @param event - `seed` event
    * @param listener - The listener function to remove
+   * @event
    */
   off(event: 'seed', listener: () => void): this;
   /**
    * Removes all listeners, or those of the specified event.
    * @param event - `seed` event
+   * @event
    */
   removeAllListeners(event?: 'seed'): this;
 }

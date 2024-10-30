@@ -9,7 +9,7 @@ export { Health, Jobs } from '@mdf.js/core';
 export { LoggerInstance } from '@mdf.js/logger';
 export { RetryOptions } from '@mdf.js/utils';
 
-export { ErrorStrategy } from './engine';
+export { ErrorStrategy, PostProcessingStrategy } from './engine';
 export * from './FileFlinger';
 export type { Pusher } from './pusher';
 export type { FileFlingerOptions } from './types';

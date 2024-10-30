@@ -23,3 +23,9 @@ export {
 export * as Adapters from './adapters';
 export * as Factory from './factories';
 export { ServiceBus, ServiceBusOptions } from './serviceBus';
+export {
+  AdapterOptions,
+  RedisClientOptions,
+  SocketIOClientOptions,
+  SocketIOServerOptions,
+} from './types';
