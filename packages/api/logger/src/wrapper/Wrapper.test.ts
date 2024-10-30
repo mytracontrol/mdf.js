@@ -44,18 +44,39 @@ describe('#Wrapper', () => {
       const wrapper = SetContext(myLogger, context, uuid);
       wrapper.silly(msg);
       expect(myLogger.value).toEqual(msg + ': ' + uuid + ': ' + context);
+      wrapper.silly(msg, 'uuid2', 'context2');
+      expect(myLogger.value).toEqual(msg + ': uuid2: context2');
+
       wrapper.debug(msg);
       expect(myLogger.value).toEqual(msg + ': ' + uuid + ': ' + context);
+      wrapper.debug(msg, 'uuid2', 'context2');
+      expect(myLogger.value).toEqual(msg + ': uuid2: context2');
+
       wrapper.verbose(msg);
       expect(myLogger.value).toEqual(msg + ': ' + uuid + ': ' + context);
+      wrapper.verbose(msg, 'uuid2', 'context2');
+      expect(myLogger.value).toEqual(msg + ': uuid2: context2');
+
       wrapper.info(msg);
       expect(myLogger.value).toEqual(msg + ': ' + uuid + ': ' + context);
+      wrapper.info(msg, 'uuid2', 'context2');
+      expect(myLogger.value).toEqual(msg + ': uuid2: context2');
+
       wrapper.warn(msg);
       expect(myLogger.value).toEqual(msg + ': ' + uuid + ': ' + context);
+      wrapper.warn(msg, 'uuid2', 'context2');
+      expect(myLogger.value).toEqual(msg + ': uuid2: context2');
+
       wrapper.error(msg);
       expect(myLogger.value).toEqual(msg + ': ' + uuid + ': ' + context);
+      wrapper.error(msg, 'uuid2', 'context2');
+      expect(myLogger.value).toEqual(msg + ': uuid2: context2');
+
       wrapper.crash(new Crash(msg));
       expect(myLogger.value).toEqual(msg + ': ' + context);
+      wrapper.crash(new Crash(msg), 'context2');
+      expect(myLogger.value).toEqual(msg + ': context2');
     });
   });
 });
+
