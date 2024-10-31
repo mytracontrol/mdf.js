@@ -10,10 +10,17 @@ import { CONFIG_ARTIFACT_ID } from './utils';
 
 // *************************************************************************************************
 // #region Default values
+
+/**
+ * Used as default container id, receiver name, sender name, etc. in cluster configurations.
+ * @defaultValue undefined
+ */
+export const NODE_APP_INSTANCE = process.env['NODE_APP_INSTANCE'];
+
 const CONFIG_MQTT_URL = 'mqtt://localhost:1883';
 const CONFIG_MQTT_PROTOCOL = 'mqtt';
 const CONFIG_MQTT_RESUBSCRIBE = true;
-const CONFIG_MQTT_CLIENT_ID = process.env['NODE_APP_INSTANCE'] || CONFIG_ARTIFACT_ID;
+const CONFIG_MQTT_CLIENT_ID = NODE_APP_INSTANCE ?? CONFIG_ARTIFACT_ID;
 const CONFIG_MQTT_KEEPALIVE = 60;
 
 export const defaultConfig: Config = {
@@ -24,4 +31,3 @@ export const defaultConfig: Config = {
   keepalive: CONFIG_MQTT_KEEPALIVE,
 };
 // #endregion
-

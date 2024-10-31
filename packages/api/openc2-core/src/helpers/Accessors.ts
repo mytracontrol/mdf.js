@@ -92,7 +92,7 @@ export class Accessors {
     } else if (startTime !== undefined && duration !== undefined) {
       delay = startTime + duration - Date.now();
     } else {
-      delay = duration || Constants.DEFAULT_MAX_RESPONSE_COMMAND_DELAY;
+      delay = duration ?? Constants.DEFAULT_MAX_RESPONSE_COMMAND_DELAY;
     }
     return delay > 0 ? delay : Constants.DEFAULT_MAX_RESPONSE_COMMAND_DELAY;
   }

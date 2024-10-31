@@ -76,7 +76,7 @@ const memoryProblem =
   '\r\nmaxmemory:1' +
   '\r\nmaxmemory_human:1B' +
   '\r\n';
-const memoryUnparseable =
+const memoryUnparsable =
   '# Memory' +
   '\r\nused_memory:1090104' +
   '\r\nused_memory_human:1.04M' +
@@ -162,7 +162,7 @@ describe('#Port #Redis', () => {
               componentId: checks['memory'][0].componentId,
               observedUnit: 'used memory / max memory',
               observedValue: '1090104 / 0',
-              output: `The system is using 0% of the available memory`,
+              output: `The system is using 0.00% of the available memory`,
               status: 'pass',
               time: checks['memory'][0].time,
             },
@@ -396,7 +396,7 @@ describe('#Port #Redis', () => {
       expect(port).toBeDefined();
       jest.spyOn(port.client, 'connect').mockResolvedValue();
       jest.spyOn(port.client, 'quit').mockResolvedValue('OK');
-      jest.spyOn(port.client, 'info').mockResolvedValue(memoryUnparseable);
+      jest.spyOn(port.client, 'info').mockResolvedValue(memoryUnparsable);
       port.on('error', error => {
         throw error;
       });

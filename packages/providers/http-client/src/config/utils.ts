@@ -24,14 +24,12 @@ export function checkConfigObject<T>(config: T): T | undefined {
   if (
     config &&
     typeof config === 'object' &&
-    typeof config !== null &&
     typeof config !== 'function' &&
     !Array.isArray(config)
   ) {
     return Object.values(config).some(value => value !== undefined) ? config : undefined;
-  } else {
-    return undefined;
   }
+  return undefined;
 }
 
 /**

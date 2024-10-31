@@ -76,7 +76,7 @@ Checks included in the provider:
 - **CONFIG\_MQTT\_CLIENT\_CA\_PATH** (default: `undefined`): CA file path
 - **CONFIG\_MQTT\_CLIENT\_CLIENT\_CERT\_PATH** (default: `undefined`): Client cert file path
 - **CONFIG\_MQTT\_CLIENT\_CLIENT\_KEY\_PATH** (default: `undefined`): Client key file path
-- **NODE\_APP\_INSTANCE**: undefined
+- **NODE\_APP\_INSTANCE** (default: `undefined`): Used as default container id, receiver name, sender name, etc. in cluster configurations.
 
 ## **License**
 

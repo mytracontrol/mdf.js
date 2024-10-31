@@ -4,7 +4,7 @@
  * Use of this source code is governed by an MIT-style license that can be found in the LICENSE file
  * or at https://opensource.org/licenses/MIT.
  */
-import { Layer } from '@mdf.js/core';
+import { Health, Layer } from '@mdf.js/core';
 import { Boom, Crash, Multi } from '@mdf.js/crash';
 import { LoggerInstance } from '@mdf.js/logger';
 import IORedis, { RedisOptions } from 'ioredis';
@@ -38,7 +38,7 @@ export class Port extends Layer.Provider.Port<Client, Config> {
    * @param logger - Port logger, to be used internally
    */
   constructor(config: Config, logger: LoggerInstance) {
-    super(config, logger, config.name || CONFIG_PROVIDER_BASE_NAME);
+    super(config, logger, config.name ?? CONFIG_PROVIDER_BASE_NAME);
     const cleanedOptions = {
       ...this.config,
       checkInterval: undefined,
@@ -188,47 +188,96 @@ export class Port extends Layer.Provider.Port<Client, Config> {
    * @returns
    */
   private evaluateStats(result: Status): Status {
-    let message: string | undefined = undefined;
+    let message: string | undefined;
     let hasError = false;
-    let observedValue = '- bytes / - bytes';
+    const observedValue = this.calculateObservedValue(result);
+    const parsingError = result.memory.errorParsing ?? result.server.errorParsing;
     let usage = 0;
-    const parsingError = result.memory.errorParsing || result.server.errorParsing;
+
     if (parsingError) {
       message = `Error parsing the Redis INFO stats: ${parsingError}, please contact with the developers`;
       hasError = true;
     } else {
-      usage =
-        result.memory.maxmemory !== '0'
-          ? parseFloat(result.memory.used_memory) / parseFloat(result.memory.maxmemory)
-          : 0;
-      if (usage >= 1) {
-        hasError = true;
-        message = `The system is OOM - used ${result.memory.used_memory_human} - max ${result.memory.maxmemory_human}`;
-      } else if (usage > 0.9) {
-        message = `The system is using more than 90% of the available memory`;
-      } else if (usage > 0.8) {
-        message = `The system is using more than 80% of the available memory`;
-      } else {
-        message = `The system is using ${usage * 100}% of the available memory`;
-      }
-      observedValue = `${result.memory.used_memory} / ${result.memory.maxmemory}`;
+      usage = this.calculateMemoryUsage(result);
+      ({ hasError, message } = this.determineMemoryStatus(usage, result, hasError));
     }
+
+    const usageStatus: Health.Status = usage > 0.8 ? 'warn' : 'pass';
+    const status = hasError ? 'fail' : usageStatus;
+
     this.addCheck('memory', {
       componentId: this.uuid,
       observedValue,
       observedUnit: 'used memory / max memory',
-      status: hasError ? 'fail' : usage > 0.8 ? 'warn' : 'pass',
+      status,
       output: message,
       time: new Date().toISOString(),
     });
+
+    this.emitHealthStatus(hasError, message);
+    return result;
+  }
+  /**
+   * Calculate the observed value for memory usage.
+   * @param result - The result of the status check
+   * @returns The observed value as a string.
+   */
+  private calculateObservedValue(result: Status): string {
+    if (!result.memory.used_memory && !result.memory.maxmemory) {
+      return '- bytes / - bytes';
+    }
+    return `${result.memory.used_memory} / ${result.memory.maxmemory}`;
+  }
+  /**
+   * Calculate memory usage percentage.
+   * @param result - The result of the status check
+   * @returns The memory usage as a percentage.
+   */
+  private calculateMemoryUsage(result: Status): number {
+    return result.memory.maxmemory !== '0'
+      ? parseFloat(result.memory.used_memory) / parseFloat(result.memory.maxmemory)
+      : 0;
+  }
+  /**
+   * Determine the memory status and create an appropriate message.
+   * @param usage - The memory usage percentage.
+   * @param result - The result of the status check.
+   * @param hasError - A flag indicating if there's an error.
+   * @returns An object containing the updated hasError flag and message.
+   */
+  private determineMemoryStatus(
+    usage: number,
+    result: Status,
+    hasError: boolean
+  ): { hasError: boolean; message: string | undefined } {
+    let message: string | undefined;
+
+    if (usage >= 1) {
+      hasError = true;
+      message = `The system is OOM - used ${result.memory.used_memory_human} - max ${result.memory.maxmemory_human}`;
+    } else if (usage > 0.9) {
+      message = `The system is using more than 90% of the available memory`;
+    } else if (usage > 0.8) {
+      message = `The system is using more than 80% of the available memory`;
+    } else {
+      message = `The system is using ${(usage * 100).toFixed(2)}% of the available memory`;
+    }
+
+    return { hasError, message };
+  }
+  /**
+   * Emit the appropriate health status event based on the current state.
+   * @param hasError - Indicates if an error was detected.
+   * @param message - The error message, if any.
+   */
+  private emitHealthStatus(hasError: boolean, message: string | undefined): void {
     if (hasError && (this.healthy || this.isFirstCheck)) {
-      this.emit('unhealthy', new Crash(message || 'Unexpected error in the evaluation', this.uuid));
+      this.emit('unhealthy', new Crash(message ?? 'Unexpected error in the evaluation', this.uuid));
       this.healthy = false;
-    } else if (!this.healthy) {
+    } else if (!hasError && !this.healthy) {
       this.emit('healthy');
       this.healthy = true;
     }
-    return result;
   }
   /**
    * Auxiliar function to log and emit events
@@ -240,7 +289,7 @@ export class Port extends Layer.Provider.Port<Client, Config> {
     this.logger.debug(`Event: ${event} was listened`);
     for (const arg of args) {
       // Stryker disable next-line all
-      this.logger.silly(`Event ${event} arg: ${arg}`);
+      this.logger.silly(`Event ${event} arg: ${JSON.stringify(arg)}`);
     }
   }
   /** Callback function for `connect` event */

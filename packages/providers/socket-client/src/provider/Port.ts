@@ -59,7 +59,7 @@ export class Port extends Layer.Provider.Port<Client, Config> {
       const onConnectError = (error: ExtendedError) => {
         // Stryker disable next-line all
         this.logger.error(error.message);
-        if (error.data && error.data.status) {
+        if (error.data?.status) {
           onLastFail(
             new Crash(`Connection error: ${error.message}, client validation error`, {
               info: error.data,
