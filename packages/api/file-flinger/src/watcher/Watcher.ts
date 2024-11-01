@@ -8,6 +8,7 @@
 import { Health, type Layer } from '@mdf.js/core';
 import { Crash, type Multi } from '@mdf.js/crash';
 import { DebugLogger, SetContext, type LoggerInstance } from '@mdf.js/logger';
+import { deCycle } from '@mdf.js/utils';
 import { watch, type ChokidarOptions, type FSWatcher } from 'chokidar';
 import EventEmitter from 'events';
 import { existsSync, statSync } from 'fs';
@@ -75,7 +76,9 @@ export class Watcher extends EventEmitter implements Layer.App.Resource {
       ...DEFAULT_FS_WATCHER_OPTIONS,
       cwd: this.options.cwd,
     };
-    this.logger.debug(`Watcher created with options: ${JSON.stringify(this.options)}`);
+    this.logger.silly(
+      `Watcher created with options: ${JSON.stringify(deCycle(this.options), null, 2)}`
+    );
     if (!this.options.watchPath) {
       throw new Crash(`Watcher must have a watch path`, this.options.componentId);
     }

@@ -215,7 +215,7 @@ export class Engine extends EventEmitter implements Layer.App.Resource {
     return Health.overallStatus(this.checks);
   }
   /**
-   * Return the status of the firehose in a standard format
+   * Return the status of the file-flinger in a standard format
    * @returns _check object_ as defined in the draft standard
    * https://datatracker.ietf.org/doc/html/draft-inadarei-api-health-check-05
    */

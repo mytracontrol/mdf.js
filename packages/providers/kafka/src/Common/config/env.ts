@@ -23,8 +23,9 @@ const CONFIG_KAFKA_CLIENT__CLIENT_ID = process.env['CONFIG_KAFKA_CLIENT__CLIENT_
  * Kafka brokers
  * @defaultValue '127.0.0.1:9092'
  */
-const CONFIG_KAFKA_CLIENT__BROKERS = process.env['CONFIG_KAFKA_CLIENT__BROKERS']
-  ? process.env['CONFIG_KAFKA_CLIENT__BROKERS'].split(',')
+const _CONFIG_KAFKA_CLIENT__BROKERS = process.env['CONFIG_KAFKA_CLIENT__BROKERS'];
+const CONFIG_KAFKA_CLIENT__BROKERS = _CONFIG_KAFKA_CLIENT__BROKERS
+  ? _CONFIG_KAFKA_CLIENT__BROKERS.split(',')
   : undefined;
 /**
  * Time in milliseconds to wait for a successful connection

@@ -15,7 +15,7 @@ type MetricInstances = {
   jobsProcessed: Counter;
   /** The total number errors processing jobs */
   jobsWithError: Counter;
-  /** Firehose jobs duration */
+  /** File flinger jobs duration */
   jobsDuration: Histogram;
 };
 

@@ -100,7 +100,6 @@ Checks included in the provider:
 - **CONFIG\_KAFKA\_LOG\_LEVEL** (default: `` `error` ``): Define the log level for the kafka provider, possible values are: - \`error\` - \`warn\` - \`info\` - \`debug\` - \`trace\`
 - **CONFIG\_KAFKA\_CLIENT\_\_CLIENT\_ID** (default: `hostname`): Client identifier
 - **CONFIG\_KAFKA\_CLIENT\_\_BROKERS** (default: `'127.0.0.1:9092'`): Kafka brokers
-- **CONFIG\_KAFKA\_CLIENT\_\_BROKERS** (default: `'127.0.0.1:9092'`): Kafka brokers
 - **CONFIG\_KAFKA\_CLIENT\_\_CONNECTION\_TIMEOUT** (default: `1000`): Time in milliseconds to wait for a successful connection
 - **CONFIG\_KAFKA\_CLIENT\_\_AUTHENTICATION\_TIMEOUT** (default: `1000`): Timeout in ms for authentication requests
 - **CONFIG\_KAFKA\_CLIENT\_\_REAUTHENTICATION\_THRESHOLD** (default: `1000`): When periodic reauthentication (connections.max.reauth.ms) is configured on the broker side, reauthenticate when \`reauthenticationThreshold\` milliseconds remain of session lifetime.

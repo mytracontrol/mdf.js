@@ -28,7 +28,7 @@
     "check-dependencies": "npm-check",
     "clean": "rimraf \"{tsconfig.build.tsbuildinfo,dist}\"",
     "envDoc": "node ../../../.config/envDoc.mjs",
-    "licenses": "license-checker --start ./ --production --csv --out ../../../licenses/api/firehose/licenses.csv --customPath ../../../.config/customFormat.json",
+    "licenses": "license-checker --start ./ --production --csv --out ../../../licenses/api/file-flinger/licenses.csv --customPath ../../../.config/customFormat.json",
     "mutants": "stryker run stryker.conf.js",
     "test": "jest --detectOpenHandles --config ./jest.config.js"
   },

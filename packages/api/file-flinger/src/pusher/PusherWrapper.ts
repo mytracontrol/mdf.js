@@ -10,7 +10,7 @@ import { Crash, type Multi } from '@mdf.js/crash';
 import EventEmitter from 'events';
 import type { Pusher } from './types';
 
-export class PusherWrapper extends EventEmitter implements Layer.App.Resource, Pusher {
+export class PusherWrapper extends EventEmitter implements Layer.App.Resource {
   /** Indicate if the last operation was finished with error */
   private lastOperationError?: Crash | Multi;
   /** Date of the last operation performed */
@@ -83,7 +83,7 @@ export class PusherWrapper extends EventEmitter implements Layer.App.Resource, P
     funcArgs: any[]
   ): Promise<T> {
     try {
-      const result = await task(...funcArgs);
+      const result = await task.bind(this.pusher)(...funcArgs);
       this.onOperationSuccess();
       return result;
     } catch (error) {
