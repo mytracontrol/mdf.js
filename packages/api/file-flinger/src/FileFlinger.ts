@@ -6,15 +6,33 @@
  */
 
 import { Health, type Layer } from '@mdf.js/core';
-import { Crash } from '@mdf.js/crash';
+import { Crash, Multi } from '@mdf.js/crash';
 import { DebugLogger, SetContext, type LoggerInstance } from '@mdf.js/logger';
 import EventEmitter from 'events';
 import { merge } from 'lodash';
+import { Registry } from 'prom-client';
 import { v4 } from 'uuid';
 import { Engine } from './engine';
 import { Keygen } from './keygen';
 import { DEFAULT_FILE_FLINGER_OPTIONS, type FileFlingerOptions } from './types';
 import { Watcher } from './watcher';
+
+export declare interface FileFlinger {
+  /**
+   * Add a listener for the `error` event, emitted when the component detects an error.
+   * @param event - `error` event
+   * @param listener - Error event listener
+   * @event
+   */
+  on(event: 'error', listener: (error: Crash | Multi | Error) => void): this;
+  /**
+   * Add a listener for the status event, emitted when the component status changes.
+   * @param event - `status` event
+   * @param listener - Status event listener
+   * @event
+   */
+  on(event: 'status', listener: (status: Health.Status) => void): this;
+}
 
 /**
  * FileFlinger class
@@ -124,5 +142,9 @@ export class FileFlinger extends EventEmitter implements Layer.App.Service {
    */
   public get checks(): Health.Checks {
     return { ...this.watcher.checks, ...this.engine.checks };
+  }
+  /** Return the metrics registry */
+  public get metrics(): Registry {
+    return this.engine.metrics;
   }
 }

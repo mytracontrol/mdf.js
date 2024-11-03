@@ -85,7 +85,7 @@ The complete framework is composed of the following packages:
   - [**@mdf.js/mongo-provider**](https://www.npmjs.com/package/@mdf.js/mongo-provider): Package for managing Mongo connections, based on [**mongodb**](https://www.npmjs.com/package/mongodb).
   - [**@mdf.js/redis-provider**](https://www.npmjs.com/package/@mdf.js/redis-provider): Package for managing Redis connections, based on [**ioredis**](https://www.npmjs.com/package/ioredis).
   - [**@mdf.js/s3-provider**](https://www.npmjs.com/package/@mdf.js/s3-provider): Package for managing S3 connections, based on [**aws-sdk/client-s3**](https://www.npmjs.com/package/@aws-sdk/client-s3).
-  - [@mdf.js/service-setup](https://www.npmjs.com/package/@mdf.js/service-setup): Package for managing the setup of the services in edge environments.
+  - [**@mdf.js/service-setup**](https://www.npmjs.com/package/@mdf.js/service-setup): Package for managing the setup of the services in edge environments.
   - [**@mdf.js/socket-client-provider**](https://www.npmjs.com/package/@mdf.js/socket-client-provider): Package for managing **socket.io** connections, based on [**socket.io**](https://www.npmjs.com/package/socket.io)
   - [**@mdf.js/socket-server-provider**](https://www.npmjs.com/package/@mdf.js/socket-server-provider): Package for managing **socket.io** servers, based on [**socket.io**](https://www.npmjs.com/package/socket.io)
 - Components:

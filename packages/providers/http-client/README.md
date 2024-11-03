@@ -3,6 +3,7 @@
 [![Node Version](https://img.shields.io/static/v1?style=flat\&logo=node.js\&logoColor=green\&label=node\&message=%3E=20\&color=blue)](https://nodejs.org/en/)
 [![Typescript Version](https://img.shields.io/static/v1?style=flat\&logo=typescript\&label=Typescript\&message=5.4\&color=blue)](https://www.typescriptlang.org/)
 [![Known Vulnerabilities](https://img.shields.io/static/v1?style=flat\&logo=snyk\&label=Vulnerabilities\&message=0\&color=300A98F)](https://snyk.io/package/npm/snyk)
+[![Documentation](https://img.shields.io/static/v1?style=flat\&logo=markdown\&label=Documentation\&message=API\&color=blue)](https://mytracontrol.github.io/mdf.js/)
 
 <!-- markdownlint-disable MD033 MD041 -->
 
@@ -27,6 +28,8 @@
   - [**Installation**](#installation)
   - [**Information**](#information)
   - [**Use**](#use)
+    - [**Health checks**](#health-checks)
+  - [**Environment variables**](#environment-variables)
   - [**License**](#license)
 
 ## **Introduction**
@@ -53,12 +56,87 @@ Check information about **@mdf.js** providers in the documentation of the core m
 
 ## **Use**
 
+The provider implemented in this module wraps the [axios](https://www.npmjs.com/package/axios) client.
+
+```typescript
+import { HTTP } from '@mdf.js/http-client-provider';
+
+const client = HTTP.Factory.create({
+  name: `myHTTPClientProvider`,
+  config: {
+    requestConfig?: {...}, // a CreateAxiosDefaults object from axios
+    httpAgentOptions: {...}, // an http AgentOptions object from Node.js
+    httpsAgentOptions: {...}, // an https AgentOptions object from Node.js
+  },
+  logger: myLoggerInstance,
+  useEnvironment: true,
+});
+```
+
+- **Defaults**:
+
+  ```typescript
+  {}
+  ```
+
+- **Environment**: remember to set the `useEnvironment` flag to `true` to use these environment variables.
+
+  ```typescript
+  {
+    requestConfig: {
+      baseURL: process.env['CONFIG_HTTP_CLIENT_BASE_URL'],
+      timeout: process.env['CONFIG_HTTP_CLIENT_TIMEOUT'],
+      auth: { // Only if username and password are set
+        username: process.env['CONFIG_HTTP_CLIENT_AUTH_USERNAME'],
+        password: process.env['CONFIG_HTTP_CLIENT_AUTH_PASSWORD'],
+      },
+    },
+    httpAgentOptions: {
+      keepAlive: process.env['CONFIG_HTTP_CLIENT_KEEPALIVE'],
+      keepAliveInitialDelay: process.env['CONFIG_HTTP_CLIENT_KEEPALIVE_INITIAL_DELAY'],
+      keepAliveMsecs: process.env['CONFIG_HTTP_CLIENT_KEEPALIVE_MSECS'],
+      maxSockets: process.env['CONFIG_HTTP_CLIENT_MAX_SOCKETS'],
+      maxTotalSockets: process.env['CONFIG_HTTP_CLIENT_MAX_SOCKETS_TOTAL'],
+      maxFreeSockets: process.env['CONFIG_HTTP_CLIENT_MAX_SOCKETS_FREE'],
+    },
+    httpsAgentOptions: {
+      keepAlive: process.env['CONFIG_HTTP_CLIENT_KEEPALIVE'],
+      keepAliveInitialDelay: process.env['CONFIG_HTTP_CLIENT_KEEPALIVE_INITIAL_DELAY'],
+      keepAliveMsecs: process.env['CONFIG_HTTP_CLIENT_KEEPALIVE_MSECS'],
+      maxSockets: process.env['CONFIG_HTTP_CLIENT_MAX_SOCKETS'],
+      maxTotalSockets: process.env['CONFIG_HTTP_CLIENT_MAX_SOCKETS_TOTAL'],
+      maxFreeSockets: process.env['CONFIG_HTTP_CLIENT_MAX_SOCKETS_FREE'],
+      rejectUnauthorized: process.env['CONFIG_HTTP_CLIENT_REJECT_UNAUTHORIZED'],
+      ca: process.env['CONFIG_HTTP_CLIENT_CA_PATH'],
+      cert: process.env['CONFIG_HTTP_CLIENT_CLIENT_CERT_PATH'],
+      key: process.env['CONFIG_HTTP_CLIENT_CLIENT_KEY_PATH'],
+    },
+  }
+  ```
+
+### **Health checks**
+
 Checks included in the provider:
 
 - **status**: Due to the nature of the HTTP client, the status check is not implemented. The provider is always in `running` state.
   - **observedValue**: `running`.
   - **status**: `pass`.
   - **output**: `undefined`.
+  - **componentType**: `service`.
+
+```json
+{
+  "[mdf-http-client:status]": [
+    {
+      "status": "pass",
+      "componentId": "00000000-0000-0000-0000-000000000000",
+      "observedValue": "running",
+      "componentType": "service",
+      "output": undefined,
+    },
+  ],
+}
+```
 
 ## **Environment variables**
 
