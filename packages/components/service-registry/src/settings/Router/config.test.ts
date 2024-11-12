@@ -96,6 +96,8 @@ describe('#Component #service-setup', () => {
               release: '0.0.1',
               version: '0',
               tags: ['NodeJS', 'MMS', 'API', 'APP'],
+              serviceId: 'mdf-service',
+              serviceGroupId: 'mdf-service-group',
             },
             loggerOptions: {
               console: {
@@ -176,3 +178,4 @@ describe('#Component #service-setup', () => {
   });
 });
 // #endregion
+

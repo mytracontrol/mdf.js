@@ -38,7 +38,7 @@
     "@mdf.js/socket-server-provider": "*",
     "jsonwebtoken": "^9.0.0",
     "socket.io": "^4.8.1",
-    "uuid": "^11.0.2"
+    "uuid": "^11.0.3"
   },
   "devDependencies": {
     "@mdf.js/repo-config": "*",

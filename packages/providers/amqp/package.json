@@ -38,8 +38,8 @@
     "lodash": "^4.17.21",
     "rhea": "^3.0.3",
     "rhea-promise": "^3.0.3",
-    "tslib": "^2.8.0",
-    "uuid": "^11.0.2"
+    "tslib": "^2.8.1",
+    "uuid": "^11.0.3"
   },
   "devDependencies": {
     "@mdf.js/repo-config": "*",

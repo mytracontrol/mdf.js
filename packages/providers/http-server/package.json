@@ -38,7 +38,7 @@
     "express": "^4.21.1",
     "http-terminator": "^3.2.0",
     "joi": "^17.13.3",
-    "tslib": "^2.8.0"
+    "tslib": "^2.8.1"
   },
   "devDependencies": {
     "@mdf.js/repo-config": "*",

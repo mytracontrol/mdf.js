@@ -18,17 +18,40 @@ import {
 } from '../../observability';
 import { ServiceRegistrySettings } from '../../types';
 
+/**
+ * Custom config preset selector, used to load a specific preset from the custom config folder.
+ * Default files to search for are `./config/custom/presets/*.preset.*`
+ * This preset is used for the custom config.
+ * @defaultValue undefined
+ */
+const CONFIG_CUSTOM_PRESET = process.env['CONFIG_CUSTOM_PRESET'];
+/**
+ * Service registry preset selector, used to load a specific preset from the service registry config folder.
+ * Default files to search for are `./config/presets/*.preset.*`
+ * This preset is used for the service registry config.
+ * @defaultValue undefined
+ */
+const CONFIG_SERVICE_REGISTRY_PRESET = process.env['CONFIG_SERVICE_REGISTRY_PRESET'];
+
+/**
+ * Application name
+ * @defaultValue 'mdf-app'
+ */
+const CONFIG_APP_NAME = process.env['CONFIG_APP_NAME'];
+
 /** Health service name */
 export const CONFIG_SERVICE_NAME = 'settings';
 
 /** Default application metadata */
 export const DEFAULT_APP_METADATA: Layer.App.Metadata = {
-  name: 'mdf-app',
+  name: CONFIG_APP_NAME ?? 'mdf-app',
   release: '0.0.0',
   version: '0',
   description: undefined,
   // This is a placeholder, the actual value will be set by the service registry
   instanceId: '00000000-0000-0000-0000-000000000000',
+  serviceId: 'mdf-service',
+  serviceGroupId: 'mdf-service-group',
 };
 
 /** Default retry options for service startup */
@@ -75,7 +98,7 @@ export const DEFAULT_CUSTOM_CONFIG_LOADER_OPTIONS: Setup.Config = {
   configFiles: ['./config/custom/*.*'],
   presetFiles: ['./config/custom/presets/*.*'],
   schemaFiles: ['./config/custom/schemas/*.*'],
-  preset: process.env['CONFIG_CUSTOM_PRESET'] ?? process.env['CONFIG_SERVICE_REGISTRY_PRESET'],
+  preset: CONFIG_CUSTOM_PRESET ?? CONFIG_SERVICE_REGISTRY_PRESET,
 };
 
 /** Default service registry config loader options */
@@ -83,7 +106,7 @@ export const DEFAULT_SERVICE_REGISTRY_CONFIG_CONFIG_LOADER_OPTIONS: Setup.Config
   configFiles: ['./config/*.*'],
   presetFiles: ['./config/presets/*.*'],
   schemaFiles: ['./config/schemas/*.*'],
-  preset: process.env['CONFIG_SERVICE_REGISTRY_PRESET'],
+  preset: CONFIG_SERVICE_REGISTRY_PRESET,
 };
 
 /** Default service registry options */

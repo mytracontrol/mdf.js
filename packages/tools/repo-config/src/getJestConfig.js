@@ -25,7 +25,7 @@ function getJestConfig(modulePath) {
       ['jest-junit', { outputDirectory: `${relativeCoverageDirectory}`, outputName: `test-results.xml` }],
       ['jest-slow-test-reporter', { numTests: 8, warnOnSlowerThan: 300, color: true }],
       ['jest-html-reporter', { outputPath: `${relativeCoverageDirectory}/report.html` }],
-      ['jest-html-reporters', { publicPath: `${relativeCoverageDirectory}`, filename: 'report.html', darkTheme: true}]
+      ['jest-html-reporters', { publicPath: `${relativeCoverageDirectory}`, filename: 'test.html', darkTheme: true}]
     ],
   };
 }

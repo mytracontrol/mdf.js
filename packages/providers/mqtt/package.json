@@ -36,7 +36,7 @@
     "@mdf.js/utils": "*",
     "joi": "^17.13.3",
     "mqtt": "^5.10.1",
-    "tslib": "^2.8.0"
+    "tslib": "^2.8.1"
   },
   "devDependencies": {
     "@mdf.js/repo-config": "*"
