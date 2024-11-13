@@ -34,7 +34,9 @@
     "@mdf.js/core": "*",
     "@mdf.js/crash": "*",
     "@mdf.js/logger": "*",
-    "@mdf.js/utils": "*",
+    "@smithy/node-http-handler": "^3.2.5",
+    "http-proxy-agent": "^7.0.2",
+    "https-proxy-agent": "^7.0.5",
     "joi": "^17.13.1",
     "tslib": "^2.8.1"
   },

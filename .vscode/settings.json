@@ -77,7 +77,8 @@
     "tasks",
     "elastic-provider",
     "jsonl-archiver",
-    "file-flinger"
+    "file-flinger",
+    "s3"
   ],
 
 }
