@@ -78,7 +78,8 @@
     "elastic-provider",
     "jsonl-archiver",
     "file-flinger",
-    "s3"
+    "s3",
+    "http-client-provider"
   ],
 
 }
