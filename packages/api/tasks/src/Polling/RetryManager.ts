@@ -58,8 +58,7 @@ export class RetryManager {
   ): WellIdentifiedTaskOptions {
     const timeout = Math.min(
       options.retryOptions?.timeout ?? DEFAULT_MAX_TIMEOUT,
-      ms(this.pollingGroup) * attempts,
-      DEFAULT_MAX_TIMEOUT
+      ms(this.pollingGroup) * attempts
     );
     const waitTime = Math.min(
       options.retryOptions?.waitTime ?? this.limiterDelay,
