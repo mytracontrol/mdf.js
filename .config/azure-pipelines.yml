@@ -17,11 +17,11 @@ variables:
     value: 'mdf-js-api'
     ## Node version
   - name: nodeVersion
-    value: '20'
+    value: '22'
     ## Releases Wiki page
   - name: artifactWikiFileName
     value: '@mdf.js%2Djs-%2D-API'
-  ## GitFlow variables for branch maching
+  ## GitFlow variables for branch matching
   - template: mdf-pipelines-variables.yml
 stages:
   - stage: 'APP'
