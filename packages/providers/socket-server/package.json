@@ -37,7 +37,7 @@
     "@mdf.js/logger": "*",
     "@mdf.js/utils": "*",
     "@socket.io/admin-ui": "^0.5.1",
-    "express": "^4.21.1",
+    "express": "^4.21.2",
     "joi": "^17.13.3",
     "socket.io": "^4.8.1",
     "tslib": "^2.8.1"

@@ -34,7 +34,7 @@
     "@mdf.js/redis-provider": "*",
     "body-parser": "^1.20.2",
     "cors": "^2.8.5",
-    "express": "^4.21.1",
+    "express": "^4.21.2",
     "express-rate-limit": "7.4.1",
     "feature-policy": "^0.6.0",
     "helmet": "^8.0.0",

@@ -30,13 +30,13 @@
     "test": "jest --detectOpenHandles --config ./jest.config.js"
   },
   "dependencies": {
-    "@aws-sdk/client-s3": "^3.693.0",
+    "@aws-sdk/client-s3": "^3.712.0",
     "@mdf.js/core": "*",
     "@mdf.js/crash": "*",
     "@mdf.js/logger": "*",
-    "@smithy/node-http-handler": "^3.3.1",
+    "@smithy/node-http-handler": "^3.3.2",
     "http-proxy-agent": "^7.0.2",
-    "https-proxy-agent": "^7.0.5",
+    "https-proxy-agent": "^7.0.6",
     "joi": "^17.13.1",
     "tslib": "^2.8.1"
   },

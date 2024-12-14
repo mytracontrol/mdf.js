@@ -39,7 +39,7 @@
     "@mdf.js/service-setup-provider": "*",
     "@mdf.js/utils": "*",
     "escalade": "^3.2.0",
-    "express": "^4.21.1",
+    "express": "^4.21.2",
     "http-proxy-middleware": "^3.0.3",
     "lodash": "^4.17.21",
     "markdown-it": "^14.1.0",
