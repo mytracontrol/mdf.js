@@ -33,6 +33,10 @@
     "sort": "sort-package-json \"packages/*/*/package.json\" package.json",
     "test": "turbo run test licenses --concurrency=1"
   },
+  "resolutions": {
+    "@types/express": "4.17.21",
+    "@types/express-serve-static-core": "4.19.6"
+  },
   "devDependencies": {
     "@mdf.js/repo-config": "*",
     "@stryker-mutator/core": "^8.7.1",
@@ -75,7 +79,7 @@
     "ts-jest": "29.2.5",
     "ts-node": "10.9.2",
     "turbo": "^2.3.3",
-    "typedoc": "0.27.4",
+    "typedoc": "0.27.5",
     "typedoc-plugin-missing-exports": "^3.1.0",
     "typescript": "5.7.2"
   },
