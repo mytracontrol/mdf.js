@@ -401,7 +401,9 @@ describe('#Port #Redis', () => {
         throw error;
       });
       port.on('unhealthy', error => {
-        expect(error.message).toContain('Error parsing the Redis INFO stats: Unexpected token');
+        expect(error.message).toContain(
+          "Error parsing the Redis INFO stats: Expected ':' after property name in JSON at position 65 (line 1 column 66), please contact with the developers"
+        );
         const checks = port.checks;
         expect(checks).toEqual({
           memory: [
