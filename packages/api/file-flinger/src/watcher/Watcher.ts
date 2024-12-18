@@ -11,7 +11,7 @@ import { DebugLogger, SetContext, type LoggerInstance } from '@mdf.js/logger';
 import { deCycle } from '@mdf.js/utils';
 import { watch, type ChokidarOptions, type FSWatcher } from 'chokidar';
 import EventEmitter from 'events';
-import { existsSync, statSync } from 'fs';
+import { existsSync, Stats, statSync } from 'fs';
 import { merge } from 'lodash';
 import path from 'path';
 import {
@@ -130,7 +130,7 @@ export class Watcher extends EventEmitter implements Layer.App.Resource {
    * Event handler for the error event
    * @param rawError - The error that occurred
    */
-  private readonly onErrorEventHandler = (rawError: Error) => {
+  private readonly onErrorEventHandler = (rawError: unknown) => {
     const cause = Crash.from(rawError);
     const error = new Crash(`Watcher error: ${cause.message}`, { cause });
     this.errorStacks.push(`${error.date.toISOString()} - ${error.message}`);
@@ -148,7 +148,14 @@ export class Watcher extends EventEmitter implements Layer.App.Resource {
    * Event handler for the add event
    * @param path - The path of the file added
    */
-  private readonly onAddEventHandler = (path: string) => {
+  private readonly onAddEventHandler = (path: string | Error, stats?: Stats) => {
+    if (path instanceof Error) {
+      this.onErrorEventHandler(path);
+      return;
+    }
+    if (!stats) {
+      this.logger.silly(`Stats: ${JSON.stringify(stats, null, 2)}`);
+    }
     this.logger.debug(`File added: ${path}`);
     this.emit('add', path);
   };
@@ -156,14 +163,28 @@ export class Watcher extends EventEmitter implements Layer.App.Resource {
    * Event handler for the change event
    * @param path - The path of the file changed
    */
-  private readonly onChangEventHandler = (path: string) => {
+  private readonly onChangEventHandler = (path: string | Error, stats?: Stats) => {
+    if (path instanceof Error) {
+      this.onErrorEventHandler(path);
+      return;
+    }
+    if (!stats) {
+      this.logger.silly(`Stats: ${JSON.stringify(stats, null, 2)}`);
+    }
     this.logger.debug(`File changed: ${path}`);
   };
   /**
    * Event handler for the unlink event
    * @param path - The path of the file unlinked
    */
-  private readonly onUnlinkEventHandler = (path: string) => {
+  private readonly onUnlinkEventHandler = (path: string | Error, stats?: Stats) => {
+    if (path instanceof Error) {
+      this.onErrorEventHandler(path);
+      return;
+    }
+    if (!stats) {
+      this.logger.silly(`Stats: ${JSON.stringify(stats, null, 2)}`);
+    }
     this.logger.debug(`File unlinked: ${path}`);
   };
   /** Get the status of the watcher */
