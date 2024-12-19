@@ -46,7 +46,7 @@ export type logCreator = (logLevel: logLevel) => (entry: LogEntry) => void;
  * @defaultValue `error`
  */
 export const CONFIG_KAFKA_LOG_LEVEL: string | logLevel =
-  process.env['CONFIG_KAFKA_LOG_LEVEL'] || 'error';
+  process.env['CONFIG_KAFKA_LOG_LEVEL'] ?? 'error';
 const UUID = v4();
 
 /**
@@ -96,4 +96,3 @@ export const defaultLogCreator: logCreator = (level: logLevel) => (entry: LogEnt
   }
 };
 // #endregion
-

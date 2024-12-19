@@ -33,15 +33,15 @@
     "@mdf.js/core": "*",
     "@mdf.js/crash": "*",
     "@mdf.js/logger": "*",
-    "@mdf.js/utils": "*",
     "@mdf.js/tasks": "*",
-    "uuid": "^10.0.0",
-    "lodash": "^4.17.21"
+    "@mdf.js/utils": "*",
+    "joi": "^17.13.3",
+    "lodash": "^4.17.21",
+    "uuid": "^11.0.3"
   },
   "devDependencies": {
     "@types/debug": "^4.1.8",
-    "@types/lodash": "^4.17.7",
-    "@types/uuid": "^10.0.0"
+    "@types/lodash": "^4.17.13"
   },
   "engines": {
     "node": ">=16.14.2"

@@ -1,0 +1,300 @@
+<!DOCTYPE html><html class="default" lang="en" data-base=".."><head><meta charset="utf-8"/><meta http-equiv="x-ua-compatible" content="IE=edge"/><title>@mdf.js/file-flinger | @mdf.js</title><meta name="description" content="Documentation for @mdf.js"/><meta name="viewport" content="width=device-width, initial-scale=1"/><link rel="stylesheet" href="../assets/style.css"/><link rel="stylesheet" href="../assets/highlight.css"/><script defer src="../assets/main.js"></script><script async src="../assets/icons.js" id="tsd-icons-script"></script><script async src="../assets/search.js" id="tsd-search-script"></script><script async src="../assets/navigation.js" id="tsd-nav-script"></script><script async src="../assets/hierarchy.js" id="tsd-hierarchy-script"></script></head><body><script>document.documentElement.dataset.theme = localStorage.getItem("tsd-theme") || "os";document.body.style.display="none";setTimeout(() => app?app.showPage():document.body.style.removeProperty("display"),500)</script><header class="tsd-page-toolbar"><div class="tsd-toolbar-contents container"><div class="table-cell" id="tsd-search"><div class="field"><label for="tsd-search-field" class="tsd-widget tsd-toolbar-icon search no-caption"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><use href="../assets/icons.svg#icon-search"></use></svg></label><input type="text" id="tsd-search-field" aria-label="Search"/></div><div class="field"><div id="tsd-toolbar-links"></div></div><ul class="results"><li class="state loading">Preparing search index...</li><li class="state failure">The search index is not available</li></ul><a href="../index.html" class="title">@mdf.js</a></div><div class="table-cell" id="tsd-widgets"><a href="#" class="tsd-widget tsd-toolbar-icon menu no-caption" data-toggle="menu" aria-label="Menu"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><use href="../assets/icons.svg#icon-menu"></use></svg></a></div></div></header><div class="container container-main"><div class="col-content"><div class="tsd-page-title"><ul class="tsd-breadcrumb"><li><a href="../modules.html">@mdf.js</a></li><li><a href="_mdf.js_file-flinger.html">@mdf.js/file-flinger</a></li></ul><h1>Module @mdf.js/file-flinger</h1></div><section class="tsd-panel tsd-typography"><a id="mdfjsfile-flinger" class="tsd-anchor"></a><h1 class="tsd-anchor-link"><strong>@mdf.js/file-flinger</strong><a href="#mdfjsfile-flinger" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h1><p><a href="https://nodejs.org/en/"><img src="https://img.shields.io/static/v1?style=flat&amp;logo=node.js&amp;logoColor=green&amp;label=node&amp;message=%3E=20&amp;color=blue" alt="Node Version"></a>
+<a href="https://www.typescriptlang.org/"><img src="https://img.shields.io/static/v1?style=flat&amp;logo=typescript&amp;label=Typescript&amp;message=5.4&amp;color=blue" alt="Typescript Version"></a>
+<a href="https://snyk.io/package/npm/snyk"><img src="https://img.shields.io/static/v1?style=flat&amp;logo=snyk&amp;label=Vulnerabilities&amp;message=0&amp;color=300A98F" alt="Known Vulnerabilities"></a>
+<a href="https://mytracontrol.github.io/mdf.js/"><img src="https://img.shields.io/static/v1?style=flat&amp;logo=markdown&amp;label=Documentation&amp;message=API&amp;color=blue" alt="Documentation"></a></p>
+<!-- markdownlint-disable MD033 MD041 -->
+<p align="center">
+  <div style="text-align:center;background-image:radial-gradient(circle farthest-corner at 50% 50%, #104c60, #0c0c13);">
+    <img src="https://assets.website-files.com/626a3ef32d23835d9b2e4532/6290ab1e2d3e0d922913a6e3_digitalizacion_ENG.svg" alt="netin" width="500">
+  </div>
+</p>
+<h1 style="text-align:center;margin-bottom:0">Mytra Development Framework - @mdf.js/file-flinger</h1>
+<h5 style="text-align:center;margin-top:0">Module designed to facilitate data file processing for cold path ingestion</h5>
+<!-- markdownlint-enable MD033 -->
+<hr>
+<a id="table-of-contents" class="tsd-anchor"></a><h2 class="tsd-anchor-link"><strong>Table of contents</strong><a href="#table-of-contents" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h2><ul>
+<li><a href="#mdfjsfile-flinger"><strong>@mdf.js/file-flinger</strong></a>
+<ul>
+<li><a href="#table-of-contents"><strong>Table of contents</strong></a></li>
+<li><a href="#introduction"><strong>Introduction</strong></a></li>
+<li><a href="#installation"><strong>Installation</strong></a></li>
+<li><a href="#use"><strong>Use</strong></a>
+<ul>
+<li><a href="#creating-a-pusher"><strong>Creating a Pusher</strong></a></li>
+<li><a href="#event-handling"><strong>Event Handling</strong></a></li>
+<li><a href="#fileflinger-configuration-and-lifecycle"><strong>FileFlinger Configuration and Lifecycle</strong></a></li>
+<li><a href="#metrics-and-health-checks"><strong>Metrics and Health Checks</strong></a></li>
+<li><a href="#keygen-detailed-explanation-of-key-generation"><strong>Keygen: Detailed Explanation of Key Generation</strong></a>
+<ul>
+<li><a href="#overview"><strong>Overview</strong></a></li>
+<li><a href="#placeholders"><strong>Placeholders</strong></a>
+<ul>
+<li><a href="#predefined-placeholders"><strong>Predefined Placeholders</strong></a></li>
+<li><a href="#custom-placeholders"><strong>Custom Placeholders</strong></a></li>
+</ul>
+</li>
+<li><a href="#keygen-options"><strong>Keygen Options</strong></a></li>
+<li><a href="#examples"><strong>Examples</strong></a>
+<ul>
+<li><a href="#example-1-default-behavior"><strong>Example 1: Default Behavior</strong></a></li>
+<li><a href="#example-2-custom-file-and-key-patterns"><strong>Example 2: Custom File and Key Patterns</strong></a></li>
+<li><a href="#example-3-applying-default-values"><strong>Example 3: Applying Default Values</strong></a></li>
+<li><a href="#example-4-using-date-placeholders"><strong>Example 4: Using Date Placeholders</strong></a></li>
+<li><a href="#example-5-advanced-customization"><strong>Example 5: Advanced Customization</strong></a></li>
+</ul>
+</li>
+<li><a href="#error-handling"><strong>Error Handling</strong></a></li>
+<li><a href="#tips-and-best-practices"><strong>Tips and Best Practices</strong></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#license"><strong>License</strong></a></li>
+</ul>
+</li>
+</ul>
+<a id="introduction" class="tsd-anchor"></a><h2 class="tsd-anchor-link"><strong>Introduction</strong><a href="#introduction" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h2><p><strong>@mdf.js/file-flinger</strong> is a robust module within the <code>@mdf.js</code> ecosystem, designed to facilitate customized data file processing workflows for cold path ingestion. It provides a versatile framework for constructing file processing pipelines, enabling developers to define custom pushers to deliver data files to various destinations.</p>
+<p>Before delving into the documentation, it is essential to understand the core concepts within <code>@mdf.js/file-flinger</code>:</p>
+<ul>
+<li><strong>Keygen</strong>: A key generation utility that creates unique identifiers for processed files based on customizable patterns. This feature is crucial for tracking and managing data files across the platform by generating consistent and meaningful identifiers.</li>
+<li><strong>Pusher</strong>: A pusher is a component that sends processed files to a specific destination. Developers can create custom pushers to integrate with various data storage solutions, such as databases, cloud storage, or data lakes. The file-flinger module supports multiple pushers, allowing users to define different destinations for processed files concurrently.</li>
+<li><strong>Watcher</strong>: The watcher module monitors directories for incoming files and triggers processing workflows when new files are detected. It plays a pivotal role in automating data ingestion tasks by initiating processing as soon as new data arrives.</li>
+<li><strong>Post-processing tasks</strong>: After processing a file, it is possible to execute a set of tasks to clean up the file system, move files to another location, archive them, or perform other operations. This post-processing can be different for completed and failed files, providing flexibility in handling different outcomes.</li>
+</ul>
+<a id="installation" class="tsd-anchor"></a><h2 class="tsd-anchor-link"><strong>Installation</strong><a href="#installation" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h2><ul>
+<li>
+<p><strong>npm</strong>:</p>
+<pre><code class="bash"><span class="hl-0">npm</span><span class="hl-1"> </span><span class="hl-2">install</span><span class="hl-1"> </span><span class="hl-2">@mdf.js/file-flinger</span>
+</code><button type="button">Copy</button></pre>
+
+</li>
+<li>
+<p><strong>yarn</strong>:</p>
+<pre><code class="bash"><span class="hl-0">yarn</span><span class="hl-1"> </span><span class="hl-2">add</span><span class="hl-1"> </span><span class="hl-2">@mdf.js/file-flinger</span>
+</code><button type="button">Copy</button></pre>
+
+</li>
+</ul>
+<a id="use" class="tsd-anchor"></a><h2 class="tsd-anchor-link"><strong>Use</strong><a href="#use" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h2><a id="creating-a-pusher" class="tsd-anchor"></a><h3 class="tsd-anchor-link"><strong>Creating a Pusher</strong><a href="#creating-a-pusher" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3><p>To build a file processing workflow, you need to create custom pushers that send processed files to specific destinations. A pusher is responsible for delivering files to storage systems like databases, cloud storage, or data lakes.</p>
+<p>To create a pusher, you need to define a class that implements the <code>Pusher</code> interface. This interface extends <code>Layer.App.Resource</code>, which provides methods and properties for managing the resource lifecycle and health status.</p>
+<p>When implementing a pusher, you should ensure the following:</p>
+<ul>
+<li><strong>Lifecycle Methods</strong>: Implement <code>start()</code>, <code>stop()</code>, and <code>close()</code> methods to manage the pusher's lifecycle.</li>
+<li><strong>Push Method</strong>: Implement the <code>push(filePath: string, key: string)</code> method, which handles the logic to send the file to the destination using the provided file path and key.</li>
+<li><strong>Metrics</strong>: Provide a <code>metrics</code> getter that returns a Prometheus <code>Registry</code> containing the pusher's metrics.</li>
+<li><strong>Health Status</strong>: Provide <code>status</code> and <code>checks</code> getters that return the pusher's health status and checks, which are crucial for monitoring the pusher's health.</li>
+</ul>
+<p>If you are using the <code>@mdf.js</code> framework to create your pusher, you can integrate the pusher's health information with the provider's health information.</p>
+<p>Here is an example of a custom pusher class:</p>
+<pre><code class="typescript"><span class="hl-3">import</span><span class="hl-1"> { </span><span class="hl-4">EventEmitter</span><span class="hl-1"> } </span><span class="hl-3">from</span><span class="hl-1"> </span><span class="hl-2">&#39;events&#39;</span><span class="hl-1">;</span><br/><span class="hl-3">import</span><span class="hl-1"> { </span><span class="hl-4">Pusher</span><span class="hl-1"> } </span><span class="hl-3">from</span><span class="hl-1"> </span><span class="hl-2">&#39;@mdf.js/file-flinger&#39;</span><span class="hl-1">;</span><br/><span class="hl-3">import</span><span class="hl-1"> { </span><span class="hl-4">Registry</span><span class="hl-1"> } </span><span class="hl-3">from</span><span class="hl-1"> </span><span class="hl-2">&#39;prom-client&#39;</span><span class="hl-1">;</span><br/><span class="hl-3">import</span><span class="hl-1"> { </span><span class="hl-4">Health</span><span class="hl-1"> } </span><span class="hl-3">from</span><span class="hl-1"> </span><span class="hl-2">&#39;@mdf.js/core&#39;</span><span class="hl-1">;</span><br/><br/><span class="hl-7">// Class that implements the Pusher interface</span><br/><span class="hl-5">class</span><span class="hl-1"> </span><span class="hl-12">MyCustomPusher</span><span class="hl-1"> </span><span class="hl-5">extends</span><span class="hl-1"> </span><span class="hl-12">EventEmitter</span><span class="hl-1"> </span><span class="hl-5">implements</span><span class="hl-1"> </span><span class="hl-12">Pusher</span><span class="hl-1"> {</span><br/><span class="hl-1">  </span><span class="hl-7">/** Constructor */</span><br/><span class="hl-1">  </span><span class="hl-5">constructor</span><span class="hl-1">() {</span><br/><span class="hl-1">    </span><span class="hl-5">super</span><span class="hl-1">();</span><br/><span class="hl-1">  }</span><br/><br/><span class="hl-1">  </span><span class="hl-7">/**</span><br/><span class="hl-7">   * Push the file to the storage</span><br/><span class="hl-7">   * </span><span class="hl-5">@param</span><span class="hl-7"> </span><span class="hl-4">filePath</span><span class="hl-7"> - The file path to push</span><br/><span class="hl-7">   * </span><span class="hl-5">@param</span><span class="hl-7"> </span><span class="hl-4">key</span><span class="hl-7"> - The key to use</span><br/><span class="hl-7">   */</span><br/><span class="hl-1">  </span><span class="hl-5">public</span><span class="hl-1"> </span><span class="hl-5">async</span><span class="hl-1"> </span><span class="hl-0">push</span><span class="hl-1">(</span><span class="hl-4">filePath</span><span class="hl-1">: </span><span class="hl-12">string</span><span class="hl-1">, </span><span class="hl-4">key</span><span class="hl-1">: </span><span class="hl-12">string</span><span class="hl-1">): </span><span class="hl-12">Promise</span><span class="hl-1">&lt;</span><span class="hl-12">void</span><span class="hl-1">&gt; {</span><br/><span class="hl-1">    </span><span class="hl-7">// Implementation of file pushing logic</span><br/><span class="hl-1">  }</span><br/><br/><span class="hl-1">  </span><span class="hl-7">/** Start the pusher and the underlying provider */</span><br/><span class="hl-1">  </span><span class="hl-5">public</span><span class="hl-1"> </span><span class="hl-5">async</span><span class="hl-1"> </span><span class="hl-0">start</span><span class="hl-1">(): </span><span class="hl-12">Promise</span><span class="hl-1">&lt;</span><span class="hl-12">void</span><span class="hl-1">&gt; {</span><br/><span class="hl-1">    </span><span class="hl-7">// Initialization logic</span><br/><span class="hl-1">  }</span><br/><br/><span class="hl-1">  </span><span class="hl-7">/** Stop the pusher and the underlying provider */</span><br/><span class="hl-1">  </span><span class="hl-5">public</span><span class="hl-1"> </span><span class="hl-5">async</span><span class="hl-1"> </span><span class="hl-0">stop</span><span class="hl-1">(): </span><span class="hl-12">Promise</span><span class="hl-1">&lt;</span><span class="hl-12">void</span><span class="hl-1">&gt; {</span><br/><span class="hl-1">    </span><span class="hl-7">// Graceful shutdown logic</span><br/><span class="hl-1">  }</span><br/><br/><span class="hl-1">  </span><span class="hl-7">/** Stop the pusher and the underlying provider and clean the resources */</span><br/><span class="hl-1">  </span><span class="hl-5">public</span><span class="hl-1"> </span><span class="hl-5">async</span><span class="hl-1"> </span><span class="hl-0">close</span><span class="hl-1">(): </span><span class="hl-12">Promise</span><span class="hl-1">&lt;</span><span class="hl-12">void</span><span class="hl-1">&gt; {</span><br/><span class="hl-1">    </span><span class="hl-7">// Cleanup logic</span><br/><span class="hl-1">  }</span><br/><br/><span class="hl-1">  </span><span class="hl-7">/** Prometheus registry to store the metrics of the pusher */</span><br/><span class="hl-1">  </span><span class="hl-5">public</span><span class="hl-1"> </span><span class="hl-5">get</span><span class="hl-1"> </span><span class="hl-0">metrics</span><span class="hl-1">(): </span><span class="hl-12">Registry</span><span class="hl-1"> {</span><br/><span class="hl-1">    </span><span class="hl-7">// Return Prometheus registry with pusher metrics</span><br/><span class="hl-1">    </span><span class="hl-3">return</span><span class="hl-1"> </span><span class="hl-5">new</span><span class="hl-1"> </span><span class="hl-0">Registry</span><span class="hl-1">();</span><br/><span class="hl-1">  }</span><br/><br/><span class="hl-1">  </span><span class="hl-7">/** Pusher health status */</span><br/><span class="hl-1">  </span><span class="hl-5">public</span><span class="hl-1"> </span><span class="hl-5">get</span><span class="hl-1"> </span><span class="hl-0">status</span><span class="hl-1">(): </span><span class="hl-12">Health</span><span class="hl-1">.</span><span class="hl-12">Status</span><span class="hl-1"> {</span><br/><span class="hl-1">    </span><span class="hl-7">// Return health status</span><br/><span class="hl-1">    </span><span class="hl-3">return</span><span class="hl-1"> </span><span class="hl-2">&#39;pass&#39;</span><span class="hl-1">;</span><br/><span class="hl-1">  }</span><br/><br/><span class="hl-1">  </span><span class="hl-7">/** Pusher health checks */</span><br/><span class="hl-1">  </span><span class="hl-5">public</span><span class="hl-1"> </span><span class="hl-5">get</span><span class="hl-1"> </span><span class="hl-0">checks</span><span class="hl-1">(): </span><span class="hl-12">Health</span><span class="hl-1">.</span><span class="hl-12">Checks</span><span class="hl-1"> {</span><br/><span class="hl-1">    </span><span class="hl-7">// Return object with health checks</span><br/><span class="hl-1">    </span><span class="hl-3">return</span><span class="hl-1"> {};</span><br/><span class="hl-1">  }</span><br/><span class="hl-1">}</span>
+</code><button type="button">Copy</button></pre>
+
+<a id="event-handling" class="tsd-anchor"></a><h3 class="tsd-anchor-link"><strong>Event Handling</strong><a href="#event-handling" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3><p>The <code>FileFlinger</code> class extends <code>EventEmitter</code> and emits several events that you can listen to:</p>
+<ul>
+<li>
+<p><code>error</code>: Emitted when the component detects an error.</p>
+<pre><code class="typescript"><span class="hl-4">fileFlinger</span><span class="hl-1">.</span><span class="hl-0">on</span><span class="hl-1">(</span><span class="hl-2">&#39;error&#39;</span><span class="hl-1">, (</span><span class="hl-4">error</span><span class="hl-1">) </span><span class="hl-5">=&gt;</span><span class="hl-1"> {</span><br/><span class="hl-1">  </span><span class="hl-4">console</span><span class="hl-1">.</span><span class="hl-0">error</span><span class="hl-1">(</span><span class="hl-2">&#39;An error occurred:&#39;</span><span class="hl-1">, </span><span class="hl-4">error</span><span class="hl-1">);</span><br/><span class="hl-1">});</span>
+</code><button type="button">Copy</button></pre>
+
+</li>
+<li>
+<p><code>status</code>: Emitted when the component's status changes.</p>
+<pre><code class="typescript"><span class="hl-4">fileFlinger</span><span class="hl-1">.</span><span class="hl-0">on</span><span class="hl-1">(</span><span class="hl-2">&#39;status&#39;</span><span class="hl-1">, (</span><span class="hl-4">status</span><span class="hl-1">) </span><span class="hl-5">=&gt;</span><span class="hl-1"> {</span><br/><span class="hl-1">  </span><span class="hl-4">console</span><span class="hl-1">.</span><span class="hl-0">log</span><span class="hl-1">(</span><span class="hl-2">&#39;FileFlinger status:&#39;</span><span class="hl-1">, </span><span class="hl-4">status</span><span class="hl-1">);</span><br/><span class="hl-1">});</span>
+</code><button type="button">Copy</button></pre>
+
+</li>
+</ul>
+<a id="fileflinger-configuration-and-lifecycle" class="tsd-anchor"></a><h3 class="tsd-anchor-link"><strong>FileFlinger Configuration and Lifecycle</strong><a href="#fileflinger-configuration-and-lifecycle" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3><p>To instantiate a <code>FileFlinger</code>, you need to provide a name and an options object that configures its behavior. The options include:</p>
+<ul>
+<li><strong><code>pushers</code></strong>: An array of pushers that will be used to send files to their destinations.</li>
+<li><strong><code>watchPath</code></strong>: The path or array of paths to monitor for incoming files.</li>
+<li><strong><code>filePattern</code></strong> (default: <code>undefined</code>): A glob pattern or custom pattern to match the files to be processed.</li>
+<li><strong><code>keyPattern</code></strong> (default: <code>{_filename}</code>): A pattern used by the key generator (<code>Keygen</code>) to create unique keys for the files.</li>
+<li><strong><code>defaultValues</code></strong> (default: <code>{}</code>): An object containing default values for placeholders used in patterns.</li>
+<li><strong><code>cwd</code></strong> (default: <code>undefined</code>): The base directory for relative paths.</li>
+<li><strong><code>maxErrors</code></strong> (default: <code>10</code>): The maximum number of errors to store in the error list.</li>
+<li><strong><code>retryDelay</code></strong> (default: <code>30000</code>): Delay in milliseconds between retries for failed file processing operations.</li>
+<li><strong><code>archiveFolder</code></strong> (default: <code>undefined</code>): The directory where processed files will be moved if the post-processing strategy is <code>archive</code> or <code>zip</code>.</li>
+<li><strong><code>deadLetterFolder</code></strong> (default: <code>undefined</code>): The directory where files with processing errors will be moved if the error strategy is <code>dead-letter</code>.</li>
+<li><strong><code>postProcessingStrategy</code></strong> (default: <code>'delete'</code>): Strategy for handling files after successful processing. Options are:
+<ul>
+<li><code>'delete'</code>: Delete the file.</li>
+<li><code>'archive'</code>: Move the file to the <code>archiveFolder</code>.</li>
+<li><code>'zip'</code>: Compress the file and move it to the <code>archiveFolder</code>.</li>
+</ul>
+</li>
+<li><strong><code>errorStrategy</code></strong> (default: <code>'delete'</code>): Strategy for handling files that encountered errors during processing. Options are:
+<ul>
+<li><code>'delete'</code>: Delete the file.</li>
+<li><code>'ignore'</code>: Leave the file as is.</li>
+<li><code>'dead-letter'</code>: Move the file to the <code>deadLetterFolder</code>.</li>
+</ul>
+</li>
+<li><strong><code>retryOptions</code></strong>: Configuration for retrying file operations. Includes:
+<ul>
+<li><strong><code>attempts</code></strong> (default: <code>3</code>): Number of retry attempts.</li>
+<li><strong><code>maxWaitTime</code></strong> (default: <code>60000</code>): Maximum total wait time in milliseconds between retries.</li>
+<li><strong><code>timeout</code></strong> (default: <code>10000</code>): Timeout in milliseconds for each retry attempt.</li>
+<li><strong><code>waitTime</code></strong> (default: <code>1000</code>): Initial wait time in milliseconds between retries, which may be increased based on a backoff strategy.</li>
+</ul>
+</li>
+</ul>
+<p>Here's how to create a <code>FileFlinger</code> instance with custom options:</p>
+<pre><code class="typescript"><span class="hl-3">import</span><span class="hl-1"> { </span><span class="hl-4">FileFlinger</span><span class="hl-1"> } </span><span class="hl-3">from</span><span class="hl-1"> </span><span class="hl-2">&#39;@mdf.js/file-flinger&#39;</span><span class="hl-1">;</span><br/><br/><span class="hl-5">const</span><span class="hl-1"> </span><span class="hl-6">fileFlinger</span><span class="hl-1"> = </span><span class="hl-5">new</span><span class="hl-1"> </span><span class="hl-0">FileFlinger</span><span class="hl-1">(</span><span class="hl-2">&#39;MyFileFlinger&#39;</span><span class="hl-1">, {</span><br/><span class="hl-1">  </span><span class="hl-4">pushers:</span><span class="hl-1"> [</span><span class="hl-7">/* Your custom pushers */</span><span class="hl-1">],</span><br/><span class="hl-1">  </span><span class="hl-4">watchPath:</span><span class="hl-1"> </span><span class="hl-2">&#39;/path/to/watch&#39;</span><span class="hl-1">,</span><br/><span class="hl-1">  </span><span class="hl-4">filePattern:</span><span class="hl-1"> </span><span class="hl-2">&#39;{sensor}_{measurement}_{date}.jsonl&#39;</span><span class="hl-1">,</span><br/><span class="hl-1">  </span><span class="hl-4">keyPattern:</span><span class="hl-1"> </span><span class="hl-2">&#39;{sensor}/{measurement}/{date}&#39;</span><span class="hl-1">,</span><br/><span class="hl-1">  </span><span class="hl-4">defaultValues:</span><span class="hl-1"> {},</span><br/><span class="hl-1">  </span><span class="hl-4">cwd:</span><span class="hl-1"> </span><span class="hl-4">process</span><span class="hl-1">.</span><span class="hl-0">cwd</span><span class="hl-1">(),</span><br/><span class="hl-1">  </span><span class="hl-4">maxErrors:</span><span class="hl-1"> </span><span class="hl-9">10</span><span class="hl-1">,</span><br/><span class="hl-1">  </span><span class="hl-4">retryDelay:</span><span class="hl-1"> </span><span class="hl-9">30000</span><span class="hl-1">,</span><br/><span class="hl-1">  </span><span class="hl-4">archiveFolder:</span><span class="hl-1"> </span><span class="hl-2">&#39;/path/to/archive&#39;</span><span class="hl-1">,</span><br/><span class="hl-1">  </span><span class="hl-4">deadLetterFolder:</span><span class="hl-1"> </span><span class="hl-2">&#39;/path/to/dead-letter&#39;</span><span class="hl-1">,</span><br/><span class="hl-1">  </span><span class="hl-4">postProcessingStrategy:</span><span class="hl-1"> </span><span class="hl-2">&#39;archive&#39;</span><span class="hl-1">,</span><br/><span class="hl-1">  </span><span class="hl-4">errorStrategy:</span><span class="hl-1"> </span><span class="hl-2">&#39;dead-letter&#39;</span><span class="hl-1">,</span><br/><span class="hl-1">  </span><span class="hl-4">retryOptions:</span><span class="hl-1"> {</span><br/><span class="hl-1">    </span><span class="hl-4">attempts:</span><span class="hl-1"> </span><span class="hl-9">3</span><span class="hl-1">,</span><br/><span class="hl-1">    </span><span class="hl-4">maxWaitTime:</span><span class="hl-1"> </span><span class="hl-9">60000</span><span class="hl-1">,</span><br/><span class="hl-1">    </span><span class="hl-4">timeout:</span><span class="hl-1"> </span><span class="hl-9">10000</span><span class="hl-1">,</span><br/><span class="hl-1">    </span><span class="hl-4">waitTime:</span><span class="hl-1"> </span><span class="hl-9">1000</span><span class="hl-1">,</span><br/><span class="hl-1">  },</span><br/><span class="hl-1">});</span>
+</code><button type="button">Copy</button></pre>
+
+<p>To manage the lifecycle of the <code>FileFlinger</code>, you can use the following methods:</p>
+<ul>
+<li><code>start(): Promise&lt;void&gt;</code>: Starts the <code>FileFlinger</code>, initializing all watchers and pushers, and begins processing files as they arrive.</li>
+<li><code>stop(): Promise&lt;void&gt;</code>: Stops the <code>FileFlinger</code>, gracefully shutting down all watchers and pushers.</li>
+<li><code>close(): Promise&lt;void&gt;</code>: Stops the <code>FileFlinger</code> and cleans up all resources, including closing any open file handles or network connections.</li>
+</ul>
+<p>Example:</p>
+<pre><code class="typescript"><span class="hl-7">// Start the FileFlinger</span><br/><span class="hl-3">await</span><span class="hl-1"> </span><span class="hl-4">fileFlinger</span><span class="hl-1">.</span><span class="hl-0">start</span><span class="hl-1">();</span><br/><br/><span class="hl-7">// The FileFlinger is now monitoring for files and processing them.</span><br/><br/><span class="hl-7">// When you need to stop the FileFlinger</span><br/><span class="hl-3">await</span><span class="hl-1"> </span><span class="hl-4">fileFlinger</span><span class="hl-1">.</span><span class="hl-0">stop</span><span class="hl-1">();</span><br/><br/><span class="hl-7">// If you want to completely close and clean up resources</span><br/><span class="hl-3">await</span><span class="hl-1"> </span><span class="hl-4">fileFlinger</span><span class="hl-1">.</span><span class="hl-0">close</span><span class="hl-1">();</span>
+</code><button type="button">Copy</button></pre>
+
+<a id="metrics-and-health-checks" class="tsd-anchor"></a><h3 class="tsd-anchor-link"><strong>Metrics and Health Checks</strong><a href="#metrics-and-health-checks" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3><p>The <code>FileFlinger</code> class includes a Prometheus <code>Registry</code> to store metrics related to the file processing pipeline. These metrics can be used to monitor the performance and health of the system.</p>
+<p>Default metrics included in the <code>FileFlinger</code> are:</p>
+<ul>
+<li><code>api_all_job_processed_total</code>: The total number of jobs processed, labeled by <code>type</code>.</li>
+<li><code>api_all_errors_job_processing_total</code>: The total number of errors encountered during job processing, labeled by <code>type</code>.</li>
+<li><code>api_all_job_in_processing_total</code>: The number of jobs currently being processed, labeled by <code>type</code>.</li>
+<li><code>api_publishing_job_duration_milliseconds</code>: The duration of file processing jobs in milliseconds, labeled by <code>type</code>.</li>
+</ul>
+<p>The <code>type</code> label typically represents the key generated for the file, allowing you to categorize metrics by file type or other meaningful identifiers.</p>
+<p>Pushers should also provide metrics and health information. They should implement the <code>metrics</code>, <code>status</code>, and <code>checks</code> properties:</p>
+<ul>
+<li><strong><code>metrics</code></strong>: Returns a Prometheus <code>Registry</code> with the pusher's metrics.</li>
+<li><strong><code>status</code></strong>: Returns the health status of the pusher (<code>'pass'</code> or <code>'fail'</code>).</li>
+<li><strong><code>checks</code></strong>: Returns an object containing detailed health checks for the pusher.</li>
+</ul>
+<p>You can access the <code>FileFlinger</code>'s metrics and health information:</p>
+<pre><code class="typescript"><span class="hl-7">// Access metrics</span><br/><span class="hl-5">const</span><span class="hl-1"> </span><span class="hl-6">metricsRegistry</span><span class="hl-1"> = </span><span class="hl-4">fileFlinger</span><span class="hl-1">.</span><span class="hl-4">metrics</span><span class="hl-1">;</span><br/><br/><span class="hl-7">// Access health status and checks</span><br/><span class="hl-5">const</span><span class="hl-1"> </span><span class="hl-6">fileFlingerStatus</span><span class="hl-1"> = </span><span class="hl-4">fileFlinger</span><span class="hl-1">.</span><span class="hl-4">status</span><span class="hl-1">;</span><br/><span class="hl-5">const</span><span class="hl-1"> </span><span class="hl-6">fileFlingerChecks</span><span class="hl-1"> = </span><span class="hl-4">fileFlinger</span><span class="hl-1">.</span><span class="hl-4">checks</span><span class="hl-1">;</span>
+</code><button type="button">Copy</button></pre>
+
+<a id="keygen-detailed-explanation-of-key-generation" class="tsd-anchor"></a><h3 class="tsd-anchor-link"><strong>Keygen: Detailed Explanation of Key Generation</strong><a href="#keygen-detailed-explanation-of-key-generation" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3><p>The <code>Keygen</code> utility is responsible for generating unique and meaningful identifiers (keys) for processed files. These keys are used to identify and track files within the system and are crucial for organizing data in storage destinations.</p>
+<a id="overview" class="tsd-anchor"></a><h4 class="tsd-anchor-link"><strong>Overview</strong><a href="#overview" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><p>The key generation process involves:</p>
+<ol>
+<li><strong>Parsing the File Name</strong>: Extract placeholders from the file name using a specified <code>filePattern</code>.</li>
+<li><strong>Generating Predefined Placeholders</strong>: Create a set of predefined placeholders based on the current date and time.</li>
+<li><strong>Merging Placeholders</strong>: Combine default values, parsed placeholders, and predefined placeholders into a single set.</li>
+<li><strong>Generating the Key</strong>: Replace placeholders in the <code>keyPattern</code> with actual values from the merged placeholders to produce the final key.</li>
+</ol>
+<a id="placeholders" class="tsd-anchor"></a><h4 class="tsd-anchor-link"><strong>Placeholders</strong><a href="#placeholders" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><p>Placeholders are enclosed in curly braces <code>{}</code> and are used in both the <code>filePattern</code> and <code>keyPattern</code>. They are replaced with actual values during key generation.</p>
+<a id="predefined-placeholders" class="tsd-anchor"></a><h5 class="tsd-anchor-link"><strong>Predefined Placeholders</strong><a href="#predefined-placeholders" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h5><p>The following placeholders are available by default:</p>
+<ul>
+<li><code>{_filename}</code>: The base name of the file without its extension.</li>
+<li><code>{_extension}</code>: The file extension (including the dot), e.g., <code>.jsonl</code>.</li>
+<li><code>{_timestamp}</code>: The current timestamp in milliseconds since the Unix epoch.</li>
+<li><code>{_date}</code>: The current date in <code>YYYY-MM-DD</code> format.</li>
+<li><code>{_time}</code>: The current time in <code>HH:mm:ss</code> format.</li>
+<li><code>{_datetime}</code>: The current date and time in <code>YYYY-MM-DD_HH-mm-ss</code> format.</li>
+<li><code>{_year}</code>: The current year as a four-digit number.</li>
+<li><code>{_month}</code>: The current month as a two-digit number (01-12).</li>
+<li><code>{_day}</code>: The current day of the month as a two-digit number (01-31).</li>
+<li><code>{_hour}</code>: The current hour as a two-digit number (00-23).</li>
+<li><code>{_minute}</code>: The current minute as a two-digit number (00-59).</li>
+<li><code>{_second}</code>: The current second as a two-digit number (00-59).</li>
+</ul>
+<a id="custom-placeholders" class="tsd-anchor"></a><h5 class="tsd-anchor-link"><strong>Custom Placeholders</strong><a href="#custom-placeholders" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h5><p>You can define custom placeholders by specifying them in the <code>filePattern</code>. These placeholders extract corresponding values from the file name.</p>
+<p><strong>Example</strong>:</p>
+<ul>
+<li><strong>File Name</strong>: <code>sensor1_temperature_2023-10-24.jsonl</code></li>
+<li><strong>File Pattern</strong>: <code>{sensor}_{measurement}_{date}.jsonl</code></li>
+<li><strong>Extracted Placeholders</strong>: <code>sensor</code>, <code>measurement</code>, <code>date</code></li>
+</ul>
+<a id="keygen-options" class="tsd-anchor"></a><h4 class="tsd-anchor-link"><strong>Keygen Options</strong><a href="#keygen-options" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><p>The <code>Keygen</code> class accepts an <code>options</code> object to customize its behavior:</p>
+<ul>
+<li><strong><code>filePattern</code></strong>: A pattern used to parse the file name and extract placeholders.</li>
+<li><strong><code>keyPattern</code></strong>: A pattern used to generate the key by replacing placeholders with actual values.</li>
+<li><strong><code>defaultValues</code></strong>: An object containing default values for placeholders that may not be present in the file name.</li>
+</ul>
+<p><strong>Default Options</strong>:</p>
+<pre><code class="typescript"><span class="hl-5">const</span><span class="hl-1"> </span><span class="hl-6">DEFAULT_KEY_GEN_OPTIONS</span><span class="hl-1">: </span><span class="hl-12">Required</span><span class="hl-1">&lt;</span><span class="hl-12">KeygenOptions</span><span class="hl-1">&gt; = {</span><br/><span class="hl-1">  </span><span class="hl-4">filePattern:</span><span class="hl-1"> </span><span class="hl-2">&#39;*&#39;</span><span class="hl-1">,              </span><span class="hl-7">// Matches any file name</span><br/><span class="hl-1">  </span><span class="hl-4">keyPattern:</span><span class="hl-1"> </span><span class="hl-2">&#39;{_filename}&#39;</span><span class="hl-1">,     </span><span class="hl-7">// Uses the file name without extension as the key</span><br/><span class="hl-1">  </span><span class="hl-4">defaultValues:</span><span class="hl-1"> {},             </span><span class="hl-7">// No default values provided</span><br/><span class="hl-1">};</span>
+</code><button type="button">Copy</button></pre>
+
+<a id="examples" class="tsd-anchor"></a><h4 class="tsd-anchor-link"><strong>Examples</strong><a href="#examples" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><a id="example-1-default-behavior" class="tsd-anchor"></a><h5 class="tsd-anchor-link"><strong>Example 1: Default Behavior</strong><a href="#example-1-default-behavior" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h5><p><strong>Description</strong>: Generate a key using default settings.</p>
+<pre><code class="yaml"><span class="hl-7"># filePattern: undefined</span><br/><span class="hl-13">keyPattern</span><span class="hl-1">: </span><span class="hl-14">&#39;{_filename}&#39;</span><br/><span class="hl-7"># defaultValues: {}</span>
+</code><button type="button">Copy</button></pre>
+
+<ul>
+<li><strong>Filename</strong>: <code>myfile.txt</code></li>
+<li><strong>Key</strong>: <code>myfile</code></li>
+</ul>
+<p><strong>Explanation</strong>:</p>
+<ul>
+<li>Since <code>filePattern</code> is <code>undefined</code>, any file name matches.</li>
+<li>The <code>keyPattern</code> <code>{_filename}</code> uses the file name without the extension.</li>
+<li>The key generated is <code>'myfile'</code>.</li>
+</ul>
+<a id="example-2-custom-file-and-key-patterns" class="tsd-anchor"></a><h5 class="tsd-anchor-link"><strong>Example 2: Custom File and Key Patterns</strong><a href="#example-2-custom-file-and-key-patterns" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h5><p><strong>Description</strong>: Generate a key by extracting custom placeholders from the file name.</p>
+<pre><code class="yaml"><span class="hl-13">filePattern</span><span class="hl-1">: </span><span class="hl-14">&#39;{sensor}_{measurement}_{date}.jsonl&#39;</span><br/><span class="hl-13">keyPattern</span><span class="hl-1">: </span><span class="hl-14">&#39;{sensor}/{measurement}/{date}&#39;</span><br/><span class="hl-7"># defaultValues: {}</span>
+</code><button type="button">Copy</button></pre>
+
+<ul>
+<li><strong>Filename</strong>: <code>sensor1_temperature_2023-10-24.jsonl</code></li>
+<li><strong>Key</strong>: <code>sensor1/temperature/2023-10-24</code></li>
+</ul>
+<p><strong>Explanation</strong>:</p>
+<ul>
+<li>The <code>filePattern</code> extracts <code>sensor</code>, <code>measurement</code>, and <code>date</code> from the file name.</li>
+<li>The <code>keyPattern</code> constructs the key using these placeholders.</li>
+</ul>
+<a id="example-3-applying-default-values" class="tsd-anchor"></a><h5 class="tsd-anchor-link"><strong>Example 3: Applying Default Values</strong><a href="#example-3-applying-default-values" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h5><p><strong>Description</strong>: Use default values for placeholders not present in the file name.</p>
+<pre><code class="yaml"><span class="hl-13">filePattern</span><span class="hl-1">: </span><span class="hl-14">&#39;{sensor}_{measurement}_{date}.jsonl&#39;</span><br/><span class="hl-13">keyPattern</span><span class="hl-1">: </span><span class="hl-14">&#39;{sensor}/{measurement}/{date}/{location}&#39;</span><br/><span class="hl-13">defaultValues</span><span class="hl-1">:</span><br/><span class="hl-1">  </span><span class="hl-13">location</span><span class="hl-1">: </span><span class="hl-14">&#39;defaultLocation&#39;</span>
+</code><button type="button">Copy</button></pre>
+
+<ul>
+<li><strong>Filename</strong>: <code>sensor1_temperature_2023-10-24.jsonl</code></li>
+<li><strong>Key</strong>: <code>sensor1/temperature/2023-10-24/defaultLocation</code></li>
+</ul>
+<p><strong>Explanation</strong>:</p>
+<ul>
+<li>The <code>location</code> placeholder is not present in the file name.</li>
+<li>The <code>defaultValues</code> provide a value for <code>location</code>.</li>
+</ul>
+<a id="example-4-using-date-placeholders" class="tsd-anchor"></a><h5 class="tsd-anchor-link"><strong>Example 4: Using Date Placeholders</strong><a href="#example-4-using-date-placeholders" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h5><p><strong>Description</strong>: Generate a key that includes current date components.</p>
+<pre><code class="yaml"><span class="hl-13">filePattern</span><span class="hl-1">: </span><span class="hl-14">&#39;{sensor}_{measurement}.jsonl&#39;</span><br/><span class="hl-13">keyPattern</span><span class="hl-1">: </span><span class="hl-14">&#39;{sensor}/{measurement}/{_year}/{_month}/{_day}&#39;</span><br/><span class="hl-7"># defaultValues: {}</span>
+</code><button type="button">Copy</button></pre>
+
+<ul>
+<li><strong>Filename</strong>: <code>sensor1_temperature.jsonl</code></li>
+<li><strong>Key</strong>: <code>sensor1/temperature/2024/11/03</code></li>
+</ul>
+<p><strong>Explanation</strong>:</p>
+<ul>
+<li>The placeholders <code>{_year}</code>, <code>{_month}</code>, <code>{_day}</code> are replaced with the current date components.</li>
+</ul>
+<a id="example-5-advanced-customization" class="tsd-anchor"></a><h5 class="tsd-anchor-link"><strong>Example 5: Advanced Customization</strong><a href="#example-5-advanced-customization" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h5><p><strong>Description</strong>: Generate a key using complex file patterns and default values.</p>
+<pre><code class="yaml"><span class="hl-13">filePattern</span><span class="hl-1">: </span><span class="hl-14">&#39;{sensor}_{measurement}_{year}-{month}-{day}_{end}.jsonl&#39;</span><br/><span class="hl-13">keyPattern</span><span class="hl-1">: </span><span class="hl-14">&#39;{sensor}/{measurement}/{year}/{month}/{day}/data_{source}&#39;</span><br/><span class="hl-13">defaultValues</span><span class="hl-1">:</span><br/><span class="hl-1">  </span><span class="hl-13">source</span><span class="hl-1">: </span><span class="hl-14">&#39;myFileFlinger1&#39;</span>
+</code><button type="button">Copy</button></pre>
+
+<ul>
+<li><strong>Filename</strong>: <code>mySensor_flowMeter1_2024-12-30_2024-12-31.jsonl</code></li>
+<li><strong>Key</strong>: <code>mySensor/flowMeter1/2024/12/30/data_myFileFlinger1</code></li>
+</ul>
+<p><strong>Explanation</strong>:</p>
+<ul>
+<li>Custom placeholders <code>sensor</code>, <code>measurement</code>, <code>year</code>, <code>month</code>, <code>day</code>, and <code>end</code> are extracted from the file name.</li>
+<li>The <code>source</code> placeholder is provided via <code>defaultValues</code>.</li>
+</ul>
+<a id="error-handling" class="tsd-anchor"></a><h4 class="tsd-anchor-link"><strong>Error Handling</strong><a href="#error-handling" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><p>During key generation, some errors can occur. These errors are emitted as <code>error</code> events and can be handled by listening to the <code>FileFlinger</code>'s <code>error</code> event.</p>
+<ul>
+<li>
+<p><strong>Filename Does Not Match Pattern</strong>: If the file name does not match the <code>filePattern</code>, an error is emitted.</p>
+<p><strong>Error Message</strong>: <code>'Filename [invalid_filename.jsonl] does not match the pattern [{sensor}_{measurement}_{date}.jsonl]'</code></p>
+</li>
+<li>
+<p><strong>Placeholder Not Found in Values</strong>: If a placeholder in the <code>keyPattern</code> is not found in the merged placeholders, an error is emitted.</p>
+<p><strong>Error Message</strong>: <code>'Error generating a key based on pattern [{sensor}/{measurement}/{date}/{unknown}] for file [sensor1_temperature_2023-10-24.jsonl]: Placeholder [unknown] not found in values'</code></p>
+</li>
+</ul>
+<a id="tips-and-best-practices" class="tsd-anchor"></a><h4 class="tsd-anchor-link"><strong>Tips and Best Practices</strong><a href="#tips-and-best-practices" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><ul>
+<li><strong>Define Both <code>filePattern</code> and <code>keyPattern</code></strong>: Explicitly specify these patterns to ensure keys are generated as expected.</li>
+<li><strong>Ensure Consistency</strong>: Make sure placeholders used in <code>keyPattern</code> are either extracted from the file name, provided in <code>defaultValues</code>, or are predefined placeholders.</li>
+<li><strong>Test Your Patterns</strong>: Validate your patterns with various file names to ensure they work correctly.</li>
+<li><strong>Handle Errors Gracefully</strong>: Implement error handling for key generation errors to prevent processing failures.</li>
+</ul>
+<a id="license" class="tsd-anchor"></a><h2 class="tsd-anchor-link"><strong>License</strong><a href="#license" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h2><p>Copyright 2024 Mytra Control S.L. All rights reserved.</p>
+<p>Use of this source code is governed by an MIT-style license that can be found in the LICENSE file or at <a href="https://opensource.org/licenses/MIT">https://opensource.org/licenses/MIT</a>.</p>
+</section><details class="tsd-panel-group tsd-member-group tsd-accordion" open><summary class="tsd-accordion-summary" data-key="section-Modules"><h2><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><use href="../assets/icons.svg#icon-chevronDown"></use></svg> Modules</h2></summary><dl class="tsd-member-summaries"><dt class="tsd-member-summary"><a id="" class="tsd-anchor"></a><span class="tsd-member-summary-name"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="../assets/icons.svg#icon-2"></use></svg><a href="_mdf.js_file-flinger._internal_.html">&lt;internal&gt;</a></span></dt><dd class="tsd-member-summary"></dd></dl></details><details class="tsd-panel-group tsd-member-group tsd-accordion" open><summary class="tsd-accordion-summary" data-key="section-Enumerations"><h2><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><use href="../assets/icons.svg#icon-chevronDown"></use></svg> Enumerations</h2></summary><dl class="tsd-member-summaries"><dt class="tsd-member-summary"><a id="errorstrategy" class="tsd-anchor"></a><span class="tsd-member-summary-name"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="../assets/icons.svg#icon-8"></use></svg><a href="../enums/_mdf.js_file-flinger.ErrorStrategy.html">ErrorStrategy</a><a href="#errorstrategy" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></span></dt><dd class="tsd-member-summary"></dd><dt class="tsd-member-summary"><a id="postprocessingstrategy" class="tsd-anchor"></a><span class="tsd-member-summary-name"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="../assets/icons.svg#icon-8"></use></svg><a href="../enums/_mdf.js_file-flinger.PostProcessingStrategy.html">PostProcessingStrategy</a><a href="#postprocessingstrategy" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></span></dt><dd class="tsd-member-summary"></dd></dl></details><details class="tsd-panel-group tsd-member-group tsd-accordion" open><summary class="tsd-accordion-summary" data-key="section-Classes"><h2><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><use href="../assets/icons.svg#icon-chevronDown"></use></svg> Classes</h2></summary><dl class="tsd-member-summaries"><dt class="tsd-member-summary"><a id="fileflinger" class="tsd-anchor"></a><span class="tsd-member-summary-name"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="../assets/icons.svg#icon-128"></use></svg><a href="../classes/_mdf.js_file-flinger.FileFlinger.html">FileFlinger</a><a href="#fileflinger" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></span></dt><dd class="tsd-member-summary"></dd></dl></details><details class="tsd-panel-group tsd-member-group tsd-accordion" open><summary class="tsd-accordion-summary" data-key="section-Interfaces"><h2><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><use href="../assets/icons.svg#icon-chevronDown"></use></svg> Interfaces</h2></summary><dl class="tsd-member-summaries"><dt class="tsd-member-summary"><a id="fileflingeroptions" class="tsd-anchor"></a><span class="tsd-member-summary-name"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="../assets/icons.svg#icon-256"></use></svg><a href="../interfaces/_mdf.js_file-flinger.FileFlingerOptions.html">FileFlingerOptions</a><a href="#fileflingeroptions" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></span></dt><dd class="tsd-member-summary"></dd><dt class="tsd-member-summary"><a id="pusher" class="tsd-anchor"></a><span class="tsd-member-summary-name"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="../assets/icons.svg#icon-256"></use></svg><a href="../interfaces/_mdf.js_file-flinger.Pusher.html">Pusher</a><a href="#pusher" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></span></dt><dd class="tsd-member-summary"></dd></dl></details></div><div class="col-sidebar"><div class="page-menu"><div class="tsd-navigation settings"><details class="tsd-accordion"><summary class="tsd-accordion-summary"><h3><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><use href="../assets/icons.svg#icon-chevronDown"></use></svg>Settings</h3></summary><div class="tsd-accordion-details"><div class="tsd-filter-visibility"><span class="settings-label">Member Visibility</span><ul id="tsd-filter-options"><li class="tsd-filter-item"><label class="tsd-filter-input"><input type="checkbox" id="tsd-filter-protected" name="protected"/><svg width="32" height="32" viewBox="0 0 32 32" aria-hidden="true"><rect class="tsd-checkbox-background" width="30" height="30" x="1" y="1" rx="6" fill="none"></rect><path class="tsd-checkbox-checkmark" d="M8.35422 16.8214L13.2143 21.75L24.6458 10.25" stroke="none" stroke-width="3.5" stroke-linejoin="round" fill="none"></path></svg><span>Protected</span></label></li><li class="tsd-filter-item"><label class="tsd-filter-input"><input type="checkbox" id="tsd-filter-inherited" name="inherited" checked/><svg width="32" height="32" viewBox="0 0 32 32" aria-hidden="true"><rect class="tsd-checkbox-background" width="30" height="30" x="1" y="1" rx="6" fill="none"></rect><path class="tsd-checkbox-checkmark" d="M8.35422 16.8214L13.2143 21.75L24.6458 10.25" stroke="none" stroke-width="3.5" stroke-linejoin="round" fill="none"></path></svg><span>Inherited</span></label></li><li class="tsd-filter-item"><label class="tsd-filter-input"><input type="checkbox" id="tsd-filter-external" name="external"/><svg width="32" height="32" viewBox="0 0 32 32" aria-hidden="true"><rect class="tsd-checkbox-background" width="30" height="30" x="1" y="1" rx="6" fill="none"></rect><path class="tsd-checkbox-checkmark" d="M8.35422 16.8214L13.2143 21.75L24.6458 10.25" stroke="none" stroke-width="3.5" stroke-linejoin="round" fill="none"></path></svg><span>External</span></label></li></ul></div><div class="tsd-theme-toggle"><label class="settings-label" for="tsd-theme">Theme</label><select id="tsd-theme"><option value="os">OS</option><option value="light">Light</option><option value="dark">Dark</option></select></div></div></details></div><details open class="tsd-accordion tsd-page-navigation"><summary class="tsd-accordion-summary"><h3><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><use href="../assets/icons.svg#icon-chevronDown"></use></svg>On This Page</h3></summary><div class="tsd-accordion-details"><a href="#mdfjsfile-flinger"><span>@mdf.js/file-<wbr/>flinger</span></a><ul><li><a href="#table-of-contents"><span>Table of contents</span></a></li><li><a href="#introduction"><span>Introduction</span></a></li><li><a href="#installation"><span>Installation</span></a></li><li><a href="#use"><span>Use</span></a></li><li><ul><li><a href="#creating-a-pusher"><span>Creating a <wbr/>Pusher</span></a></li><li><a href="#event-handling"><span>Event <wbr/>Handling</span></a></li><li><a href="#fileflinger-configuration-and-lifecycle"><span>File<wbr/>Flinger <wbr/>Configuration and <wbr/>Lifecycle</span></a></li><li><a href="#metrics-and-health-checks"><span>Metrics and <wbr/>Health <wbr/>Checks</span></a></li><li><a href="#keygen-detailed-explanation-of-key-generation"><span>Keygen: <wbr/>Detailed <wbr/>Explanation of <wbr/>Key <wbr/>Generation</span></a></li><li><ul><li><a href="#overview"><span>Overview</span></a></li><li><a href="#placeholders"><span>Placeholders</span></a></li><li><ul><li><a href="#predefined-placeholders"><span>Predefined <wbr/>Placeholders</span></a></li><li><a href="#custom-placeholders"><span>Custom <wbr/>Placeholders</span></a></li></ul></li><li><a href="#keygen-options"><span>Keygen <wbr/>Options</span></a></li><li><a href="#examples"><span>Examples</span></a></li><li><ul><li><a href="#example-1-default-behavior"><span>Example 1: <wbr/>Default <wbr/>Behavior</span></a></li><li><a href="#example-2-custom-file-and-key-patterns"><span>Example 2: <wbr/>Custom <wbr/>File and <wbr/>Key <wbr/>Patterns</span></a></li><li><a href="#example-3-applying-default-values"><span>Example 3: <wbr/>Applying <wbr/>Default <wbr/>Values</span></a></li><li><a href="#example-4-using-date-placeholders"><span>Example 4: <wbr/>Using <wbr/>Date <wbr/>Placeholders</span></a></li><li><a href="#example-5-advanced-customization"><span>Example 5: <wbr/>Advanced <wbr/>Customization</span></a></li></ul></li><li><a href="#error-handling"><span>Error <wbr/>Handling</span></a></li><li><a href="#tips-and-best-practices"><span>Tips and <wbr/>Best <wbr/>Practices</span></a></li></ul></li></ul></li><li><a href="#license"><span>License</span></a></li></ul><details open class="tsd-accordion tsd-page-navigation-section"><summary class="tsd-accordion-summary" data-key="section-Modules"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><use href="../assets/icons.svg#icon-chevronDown"></use></svg>Modules</summary><div><a href="#" class=""><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="../assets/icons.svg#icon-2"></use></svg><span>&lt;internal&gt;</span></a></div></details><details open class="tsd-accordion tsd-page-navigation-section"><summary class="tsd-accordion-summary" data-key="section-Enumerations"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><use href="../assets/icons.svg#icon-chevronDown"></use></svg>Enumerations</summary><div><a href="#errorstrategy" class=""><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="../assets/icons.svg#icon-8"></use></svg><span>Error<wbr/>Strategy</span></a><a href="#postprocessingstrategy" class=""><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="../assets/icons.svg#icon-8"></use></svg><span>Post<wbr/>Processing<wbr/>Strategy</span></a></div></details><details open class="tsd-accordion tsd-page-navigation-section"><summary class="tsd-accordion-summary" data-key="section-Classes"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><use href="../assets/icons.svg#icon-chevronDown"></use></svg>Classes</summary><div><a href="#fileflinger" class=""><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="../assets/icons.svg#icon-128"></use></svg><span>File<wbr/>Flinger</span></a></div></details><details open class="tsd-accordion tsd-page-navigation-section"><summary class="tsd-accordion-summary" data-key="section-Interfaces"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><use href="../assets/icons.svg#icon-chevronDown"></use></svg>Interfaces</summary><div><a href="#fileflingeroptions" class=""><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="../assets/icons.svg#icon-256"></use></svg><span>File<wbr/>Flinger<wbr/>Options</span></a><a href="#pusher" class=""><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="../assets/icons.svg#icon-256"></use></svg><span>Pusher</span></a></div></details></div></details></div><div class="site-menu"><nav class="tsd-navigation"><a href="../modules.html">@mdf.js</a><ul class="tsd-small-nested-navigation" id="tsd-nav-container"><li>Loading...</li></ul></nav></div></div></div><footer></footer><div class="overlay"></div></body></html>

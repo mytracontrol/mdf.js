@@ -35,13 +35,12 @@
   "dependencies": {
     "@mdf.js/crash": "*",
     "lodash": "^4.17.21",
-    "tslib": "^2.7.0",
-    "uuid": "^10.0.0"
+    "tslib": "^2.8.1",
+    "uuid": "^11.0.3"
   },
   "devDependencies": {
     "@mdf.js/repo-config": "*",
-    "@types/lodash": "^4.17.10",
-    "@types/uuid": "^10.0.0"
+    "@types/lodash": "^4.17.13"
   },
   "engines": {
     "node": ">=16.14.2"

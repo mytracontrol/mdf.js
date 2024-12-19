@@ -55,7 +55,7 @@ export class ConsumerMap extends EventEmitter implements Layer.App.Resource {
   public get nodes(): Control.Response[] {
     return Array.from(this.map.values())
       .map(node => node.observedValue)
-      .filter(node => node !== undefined) as Control.Response[];
+      .filter(node => node !== undefined);
   }
   /**
    * Returns the grouped features of all the consumer in the map
@@ -141,7 +141,7 @@ export class ConsumerMap extends EventEmitter implements Layer.App.Resource {
     const emitAsAged: string[] = [];
     const checkTime = new Date().getTime();
     for (const [consumerId, consumer] of this.map.entries()) {
-      const age = checkTime - new Date(consumer.time || 0).getTime();
+      const age = checkTime - new Date(consumer.time ?? 0).getTime();
       if (age > this.maxAge) {
         emitAsAged.push(consumerId);
         this.map.delete(consumerId);

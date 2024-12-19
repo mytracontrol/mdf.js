@@ -118,7 +118,7 @@ export class Observability {
     await this.stop();
     for (const register of this._registers) {
       if (typeof register.close === 'function') {
-        await register.close.call(register);
+        await register.close();
       }
     }
   }
@@ -177,3 +177,4 @@ export class Observability {
     return this._app.links;
   }
 }
+

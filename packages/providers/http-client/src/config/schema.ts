@@ -15,7 +15,7 @@ export const schema = Joi.object({
       username: Joi.string(),
       password: Joi.string(),
     }),
-  }),
+  }).unknown(true),
   httpAgentOptions: Joi.object({
     keepAlive: Joi.boolean(),
     keepAliveInitialDelay: Joi.number().integer().min(0),
@@ -23,7 +23,7 @@ export const schema = Joi.object({
     maxSockets: Joi.number().integer().min(0),
     maxTotalSockets: Joi.number().integer().min(0),
     maxFreeSockets: Joi.number().integer().min(0),
-  }),
+  }).unknown(true),
   httpsAgentOptions: Joi.object({
     keepAlive: Joi.boolean(),
     keepAliveInitialDelay: Joi.number().integer().min(0),
@@ -35,5 +35,6 @@ export const schema = Joi.object({
     ca: Joi.string(),
     cert: Joi.string(),
     key: Joi.string(),
-  }),
-});
+  }).unknown(true),
+}).unknown(true);
+

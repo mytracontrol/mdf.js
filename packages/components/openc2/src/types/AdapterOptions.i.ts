@@ -5,6 +5,7 @@
  * or at https://opensource.org/licenses/MIT.
  */
 
+/** Adapter options */
 export interface AdapterOptions {
   /** Instance identification */
   id: string;
@@ -15,3 +16,4 @@ export interface AdapterOptions {
   /** Authorization token */
   token?: string;
 }
+

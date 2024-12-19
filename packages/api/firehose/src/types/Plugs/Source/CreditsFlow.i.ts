@@ -8,6 +8,11 @@
 import { Jobs } from '@mdf.js/core';
 import { Base } from './Base.i';
 
+/**
+ * CreditsFlow Source interface definition
+ * A CreditsFlow is a Source that allows to manage the flow of Jobs using a credit system to control
+ * the rate of Jobs that can be processed
+ */
 export interface CreditsFlow<
   Type extends string = string,
   Data = any,
@@ -20,4 +25,3 @@ export interface CreditsFlow<
    */
   addCredits(credits: number): Promise<number>;
 }
-

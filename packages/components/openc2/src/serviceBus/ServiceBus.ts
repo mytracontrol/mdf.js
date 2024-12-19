@@ -161,7 +161,7 @@ export class ServiceBus extends EventEmitter implements Layer.App.Resource {
   private readonly onDisconnectEvent = (socketId: string): ((reason: string) => void) => {
     return (reason: string) => {
       const openC2Id = this.addressMapper.getBySocketId(socketId);
-      const error = this.disconnectReasonToCrashError(reason, openC2Id || 'unknown');
+      const error = this.disconnectReasonToCrashError(reason, openC2Id ?? 'unknown');
       this.addressMapper.delete(socketId);
       if (error) {
         this.onErrorHandler(error);
@@ -254,3 +254,4 @@ export class ServiceBus extends EventEmitter implements Layer.App.Resource {
     };
   }
 }
+

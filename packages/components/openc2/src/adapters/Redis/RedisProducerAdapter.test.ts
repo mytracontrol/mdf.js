@@ -232,7 +232,7 @@ describe('#RedisProducerAdapter', () => {
       const adapter = new RedisProducerAdapter({ id: 'myId' });
       adapter.on('error', error => {
         expect(error.message).toEqual(
-          `Error performing the adaptation of the incoming message: Expected property name or '}' in JSON at position 1`
+          `Error performing the adaptation of the incoming message: Expected property name or '}' in JSON at position 1 (line 1 column 2)`
         );
         done();
       });
@@ -241,3 +241,4 @@ describe('#RedisProducerAdapter', () => {
     }, 300);
   });
 });
+

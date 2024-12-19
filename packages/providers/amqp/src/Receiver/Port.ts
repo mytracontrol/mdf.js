@@ -9,6 +9,7 @@ import { Receiver } from '../Client';
 import { BasePort } from '../Common';
 import { Config, Receiver as RheaReceiver } from './types';
 
+/** Implementation of an AMQP Receiver port instance */
 export class Port extends BasePort<RheaReceiver> {
   /**
    * Implementation of functionalities of an AMQP Receiver port instance.
@@ -19,3 +20,4 @@ export class Port extends BasePort<RheaReceiver> {
     super(config, logger, new Receiver(config));
   }
 }
+

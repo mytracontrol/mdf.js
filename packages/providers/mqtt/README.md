@@ -3,6 +3,7 @@
 [![Node Version](https://img.shields.io/static/v1?style=flat\&logo=node.js\&logoColor=green\&label=node\&message=%3E=20\&color=blue)](https://nodejs.org/en/)
 [![Typescript Version](https://img.shields.io/static/v1?style=flat\&logo=typescript\&label=Typescript\&message=5.4\&color=blue)](https://www.typescriptlang.org/)
 [![Known Vulnerabilities](https://img.shields.io/static/v1?style=flat\&logo=snyk\&label=Vulnerabilities\&message=0\&color=300A98F)](https://snyk.io/package/npm/snyk)
+[![Documentation](https://img.shields.io/static/v1?style=flat\&logo=markdown\&label=Documentation\&message=API\&color=blue)](https://mytracontrol.github.io/mdf.js/)
 
 <!-- markdownlint-disable MD033 MD041 -->
 
@@ -27,6 +28,7 @@
   - [**Installation**](#installation)
   - [**Information**](#information)
   - [**Use**](#use)
+  - [**Environment variables**](#environment-variables)
   - [**License**](#license)
 
 ## **Introduction**
@@ -76,7 +78,7 @@ Checks included in the provider:
 - **CONFIG\_MQTT\_CLIENT\_CA\_PATH** (default: `undefined`): CA file path
 - **CONFIG\_MQTT\_CLIENT\_CLIENT\_CERT\_PATH** (default: `undefined`): Client cert file path
 - **CONFIG\_MQTT\_CLIENT\_CLIENT\_KEY\_PATH** (default: `undefined`): Client key file path
-- **NODE\_APP\_INSTANCE**: undefined
+- **NODE\_APP\_INSTANCE** (default: `undefined`): Used as default container id, receiver name, sender name, etc. in cluster configurations.
 
 ## **License**
 

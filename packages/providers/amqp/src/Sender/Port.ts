@@ -9,6 +9,7 @@ import { Sender } from '../Client';
 import { BasePort } from '../Common';
 import { Config, AwaitableSender as RheaSender } from './types';
 
+/** Implementation of an AMQP Sender port instance */
 export class Port extends BasePort<RheaSender> {
   /**
    * Implementation of functionalities of an AMQP Sender port instance.
@@ -19,3 +20,4 @@ export class Port extends BasePort<RheaSender> {
     super(config, logger, new Sender(config));
   }
 }
+

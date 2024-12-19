@@ -3,6 +3,7 @@
 [![Node Version](https://img.shields.io/static/v1?style=flat\&logo=node.js\&logoColor=green\&label=node\&message=%3E=20\&color=blue)](https://nodejs.org/en/)
 [![Typescript Version](https://img.shields.io/static/v1?style=flat\&logo=typescript\&label=Typescript\&message=5.4\&color=blue)](https://www.typescriptlang.org/)
 [![Known Vulnerabilities](https://img.shields.io/static/v1?style=flat\&logo=snyk\&label=Vulnerabilities\&message=0\&color=300A98F)](https://snyk.io/package/npm/snyk)
+[![Documentation](https://img.shields.io/static/v1?style=flat\&logo=markdown\&label=Documentation\&message=API\&color=blue)](https://mytracontrol.github.io/mdf.js/)
 
 <!-- markdownlint-disable MD033 MD041 -->
 
@@ -27,6 +28,7 @@
   - [**Installation**](#installation)
   - [**Information**](#information)
   - [**Use**](#use)
+  - [**Environment variables**](#environment-variables)
   - [**License**](#license)
 
 ## **Introduction**
@@ -75,7 +77,7 @@ Checks included in the provider:
 - **CONFIG\_REDIS\_CONNECTION\_TIMEOUT** (default: `10000`): REDIS connection keepAlive
 - **CONFIG\_REDIS\_CHECK\_INTERVAL** (default: `60000`): REDIS status check interval
 - **CONFIG\_REDIS\_DISABLE\_CHECKS** (default: `false`): Disable Redis checks
-- **NODE\_APP\_INSTANCE**: undefined
+- **NODE\_APP\_INSTANCE** (default: `undefined`): Used as default container id, receiver name, sender name, etc. in cluster configurations.
 
 ## **License**
 

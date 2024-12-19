@@ -3,6 +3,7 @@
 [![Node Version](https://img.shields.io/static/v1?style=flat\&logo=node.js\&logoColor=green\&label=node\&message=%3E=20\&color=blue)](https://nodejs.org/en/)
 [![Typescript Version](https://img.shields.io/static/v1?style=flat\&logo=typescript\&label=Typescript\&message=5.4\&color=blue)](https://www.typescriptlang.org/)
 [![Known Vulnerabilities](https://img.shields.io/static/v1?style=flat\&logo=snyk\&label=Vulnerabilities\&message=0\&color=300A98F)](https://snyk.io/package/npm/snyk)
+[![Documentation](https://img.shields.io/static/v1?style=flat\&logo=markdown\&label=Documentation\&message=API\&color=blue)](https://mytracontrol.github.io/mdf.js/)
 
 <!-- markdownlint-disable MD033 MD041 -->
 
@@ -27,6 +28,8 @@
   - [**Installation**](#installation)
   - [**Information**](#information)
   - [**Use**](#use)
+    - [**Health checks**](#health-checks)
+  - [**Environment variables**](#environment-variables)
   - [**License**](#license)
 
 ## **Introduction**
@@ -53,12 +56,68 @@ Check information about **@mdf.js** providers in the documentation of the core m
 
 ## **Use**
 
+The provider implemented in this module wraps an HTTP server based on [express](https://www.npmjs.com/package/express) to provide a simple HTTP server.
+
+```typescript
+import { HTTP } from '@mdf.js/http-server-provider';
+
+const client = HTTP.Factory.create({
+  name: `myHTTPServerProvider`,
+  config: {
+    /** Port for the HTTP server */
+    port: 8080,
+    /** Host for the HTTP server */
+    host: 'localhost',
+    /** Express app configuration */
+    app: Express,
+  },
+  logger: myLoggerInstance,
+  useEnvironment: true,
+});
+```
+
+- **Defaults**:
+
+  ```typescript
+  {
+    port: 8080,
+    host: 'localhost',
+    app: /* Default static web */,
+  }
+  ```
+
+- **Environment**: remember to set the `useEnvironment` flag to `true` to use these environment variables.
+
+  ```typescript
+  {
+    port: process.env['CONFIG_SERVER_PORT'],
+    host: process.env['CONFIG_SERVER_HOST'],
+  }
+  ```
+
+### **Health checks**
+
 Checks included in the provider:
 
 - **status**: Due to the nature of the HTTP server, the status could be `running` if the server has been started properly, `stopped` if the server has been stopped or is not initialized, or `error` if the server could not be started.
   - **observedValue**: `running` if the server is running, `stopped` if the server is stopped, or `error` if the server could not be started.
   - **status**: `pass` if the server is running, `fail` could not be started or `warn` if the server is stopped.
   - **output**: In case of `error` state (status `fail`), the error message is shown.
+  - **componentType**: `service`.
+
+```json
+{
+  "[mdf-http-server:status]": [
+    {
+      "status": "pass",
+      "componentId": "00000000-0000-0000-0000-000000000000",
+      "observedValue": "running",
+      "componentType": "service",
+      "output": undefined,
+    },
+  ],
+}
+```
 
 ## **Environment variables**
 

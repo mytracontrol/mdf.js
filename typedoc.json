@@ -3,18 +3,21 @@
     "packages/api/*",
     "packages/components/*",
     "packages/providers/*",
-    "packages/registries/*",
   ],
   "entryPointStrategy": "packages",
   "name": "@mdf.js",
   "includeVersion": false,
   "readme": "README.md",
-  "plugin": [],
+  "plugin": [
+    "typedoc-plugin-missing-exports",
+  ],
   "navigation": {
     "includeCategories": false,
     "includeGroups": false,
     "includeFolders": false
   },
   "categorizeByGroup": true,
+  "useTsLinkResolution" : true,
   "logLevel": "Info",
+  "hideGenerator": true
 }

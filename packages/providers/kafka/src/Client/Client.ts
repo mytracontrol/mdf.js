@@ -80,7 +80,7 @@ export abstract class Client extends EventEmitter {
     // Stryker disable next-line all
     this.logger.debug(`New instance of Kafka Client created: ${this.componentId}`);
     this.options = { ...options, logCreator: options.logCreator ?? this.defaultLogCreator };
-    this.interval = Math.floor((this.options.requestTimeout || interval) * 1.1);
+    this.interval = Math.floor((this.options.requestTimeout ?? interval) * 1.1);
     this.instance = new Kafka(this.options);
     this.admin = this.instance.admin();
     this.connected = false;
@@ -156,7 +156,7 @@ export abstract class Client extends EventEmitter {
       this.status.topics = fetchedTopics.topics.filter(entry => !entry.name.startsWith('__'));
       this.status.groups = [];
       const fetchedGroups = await this.admin.listGroups();
-      if (fetchedGroups && fetchedGroups.groups.length) {
+      if (fetchedGroups?.groups.length) {
         const descriptions = await this.admin.describeGroups(
           fetchedGroups.groups.map(entry => entry.groupId)
         );

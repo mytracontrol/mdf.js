@@ -9,7 +9,7 @@ import { Boom, Crash, Multi } from '@mdf.js/crash';
 import { v4 } from 'uuid';
 import { LoggerFunction, LoggerInstance } from '../types';
 
-class WrapperLogger {
+export class WrapperLogger {
   /**
    * Create a wrapped version of the logger where the context and uuid are already set
    * @param logger - Logger instance to wrap
@@ -31,7 +31,7 @@ class WrapperLogger {
    * @param meta - extra information
    */
   silly: LoggerFunction = (message: string, uuid?: string, context?: string, ...meta: any[]) => {
-    this.logger.silly(message, uuid || this.componentId, context || this.context, ...meta);
+    this.logger.silly(message, uuid ?? this.componentId, context ?? this.context, ...meta);
   };
   /**
    * Log events in the DEBUG level: all the information in a detailed way.
@@ -43,7 +43,7 @@ class WrapperLogger {
    * @param meta - extra information
    */
   debug: LoggerFunction = (message: string, uuid?: string, context?: string, ...meta: any[]) => {
-    this.logger.debug(message, uuid || this.componentId, context || this.context, ...meta);
+    this.logger.debug(message, uuid ?? this.componentId, context ?? this.context, ...meta);
   };
   /**
    * Log events in the VERBOSE level: trace information without details.
@@ -55,7 +55,7 @@ class WrapperLogger {
    * @param meta - extra information
    */
   verbose: LoggerFunction = (message: string, uuid?: string, context?: string, ...meta: any[]) => {
-    this.logger.verbose(message, uuid || this.componentId, context || this.context, ...meta);
+    this.logger.verbose(message, uuid ?? this.componentId, context ?? this.context, ...meta);
   };
   /**
    * Log events in the INFO level: only relevant events are reported.
@@ -66,7 +66,7 @@ class WrapperLogger {
    * @param meta - extra information
    */
   info: LoggerFunction = (message: string, uuid?: string, context?: string, ...meta: any[]) => {
-    this.logger.info(message, uuid || this.componentId, context || this.context, ...meta);
+    this.logger.info(message, uuid ?? this.componentId, context ?? this.context, ...meta);
   };
   /**
    * Log events in the WARN level: information about possible problems or dangerous situations.
@@ -76,7 +76,7 @@ class WrapperLogger {
    * @param meta - extra information
    */
   warn: LoggerFunction = (message: string, uuid?: string, context?: string, ...meta: any[]) => {
-    this.logger.warn(message, uuid || this.componentId, context || this.context, ...meta);
+    this.logger.warn(message, uuid ?? this.componentId, context ?? this.context, ...meta);
   };
   /**
    * Log events in the ERROR level: all the errors and problems with detailed information.
@@ -86,7 +86,7 @@ class WrapperLogger {
    * @param meta - extra information
    */
   error: LoggerFunction = (message: string, uuid?: string, context?: string, ...meta: any[]) => {
-    this.logger.error(message, uuid || this.componentId, context || this.context, ...meta);
+    this.logger.error(message, uuid ?? this.componentId, context ?? this.context, ...meta);
   };
   /**
    * Log events in the ERROR level: all the information in a very detailed way.
@@ -95,7 +95,7 @@ class WrapperLogger {
    * @param context - context (class/function) where this logger is logging
    */
   crash = (rawError: Crash | Boom | Multi, context?: string) => {
-    this.logger.crash(rawError, context || this.context);
+    this.logger.crash(rawError, context ?? this.context);
   };
   /** Stream logger */
   stream: { write: (message: string) => void } = {

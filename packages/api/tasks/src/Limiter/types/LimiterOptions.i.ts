@@ -12,12 +12,12 @@ import { QueueOptions } from './QueueOptions.i';
 export interface LimiterOptions extends QueueOptions {
   /**
    * The maximum number of concurrent jobs
-   * @default 1
+   * @defaultValue 1
    */
   concurrency?: number;
   /**
    * Delay between each job in milliseconds
-   * @default 0
+   * @defaultValue 0
    * For `concurrency = 1`, the delay is applied after each job is finished
    * For `concurrency > 1`, if the actual number of concurrent jobs is less than `concurrency`, the
    * delay is applied after each job is finished, otherwise, the delay is applied after each job is
@@ -26,12 +26,12 @@ export interface LimiterOptions extends QueueOptions {
   delay?: number;
   /**
    * Set the default options for the retry process of the jobs
-   * @default undefined
+   * @defaultValue undefined
    */
   retryOptions?: RetryOptions;
   /**
    * Set whether the limiter should start to process the jobs automatically
-   * @default true
+   * @defaultValue true
    */
   autoStart?: boolean;
 }
@@ -40,3 +40,4 @@ export interface LimiterOptions extends QueueOptions {
 export interface ConsolidatedLimiterOptions extends Omit<Required<LimiterOptions>, 'retryOptions'> {
   retryOptions?: RetryOptions;
 }
+

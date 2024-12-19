@@ -34,9 +34,9 @@ export type AuthZOptions = {
 function authZ(options: AuthZOptions = {}): SocketIOMiddleware {
   return (socket: Socket, next: SocketIONextFunction) => {
     const token = socket.handshake.auth['token'];
-    const secret = options.secret || DEFAULT_CONFIG_JWT_TOKEN_SECRET;
-    const algorithms = options.algorithms || DEFAULT_CONFIG_JWT_TOKEN_ALGORITHMS;
-    const onAuthorization = options.onAuthorization || DEFAULT_CONFIG_JWT_ON_AUTHORIZATION;
+    const secret = options.secret ?? DEFAULT_CONFIG_JWT_TOKEN_SECRET;
+    const algorithms = options.algorithms ?? DEFAULT_CONFIG_JWT_TOKEN_ALGORITHMS;
+    const onAuthorization = options.onAuthorization ?? DEFAULT_CONFIG_JWT_ON_AUTHORIZATION;
     const requestId = v4();
 
     hasValidAuthenticationInformation(token, requestId)
@@ -100,3 +100,4 @@ export class AuthZ {
     return authZ(options);
   }
 }
+

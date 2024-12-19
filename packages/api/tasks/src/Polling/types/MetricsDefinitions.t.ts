@@ -7,7 +7,7 @@
 import { Counter, Gauge, Histogram, Registry } from 'prom-client';
 
 /** Metrics for tasks */
-type TaskMetricsDefinitions = {
+export type TaskMetricsDefinitions = {
   /** Duration in millisecond for each concrete task, providing insights into task efficiency. */
   task_duration_milliseconds: Histogram;
   /** Cumulative count of task performed, for tracking demand and usage patterns. */
@@ -17,6 +17,7 @@ type TaskMetricsDefinitions = {
   /** Number of task in progress */
   task_in_progress: Gauge;
 };
+
 /** Metrics for tasks */
 const TASK_METRICS_DEFINITIONS = (registry: Registry): TaskMetricsDefinitions => {
   const task_duration_milliseconds = new Histogram({
@@ -56,7 +57,7 @@ const TASK_METRICS_DEFINITIONS = (registry: Registry): TaskMetricsDefinitions =>
 };
 
 /** Metrics for Scan */
-type ScanMetricsDefinitions = {
+export type ScanMetricsDefinitions = {
   /** Cumulative count of scan cycles performed. */
   scan_cycles_total: Counter;
   /** Cumulative count of scan overruns */

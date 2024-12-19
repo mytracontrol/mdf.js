@@ -136,16 +136,14 @@ export class Validator {
   private static isValidConfig(config: TaskBaseConfig): void {
     if (!config || typeof config !== 'object' || Array.isArray(config)) {
       throw new Crash(`The task configuration should be an object`);
+    } else if ('task' in config) {
+      Validator.isValidSingleTaskConfig(config);
+    } else if ('tasks' in config) {
+      Validator.isValidGroupConfig(config);
+    } else if ('pattern' in config) {
+      Validator.isValidSequenceConfig(config);
     } else {
-      if ('task' in config) {
-        Validator.isValidSingleTaskConfig(config as SingleTaskBaseConfig);
-      } else if ('tasks' in config) {
-        Validator.isValidGroupConfig(config as GroupTaskBaseConfig);
-      } else if ('pattern' in config) {
-        Validator.isValidSequenceConfig(config as SequenceTaskBaseConfig);
-      } else {
-        throw new Crash(`The task configuration should have a task, tasks or pattern property`);
-      }
+      throw new Crash(`The task configuration should have a task, tasks or pattern property`);
     }
   }
   /**
@@ -189,10 +187,10 @@ export class Validator {
    * @param config - The group configuration
    */
   private static isValidGroupConfig(config: GroupTaskBaseConfig): void {
-    if (!Array.isArray((config as GroupTaskBaseConfig).tasks)) {
+    if (!Array.isArray(config.tasks)) {
       throw new Crash(`The tasks should be an array of tasks: ${JSON.stringify(config, null, 2)}`);
     } else {
-      for (const task of (config as GroupTaskBaseConfig).tasks) {
+      for (const task of config.tasks) {
         Validator.isValidSingleTaskConfig(task);
       }
       Validator.isValidTaskOptions(config.options);
@@ -203,21 +201,21 @@ export class Validator {
    * @param config - The sequence configuration
    */
   private static isValidSequenceConfig(config: SequenceTaskBaseConfig): void {
-    if (
-      !('pattern' in config) ||
-      !config.pattern ||
-      typeof config.pattern !== 'object' ||
-      Array.isArray(config.pattern)
-    ) {
+    // Helper to validate array properties
+    const validateArrayProperty = (property: 'pre' | 'post' | 'finally') => {
+      if (property in config.pattern && !Array.isArray(config.pattern[property])) {
+        throw new Crash(
+          `The ${property} property should be an array of tasks: ${JSON.stringify(config, null, 2)}`
+        );
+      }
+    };
+    // Ensure `pattern` is a valid object with a `task` property
+    if (!config.pattern || typeof config.pattern !== 'object' || Array.isArray(config.pattern)) {
       throw new Crash(
-        `Pattern should be an object an object with the task property: ${JSON.stringify(
-          config,
-          null,
-          2
-        )}`
+        `Pattern should be an object with the task property: ${JSON.stringify(config, null, 2)}`
       );
-    } else if (
-      !('task' in config.pattern) ||
+    }
+    if (
       !config.pattern.task ||
       typeof config.pattern.task !== 'object' ||
       Array.isArray(config.pattern.task)
@@ -225,38 +223,18 @@ export class Validator {
       throw new Crash(
         `The sequence configuration should have a task property: ${JSON.stringify(config, null, 2)}`
       );
-    } else if ('pre' in config.pattern && !Array.isArray(config.pattern.pre)) {
-      throw new Crash(
-        `The pre property should be an array of tasks: ${JSON.stringify(config, null, 2)}`
-      );
-    } else if ('post' in config.pattern && !Array.isArray(config.pattern.post)) {
-      throw new Crash(
-        `The post property should be an array of tasks: ${JSON.stringify(config, null, 2)}`
-      );
-    } else if ('finally' in config.pattern && !Array.isArray(config.pattern.finally)) {
-      throw new Crash(
-        `The finally property should be an array of tasks: ${JSON.stringify(config, null, 2)}`
-      );
-    } else {
-      if ('task' in config.pattern) {
-        Validator.isValidSingleTaskConfig(config.pattern.task);
-      }
-      if ('pre' in config.pattern && Array.isArray(config.pattern.pre)) {
-        for (const task of config.pattern.pre) {
-          Validator.isValidSingleTaskConfig(task);
-        }
-      }
-      if ('post' in config.pattern && Array.isArray(config.pattern.post)) {
-        for (const task of config.pattern.post) {
-          Validator.isValidSingleTaskConfig(task);
-        }
-      }
-      if ('finally' in config.pattern && Array.isArray(config.pattern.finally)) {
-        for (const task of config.pattern.finally) {
-          Validator.isValidSingleTaskConfig(task);
-        }
-      }
-      Validator.isValidTaskOptions(config.options);
     }
+    // Validate that `pre`, `post`, and `finally` properties (if present) are arrays
+    (['pre', 'post', 'finally'] as const).forEach(validateArrayProperty);
+    // Validate each array of tasks in `pre`, `post`, and `finally` if they exist
+    (['pre', 'post', 'finally'] as const).forEach(property => {
+      if (Array.isArray(config.pattern[property])) {
+        for (const task of config.pattern[property]) {
+          Validator.isValidSingleTaskConfig(task);
+        }
+      }
+    });
+    // Validate any additional task options
+    Validator.isValidTaskOptions(config.options);
   }
 }

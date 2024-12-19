@@ -34,7 +34,7 @@ export class Cors {
    */
   private constructor(configuration?: CorsConfig) {
     this.config = configuration;
-    this.enable = this.config && this.config.enabled === false ? false : true;
+    this.enable = this.config?.enabled !== false;
     // *****************************************************************************************
     // #region Cors options
     this.corsOptions.methods = this.config?.methods;

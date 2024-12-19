@@ -182,7 +182,7 @@ describe('In #Multi class the ', () => {
     it('Should throw a Crash error if the causes is not an Array', () => {
       const test = () => {
         //@ts-ignore - Test environment
-        new Multi('Error', uuidTest, { causes: 0 });
+        new Multi('Error', uuidTest, { causes: 1 });
       };
       expect(test).toThrowError('Options[causes] must be an array of Error/Crash');
     });
@@ -349,3 +349,4 @@ describe('In #Multi class the ', () => {
     });
   });
 });
+

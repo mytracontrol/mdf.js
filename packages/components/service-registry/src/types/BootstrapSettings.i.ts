@@ -5,6 +5,7 @@
  * or at https://opensource.org/licenses/MIT.
  */
 
+/** Bootstrap options */
 export interface BootstrapOptions {
   /**
    * List of files with deploying options to be loaded. The entries could be a file path or
@@ -88,3 +89,4 @@ export interface BootstrapOptions {
    */
   consumer?: boolean;
 }
+

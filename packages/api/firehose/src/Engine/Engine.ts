@@ -109,7 +109,7 @@ export class Engine extends Transform implements Layer.App.Component {
   private executeStrategy(job: OpenJobHandler, strategy: OpenStrategy): OpenJobHandler {
     try {
       const result = strategy.do(job.toObject());
-      if (!result || result.data === undefined || result.data === null) {
+      if (result?.data == null) {
         job.addError(
           new Crash(
             `Strategy ${strategy.name} return an undefined job or a job with no data, it has not be applied`,

@@ -35,7 +35,7 @@ export class RetryManager {
    * @returns Task options with fast cycle retry options
    */
   public fastCycleRetryOptions(options: WellIdentifiedTaskOptions): WellIdentifiedTaskOptions {
-    const attempts = Math.min(DEFAULT_MAX_RETRY_FACTOR, options.retryOptions?.attempts || 1);
+    const attempts = Math.min(DEFAULT_MAX_RETRY_FACTOR, options.retryOptions?.attempts ?? 1);
     return this.cycleRetryOptions(options, attempts);
   }
   /**
@@ -57,12 +57,11 @@ export class RetryManager {
     attempts: number
   ): WellIdentifiedTaskOptions {
     const timeout = Math.min(
-      options.retryOptions?.timeout || DEFAULT_MAX_TIMEOUT,
-      ms(this.pollingGroup) * attempts,
-      DEFAULT_MAX_TIMEOUT
+      options.retryOptions?.timeout ?? DEFAULT_MAX_TIMEOUT,
+      ms(this.pollingGroup) * attempts
     );
     const waitTime = Math.min(
-      options.retryOptions?.waitTime || this.limiterDelay,
+      options.retryOptions?.waitTime ?? this.limiterDelay,
       this.limiterDelay
     );
     const retryOptions: RetryOptions = {

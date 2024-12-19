@@ -41,8 +41,8 @@ function expressLogger<
 >(logger: LoggerInstance): Handler<Request, Response> {
   return morgan<Request, Response>(
     (tokens: morgan.TokenIndexer<Request, Response>, req: Request, res: Response) => {
-      const status = tokens['status'](req, res) || '-';
-      const timestamp = tokens['date'](req, res, 'iso') || '-';
+      const status = tokens['status'](req, res) ?? '-';
+      const timestamp = tokens['date'](req, res, 'iso') ?? '-';
       let str = `HTTP/${tokens['http-version'](req, res)} `;
       str += `${tokens['method'](req, res)} `;
       str += `${status} `;
@@ -69,3 +69,4 @@ export class LoggerMiddleware {
     return expressLogger(logger);
   }
 }
+

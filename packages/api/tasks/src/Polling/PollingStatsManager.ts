@@ -19,7 +19,7 @@ import {
 
 export class PollingMetricsHandler {
   /** Polling stats */
-  private pollingStats: PollingStats = { ...DEFAULT_POLLING_STATS };
+  private readonly pollingStats: PollingStats = { ...DEFAULT_POLLING_STATS };
   /** Scan cycles duration in milliseconds */
   private readonly scanCyclesDuration: number[] = [];
   /** Metrics labels */
@@ -32,7 +32,6 @@ export class PollingMetricsHandler {
    * @param resource - Resource identifier
    * @param pollingGroup - Polling group assigned to this manager
    * @param cyclesOnStats - Number of cycles on stats
-   * @param logger - Logger instance
    * @param metrics - Metrics instances
    */
   constructor(
@@ -155,4 +154,3 @@ export class PollingMetricsHandler {
     return _check;
   }
 }
-

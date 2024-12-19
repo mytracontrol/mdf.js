@@ -62,7 +62,11 @@ export class BoomHelpers {
    * @param options - Specific options for enhanced error management
    * @public
    */
-  public static badRequest = (message: string, uuid: string, options?: BoomOptions): Boom => {
+  public static readonly badRequest = (
+    message: string,
+    uuid: string,
+    options?: BoomOptions
+  ): Boom => {
     return regularError(message, uuid, HTTPCode.BAD_REQUEST, options);
   };
   /**
@@ -75,7 +79,11 @@ export class BoomHelpers {
    * @param options - Specific options for enhanced error management
    * @public
    */
-  public static unauthorized = (message: string, uuid: string, options?: BoomOptions): Boom => {
+  public static readonly unauthorized = (
+    message: string,
+    uuid: string,
+    options?: BoomOptions
+  ): Boom => {
     return regularError(message, uuid, HTTPCode.UNAUTHORIZED, options);
   };
   /**
@@ -90,7 +98,11 @@ export class BoomHelpers {
    * @param options - Specific options for enhanced error management
    * @public
    */
-  public static paymentRequired = (message: string, uuid: string, options?: BoomOptions): Boom => {
+  public static readonly paymentRequired = (
+    message: string,
+    uuid: string,
+    options?: BoomOptions
+  ): Boom => {
     return regularError(message, uuid, HTTPCode.PAYMENT_REQUIRED, options);
   };
   /**
@@ -104,7 +116,11 @@ export class BoomHelpers {
    * @param options - Specific options for enhanced error management
    * @public
    */
-  public static forbidden = (message: string, uuid: string, options?: BoomOptions): Boom => {
+  public static readonly forbidden = (
+    message: string,
+    uuid: string,
+    options?: BoomOptions
+  ): Boom => {
     return regularError(message, uuid, HTTPCode.FORBIDDEN, options);
   };
   /**
@@ -118,7 +134,11 @@ export class BoomHelpers {
    * @param options - Specific options for enhanced error management
    * @public
    */
-  public static notFound = (message: string, uuid: string, options?: BoomOptions): Boom => {
+  public static readonly notFound = (
+    message: string,
+    uuid: string,
+    options?: BoomOptions
+  ): Boom => {
     return regularError(message, uuid, HTTPCode.NOT_FOUND, options);
   };
   /**
@@ -131,7 +151,11 @@ export class BoomHelpers {
    * @param options - Specific options for enhanced error management
    * @public
    */
-  public static methodNotAllowed = (message: string, uuid: string, options?: BoomOptions): Boom => {
+  public static readonly methodNotAllowed = (
+    message: string,
+    uuid: string,
+    options?: BoomOptions
+  ): Boom => {
     return regularError(message, uuid, HTTPCode.METHOD_NOT_ALLOWED, options);
   };
   /**
@@ -150,7 +174,11 @@ export class BoomHelpers {
    * @param options - Specific options for enhanced error management
    * @public
    */
-  public static notAcceptable = (message: string, uuid: string, options?: BoomOptions): Boom => {
+  public static readonly notAcceptable = (
+    message: string,
+    uuid: string,
+    options?: BoomOptions
+  ): Boom => {
     return regularError(message, uuid, HTTPCode.NOT_ACCEPTABLE, options);
   };
   /**
@@ -164,7 +192,7 @@ export class BoomHelpers {
    * @param options - Specific options for enhanced error management
    * @public
    */
-  public static proxyAuthRequired = (
+  public static readonly proxyAuthRequired = (
     message: string,
     uuid: string,
     options?: BoomOptions
@@ -184,7 +212,11 @@ export class BoomHelpers {
    * @param options - Specific options for enhanced error management
    * @public
    */
-  public static requestTimeout = (message: string, uuid: string, options?: BoomOptions): Boom => {
+  public static readonly requestTimeout = (
+    message: string,
+    uuid: string,
+    options?: BoomOptions
+  ): Boom => {
     return regularError(message, uuid, HTTPCode.REQUEST_TIMEOUT, options);
   };
   /**
@@ -198,7 +230,11 @@ export class BoomHelpers {
    * @param options - Specific options for enhanced error management
    * @public
    */
-  public static conflict = (message: string, uuid: string, options?: BoomOptions): Boom => {
+  public static readonly conflict = (
+    message: string,
+    uuid: string,
+    options?: BoomOptions
+  ): Boom => {
     return regularError(message, uuid, HTTPCode.CONFLICT, options);
   };
   /**
@@ -212,7 +248,7 @@ export class BoomHelpers {
    * @param options - Specific options for enhanced error management
    * @public
    */
-  public static gone = (message: string, uuid: string, options?: BoomOptions): Boom => {
+  public static readonly gone = (message: string, uuid: string, options?: BoomOptions): Boom => {
     return regularError(message, uuid, HTTPCode.GONE, options);
   };
   /**
@@ -223,7 +259,11 @@ export class BoomHelpers {
    * @param options - Specific options for enhanced error management
    * @public
    */
-  public static lengthRequired = (message: string, uuid: string, options?: BoomOptions): Boom => {
+  public static readonly lengthRequired = (
+    message: string,
+    uuid: string,
+    options?: BoomOptions
+  ): Boom => {
     return regularError(message, uuid, HTTPCode.LENGTH_REQUIRED, options);
   };
   /**
@@ -238,7 +278,7 @@ export class BoomHelpers {
    * @param options - Specific options for enhanced error management
    * @public
    */
-  public static preconditionFailed = (
+  public static readonly preconditionFailed = (
     message: string,
     uuid: string,
     options?: BoomOptions
@@ -254,7 +294,11 @@ export class BoomHelpers {
    * @param options - Specific options for enhanced error management
    * @public
    */
-  public static payloadTooLarge = (message: string, uuid: string, options?: BoomOptions): Boom => {
+  public static readonly payloadTooLarge = (
+    message: string,
+    uuid: string,
+    options?: BoomOptions
+  ): Boom => {
     return regularError(message, uuid, HTTPCode.PAYLOAD_TOO_LARGE, options);
   };
   /**
@@ -272,7 +316,11 @@ export class BoomHelpers {
    * @param options - Specific options for enhanced error management
    * @public
    */
-  public static uriTooLong = (message: string, uuid: string, options?: BoomOptions): Boom => {
+  public static readonly uriTooLong = (
+    message: string,
+    uuid: string,
+    options?: BoomOptions
+  ): Boom => {
     return regularError(message, uuid, HTTPCode.URI_TOO_LONG, options);
   };
   /**
@@ -285,7 +333,7 @@ export class BoomHelpers {
    * @param options - Specific options for enhanced error management
    * @public
    */
-  public static unsupportedMediaType = (
+  public static readonly unsupportedMediaType = (
     message: string,
     uuid: string,
     options?: BoomOptions
@@ -306,7 +354,7 @@ export class BoomHelpers {
    * @param options - Specific options for enhanced error management
    * @public
    */
-  public static rangeNotSatisfiable = (
+  public static readonly rangeNotSatisfiable = (
     message: string,
     uuid: string,
     options?: BoomOptions
@@ -322,7 +370,7 @@ export class BoomHelpers {
    * @param options - Specific options for enhanced error management
    * @public
    */
-  public static expectationFailed = (
+  public static readonly expectationFailed = (
     message: string,
     uuid: string,
     options?: BoomOptions
@@ -339,7 +387,7 @@ export class BoomHelpers {
    * @param options - Specific options for enhanced error management
    * @public
    */
-  public static teapot = (message: string, uuid: string, options?: BoomOptions): Boom => {
+  public static readonly teapot = (message: string, uuid: string, options?: BoomOptions): Boom => {
     return regularError(message, uuid, HTTPCode.I_AM_A_TEAPOT, options);
   };
   /**
@@ -351,7 +399,7 @@ export class BoomHelpers {
    * @param options - Specific options for enhanced error management
    * @public
    */
-  public static unprocessableEntity = (
+  public static readonly unprocessableEntity = (
     message: string,
     uuid: string,
     options?: BoomOptions
@@ -367,7 +415,7 @@ export class BoomHelpers {
    * @param options - Specific options for enhanced error management
    * @public
    */
-  public static locked = (message: string, uuid: string, options?: BoomOptions): Boom => {
+  public static readonly locked = (message: string, uuid: string, options?: BoomOptions): Boom => {
     return regularError(message, uuid, HTTPCode.LOCKED, options);
   };
   /**
@@ -380,7 +428,11 @@ export class BoomHelpers {
    * @param options - Specific options for enhanced error management
    * @public
    */
-  public static failedDependency = (message: string, uuid: string, options?: BoomOptions): Boom => {
+  public static readonly failedDependency = (
+    message: string,
+    uuid: string,
+    options?: BoomOptions
+  ): Boom => {
     return regularError(message, uuid, HTTPCode.FAILED_DEPENDENCY, options);
   };
   /**
@@ -392,7 +444,11 @@ export class BoomHelpers {
    * @param options - Specific options for enhanced error management
    * @public
    */
-  public static tooEarly = (message: string, uuid: string, options?: BoomOptions): Boom => {
+  public static readonly tooEarly = (
+    message: string,
+    uuid: string,
+    options?: BoomOptions
+  ): Boom => {
     return regularError(message, uuid, HTTPCode.TOO_EARLY, options);
   };
   /**
@@ -405,7 +461,11 @@ export class BoomHelpers {
    * @param options - Specific options for enhanced error management
    * @public
    */
-  public static upgradeRequired = (message: string, uuid: string, options?: BoomOptions): Boom => {
+  public static readonly upgradeRequired = (
+    message: string,
+    uuid: string,
+    options?: BoomOptions
+  ): Boom => {
     return regularError(message, uuid, HTTPCode.UPGRADE_REQUIRED, options);
   };
   /**
@@ -419,7 +479,7 @@ export class BoomHelpers {
    * @param options - Specific options for enhanced error management
    * @public
    */
-  public static preconditionRequired = (
+  public static readonly preconditionRequired = (
     message: string,
     uuid: string,
     options?: BoomOptions
@@ -436,7 +496,11 @@ export class BoomHelpers {
    * @param options - Specific options for enhanced error management
    * @public
    */
-  public static tooManyRequests = (message: string, uuid: string, options?: BoomOptions): Boom => {
+  public static readonly tooManyRequests = (
+    message: string,
+    uuid: string,
+    options?: BoomOptions
+  ): Boom => {
     return regularError(message, uuid, HTTPCode.TOO_MANY_REQUESTS, options);
   };
   /**
@@ -455,7 +519,7 @@ export class BoomHelpers {
    * @param options - Specific options for enhanced error management
    * @public
    */
-  public static headerFieldsTooLarge = (
+  public static readonly headerFieldsTooLarge = (
     message: string,
     uuid: string,
     options?: BoomOptions
@@ -471,7 +535,7 @@ export class BoomHelpers {
    * @param options - Specific options for enhanced error management
    * @public
    */
-  public static illegal = (message: string, uuid: string, options?: BoomOptions): Boom => {
+  public static readonly illegal = (message: string, uuid: string, options?: BoomOptions): Boom => {
     return regularError(message, uuid, HTTPCode.UNAVAILABLE_FOR_LEGAL_REASONS, options);
   };
   /**
@@ -487,7 +551,7 @@ export class BoomHelpers {
    * @param options - Specific options for enhanced error management
    * @public
    */
-  public static internalServerError = (
+  public static readonly internalServerError = (
     message: string,
     uuid: string,
     options?: BoomOptions
@@ -509,7 +573,11 @@ export class BoomHelpers {
    * @param options - Specific options for enhanced error management
    * @public
    */
-  public static notImplemented = (message: string, uuid: string, options?: BoomOptions): Boom => {
+  public static readonly notImplemented = (
+    message: string,
+    uuid: string,
+    options?: BoomOptions
+  ): Boom => {
     return regularError(message, uuid, HTTPCode.NOT_IMPLEMENTED, options);
   };
   /**
@@ -521,7 +589,11 @@ export class BoomHelpers {
    * @param options - Specific options for enhanced error management
    * @public
    */
-  public static badGateway = (message: string, uuid: string, options?: BoomOptions): Boom => {
+  public static readonly badGateway = (
+    message: string,
+    uuid: string,
+    options?: BoomOptions
+  ): Boom => {
     return regularError(message, uuid, HTTPCode.BAD_GATEWAY, options);
   };
   /**
@@ -537,7 +609,7 @@ export class BoomHelpers {
    * @param options - Specific options for enhanced error management
    * @public
    */
-  public static serverUnavailable = (
+  public static readonly serverUnavailable = (
     message: string,
     uuid: string,
     options?: BoomOptions
@@ -553,10 +625,15 @@ export class BoomHelpers {
    * @param options - Specific options for enhanced error management
    * @public
    */
-  public static gatewayTimeout = (message: string, uuid: string, options?: BoomOptions): Boom => {
+  public static readonly gatewayTimeout = (
+    message: string,
+    uuid: string,
+    options?: BoomOptions
+  ): Boom => {
     return regularError(message, uuid, HTTPCode.GATEWAY_TIMEOUT, options);
   };
 }
 function regularError(message: string, uuid: string, code: number, options?: BoomOptions): Boom {
   return new Boom(message, uuid, code, options);
 }
+

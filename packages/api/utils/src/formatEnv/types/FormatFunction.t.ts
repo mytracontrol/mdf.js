@@ -5,4 +5,6 @@
  * or at https://opensource.org/licenses/MIT.
  */
 
+/** Format function type */
 export type FormatFunction = (str: string) => string;
+

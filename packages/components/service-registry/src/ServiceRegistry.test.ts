@@ -92,6 +92,8 @@ describe('#ServiceRegistry class', () => {
         description: undefined,
         release: '0.0.0',
         version: '0',
+        serviceId: 'mdf-service',
+        serviceGroupId: 'mdf-service-group',
         //@ts-ignore private property
         instanceId: wrapper._settingsManager.instanceId,
         notes: [],
@@ -184,6 +186,8 @@ describe('#ServiceRegistry class', () => {
         description: undefined,
         release: '0.0.0',
         version: '0',
+        serviceId: 'mdf-service',
+        serviceGroupId: 'mdf-service-group',
         //@ts-ignore private property
         instanceId: wrapper._settingsManager.instanceId,
         notes: [],
@@ -850,6 +854,8 @@ describe('#ServiceRegistry class', () => {
               description: undefined,
               version: '0',
               release: '0.0.0',
+              serviceId: 'mdf-service',
+              serviceGroupId: 'mdf-service-group',
               instanceId: resultOfQueryHealth.content.results['x-myNamespace:health'].instanceId,
               notes: [],
               output: undefined,

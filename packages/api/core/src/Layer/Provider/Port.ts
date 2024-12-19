@@ -135,9 +135,9 @@ export declare interface Port<PortClient, PortConfig> {
  * - The {@link Port.client} property, that return the _**PortClient**_ instance that is used to
  * interact with the resources.
  *
- * ![class diagram](media/Provider-Class-Hierarchy.png)
+ * ![class diagram](../../../media/Provider-Class-Hierarchy.png)
  *
- * In the other hand, this class extends the {@link EventEmitter} class, so it's possible to emit
+ * In the other hand, this class extends the `EventEmitter` class, so it's possible to emit
  * events to notify the status of the port:
  *
  * - _**error**_: should be emitted to notify errors in the resource management or access, this will
@@ -147,7 +147,7 @@ export declare interface Port<PortClient, PortConfig> {
  * - _**unhealthy**_: should be emitted when the port has limited access to the resources.
  * - _**healthy**_: should be emitted when the port has recovered the access to the resources.
  *
- * ![class diagram](media/Provider-States-Events.png)
+ * ![class diagram](../../../media/Provider-States-Events.png)
  *
  * Check some examples of implementation in:
  *

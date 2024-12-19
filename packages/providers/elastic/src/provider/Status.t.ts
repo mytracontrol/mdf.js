@@ -5,6 +5,7 @@
  * or at https://opensource.org/licenses/MIT.
  */
 
+/** Status */
 export type Status = {
   /** Timestamp */
   epoch: number;
@@ -35,3 +36,4 @@ export type Status = {
   /** Active number of shards in percent */
   active_shards_percent: string;
 }[];
+

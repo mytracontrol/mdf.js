@@ -111,8 +111,8 @@ export class Producer extends Component<AdapterWrapper, ProducerOptions> {
     super(new AdapterWrapper(adapter, options.retryOptions), options);
     this.consumerMap = new ConsumerMap(
       this.name,
-      this.options.agingInterval || DEFAULT_AGING_CHECK_INTERVAL,
-      this.options.maxAge || DEFAULT_MAX_AGE
+      this.options.agingInterval ?? DEFAULT_AGING_CHECK_INTERVAL,
+      this.options.maxAge ?? DEFAULT_MAX_AGE
     );
     this._router.on('command', this.onCommandHandler);
     this.health.add(this.consumerMap);
@@ -148,7 +148,6 @@ export class Producer extends Component<AdapterWrapper, ProducerOptions> {
    * broadcasted even if it include the '*' symbol.
    * @param to - Consumer objetive of this command
    * @param content - Command to be issued
-   * @param id - producer identification
    * @returns
    */
   public async command(to: string[], content: Control.Command): Promise<Control.ResponseMessage[]>;
@@ -207,7 +206,7 @@ export class Producer extends Component<AdapterWrapper, ProducerOptions> {
   };
   /** Perform the lookup of OpenC2 consumers */
   private readonly lookup: () => void = () => {
-    const command = Helpers.queryFeatures(this.options.lookupTimeout || 30000);
+    const command = Helpers.queryFeatures(this.options.lookupTimeout ?? 30000);
     // Stryker disable next-line all
     this.logger.debug(`New lookup command will be emitted`);
     this.command(['*'], command)
@@ -423,7 +422,7 @@ export class Producer extends Component<AdapterWrapper, ProducerOptions> {
             } catch (rawError) {
               clearTimeout(timeoutTimer);
               this.adapter.off(requestId, consumerResponseHandler);
-              reject(rawError);
+              reject(Crash.from(rawError));
             }
           }
         } catch (rawError) {

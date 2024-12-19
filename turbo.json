@@ -18,6 +18,9 @@
     "licenses": {
       "outputs": []
     },
+    "owasp": {
+      "outputs": []
+    },
     "doc": {
       "outputs": []
     },

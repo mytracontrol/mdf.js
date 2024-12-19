@@ -115,7 +115,7 @@ export class RegisterFacade extends EventEmitter implements Layer.App.Service {
   }
   /**
    * Registers one or multiple components to be monitored.
-   * @param services - A single component or an array of component to be registered.
+   * @param component - The component or components to register.
    */
   public register(component: Layer.Observable | Layer.Observable[]): void {
     this.aggregator.register(component);
@@ -179,3 +179,4 @@ export class RegisterFacade extends EventEmitter implements Layer.App.Service {
     }
   };
 }
+

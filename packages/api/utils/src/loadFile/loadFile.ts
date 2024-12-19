@@ -8,9 +8,11 @@
 import { Crash } from '@mdf.js/crash';
 import fs from 'fs';
 
-type LoggerInstance = {
+/** Logger instance */
+export type LoggerInstance = {
   debug: (message: string) => void;
 };
+
 /**
  * Load the file from the path if this exist
  * @param path - path to file
@@ -38,3 +40,4 @@ export function loadFile(path?: string, logger?: LoggerInstance): Buffer | undef
     return undefined;
   }
 }
+

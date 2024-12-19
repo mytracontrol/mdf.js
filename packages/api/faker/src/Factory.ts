@@ -248,7 +248,7 @@ export class Factory<
     }
 
     return this.attr(attr, _attribute.dependencies || [], (...args: any[]) => {
-      const value = _attribute.builder(this._seques[attr] || 0, ...args);
+      const value = _attribute.builder(this._seques[attr] ?? 0, ...args);
       this._seques[attr] = value;
       return value;
     });
@@ -531,16 +531,15 @@ export class Factory<
       }
       _dependencies = undefined;
       _builder = this._ReturnFunction<H>(generatorOptions);
+    } else if (Array.isArray(generatorOptions)) {
+      _dependencies = generatorOptions;
+      _builder = this._ReturnFunction(generator);
     } else {
-      if (Array.isArray(generatorOptions)) {
-        _dependencies = generatorOptions;
-        _builder = this._ReturnFunction(generator);
-      } else {
-        throw new Crash('Dependencies must be an array', {
-          attributeDependencies: generatorOptions,
-        });
-      }
+      throw new Crash('Dependencies must be an array', {
+        attributeDependencies: generatorOptions,
+      });
     }
+
     return { dependencies: _dependencies, builder: _builder };
   }
   /**

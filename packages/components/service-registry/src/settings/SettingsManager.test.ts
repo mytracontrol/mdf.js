@@ -49,6 +49,8 @@ describe('#SettingsManager', () => {
         version: '0',
         description: undefined,
         instanceId: manager.componentId,
+        serviceId: 'mdf-service',
+        serviceGroupId: 'mdf-service-group',
       });
       expect(manager.namespace).toBeUndefined();
       expect(manager.release).toEqual('0.0.0');
@@ -59,6 +61,8 @@ describe('#SettingsManager', () => {
           version: '0',
           description: undefined,
           instanceId: manager.componentId,
+          serviceId: 'mdf-service',
+          serviceGroupId: 'mdf-service-group',
         },
         service: {
           primaryPort: 9081,
@@ -92,6 +96,8 @@ describe('#SettingsManager', () => {
           version: '0',
           description: undefined,
           instanceId: manager.componentId,
+          serviceId: 'mdf-service',
+          serviceGroupId: 'mdf-service-group',
         },
         retryOptions: {
           attempts: 3,

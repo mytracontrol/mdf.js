@@ -5,8 +5,14 @@
  * or at https://opensource.org/licenses/MIT.
  */
 import { Express } from 'express';
+
+/** Configuration for the HTTP server provider */
 export interface Config {
+  /** Port to listen on */
   port?: number;
+  /** Host to listen on */
   host?: string;
+  /** Express app to use */
   app?: Express;
 }
+

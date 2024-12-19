@@ -13,7 +13,6 @@ export class DummyProducerAdapter extends DummyAdapter implements ProducerAdapte
   /**
    * Create a new OpenC2 adapter for Dummy
    * @param adapterOptions - Adapter configuration options
-   * @param type - component type
    */
   constructor(adapterOptions: AdapterOptions) {
     super(adapterOptions, 'consumer');
@@ -29,3 +28,4 @@ export class DummyProducerAdapter extends DummyAdapter implements ProducerAdapte
     // Dummy adapter does not need to publish
   }
 }
+

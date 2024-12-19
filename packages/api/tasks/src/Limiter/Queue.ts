@@ -162,54 +162,31 @@ export class Queue extends EventEmitter {
    * @param options - The options to check
    */
   private checkOptions(options: ConsolidatedQueueOptions): void {
-    if (
-      typeof options.highWater !== 'number' ||
-      options.highWater < 1 ||
-      Number.isNaN(options.highWater)
-    ) {
+    if (this.isLessThan(options.highWater, 1, true)) {
       throw new Crash('The highWater should be a number greater than 0', {
         name: 'ValidationError',
       });
     }
-    if (
-      typeof options.bucketSize !== 'number' ||
-      options.bucketSize < 0 ||
-      Number.isNaN(options.bucketSize)
-    ) {
+    if (this.isLessThan(options.bucketSize, 0, true)) {
       throw new Crash('The bucketSize should be a number', { name: 'ValidationError' });
     }
-    if (
-      typeof options.interval !== 'number' ||
-      options.interval < 0 ||
-      Number.isNaN(options.interval) ||
-      !Number.isFinite(options.interval)
-    ) {
+    if (this.isLessThan(options.interval)) {
       throw new Crash('The interval should be a number greater than or equal to 0', {
+        name: 'ValidationError',
+      });
+    }
+    if (this.isLessThan(options.tokensPerInterval)) {
+      throw new Crash('The tokensPerInterval should be a number greater than 0', {
+        name: 'ValidationError',
+      });
+    }
+    if (this.isLessThan(options.penalty)) {
+      throw new Crash('The penalty should be a number', {
         name: 'ValidationError',
       });
     }
     if (typeof options.strategy !== 'string' || !STRATEGIES.includes(options.strategy)) {
       throw new Crash(`The strategy should be one of ${STRATEGIES.join(', ')}`, {
-        name: 'ValidationError',
-      });
-    }
-    if (
-      typeof options.tokensPerInterval !== 'number' ||
-      options.tokensPerInterval < 0 ||
-      Number.isNaN(options.tokensPerInterval) ||
-      !Number.isFinite(options.tokensPerInterval)
-    ) {
-      throw new Crash('The tokensPerInterval should be a number greater than 0', {
-        name: 'ValidationError',
-      });
-    }
-    if (
-      typeof options.penalty !== 'number' ||
-      options.penalty < 0 ||
-      Number.isNaN(options.penalty) ||
-      !Number.isFinite(options.penalty)
-    ) {
-      throw new Crash('The penalty should be a number', {
         name: 'ValidationError',
       });
     }
@@ -248,7 +225,7 @@ export class Queue extends EventEmitter {
     while (count > 0) {
       const step = Math.trunc(count / 2);
       let it = first + step;
-      if (comparator(array[it]!, value) <= 0) {
+      if (comparator(array[it], value) <= 0) {
         first = ++it;
         count -= step + 1;
       } else {
@@ -325,4 +302,19 @@ export class Queue extends EventEmitter {
     }
     this.refillTimer = setTimeout(this.refillBucket, this.options.interval);
   };
+  /**
+   * Checks if a given value is less than a specified minimum value.
+   * @param value - The value to be checked.
+   * @param min - The minimum value to compare against. Defaults to 0.
+   * @param allowInfinity - Whether to allow infinite values. Defaults to true.
+   * @returns `true` if the value is less than the minimum value, or if the value is not a number, or if the value is NaN, or if infinite values are not allowed and the value is infinite. Otherwise, returns `false`.
+   */
+  private isLessThan(value: number, min: number = 0, allowInfinity = false): boolean {
+    return (
+      typeof value !== 'number' ||
+      Number.isNaN(value) ||
+      value < min ||
+      (!allowInfinity && !Number.isFinite(value))
+    );
+  }
 }

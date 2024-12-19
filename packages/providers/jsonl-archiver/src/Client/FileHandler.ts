@@ -39,6 +39,7 @@ export declare interface FileHandler {
    */
   on(event: 'resolve', listener: (stats: FileStats) => void): this;
 }
+
 /** File handler class for managing file operations */
 export class FileHandler extends EventEmitter {
   /** The name of the current file being managed */

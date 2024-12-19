@@ -22,7 +22,9 @@ export class Port extends Layer.Provider.Port<Client, Config> {
    */
   constructor(config: Config, logger: LoggerInstance) {
     super(config, logger, config.serviceId || CONFIG_PROVIDER_BASE_NAME);
-    this.logger.info(`config: ${JSON.stringify(config)}`);
+    this.logger.silly(
+      `config: ${JSON.stringify({ ...config, credentials: { accessKeyId: '***', secretAccess: '***' } })}`
+    );
     this.instance = new Client(config);
     // Stryker disable next-line all
     this.logger.debug(`New instance of S3 port created: ${this.uuid}`, this.uuid, this.name);

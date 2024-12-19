@@ -61,7 +61,7 @@ export class CacheRepository {
     // Stryker disable next-line all
     logger.debug(`New request for path ${path}`, uuid, this.context);
     // Stryker disable next-line all
-    logger.silly(`${response}`, uuid, this.context);
+    logger.silly(`${JSON.stringify(response)}`, uuid, this.context);
     if (this.redis.status !== 'ready') {
       return Promise.resolve();
     }
@@ -86,3 +86,4 @@ export class CacheRepository {
     });
   }
 }
+

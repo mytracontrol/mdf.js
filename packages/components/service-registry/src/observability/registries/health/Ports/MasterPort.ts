@@ -122,7 +122,7 @@ export class MasterPort extends Port {
     timeOutHandler = setTimeout(onTimeOut, this.interval * 0.9);
     cluster.on('message', onWorkerResponse);
     for (const worker of Object.values(this.workers)) {
-      if (worker && worker.isConnected()) {
+      if (worker?.isConnected()) {
         this.logger.debug(`Sending an health update request to worker [${worker.process.pid}]`);
         worker.send({
           type: HealthMessageType.REQ,
@@ -203,3 +203,4 @@ export class MasterPort extends Port {
     return cluster.workers ? cluster.workers : {};
   }
 }
+

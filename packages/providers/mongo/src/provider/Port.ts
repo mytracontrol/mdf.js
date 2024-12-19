@@ -33,7 +33,7 @@ export class Port extends Layer.Provider.Port<Client, Config> {
    * @param logger - Port logger, to be used internally
    */
   constructor(config: Config, logger: LoggerInstance) {
-    super(config, logger, config.appName || CONFIG_PROVIDER_BASE_NAME);
+    super(config, logger, config.appName ?? CONFIG_PROVIDER_BASE_NAME);
     const cleanedOptions = { ...this.config, url: undefined, collections: undefined } as Config;
     this.instance = new MongoClient(config.url as string, cleanedOptions);
     // Stryker disable next-line all
@@ -241,3 +241,4 @@ export class Port extends Layer.Provider.Port<Client, Config> {
     }
   }
 }
+

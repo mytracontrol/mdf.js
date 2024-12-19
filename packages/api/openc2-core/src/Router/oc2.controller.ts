@@ -94,43 +94,43 @@ export class Controller {
     switch (response.status) {
       case Control.StatusCode.BadRequest:
         return BoomHelpers.badRequest(
-          response.content.status_text || 'Bad OC2 Request',
+          response.content.status_text ?? 'Bad OC2 Request',
           response.request_id,
           { info: response }
         );
       case Control.StatusCode.Unauthorized:
         return BoomHelpers.unauthorized(
-          response.content.status_text || 'Unauthorized OC2 Request',
+          response.content.status_text ?? 'Unauthorized OC2 Request',
           response.request_id,
           { info: response }
         );
       case Control.StatusCode.Forbidden:
         return BoomHelpers.forbidden(
-          response.content.status_text || 'Forbidden OC2 Request',
+          response.content.status_text ?? 'Forbidden OC2 Request',
           response.request_id,
           { info: response }
         );
       case Control.StatusCode.NotFound:
         return BoomHelpers.notFound(
-          response.content.status_text || 'Not Found OC2 Request',
+          response.content.status_text ?? 'Not Found OC2 Request',
           response.request_id,
           { info: response }
         );
       case Control.StatusCode.NotImplemented:
         return BoomHelpers.notImplemented(
-          response.content.status_text || 'Not Implemented OC2 Request',
+          response.content.status_text ?? 'Not Implemented OC2 Request',
           response.request_id,
           { info: response }
         );
       case Control.StatusCode.ServiceUnavailable:
         return BoomHelpers.serverUnavailable(
-          response.content.status_text || 'Service Unavailable OC2 Request',
+          response.content.status_text ?? 'Service Unavailable OC2 Request',
           response.request_id,
           { info: response }
         );
       default:
         return BoomHelpers.internalServerError(
-          response.content.status_text || 'Unknown OC2 response status code',
+          response.content.status_text ?? 'Unknown OC2 response status code',
           response.request_id,
           { info: response }
         );

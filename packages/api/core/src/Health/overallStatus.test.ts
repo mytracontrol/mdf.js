@@ -5,13 +5,13 @@
  * or at https://opensource.org/licenses/MIT.
  */
 
-import { Health } from '@mdf.js/core';
 import { overallStatus } from './overallStatus';
+import { Checks } from './types';
 
 describe('#overallStatus', () => {
   describe('#Happy path', () => {
     it(`Should return 'pass' if all checks are 'pass'`, () => {
-      const checks: Health.Checks = {
+      const checks: Checks = {
         'test:test': [
           {
             componentId: 'test:test',
@@ -32,7 +32,7 @@ describe('#overallStatus', () => {
       expect(overallStatus(checks)).toEqual('pass');
     });
     it(`Should return 'fail' if any check is 'fail'`, () => {
-      const checks: Health.Checks = {
+      const checks: Checks = {
         'test:test': [
           {
             componentId: 'test:test',
@@ -73,7 +73,7 @@ describe('#overallStatus', () => {
       expect(overallStatus(checks)).toEqual('fail');
     });
     it(`Should return 'warn' if any check is 'warn'`, () => {
-      const checks: Health.Checks = {
+      const checks: Checks = {
         'test:test': [
           {
             componentId: 'test:test',
@@ -95,3 +95,4 @@ describe('#overallStatus', () => {
     });
   });
 });
+

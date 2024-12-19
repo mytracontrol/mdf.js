@@ -10,5 +10,6 @@ import { Port } from './Port';
 import { Config, Server } from './types';
 
 export { Factory } from './Factory';
-export { Config, Server } from './types';
+export { Port } from './Port';
+export { BasicAuthentication, Config, ConnectionError, InstrumentOptions, Server } from './types';
 export type Provider = Layer.Provider.Manager<Server, Config, Port>;

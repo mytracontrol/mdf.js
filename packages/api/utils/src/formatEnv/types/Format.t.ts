@@ -5,4 +5,6 @@
  * or at https://opensource.org/licenses/MIT.
  */
 
+/** The format to apply to the environment variable name. */
 export type Format = 'camelcase' | 'pascalcase' | 'lowercase' | 'uppercase';
+

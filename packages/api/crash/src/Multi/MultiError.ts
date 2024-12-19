@@ -70,7 +70,7 @@ export class Multi extends Base {
    * @returns
    */
   private extractCauses(uuid: string, options?: MultiOptions): Cause[] | undefined {
-    if (!options || options['causes'] === undefined) {
+    if (!options?.['causes']) {
       return;
     }
     const causes = options['causes'];
@@ -213,3 +213,4 @@ export class Multi extends Base {
     }
   }
 }
+

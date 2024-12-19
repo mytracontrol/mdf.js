@@ -177,7 +177,7 @@ export class JobHandler<
     }
     this.jobUserUUID = v5(this.jobUserId, MDF_NAMESPACE_OID);
     this.createdAt = new Date();
-    this.pendingDone = options?.numberOfHandlers || 1;
+    this.pendingDone = options?.numberOfHandlers ?? 1;
   }
   /** Job payload */
   public get data(): Data {
@@ -251,7 +251,7 @@ export class JobHandler<
     return {
       uuid: this.uuid,
       createdAt: this.createdAt.toISOString(),
-      resolvedAt: this.resolvedAt?.toISOString() || '',
+      resolvedAt: this.resolvedAt?.toISOString() ?? '',
       quantity: Array.isArray(this._data) ? this._data.length : 1,
       hasErrors: this._errors ? this._errors.size > 0 : false,
       errors: this._errors ? this._errors.toJSON() : undefined,
@@ -280,3 +280,4 @@ export class JobHandler<
     }
   }
 }
+

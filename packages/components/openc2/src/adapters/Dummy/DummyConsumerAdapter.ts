@@ -13,7 +13,6 @@ export class DummyConsumerAdapter extends DummyAdapter implements ConsumerAdapte
   /**
    * Create a new OpenC2 adapter for Dummy
    * @param adapterOptions - Adapter configuration options
-   * @param type - component type
    */
   constructor(adapterOptions: AdapterOptions) {
     super(adapterOptions, 'consumer');
@@ -35,3 +34,4 @@ export class DummyConsumerAdapter extends DummyAdapter implements ConsumerAdapte
     // Dummy adapter does not need to unsubscribe
   }
 }
+

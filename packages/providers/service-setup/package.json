@@ -35,20 +35,20 @@
     "@mdf.js/doorkeeper": "*",
     "@mdf.js/logger": "*",
     "@mdf.js/utils": "*",
-    "dotenv": "^16.4.5",
+    "dotenv": "^16.4.7",
     "glob": "^11.0.0",
+    "joi": "^17.13.3",
     "lodash": "^4.17.21",
     "toml": "^3.0.0",
-    "tslib": "^2.7.0",
-    "uuid": "^10.0.0",
-    "yaml": "^2.5.1"
+    "tslib": "^2.8.1",
+    "uuid": "^11.0.3",
+    "yaml": "^2.6.1"
   },
   "devDependencies": {
     "@mdf.js/repo-config": "*",
     "@types/debug": "^4.1.8",
     "@types/glob": "^8.1.0",
-    "@types/lodash": "^4.17.10",
-    "@types/uuid": "^10.0.0"
+    "@types/lodash": "^4.17.13"
   },
   "engines": {
     "node": ">=16.14.2"

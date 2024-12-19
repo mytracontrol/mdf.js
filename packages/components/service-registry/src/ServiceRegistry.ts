@@ -224,9 +224,7 @@ export class ServiceRegistry<
         return;
       }
       // Stryker disable next-line all
-      this._logger.info(
-        `Welcome to ${this.health.name} - ${this._settingsManager.release}, running with instanceId: [${this._settingsManager.instanceId}]`
-      );
+      this._logger.info(`Welcome to ${this.identification}`);
       // Stryker disable next-line all
       this._logger.info('Bootstrapping application engine ...');
       await retryBind(this._observability.start, this._observability, [], this.retryOptions);
@@ -311,6 +309,10 @@ export class ServiceRegistry<
   /** @returns The logger instance */
   public get logger(): LoggerInstance {
     return this._logger;
+  }
+  /** @return The application identification string */
+  private get identification(): string {
+    return `${this.health.name} - ${this.health.serviceId}/${this.health.serviceGroupId} - ${this.health.release} - running with instanceId: [${this.health.instanceId}]`;
   }
   /**
    * Register a resource within the service observability

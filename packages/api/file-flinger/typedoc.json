@@ -1,0 +1,34 @@
+{
+  "extends": ["../../../typedoc.json"],
+  "entryPoints": [
+    "src/index.ts"
+  ],
+  "tsconfig": "./tsconfig.build.json",
+  "entryPointStrategy": "resolve",
+  "exclude": [
+    "**/dist/**",
+    "**/node_modules",
+    "src/**/*.test.ts",
+    "src/**/test/*.*"
+  ],
+  "externalPattern": ["**/node_modules/**"],
+  "excludeExternals": true,
+  "excludePrivate": true,
+  "excludeProtected": true,
+  "excludeInternal": true,
+
+  "out": "../../../docs/api/file-flinger",
+  "markdownItOptions": {
+    "html": true,
+    "linkify": true,
+  },
+  "name": "@mdf.js/file-flinger",
+  "includeVersion": false,
+  "disableSources": true,
+  "excludeTags": [],
+  "readme": "README.md",
+  "categorizeByGroup": false,
+  "categoryOrder": [],
+  "cleanOutputDir": true,
+  "gitRevision": "master",
+}

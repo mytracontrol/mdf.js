@@ -41,13 +41,13 @@ function authZ(options: AuthZOptions = {}): RequestHandler {
       if (typeof options !== 'object' || Array.isArray(options)) {
         throw new Crash(`Error in the authz middleware configuration`, req.uuid);
       }
-      const onAuthorization = options.onAuthorization || DEFAULT_CONFIG_JWT_ON_AUTHORIZATION;
+      const onAuthorization = options.onAuthorization ?? DEFAULT_CONFIG_JWT_ON_AUTHORIZATION;
       onAuthorization(
         verify(
           hasValidAuthenticationInformation(req.headers.authorization, req.uuid),
           {
-            secret: options.secret || DEFAULT_CONFIG_JWT_TOKEN_SECRET,
-            algorithms: options.algorithms || DEFAULT_CONFIG_JWT_TOKEN_ALGORITHMS,
+            secret: options.secret ?? DEFAULT_CONFIG_JWT_TOKEN_SECRET,
+            algorithms: options.algorithms ?? DEFAULT_CONFIG_JWT_TOKEN_ALGORITHMS,
             role: hasValidRole(options.role, req.uuid),
           },
           req.uuid
@@ -155,3 +155,4 @@ export class AuthZ {
     return authZ(options);
   }
 }
+

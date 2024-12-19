@@ -7,6 +7,7 @@
 
 export * from './EngineOptions.i';
 export * from './FirehoseOptions.i';
+export * from './JobEventHandler.t';
 export * as Plugs from './Plugs';
 export * from './PostConsumeOptions.i';
 export * from './SinkOptions.i';

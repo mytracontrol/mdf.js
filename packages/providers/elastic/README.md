@@ -3,6 +3,7 @@
 [![Node Version](https://img.shields.io/static/v1?style=flat\&logo=node.js\&logoColor=green\&label=node\&message=%3E=20\&color=blue)](https://nodejs.org/en/)
 [![Typescript Version](https://img.shields.io/static/v1?style=flat\&logo=typescript\&label=Typescript\&message=5.4\&color=blue)](https://www.typescriptlang.org/)
 [![Known Vulnerabilities](https://img.shields.io/static/v1?style=flat\&logo=snyk\&label=Vulnerabilities\&message=0\&color=300A98F)](https://snyk.io/package/npm/snyk)
+[![Documentation](https://img.shields.io/static/v1?style=flat\&logo=markdown\&label=Documentation\&message=API\&color=blue)](https://mytracontrol.github.io/mdf.js/)
 
 <!-- markdownlint-disable MD033 MD041 -->
 
@@ -156,7 +157,7 @@ Checks included in the provider:
 - **CONFIG\_ELASTIC\_TLS\_SERVER\_NAME** (default: `undefined`): Server name for the TLS certificate.
 - **CONFIG\_ELASTIC\_AUTH\_USERNAME** (default: `undefined`): Username for the Elasticsearch cluster. If this is set, a password must also be provided.
 - **CONFIG\_ELASTIC\_AUTH\_PASSWORD** (default: `undefined`): Password for the Elasticsearch cluster. If this is set, a username must also be provided.
-- **NODE\_APP\_INSTANCE**: undefined
+- **NODE\_APP\_INSTANCE** (default: `undefined`): Used as default container id, receiver name, sender name, etc. in cluster configurations.
 
 ## **License**
 

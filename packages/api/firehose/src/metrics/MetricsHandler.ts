@@ -26,7 +26,7 @@ type MetricInstances = {
 /** Metrics handler */
 export class MetricsHandler {
   /** Map of registered plugs */
-  private plugs: Map<string, Sources | Sinks> = new Map();
+  private readonly plugs: Map<string, Sources | Sinks> = new Map();
   /** Metrics instances */
   private readonly metrics: MetricInstances;
   /** The registry to register the metrics */
@@ -119,3 +119,4 @@ export class MetricsHandler {
     }
   }
 }
+
