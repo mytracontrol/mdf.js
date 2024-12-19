@@ -106,7 +106,7 @@ describe('#FileFlinger #Watcher', () => {
       const addListener = jest.fn();
       watcher.on('add', addListener);
       // Simulate the 'add' event
-      (watcher['watcher'] as EventEmitter).emit('add', mockPath);
+      (watcher['watcher'] as EventEmitter).emit('add', mockPath, {});
       // Expect the 'add' listener to be called with the mock path
       expect(addListener).toHaveBeenCalledWith(mockPath);
       // Clean up by closing the watcher
@@ -180,11 +180,33 @@ describe('#FileFlinger #Watcher', () => {
       // Mock path of the unlinked file
       const mockPath = '/path/to/file.txt';
       // Simulate the 'unlink' event
-      (watcher['watcher'] as EventEmitter).emit('unlink', mockPath);
+      (watcher['watcher'] as EventEmitter).emit('unlink', mockPath, {});
       expect(debug).toHaveBeenCalledTimes(1);
       // Simulate the 'change' event
-      (watcher['watcher'] as EventEmitter).emit('change', mockPath);
+      (watcher['watcher'] as EventEmitter).emit('change', mockPath, {});
       expect(debug).toHaveBeenCalledTimes(2);
+      // Clean up by closing the watcher
+      await watcher.close();
+    });
+    it(`Should emit an error event when "add", "unlink" or "change" receive an error instead of a path`, async () => {
+      jest.spyOn(fs, 'existsSync').mockReturnValue(true);
+      jest.spyOn(fs, 'statSync').mockReturnValue({ isDirectory: () => true } as fs.Stats);
+      // Create a new Watcher instance
+      const watcher = new Watcher();
+      // Start the watcher
+      await watcher.start();
+      // Spy on the 'error' event listener
+      const error = jest.fn();
+      watcher.on('error', error);
+      // Simulate the 'add' event with an error
+      (watcher['watcher'] as EventEmitter).emit('add', new Error('Test error'), {});
+      expect(error).toHaveBeenCalledTimes(1);
+      // Simulate the 'unlink' event with an error
+      (watcher['watcher'] as EventEmitter).emit('unlink', new Error('Test error'), {});
+      expect(error).toHaveBeenCalledTimes(2);
+      // Simulate the 'change' event with an error
+      (watcher['watcher'] as EventEmitter).emit('change', new Error('Test error'), {});
+      expect(error).toHaveBeenCalledTimes(3);
       // Clean up by closing the watcher
       await watcher.close();
     });
