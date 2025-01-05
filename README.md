@@ -75,6 +75,7 @@ The complete framework is composed of the following packages:
     - loadFile: Functions for loading files.
     - mock: Functions for mocking objects, specially useful for testing in Jest.
     - prettyMS: Functions for formatting milliseconds.
+    - cleanDeep: Functions for cleaning objects and arrays.
 - Providers:
   - [**@mdf.js/amqp-provider**](https://www.npmjs.com/package/@mdf.js/amqp-provider): Package for managing AMQP connections, based on [**rhea-promise**](https://www.npmjs.com/package/rhea-promise).
   - [**@mdf.js/elastic-provider**](https://www.npmjs.com/package/@mdf.js/elastic-provider): Package for managing Elastic connections, based on [**@elastic/elasticsearch**](https://www.npmjs.com/package/@elastic/elasticsearch).

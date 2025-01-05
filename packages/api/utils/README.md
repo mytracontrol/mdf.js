@@ -36,6 +36,7 @@
     - [**`camelCase`**](#camelcase)
     - [**`deCycle` and `retroCycle`**](#decycle-and-retrocycle)
     - [**`formatEnv`**](#formatenv)
+    - [**`cleanDeep`**](#cleandeep)
   - [**License**](#license)
 
 ## **Introduction**
@@ -351,11 +352,54 @@ console.log(
 //  }
 ```
 
+### **`cleanDeep`**
+
+The `cleanDeep` function is used to remove empty objects, arrays, empty strings, null, undefined, and NaN values from an object or array. It has the following signature:
+
+- **`cleanDeep`**: `(obj: any, options?: CleanDeepOptions): any`. The `obj` parameter is the object or array to clean, and the `options` parameter is an object with the following properties:
+  - **`cleanKeys`** (`string[]`): The keys to clean. Default is `[]`.
+  - **`cleanValues`** (`any[]`): The values to clean. Default is `[]`.
+  - **`emptyArrays`** (`boolean`): Whether to clean empty arrays. Default is `true`.
+  - **`emptyObjects`** (`boolean`): Whether to clean empty objects. Default is `true`.
+  - **`emptyStrings`** (`boolean`): Whether to clean empty strings. Default is `true`.
+  - **`nullValues`** (`boolean`): Whether to clean null values. Default is `true`.
+  - **`undefinedValues`** (`boolean`): Whether to clean undefined values. Default is `true`.
+  - **`NaNValues`** (`boolean`): Whether to clean NaN values. Default is `true`.
+  - **`nested`** (`boolean`): Whether to clean nested objects and arrays. Default is `true`.
+
+```typescript
+import { cleanDeep } from '@mdf.js/utils';
+
+const obj = {
+  a: 1,
+  b: '',
+  c: null,
+  d: undefined,
+  e: NaN,
+  f: [],
+  g: {},
+  h: {
+    i: 1,
+    j: '',
+    k: null,
+    l: undefined,
+    m: NaN,
+    n: [],
+    o: {},
+  },
+};
+
+console.log(cleanDeep(obj));
+// {
+//   a: 1,
+//   h: {
+//     i: 1,
+//   },
+// }
+```
+
 ## **License**
 
 Copyright 2024 Mytra Control S.L. All rights reserved.
 
 Use of this source code is governed by an MIT-style license that can be found in the LICENSE file or at <https://opensource.org/licenses/MIT>.
-
-```
-```

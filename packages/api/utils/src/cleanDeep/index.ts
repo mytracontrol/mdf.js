@@ -6,12 +6,3 @@
  */
 
 export * from './cleanDeep';
-export * from './coerce';
-export * from './cycle';
-export * from './escape';
-export * from './findNodeModule';
-export * from './formatEnv';
-export * from './loadFile';
-export * from './prettyMS';
-export * from './retry';
-

@@ -41,7 +41,7 @@
   },
   "devDependencies": {
     "@types/debug": "^4.1.8",
-    "@types/lodash": "^4.17.13"
+    "@types/lodash": "^4.17.14"
   },
   "engines": {
     "node": ">=16.14.2"
