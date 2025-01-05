@@ -147,6 +147,32 @@ const schema7 = {
     },
   },
 };
+const schemaWithOwnKeyword = {
+  $schema: 'http://json-schema.org/draft-07/schema',
+  $id: 'schemaWithOwnKeyword.schema.json',
+  title: 'Schema With Own Keyword',
+  description: 'Schema With Own Keyword',
+  type: 'object',
+  properties: {
+    schema1: {
+      type: ['object', 'string'],
+      JSDate: { toDate: true },
+    },
+  },
+};
+const schemaWithOwnKeywordWithoutTransform = {
+  $schema: 'http://json-schema.org/draft-07/schema',
+  $id: 'schemaWithOwnKeywordWithoutTransform.schema.json',
+  title: 'Schema With Own Keyword',
+  description: 'Schema With Own Keyword',
+  type: 'object',
+  properties: {
+    schema1: {
+      type: ['object', 'string'],
+      JSDate: { toDate: false },
+    },
+  },
+};
 const resultSchema7Dereference = {
   $schema: 'http://json-schema.org/draft-07/schema',
   $id: 'schema7.schema.json',
@@ -174,6 +200,8 @@ const schemasArray = [
   schema3Referenced,
   schema2Referenced,
   schema1Referenced,
+  schemaWithOwnKeyword,
+  schemaWithOwnKeywordWithoutTransform,
 ];
 
 const artifact = {
@@ -319,6 +347,8 @@ describe('#DoorKeeper #package', () => {
       expect(dk.ajv.getKeyword('markdownDescription')).toBeDefined();
       //@ts-ignore - Test environment
       expect(dk.ajv.getKeyword('defaultSnippets')).toBeDefined();
+      //@ts-ignore - Test environment
+      expect(dk.ajv.getKeyword('JSDate')).toBeDefined();
       const myDK = new DoorKeeper();
       expect(myDK).toBeInstanceOf(DoorKeeper);
       expect(myDK.options).toHaveProperty('allErrors', true);
@@ -449,6 +479,25 @@ describe('#DoorKeeper #package', () => {
       } catch (error) {
         throw error;
       }
+    });
+    it(`Should be able to use own keywords properly`, () => {
+      const myDK = new DoorKeeper({ allowUnionTypes: true });
+      myDK.register('SchemaWithOwnKeyword', schemaWithOwnKeyword);
+      myDK.register('SchemaWithOwnKeywordWithoutTransform', schemaWithOwnKeywordWithoutTransform);
+
+      const result1 = myDK.attempt('SchemaWithOwnKeyword', { schema1: '2021-01-01T00:00:00.000Z' });
+      const result1NT = myDK.attempt('SchemaWithOwnKeywordWithoutTransform', {
+        schema1: '2021-01-01T00:00:00.000Z',
+      });
+      expect(result1).toHaveProperty('schema1');
+      expect(result1.schema1).toBeInstanceOf(Date);
+      expect(result1NT).toHaveProperty('schema1');
+      expect(result1NT.schema1).toEqual('2021-01-01T00:00:00.000Z');
+
+      const result2 = myDK.attempt('SchemaWithOwnKeyword', { schema1: new Date(0) });
+      expect(result2).toHaveProperty('schema1');
+      expect(result2.schema1).toBeInstanceOf(Date);
+      expect(result2.schema1.toISOString()).toEqual('1970-01-01T00:00:00.000Z');
     });
   });
   describe('#Sad path', () => {
@@ -645,6 +694,24 @@ describe('#DoorKeeper #package', () => {
         expect((error as Multi).name).toEqual('ValidationError');
         expect((error as Multi).causes).toBeDefined();
         done();
+      }
+    }, 300);
+    it(`Should fail to validate the custom JSDate keyword if the data is not a valid date`, async () => {
+      try {
+        const myDK = new DoorKeeper({ allowUnionTypes: true });
+        myDK.register('SchemaWithOwnKeyword', schemaWithOwnKeyword);
+        await myDK.validate('SchemaWithOwnKeyword', { schema1: 'not a date' });
+        throw new Error('Should not be here');
+      } catch (error) {
+        expect(error).toBeInstanceOf(Multi);
+      }
+      try {
+        const myDK = new DoorKeeper({ allowUnionTypes: true });
+        myDK.register('SchemaWithOwnKeyword', schemaWithOwnKeyword);
+        await myDK.validate('SchemaWithOwnKeyword', { schema1: 2 });
+        throw new Error('Should not be here');
+      } catch (error) {
+        expect(error).toBeInstanceOf(Multi);
       }
     }, 300);
   });

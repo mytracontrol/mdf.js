@@ -16,6 +16,7 @@ import { cloneDeep, forOwn, omit } from 'lodash';
 import { v4 } from 'uuid';
 
 import DynamicDefaults, { DynamicDefaultFunc } from 'ajv-keywords/dist/definitions/dynamicDefaults';
+import { JSDateKeyword } from './JSDateKeyword';
 
 const DEFAULT_SNIPPET_META_SCHEMA = {
   title: 'Default snippets',
@@ -79,6 +80,7 @@ export class DoorKeeper<T = void> {
       metaSchema: DEFAULT_SNIPPET_META_SCHEMA,
       valid: true,
     });
+    this.ajv.addKeyword(JSDateKeyword);
     this.options = AJVOptions;
   }
   /**
