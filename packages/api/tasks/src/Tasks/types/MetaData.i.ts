@@ -16,15 +16,15 @@ export interface MetaData {
   /** Status of the task */
   status: TaskState;
   /** Date when the task was created */
-  createdAt: string;
+  createdAt: Date;
   /** Date when the task was executed in ISO format */
-  executedAt?: string;
+  executedAt?: Date;
   /** Date when the task was completed in ISO format */
-  completedAt?: string;
+  completedAt?: Date;
   /** Date when the task was cancelled in ISO format */
-  cancelledAt?: string;
+  cancelledAt?: Date;
   /** Date when the task was failed in ISO format  */
-  failedAt?: string;
+  failedAt?: Date;
   /** Reason of failure or cancellation */
   reason?: string;
   /** Duration of the task in milliseconds */
@@ -39,3 +39,4 @@ export interface MetaData {
    */
   $meta?: MetaData[];
 }
+
