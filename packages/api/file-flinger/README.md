@@ -195,6 +195,7 @@ To instantiate a `FileFlinger`, you need to provide a name and an options object
   - **`maxWaitTime`** (default: `60000`): Maximum total wait time in milliseconds between retries.
   - **`timeout`** (default: `10000`): Timeout in milliseconds for each retry attempt.
   - **`waitTime`** (default: `1000`): Initial wait time in milliseconds between retries, which may be increased based on a backoff strategy.
+- **`bypassFileOpenCheck`** (default: `undefined`): Whether to bypass the file open check when processing files. If set to `true`, the file will be processed even if it is open.
 
 Here's how to create a `FileFlinger` instance with custom options:
 

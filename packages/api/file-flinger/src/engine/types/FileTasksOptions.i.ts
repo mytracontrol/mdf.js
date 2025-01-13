@@ -24,4 +24,6 @@ export interface FileTasksOptions {
   postProcessingStrategy?: PostProcessingStrategy;
   /** Determine the error strategy for files with errors */
   errorStrategy?: ErrorStrategy;
+  /** Flag to bypass the file open check */
+  bypassFileOpenCheck?: boolean;
 }

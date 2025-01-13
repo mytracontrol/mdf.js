@@ -118,6 +118,23 @@ describe('#FileFlinger #FileTasks', () => {
       // Run the sequence
       await expect(sequence.execute()).resolves.toBeDefined();
     });
+    it('Should process a file properly if all the tasks resolve and avoid to check if the file is open is bypass option is activated', async () => {
+      // Create a new FileTasks instance
+      const fileTasks = new FileTasks({
+        pushers: [pusher],
+        postProcessingStrategy: PostProcessingStrategy.DELETE,
+        bypassFileOpenCheck: true,
+      });
+      // Get the process file task sequence
+      const sequence = fileTasks.getProcessFileTask('/path/to/file.txt', 'file-key');
+      jest.spyOn(os, 'type').mockReturnValue('Linux');
+      jest.spyOn(pusher, 'push').mockResolvedValue();
+      jest.spyOn(fs, 'unlinkSync').mockReturnValue();
+      const execFile = jest.spyOn(child_process, 'execFile');
+      // Run the sequence
+      await expect(sequence.execute()).resolves.toBeDefined();
+      expect(execFile).not.toHaveBeenCalled();
+    });
     it('Should process a file properly if all the tasks resolve with a "delete" post processing strategy in a linux system - stdout: ""', async () => {
       // Create a new FileTasks instance
       const fileTasks = new FileTasks({

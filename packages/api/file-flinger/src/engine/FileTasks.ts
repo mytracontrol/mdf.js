@@ -348,6 +348,10 @@ export class FileTasks {
    */
   private async isFileOpen(filePath: string): Promise<boolean> {
     this.logger.debug(`Checking if file [${filePath}] is open`);
+    if (this.options.bypassFileOpenCheck) {
+      this.logger.debug(`Bypassing file open check`);
+      return false;
+    }
     // Specific implementation according to the operating system
     if (os.type() === 'Windows_NT') {
       return this.isFileOpenWindows(filePath);
@@ -367,6 +371,8 @@ export class FileTasks {
         'lsof',
         ['-F', 'n', '--', filePath],
         (error: ExecFileException | null, stdout: string, stderr: string) => {
+          this.logger.debug(`lsof output: ${stdout}`);
+          this.logger.debug(`lsof error: ${stderr}`);
           if (error) {
             // If 'lsof' exits with code 1 and no stderr, the file is not open
             if (error.code === 1 && !stderr) {
