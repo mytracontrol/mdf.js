@@ -36,6 +36,7 @@
     - [**Contextual Logging**](#contextual-logging)
     - [**Logging Errors and Crashes**](#logging-errors-and-crashes)
     - [**Configuring the Logger**](#configuring-the-logger)
+    - [**Using DebugLogger**](#using-debuglogger)
     - [**Logger Configuration Interface**](#logger-configuration-interface)
       - [**Console Transport Configuration**](#console-transport-configuration)
       - [**File Transport Configuration**](#file-transport-configuration)
@@ -181,14 +182,15 @@ const config: LoggerConfig = {
   },
   fluentd: {
     enabled: false,
+    level: 'info',
+    tagPrefix: 'my-app', // Fluentd tag prefix
+    label: 'my-app', // Fluentd label
     // Additional Fluentd configurations for fluent-logger module
   },
 };
 
 const logger = new Logger('my-app', config);
 ```
-
-````
 
 ### **Using DebugLogger**
 
@@ -243,6 +245,8 @@ interface FileTransportConfig {
 type FluentdTransportConfig = {
   enabled?: boolean; // Default: false
   level?: LogLevel; // Default: 'info'
+  tagPrefix?: string; // Fluentd tag prefix
+  label?: string; // Fluentd label
   // Additional Fluentd-specific options here
 };
 ```

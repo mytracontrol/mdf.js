@@ -12,7 +12,7 @@ import { Logger } from '../logger';
 import { LOG_LEVELS, LogLevel } from '../types';
 const { winstonTransport } = support;
 
-const DEFAULT_TAG_PATH = 'netin.';
+const DEFAULT_TAG_PATH = 'mdf.';
 const DEFAULT_ENABLED_STATE = false;
 const DEFAULT_LOG_LEVEL = 'info';
 const DEFAULT_HOST = 'localhost';
@@ -34,6 +34,10 @@ export type FluentdTransportConfig = Exclude<Options, 'internalLogger'> & {
   enabled?: boolean;
   /** Fluentd log level, default: info */
   level?: LogLevel;
+  /** Tag prefix for the fluentd transport, default: mdf. */
+  tagPrefix?: string;
+  /** Label for the logger instance, default: logger identifier */
+  label?: string;
 };
 
 /** File transport validation schema */
@@ -58,6 +62,9 @@ export const FluentdTransportSchema = Joi.object<FluentdTransportConfig>({
     then: Joi.object().required(),
     otherwise: Joi.any(),
   }),
+  tagPrefix: Joi.string().optional(),
+  // Optional label for the logger instance
+  label: Joi.string().optional(),
 }).default();
 
 /** Fluentd transport management class */
@@ -71,6 +78,10 @@ export class FluentdTransport {
   private readonly _config: FluentdTransportConfig;
   /** Transport instance */
   private readonly instance: FluentTransportInterface;
+  /** Transport prefix */
+  private readonly prefix: string;
+  /** Transport label */
+  private readonly label: string;
   /**
    * Create a fluentd transport instance
    * @param label - Logger label
@@ -91,11 +102,13 @@ export class FluentdTransport {
     } else {
       this._config = validation.value;
     }
+    this.label = this._config.label ?? label;
+    this.prefix = this._config.tagPrefix ?? DEFAULT_TAG_PATH;
     // Stryker disable next-line all
     this.debug(`${process.pid} - Final configuration %O`, this._config);
-    this.instance = new (winstonTransport())(`${DEFAULT_TAG_PATH}${label}`, {
+    this.instance = new (winstonTransport())(`${this.prefix}${this.label}`, {
       ...this._config,
-      format: jsonFormat(label),
+      format: jsonFormat(this.label),
       internalLogger: {
         info: (message: string, data?: any, ...extra: any[]) => {
           logger.silly(message, uuid, 'Fluentd', data, ...extra);

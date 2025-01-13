@@ -29,6 +29,8 @@ describe('#Fluentd transport', () => {
         enabled: true,
         host: '127.0.0.1',
         port: 24524,
+        tagPrefix: 'test.',
+        label: 'test',
       });
       const config = fluentd.config;
       expect(config?.enabled).toBeTruthy();
@@ -74,3 +76,4 @@ describe('#Fluentd transport', () => {
     }, 300);
   });
 });
+
