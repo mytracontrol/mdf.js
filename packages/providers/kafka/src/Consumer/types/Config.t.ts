@@ -5,10 +5,9 @@
  * or at https://opensource.org/licenses/MIT.
  */
 
-import { ConsumerConfig } from 'kafkajs';
+import { KafkaJS } from '@confluentinc/kafka-javascript';
 import { BaseConfig } from '../../Common';
 export interface Config extends BaseConfig {
   /** Kafka consumer configuration options */
-  consumer: ConsumerConfig;
+  consumer: KafkaJS.ConsumerConfig;
 }
-

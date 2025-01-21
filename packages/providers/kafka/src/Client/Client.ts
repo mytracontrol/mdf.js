@@ -8,24 +8,14 @@
 import { Crash } from '@mdf.js/crash';
 import { DebugLogger, LoggerInstance, SetContext } from '@mdf.js/logger';
 import { EventEmitter } from 'events';
-import {
-  Admin,
-  GroupDescription,
-  ITopicMetadata,
-  InstrumentationEvent,
-  Kafka,
-  KafkaConfig,
-  LogEntry,
-  logCreator,
-} from 'kafkajs';
-import { inspect } from 'util';
 import { v4 } from 'uuid';
 
-export { KafkaConfig as KafkaClientOptions, logLevel } from 'kafkajs';
+import { KafkaJS } from '@confluentinc/kafka-javascript';
+import { cleanObject } from '../Common';
 
 const DEFAULT_CHECK_INTERVAL = 30000;
 
-export type SystemStatus = { topics: ITopicMetadata[]; groups: GroupDescription[] };
+export type SystemStatus = KafkaJS.GroupDescriptions & { topics: KafkaJS.ITopicMetadata[] };
 
 export declare interface Client {
   /** Emitted when admin client can collect the desired information */
@@ -51,11 +41,11 @@ export abstract class Client extends EventEmitter {
   /** Instance identification */
   protected readonly componentId = v4();
   /** Kafka Broker configuration options */
-  readonly options: KafkaConfig;
+  readonly options: KafkaJS.CommonConstructorConfig;
   /** Kafka Client */
-  protected readonly instance: Kafka;
+  protected readonly instance: KafkaJS.Kafka;
   /** Kafka admin instance */
-  private readonly admin: Admin;
+  private readonly admin: KafkaJS.Admin;
   /** Check interval */
   private timeInterval?: NodeJS.Timeout;
   /** System status */
@@ -72,16 +62,20 @@ export abstract class Client extends EventEmitter {
    * @param interval - Period of health check interval
    */
   constructor(
-    options: KafkaConfig,
+    options: KafkaJS.CommonConstructorConfig & { kafkaJS: KafkaJS.KafkaConfig },
     private readonly interval = DEFAULT_CHECK_INTERVAL
   ) {
     super();
     this.logger = SetContext(new DebugLogger('mdf:client:kafka'), 'kafka', this.componentId);
     // Stryker disable next-line all
     this.logger.debug(`New instance of Kafka Client created: ${this.componentId}`);
-    this.options = { ...options, logCreator: options.logCreator ?? this.defaultLogCreator };
-    this.interval = Math.floor((this.options.requestTimeout ?? interval) * 1.1);
-    this.instance = new Kafka(this.options);
+    this.options = {
+      ...options,
+      kafkaJS: { ...options.kafkaJS /*, logger: options.kafkaJS?.logger ?? defaultLogger*/ }, // TODO: Check
+    };
+    this.interval = Math.floor((this.options.kafkaJS?.requestTimeout ?? interval) * 1.1);
+    // Need to clean object because the library tries to use values that are explicitly null or undefined
+    this.instance = new KafkaJS.Kafka(cleanObject(this.options));
     this.admin = this.instance.admin();
     this.connected = false;
     this.healthy = false;
@@ -90,19 +84,18 @@ export abstract class Client extends EventEmitter {
   public get state(): boolean {
     return this.connected && this.healthy;
   }
-  /**
-   * Log creator function, used to log kafka events
-   * @param level - configured log level
-   * @returns
-   */
-  private readonly defaultLogCreator: logCreator = () => (entry: LogEntry) => {
-    const { logger, message, ...others } = entry.log;
-    const logMessage = `${logger} - ${entry.label} - ${entry.namespace} - ${message}`;
-    this.logger.debug(logMessage);
-    if (others) {
-      this.logger.silly(inspect(others, false, 6));
+
+  public async listTopics(): Promise<string[]> {
+    try {
+      return this.admin.listTopics();
+    } catch (error) {
+      const cause = Crash.from(error, this.componentId);
+      throw new Crash(`Error listing topics: ${cause.message}`, this.componentId, {
+        cause,
+      });
     }
-  };
+  }
+
   /** Perform the connection of the instance to the system */
   protected async start(): Promise<void> {
     if (this.connected) {
@@ -110,9 +103,6 @@ export abstract class Client extends EventEmitter {
     }
     try {
       await this.admin.connect();
-      for (const event of Object.values(this.admin.events)) {
-        this.admin.on(event, this.eventLogging);
-      }
       this.connected = true;
       if (!this.timeInterval) {
         this.timeInterval = setInterval(this.checkHealth, this.interval);
@@ -153,7 +143,19 @@ export abstract class Client extends EventEmitter {
     this.status = { topics: [], groups: [] };
     try {
       const fetchedTopics = await this.admin.fetchTopicMetadata();
-      this.status.topics = fetchedTopics.topics.filter(entry => !entry.name.startsWith('__'));
+      // TODO: fetchTopicMetadata returns just an array, there is no "topics" property
+      // with the array inside. Not consistent with defiend type
+      // this.status.topics = fetchedTopics.topics.filter(entry => !entry.name.startsWith('__'));
+      // TODO: Added .map to keep only properties from kafkajs. One of the new properties causes
+      // an error when JSON.stringify (Do not know how to serialize a BigInt)
+      this.status.topics = (fetchedTopics as any)
+        .filter((entry: any) => !entry.name.startsWith('__'))
+        .map((entry: any) => {
+          return {
+            name: entry.name,
+            partitions: entry.partitions,
+          };
+        });
       this.status.groups = [];
       const fetchedGroups = await this.admin.listGroups();
       if (fetchedGroups?.groups.length) {
@@ -200,20 +202,6 @@ export abstract class Client extends EventEmitter {
       // Stryker disable next-line all
       this.logger.silly(`STATUS: ${JSON.stringify(this.status, null, 2)}`);
       this.isFirstCheck = false;
-    }
-  };
-  /**
-   * Log an event using the DEBUG logger for troubleshooting
-   * @param context - event context
-   */
-  protected eventLogging = (context: InstrumentationEvent<unknown>): void => {
-    const { type, timestamp, payload, id } = context;
-    const date = new Date(timestamp).toISOString();
-    // Stryker disable next-line all
-    this.logger.debug(`[${type}] event in client with [${id}] at [${date}]`);
-    if (payload) {
-      // Stryker disable next-line all
-      this.logger.silly(inspect(payload, false, 6));
     }
   };
   /**

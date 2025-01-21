@@ -6,7 +6,7 @@
  */
 // *************************************************************************************************
 // #region Arrange
-import { CONFIG_PROVIDER_BASE_NAME, defaultLogCreator } from '../../Common';
+import { CONFIG_PROVIDER_BASE_NAME } from '../../Common';
 import { defaultConfig } from './default';
 
 // #endregion
@@ -17,18 +17,17 @@ describe(`#Config #${CONFIG_PROVIDER_BASE_NAME.toLocaleUpperCase()} #Producer`, 
     it(`Should has a default config`, () => {
       expect(defaultConfig).toMatchObject({
         client: {
-          clientId: defaultConfig.client.clientId,
-          connectionTimeout: 1000,
-          enforceRequestTimeout: false,
-          logCreator: defaultLogCreator,
-          logLevel: 1,
-          requestTimeout: 30000,
-          retry: {
-            factor: 0.2,
-            initialRetryTime: 300,
-            maxRetryTime: 30000,
-            multiplier: 2,
-            retries: 1.7976931348623157e308,
+          kafkaJS: {
+            clientId: defaultConfig.client.kafkaJS.clientId,
+            connectionTimeout: 1000,
+            enforceRequestTimeout: false,
+            logLevel: 1,
+            requestTimeout: 30000,
+            retry: {
+              initialRetryTime: 300,
+              maxRetryTime: 30000,
+              retries: 1.7976931348623157e308,
+            },
           },
         },
         producer: {
@@ -37,14 +36,15 @@ describe(`#Config #${CONFIG_PROVIDER_BASE_NAME.toLocaleUpperCase()} #Producer`, 
           maxInFlightRequests: undefined,
           metadataMaxAge: 300000,
           retry: {
-            factor: 0.2,
             initialRetryTime: 300,
             maxRetryTime: 30000,
-            multiplier: 2,
             retries: 5,
           },
           transactionTimeout: 60000,
           transactionalId: undefined,
+          acks: -1,
+          timeout: 5000,
+          compression: 'none',
         },
       });
     }, 300);

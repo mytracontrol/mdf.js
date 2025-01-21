@@ -5,38 +5,37 @@
  * or at https://opensource.org/licenses/MIT.
  */
 
+import { KafkaJS } from '@confluentinc/kafka-javascript';
 import { Crash } from '@mdf.js/crash';
-import {
-  ConsumerConfig,
-  ConsumerCrashEvent,
-  KafkaConfig,
-  Consumer as KafkaConsumer,
-  KafkaJSNonRetriableError,
-} from 'kafkajs';
-import { get } from 'lodash';
+import { cleanObject } from '../Common';
 import { Client } from './Client';
 
 export class Consumer extends Client {
   /** Kafka Consumer */
-  private readonly consumer: KafkaConsumer;
+  private readonly consumer: KafkaJS.Consumer;
   /** Kafka Consumer configuration options */
-  readonly consumerOptions: ConsumerConfig;
+  readonly consumerOptions: KafkaJS.ConsumerConfig;
   /**
    * Creates an instance of KafkaConsumer
    * @param clientOptions - Kafka client configuration options
    * @param consumerOptions - Kafka consumer configuration options
    * @param interval - Period of health check interval
    */
-  constructor(clientOptions: KafkaConfig, consumerOptions: ConsumerConfig, interval?: number) {
+  constructor(
+    clientOptions: KafkaJS.CommonConstructorConfig & { kafkaJS: KafkaJS.KafkaConfig },
+    consumerOptions: KafkaJS.ConsumerConfig,
+    interval?: number
+  ) {
     super(clientOptions, interval);
     this.consumerOptions = {
       ...consumerOptions,
-      retry: consumerOptions.retry ?? { restartOnFailure: this.onFailure },
+      retry: consumerOptions.retry,
+      // logger: defaultLogger,
     };
-    this.consumer = this.instance.consumer(this.consumerOptions);
+    this.consumer = this.instance.consumer({ kafkaJS: cleanObject(this.consumerOptions) });
   }
   /** Kafka consumer */
-  public get client(): KafkaConsumer {
+  public get client(): KafkaJS.Consumer {
     return this.consumer;
   }
   /** Perform the connection of the instance to the system */
@@ -44,10 +43,6 @@ export class Consumer extends Client {
     try {
       await super.start();
       await this.consumer.connect();
-      for (const event of Object.values(this.consumer.events)) {
-        this.consumer.on(event, this.eventLogging);
-      }
-      this.consumer.on('consumer.crash', this.onCrashEvent);
     } catch (error) {
       const cause = Crash.from(error, this.componentId);
       throw new Crash(`Error in initial connection process: ${cause.message}`, this.componentId, {
@@ -67,18 +62,8 @@ export class Consumer extends Client {
       });
     }
   }
-  /**
-   * Manage error events from KafkaJS library
-   * @param context - event context
-   */
-  private readonly onCrashEvent = (context: ConsumerCrashEvent): void => {
-    // Stryker disable next-line all
-    this.logger.error(`Kafka error in consumer interface`);
-    const cause = get(context, 'payload.error', new Crash('Unknown error', this.componentId));
-    const message =
-      cause instanceof KafkaJSNonRetriableError
-        ? `No fixable error in Kafka interface: ${cause.message}`
-        : `Fixable error in Kafka interface: ${cause.message}`;
-    this.emit('error', new Crash(message, this.componentId, { cause }));
-  };
+
+  // public override async listTopics(): Promise<string[]> {
+  //   return await super.listTopics();
+  // }
 }

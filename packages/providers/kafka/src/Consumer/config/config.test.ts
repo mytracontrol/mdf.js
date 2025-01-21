@@ -6,7 +6,7 @@
  */
 // *************************************************************************************************
 // #region Arrange
-import { CONFIG_PROVIDER_BASE_NAME, defaultLogCreator } from '../../Common';
+import { CONFIG_PROVIDER_BASE_NAME } from '../../Common';
 import { defaultConfig } from './default';
 // #endregion
 // *************************************************************************************************
@@ -16,21 +16,20 @@ describe(`#Config #${CONFIG_PROVIDER_BASE_NAME.toLocaleUpperCase()} #Consumer`, 
     it(`Should has a default config`, () => {
       expect(defaultConfig).toMatchObject({
         client: {
-          brokers: ['127.0.0.1:9092'],
-          clientId: defaultConfig.client.clientId,
-          connectionTimeout: 1000,
-          enforceRequestTimeout: false,
-          logCreator: defaultLogCreator,
-          logLevel: 1,
-          requestTimeout: 30000,
-          retry: {
-            factor: 0.2,
-            initialRetryTime: 300,
-            maxRetryTime: 30000,
-            multiplier: 2,
-            retries: 1.7976931348623157e308,
+          kafkaJS: {
+            brokers: ['127.0.0.1:9092'],
+            clientId: defaultConfig.client.kafkaJS.clientId,
+            connectionTimeout: 1000,
+            enforceRequestTimeout: false,
+            logLevel: 1,
+            requestTimeout: 30000,
+            retry: {
+              initialRetryTime: 300,
+              maxRetryTime: 30000,
+              retries: 1.7976931348623157e308,
+            },
+            ssl: false,
           },
-          ssl: false,
         },
         consumer: {
           allowAutoTopicCreation: true,
@@ -44,12 +43,12 @@ describe(`#Config #${CONFIG_PROVIDER_BASE_NAME.toLocaleUpperCase()} #Consumer`, 
           readUncommitted: false,
           rebalanceTimeout: 60000,
           retry: {
-            factor: 0.2,
             initialRetryTime: 300,
             maxRetryTime: 30000,
-            multiplier: 2,
             retries: 5,
           },
+          fromBeginning: true,
+          autoCommit: false,
         },
       });
     }, 300);

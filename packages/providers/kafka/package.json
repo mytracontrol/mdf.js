@@ -30,12 +30,12 @@
     "test": "jest --detectOpenHandles --config ./jest.config.js"
   },
   "dependencies": {
+    "@confluentinc/kafka-javascript": "^1.0.0",
     "@mdf.js/core": "*",
     "@mdf.js/crash": "*",
     "@mdf.js/logger": "*",
     "@mdf.js/utils": "*",
     "joi": "^17.13.3",
-    "kafkajs": "^2.2.4",
     "lodash": "^4.17.21",
     "tslib": "^2.8.1",
     "uuid": "^11.0.3"

@@ -5,7 +5,9 @@
  * or at https://opensource.org/licenses/MIT.
  */
 
+import { KafkaJS } from '@confluentinc/kafka-javascript';
 import { DebugLogger } from '@mdf.js/logger';
+import _ from 'lodash';
 import { v4 } from 'uuid';
 /** Base name for the kafka provider */
 export const CONFIG_PROVIDER_BASE_NAME = 'kafka';
@@ -20,21 +22,9 @@ export enum logLevel {
   NOTHING = 0,
   ERROR = 1,
   WARN = 2,
-  INFO = 4,
-  DEBUG = 5,
+  INFO = 3,
+  DEBUG = 4,
 }
-export interface LogEntry {
-  namespace: string;
-  level: logLevel;
-  label: string;
-  log: LoggerEntryContent;
-}
-export interface LoggerEntryContent {
-  readonly timestamp: string;
-  readonly message: string;
-  [key: string]: any;
-}
-export type logCreator = (logLevel: logLevel) => (entry: LogEntry) => void;
 
 /**
  * Define the log level for the kafka provider, possible values are:
@@ -70,29 +60,65 @@ export const selectLogLevel = (level: string): logLevel => {
   }
 };
 export const CONFIG_KAFKA_CLIENT__LOG_LEVEL = selectLogLevel(CONFIG_KAFKA_LOG_LEVEL);
-/**
- * Log creator function, used to log kafka events
- * @param level - configured log level
- * @returns
- */
-export const defaultLogCreator: logCreator = (level: logLevel) => (entry: LogEntry) => {
-  const { message, ...others } = entry.log;
-  const logMessage = `${entry.label} - ${entry.namespace} - ${message}`;
-  switch (level) {
-    case logLevel.ERROR:
-      logger.error(logMessage, UUID, 'Kafka', others);
-      break;
-    case logLevel.WARN:
-      logger.warn(logMessage, UUID, 'Kafka', others);
-      break;
-    case logLevel.INFO:
-      logger.info(logMessage, UUID, 'Kafka', others);
-      break;
-    case logLevel.DEBUG:
-      logger.debug(logMessage, UUID, 'Kafka', others);
-      break;
-    default:
-      logger.silly(logMessage, UUID, 'Kafka', others);
+
+// TODO: Check. Passing object of this type in kafkaa client config does not work,
+// even when it is based in DefaultLogger implemented in the library
+export class DefaultLogger implements KafkaJS.Logger {
+  private logLevel: logLevel;
+  // private _namespace = 'namespace';
+
+  constructor() {
+    this.logLevel = CONFIG_KAFKA_CLIENT__LOG_LEVEL;
   }
-};
+
+  setLogLevel(logLevel: any) {
+    this.logLevel = logLevel;
+  }
+  info(message: string, extra?: object) {
+    // TODO: Check. No label anymore
+    // const logMessage = `${this._namespace} - ${message}`;
+    const logMessage = `${message}`;
+    logger.info(logMessage, UUID, 'Kafka', extra);
+  }
+  error(message: string, extra?: object) {
+    // const logMessage = `${this._namespace} - ${message}`;
+    const logMessage = `${message}`;
+    logger.error(logMessage, UUID, 'Kafka', extra);
+  }
+  warn(message: string, extra?: object) {
+    // const logMessage = `${this._namespace} - ${message}`;
+    const logMessage = `${message}`;
+    logger.warn(logMessage, UUID, 'Kafka', extra);
+  }
+  debug(message: string, extra?: object) {
+    // const logMessage = `${this._namespace} - ${message}`;
+    const logMessage = `${message}`;
+    logger.debug(logMessage, UUID, 'Kafka', extra);
+  }
+  namespace(namespace: string, logLevel?: logLevel) {
+    // this._namespace = namespace;
+    // if (logLevel !== undefined) {
+    //   this.logLevel = logLevel;
+    // }
+    return this;
+  }
+}
+export const defaultLogger = new DefaultLogger();
+
+export function cleanObject<T>(obj: T): T {
+  if (_.isObject(obj) && !_.isArray(obj)) {
+    return _.reduce(
+      obj,
+      (result: any, value, key) => {
+        if (!_.isNil(value)) {
+          result[key] = _.isObject(value) ? cleanObject(value) : value;
+        }
+        return result;
+      },
+      {}
+    );
+  }
+
+  return obj;
+}
 // #endregion

@@ -5,6 +5,7 @@
  * or at https://opensource.org/licenses/MIT.
  */
 
+import { KafkaJS } from '@confluentinc/kafka-javascript';
 import { defaultConfig as commonDefaultConfig } from '../../Common';
 import { Config as ProducerConfig } from '../types';
 
@@ -18,9 +19,10 @@ const KAFKA_PRODUCER__TRANSACTION_TIMEOUT = 60000;
 const KAFKA_PRODUCER__MAX_IN_FLIGHT_REQUEST = undefined;
 const KAFKA_PRODUCER__RETRY__MAX_RETRY_TIME = 30000;
 const KAFKA_PRODUCER__RETRY__INITIAL_RETRY_TIME = 300;
-const KAFKA_PRODUCER__RETRY__FACTOR = 0.2;
-const KAFKA_PRODUCER__RETRY__MULTIPLIER = 2;
 const KAFKA_PRODUCER__RETRY__RETRIES = 5;
+const KAFKA_PRODUCER__ACKS = -1;
+const KAFKA_PRODUCER__TIMEOUT = 5000;
+const KAFKA_PRODUCER__COMPRESSION = KafkaJS.CompressionTypes['None'];
 
 export const defaultConfig: ProducerConfig = {
   ...commonDefaultConfig,
@@ -34,11 +36,12 @@ export const defaultConfig: ProducerConfig = {
     retry: {
       maxRetryTime: KAFKA_PRODUCER__RETRY__MAX_RETRY_TIME,
       initialRetryTime: KAFKA_PRODUCER__RETRY__INITIAL_RETRY_TIME,
-      factor: KAFKA_PRODUCER__RETRY__FACTOR,
-      multiplier: KAFKA_PRODUCER__RETRY__MULTIPLIER,
       retries: KAFKA_PRODUCER__RETRY__RETRIES,
     },
+    // TODO: Added. This options cannot be passed to send methods anymore
+    acks: KAFKA_PRODUCER__ACKS,
+    timeout: KAFKA_PRODUCER__TIMEOUT,
+    compression: KAFKA_PRODUCER__COMPRESSION,
   },
 };
 // #endregion
-

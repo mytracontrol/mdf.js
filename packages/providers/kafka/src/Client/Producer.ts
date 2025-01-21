@@ -5,31 +5,37 @@
  * or at https://opensource.org/licenses/MIT.
  */
 
+import { KafkaJS } from '@confluentinc/kafka-javascript';
 import { Crash } from '@mdf.js/crash';
-import { KafkaConfig, Producer as KafkaProducer, ProducerConfig } from 'kafkajs';
+import { cleanObject } from '../Common';
 import { Client } from './Client';
 
 export class Producer extends Client {
   /** Kafka Producer */
-  private readonly producer: KafkaProducer;
+  private readonly producer: KafkaJS.Producer;
   /** Kafka Producer configuration options */
-  private readonly producerOptions: ProducerConfig;
+  private readonly producerOptions: KafkaJS.ProducerConfig;
   /**
    * Creates an instance of KafkaProducer
    * @param clientOptions - Kafka client configuration options
    * @param producerOptions - Kafka producer configuration options
    * @param interval - Period of health check interval
    */
-  constructor(clientOptions: KafkaConfig, producerOptions?: ProducerConfig, interval?: number) {
+  constructor(
+    clientOptions: KafkaJS.CommonConstructorConfig & { kafkaJS: KafkaJS.KafkaConfig }, // TODO: Check,
+    producerOptions?: KafkaJS.ProducerConfig,
+    interval?: number
+  ) {
     super(clientOptions, interval);
     this.producerOptions = {
       ...producerOptions,
-      retry: producerOptions?.retry ?? { restartOnFailure: this.onFailure },
+      retry: producerOptions?.retry,
+      // logger: defaultLogger,
     };
-    this.producer = this.instance.producer(this.producerOptions);
+    this.producer = this.instance.producer({ kafkaJS: cleanObject(this.producerOptions) });
   }
   /** Return the producer of this class instance */
-  public get client(): KafkaProducer {
+  public get client(): KafkaJS.Producer {
     return this.producer;
   }
   /** Perform the connection of the instance to the system */
@@ -37,9 +43,6 @@ export class Producer extends Client {
     try {
       await super.start();
       await this.producer.connect();
-      for (const event of Object.values(this.producer.events)) {
-        this.producer.on(event, this.eventLogging);
-      }
     } catch (error) {
       const cause = Crash.from(error, this.componentId);
       throw new Crash(`Error in initial connection process: ${cause.message}`, this.componentId, {

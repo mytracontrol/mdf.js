@@ -18,7 +18,7 @@ export abstract class BasePort<Client, Config extends BaseConfig> extends Layer.
   /** Flag to check if the port is already started */
   private started = false;
   /**
-   * Implementation of functionalities of an Elastic port instance.
+   * Implementation of functionalities of an Kafka port instance.
    * @param config - Port configuration options
    * @param logger - Port logger, to be used internally
    * @param instance - Consumer/Producer instance
@@ -28,7 +28,7 @@ export abstract class BasePort<Client, Config extends BaseConfig> extends Layer.
     logger: LoggerInstance,
     private readonly instance: Consumer | Producer
   ) {
-    super(config, logger, config.client.clientId ?? CONFIG_PROVIDER_BASE_NAME);
+    super(config, logger, config.client.kafkaJS.clientId ?? CONFIG_PROVIDER_BASE_NAME);
     this.instance.on('status', this.onStatusEvent);
     this.instance.on('error', this.onErrorEvent);
     // Stryker disable next-line all
@@ -78,6 +78,10 @@ export abstract class BasePort<Client, Config extends BaseConfig> extends Layer.
   /** Close the port instance */
   public async close(): Promise<void> {
     await this.stop();
+  }
+  /** List the Kafka Topics */
+  public async listTopics(): Promise<string[]> {
+    return await this.instance.listTopics();
   }
   /** Handler for the status event */
   private readonly onStatusEvent = (status?: SystemStatus): void => {

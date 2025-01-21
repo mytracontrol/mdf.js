@@ -4,13 +4,9 @@
  * Use of this source code is governed by an MIT-style license that can be found in the LICENSE file
  * or at https://opensource.org/licenses/MIT.
  */
-
-import { KafkaConfig, ProducerConfig } from 'kafkajs';
-export interface Config {
-  /** Kafka client configuration options */
-  client: KafkaConfig;
+import { KafkaJS } from '@confluentinc/kafka-javascript';
+import { BaseConfig } from '../../Common';
+export interface Config extends BaseConfig {
   /** Kafka producer configuration options */
-  producer?: ProducerConfig;
-  /** Period of health check interval */
-  interval?: number;
+  producer?: KafkaJS.ProducerConfig;
 }

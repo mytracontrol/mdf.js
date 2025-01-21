@@ -7,7 +7,7 @@
 
 import { hostname } from 'os';
 import { BaseConfig } from '../types';
-import { CONFIG_KAFKA_CLIENT__LOG_LEVEL, defaultLogCreator } from './utils';
+import { CONFIG_KAFKA_CLIENT__LOG_LEVEL } from './utils';
 
 // *************************************************************************************************
 // #region Default values
@@ -27,29 +27,25 @@ const KAFKA_CLIENT__ENFORCE_REQUEST_TIMEOUT = false;
 
 const KAFKA_CLIENT__RETRY__MAX_RETRY_TIME = 30000;
 const KAFKA_CLIENT__RETRY__INITIAL_RETRY_TIME = 300;
-const KAFKA_CLIENT__RETRY__FACTOR = 0.2;
-const KAFKA_CLIENT__RETRY__MULTIPLIER = 2;
 const KAFKA_CLIENT__RETRY__RETRIES = Number.MAX_VALUE;
 const logLevel = CONFIG_KAFKA_CLIENT__LOG_LEVEL;
-const logCreator = defaultLogCreator;
 
 export const defaultConfig: BaseConfig = {
   client: {
-    brokers: KAFKA_CLIENT__BROKERS.split(','),
-    ssl: KAFKA_CLIENT__SSL,
-    clientId: KAFKA_CLIENT__CLIENT_ID,
-    connectionTimeout: KAFKA_CLIENT__CONNECTION_TIMEOUT,
-    requestTimeout: KAFKA_CLIENT__REQUEST_TIMEOUT,
-    enforceRequestTimeout: KAFKA_CLIENT__ENFORCE_REQUEST_TIMEOUT,
-    retry: {
-      maxRetryTime: KAFKA_CLIENT__RETRY__MAX_RETRY_TIME,
-      initialRetryTime: KAFKA_CLIENT__RETRY__INITIAL_RETRY_TIME,
-      factor: KAFKA_CLIENT__RETRY__FACTOR,
-      multiplier: KAFKA_CLIENT__RETRY__MULTIPLIER,
-      retries: KAFKA_CLIENT__RETRY__RETRIES,
+    kafkaJS: {
+      brokers: KAFKA_CLIENT__BROKERS.split(','),
+      ssl: KAFKA_CLIENT__SSL,
+      clientId: KAFKA_CLIENT__CLIENT_ID,
+      connectionTimeout: KAFKA_CLIENT__CONNECTION_TIMEOUT,
+      requestTimeout: KAFKA_CLIENT__REQUEST_TIMEOUT,
+      enforceRequestTimeout: KAFKA_CLIENT__ENFORCE_REQUEST_TIMEOUT,
+      retry: {
+        maxRetryTime: KAFKA_CLIENT__RETRY__MAX_RETRY_TIME,
+        initialRetryTime: KAFKA_CLIENT__RETRY__INITIAL_RETRY_TIME,
+        retries: KAFKA_CLIENT__RETRY__RETRIES,
+      },
+      logLevel,
     },
-    logLevel,
-    logCreator,
   },
 };
 // #endregion

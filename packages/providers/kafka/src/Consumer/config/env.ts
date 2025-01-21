@@ -102,20 +102,6 @@ const CONFIG_KAFKA_CONSUMER__RETRY__INITIAL_RETRY_TIME = coerce<number>(
   process.env['CONFIG_KAFKA_CONSUMER__RETRY__INITIAL_RETRY_TIME']
 );
 /**
- * A multiplier to apply to the retry time
- * @defaultValue 0.2
- */
-const CONFIG_KAFKA_CONSUMER__RETRY__FACTOR = coerce<number>(
-  process.env['CONFIG_KAFKA_CONSUMER__RETRY__FACTOR']
-);
-/**
- * A multiplier to apply to the retry time
- * @defaultValue 2
- */
-const CONFIG_KAFKA_CONSUMER__RETRY__MULTIPLIER = coerce<number>(
-  process.env['CONFIG_KAFKA_CONSUMER__RETRY__MULTIPLIER']
-);
-/**
  * Maximum number of retries per call
  * @defaultValue 5
  */
@@ -159,8 +145,6 @@ export const envBasedConfig: ConsumerConfig = {
     retry: {
       maxRetryTime: CONFIG_KAFKA_CONSUMER__RETRY__MAX_RETRY_TIME,
       initialRetryTime: CONFIG_KAFKA_CONSUMER__RETRY__INITIAL_RETRY_TIME,
-      factor: CONFIG_KAFKA_CONSUMER__RETRY__FACTOR,
-      multiplier: CONFIG_KAFKA_CONSUMER__RETRY__MULTIPLIER,
       retries: CONFIG_KAFKA_CONSUMER__RETRY__RETRIES,
     },
     readUncommitted: CONFIG_KAFKA_CONSUMER__READ_UNCOMMITTED,

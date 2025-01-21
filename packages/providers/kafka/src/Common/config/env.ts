@@ -6,8 +6,8 @@
  */
 
 import { coerce, loadFile } from '@mdf.js/utils';
-import { SASLMechanismOptions } from 'kafkajs';
-import { ConnectionOptions } from 'tls';
+// import { SASLMechanismOptions } from 'kafkajs';
+import { KafkaJS } from '@confluentinc/kafka-javascript';
 import { BaseConfig } from '../types';
 import { logger } from './utils';
 
@@ -42,14 +42,6 @@ const CONFIG_KAFKA_CLIENT__AUTHENTICATION_TIMEOUT = coerce<number>(
   process.env['CONFIG_KAFKA_CLIENT__AUTHENTICATION_TIMEOUT']
 );
 /**
- * When periodic reauthentication (connections.max.reauth.ms) is configured on the broker side,
- * reauthenticate when `reauthenticationThreshold` milliseconds remain of session lifetime.
- * @defaultValue 1000
- */
-const CONFIG_KAFKA_CLIENT__REAUTHENTICATION_THRESHOLD = coerce<number>(
-  process.env['CONFIG_KAFKA_CLIENT__REAUTHENTICATION_THRESHOLD']
-);
-/**
  * Time in milliseconds to wait for a successful request
  * @defaultValue 30000
  */
@@ -77,18 +69,6 @@ const CONFIG_KAFKA_CLIENT__RETRY__MAX_RETRY_TIME = coerce<number>(
  */
 const CONFIG_KAFKA_CLIENT__RETRY__INITIAL_RETRY_TIME = coerce<number>(
   process.env['CONFIG_KAFKA_INITIAL_RETRY_TIME']
-);
-/**
- * Randomization factor
- * @defaultValue 0.2
- */
-const CONFIG_KAFKA_CLIENT__RETRY__FACTOR = coerce<number>(process.env['CONFIG_KAFKA_RETRY_FACTOR']);
-/**
- * Exponential factor
- * @defaultValue 2
- */
-const CONFIG_KAFKA_CLIENT__RETRY__MULTIPLIER = coerce<number>(
-  process.env['CONFIG_KAFKA_RETRY_MULTIPLIER']
 );
 /**
  * Maximum number of retries per call
@@ -154,15 +134,19 @@ const isSSLConfig =
   CONFIG_KAFKA_CLIENT__SSL__REJECT_UNAUTHORIZED ||
   CONFIG_KAFKA_CLIENT__SSL__SERVER_NAME;
 
-let SSL: ConnectionOptions | undefined = undefined;
+// let SSL: ConnectionOptions | undefined = undefined;
+let SSL: boolean | undefined = undefined;
 if (CONFIG_KAFKA_CLIENT_SSL_ENABLED && isSSLConfig) {
-  SSL = {
-    ca: CA,
-    cert: CERT,
-    key: KEY,
-    rejectUnauthorized: CONFIG_KAFKA_CLIENT__SSL__REJECT_UNAUTHORIZED,
-    servername: CONFIG_KAFKA_CLIENT__SSL__SERVER_NAME,
-  };
+  // SSL = {
+  //   ca: CA,
+  //   cert: CERT,
+  //   key: KEY,
+  //   rejectUnauthorized: CONFIG_KAFKA_CLIENT__SSL__REJECT_UNAUTHORIZED,
+  //   servername: CONFIG_KAFKA_CLIENT__SSL__SERVER_NAME,
+  // };
+  // TODO: ca, cert, etc. need to be specified outside the kafkaJS block. There is no
+  // rejectUnauthorized nor servername
+  SSL = true;
 }
 // #endregion
 // *************************************************************************************************
@@ -186,8 +170,8 @@ const CONFIG_KAFKA_CLIENT__SASL_USERNAME = process.env['CONFIG_KAFKA_CLIENT__SAS
  */
 const CONFIG_KAFKA_CLIENT__SASL_PASSWORD = process.env['CONFIG_KAFKA_CLIENT__SASL_PASSWORD'];
 let CONFIG_KAFKA_CLIENT_SASL:
-  | SASLMechanismOptions<'plain' | 'scram-sha-256' | 'scram-sha-512'>
-  //| Mechanism
+  | KafkaJS.SASLOptions
+  // | SASLMechanismOptions<'plain' | 'scram-sha-256' | 'scram-sha-512' // TODO: Check
   | undefined = undefined;
 
 if (
@@ -205,22 +189,25 @@ if (
 
 export const envBasedConfig: BaseConfig = {
   client: {
-    brokers: CONFIG_KAFKA_CLIENT__BROKERS as string[],
-    ssl: SSL,
-    sasl: CONFIG_KAFKA_CLIENT_SASL,
-    clientId: CONFIG_KAFKA_CLIENT__CLIENT_ID,
-    connectionTimeout: CONFIG_KAFKA_CLIENT__CONNECTION_TIMEOUT,
-    authenticationTimeout: CONFIG_KAFKA_CLIENT__AUTHENTICATION_TIMEOUT,
-    reauthenticationThreshold: CONFIG_KAFKA_CLIENT__REAUTHENTICATION_THRESHOLD,
-    requestTimeout: CONFIG_KAFKA_CLIENT__REQUEST_TIMEOUT,
-    enforceRequestTimeout: CONFIG_KAFKA_CLIENT__ENFORCE_REQUEST_TIMEOUT,
-    retry: {
-      maxRetryTime: CONFIG_KAFKA_CLIENT__RETRY__MAX_RETRY_TIME,
-      initialRetryTime: CONFIG_KAFKA_CLIENT__RETRY__INITIAL_RETRY_TIME,
-      factor: CONFIG_KAFKA_CLIENT__RETRY__FACTOR,
-      multiplier: CONFIG_KAFKA_CLIENT__RETRY__MULTIPLIER,
-      retries: CONFIG_KAFKA_CLIENT__RETRY__RETRIES,
+    kafkaJS: {
+      brokers: CONFIG_KAFKA_CLIENT__BROKERS as string[],
+      ssl: SSL,
+      sasl: CONFIG_KAFKA_CLIENT_SASL,
+      clientId: CONFIG_KAFKA_CLIENT__CLIENT_ID,
+      connectionTimeout: CONFIG_KAFKA_CLIENT__CONNECTION_TIMEOUT,
+      authenticationTimeout: CONFIG_KAFKA_CLIENT__AUTHENTICATION_TIMEOUT,
+      requestTimeout: CONFIG_KAFKA_CLIENT__REQUEST_TIMEOUT,
+      enforceRequestTimeout: CONFIG_KAFKA_CLIENT__ENFORCE_REQUEST_TIMEOUT,
+      retry: {
+        maxRetryTime: CONFIG_KAFKA_CLIENT__RETRY__MAX_RETRY_TIME,
+        initialRetryTime: CONFIG_KAFKA_CLIENT__RETRY__INITIAL_RETRY_TIME,
+        retries: CONFIG_KAFKA_CLIENT__RETRY__RETRIES,
+      },
     },
+    // TODO: Test
+    ssl_ca: CA,
+    ssl_certificate: CERT,
+    ssl_key: KEY,
   },
 };
 // #endregion

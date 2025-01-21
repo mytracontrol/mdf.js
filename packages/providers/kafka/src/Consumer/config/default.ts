@@ -23,10 +23,10 @@ const KAFKA_CONSUMER__MAX_BYTES = 10485760;
 const KAFKA_CONSUMER__MAX_WAIT_TIME_IN_MS = 5000;
 const KAFKA_CONSUMER__RETRY__MAX_RETRY_TIME = 30000;
 const KAFKA_CONSUMER__RETRY__INITIAL_RETRY_TIME = 300;
-const KAFKA_CONSUMER__RETRY__FACTOR = 0.2;
-const KAFKA_CONSUMER__RETRY__MULTIPLIER = 2;
 const KAFKA_CONSUMER__RETRY__RETRIES = 5;
 const KAFKA_CONSUMER__READ_UNCOMMITTED = false;
+const KAFKA_CONSUMER__FROM_BEGINNING = true;
+const KAFKA_CONSUMER__AUTO_COMMIT = false;
 
 export const defaultConfig: ConsumerConfig = {
   ...commonDefaultConfig,
@@ -44,11 +44,12 @@ export const defaultConfig: ConsumerConfig = {
     retry: {
       maxRetryTime: KAFKA_CONSUMER__RETRY__MAX_RETRY_TIME,
       initialRetryTime: KAFKA_CONSUMER__RETRY__INITIAL_RETRY_TIME,
-      factor: KAFKA_CONSUMER__RETRY__FACTOR,
-      multiplier: KAFKA_CONSUMER__RETRY__MULTIPLIER,
       retries: KAFKA_CONSUMER__RETRY__RETRIES,
     },
+    // TODO: Added. This options cannot be passed to subscribe/run methods anymore
     readUncommitted: KAFKA_CONSUMER__READ_UNCOMMITTED,
+    fromBeginning: KAFKA_CONSUMER__FROM_BEGINNING,
+    autoCommit: KAFKA_CONSUMER__AUTO_COMMIT,
   },
 };
 // #endregion

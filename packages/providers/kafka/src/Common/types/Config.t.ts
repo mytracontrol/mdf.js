@@ -5,10 +5,10 @@
  * or at https://opensource.org/licenses/MIT.
  */
 
-import { KafkaConfig } from 'kafkajs';
+import { KafkaJS } from '@confluentinc/kafka-javascript';
 export interface BaseConfig {
   /** Kafka client configuration options */
-  client: KafkaConfig;
+  client: KafkaJS.CommonConstructorConfig & { kafkaJS: KafkaJS.KafkaConfig };
   /** Period of health check interval */
   interval?: number;
 }

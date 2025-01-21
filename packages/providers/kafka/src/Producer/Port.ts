@@ -11,7 +11,7 @@ import { Config, Producer as KafkaProducer } from './types';
 
 export class Port extends BasePort<KafkaProducer, Config> {
   /**
-   * Implementation of functionalities of an Elastic port instance.
+   * Implementation of functionalities of an Kafka port instance.
    * @param config - Port configuration options
    * @param logger - Port logger, to be used internally
    */
