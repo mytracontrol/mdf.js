@@ -7,7 +7,7 @@
 
 import { LoggerInstance } from '@mdf.js/logger';
 import { RetryOptions } from '@mdf.js/utils';
-import ms from 'ms';
+import ms, { StringValue } from 'ms';
 import { DEFAULT_MAX_RETRY_FACTOR, DEFAULT_MAX_TIMEOUT } from '.';
 import { WellIdentifiedTaskOptions } from './types';
 
@@ -58,7 +58,7 @@ export class RetryManager {
   ): WellIdentifiedTaskOptions {
     const timeout = Math.min(
       options.retryOptions?.timeout ?? DEFAULT_MAX_TIMEOUT,
-      ms(this.pollingGroup) * attempts
+      ms(this.pollingGroup as StringValue) * attempts
     );
     const waitTime = Math.min(
       options.retryOptions?.waitTime ?? this.limiterDelay,

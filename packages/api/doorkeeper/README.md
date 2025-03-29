@@ -126,7 +126,7 @@ The package has a set of own keywords that has been added to AJV to improve the 
 - **`markdownDescription`**: This keyword allows to define the description of the schema using markdown, this description is recognized by [Visual Code](https://code.visualstudio.com/docs/languages/json#_use-rich-formatting-in-hovers).
 - **`JSDate`**: This keyword allows to define a custom format for date, allowing to use `string` or `Date` types in the schema validation. If the value is a string, it could be converted to a `Date` object using the `toDate` property. The property `allowUnionTypes` should be set to `true` to allow the use of `string` and `Date` types in the schema.
 
-```json
+````json
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "type": "object",
@@ -150,7 +150,7 @@ The package has a set of own keywords that has been added to AJV to improve the 
     }
   }
 }
-```
+````
 
 ## **API**
 

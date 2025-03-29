@@ -202,7 +202,7 @@ import { DebugLogger } from '@mdf.js/logger';
 const debugLogger = new DebugLogger('my-app');
 
 debugLogger.debug('This is a debug message using DebugLogger');
-````
+```
 
 ### **Logger Configuration Interface**
 

@@ -104,7 +104,7 @@ export class Engine extends Transform implements Layer.App.Component {
    * Execute an strategy
    * @param job - job to be processed
    * @param strategy - strategy to be applied
-   * @returns
+   * @returns the job with the strategy applied
    */
   private executeStrategy(job: OpenJobHandler, strategy: OpenStrategy): OpenJobHandler {
     try {

@@ -6,7 +6,7 @@
  */
 
 import { Crash } from '@mdf.js/crash';
-import ms from 'ms';
+import ms, { StringValue } from 'ms';
 import {
   DefaultPollingGroups,
   GroupTaskBaseConfig,
@@ -106,7 +106,7 @@ export class Validator {
       throw new Crash(`The period should be a string with the format <number><ms|s|m|h|d>`);
     } else {
       try {
-        const value = ms(period);
+        const value = ms(period as StringValue);
         if (typeof value !== 'number' || Number.isNaN(value) || value < 0) {
           throw new Crash(`Wrong period value [${period}]`);
         }
