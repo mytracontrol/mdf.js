@@ -211,20 +211,16 @@ describe('#Faker #package', () => {
     it('Should throw an error if no attributes are set', () => {
       const factory = new Factory();
       // @ts-expect-error Testing purposes
-      expect(() => factory.attr('a', 9, () => 'John')).toThrowError(
-        'Dependencies must be an array'
-      );
+      expect(() => factory.attr('a', 9, () => 'John')).toThrow('Dependencies must be an array');
     });
     it('Should throw an error if the dependencies are not an array', () => {
       const factory = new Factory();
       // @ts-expect-error Testing purposes
-      expect(() => factory.attr('a', 9, () => 'John')).toThrowError(
-        'Dependencies must be an array'
-      );
+      expect(() => factory.attr('a', 9, () => 'John')).toThrow('Dependencies must be an array');
     });
     it('Should throw an error if the dependencies are defined but the generator is not', () => {
       const factory = new Factory();
-      expect(() => factory.attr('a', ['d'])).toThrowError(
+      expect(() => factory.attr('a', ['d'])).toThrow(
         'Generator function is required if dependencies are defined'
       );
     });
@@ -233,13 +229,13 @@ describe('#Faker #package', () => {
       factory.option('name', () => 'John');
       factory.attr('surname', () => 'Doe');
       // @ts-expect-error Testing purposes
-      expect(() => factory.build({}, { likelihood: 'a' })).toThrowError(
+      expect(() => factory.build({}, { likelihood: 'a' })).toThrow(
         'Likelihood must be a number between 0 and 100'
       );
-      expect(() => factory.build({}, { likelihood: 101 })).toThrowError(
+      expect(() => factory.build({}, { likelihood: 101 })).toThrow(
         'Likelihood must be a number between 0 and 100'
       );
-      expect(() => factory.build({}, { likelihood: -1 })).toThrowError(
+      expect(() => factory.build({}, { likelihood: -1 })).toThrow(
         'Likelihood must be a number between 0 and 100'
       );
     });
@@ -247,7 +243,8 @@ describe('#Faker #package', () => {
       const factory = new Factory();
       factory.attr('a', ['b'], () => 'John');
       factory.attr('b', ['a'], () => 'Doe');
-      expect(() => factory.build()).toThrowError('Detect a dependency cycle: b -> a -> b');
+      expect(() => factory.build()).toThrow('Detect a dependency cycle: b -> a -> b');
     });
   });
 });
+

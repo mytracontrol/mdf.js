@@ -158,7 +158,7 @@ describe('In #Multi class the ', () => {
         //@ts-ignore - Test environment
         new Multi(5, uuidTest);
       };
-      expect(test).toThrowError('Message parameter must be a string');
+      expect(test).toThrow('Message parameter must be a string');
     });
     it(`Should truncate the message if message is to large (>${CONFIG_MAX_ERROR_MESSAGE_LENGTH})`, () => {
       const error = new Crash('o'.padEnd(CONFIG_MAX_ERROR_MESSAGE_LENGTH + 1, 'o'), uuidTest);
@@ -170,21 +170,21 @@ describe('In #Multi class the ', () => {
         //@ts-ignore - Test environment
         new Multi('Error', uuidTest, { name: 5 });
       };
-      expect(test).toThrowError('Parameter name must a string');
+      expect(test).toThrow('Parameter name must a string');
     });
     it('Should throw a Crash error if the UUID is not valid', () => {
       const test = () => {
         //@ts-ignore - Test environment
         new Multi('Error', 5, new Error(), {}, 'tooMuch');
       };
-      expect(test).toThrowError('uuid parameter must be an string and RFC 4122 based');
+      expect(test).toThrow('uuid parameter must be an string and RFC 4122 based');
     });
     it('Should throw a Crash error if the causes is not an Array', () => {
       const test = () => {
         //@ts-ignore - Test environment
         new Multi('Error', uuidTest, { causes: 1 });
       };
-      expect(test).toThrowError('Options[causes] must be an array of Error/Crash');
+      expect(test).toThrow('Options[causes] must be an array of Error/Crash');
     });
     it('Should throw a Crash error if the causes are not error or Crash', () => {
       //@ts-ignore - Test environment
@@ -192,7 +192,7 @@ describe('In #Multi class the ', () => {
       const test = () => {
         new Multi('Error', uuidTest, { causes });
       };
-      expect(test).toThrowError('Options[causes] must be an array of Error/Crash');
+      expect(test).toThrow('Options[causes] must be an array of Error/Crash');
       causes.pop();
     });
   });
@@ -349,4 +349,3 @@ describe('In #Multi class the ', () => {
     });
   });
 });
-

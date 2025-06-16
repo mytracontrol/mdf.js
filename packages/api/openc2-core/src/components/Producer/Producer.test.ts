@@ -226,11 +226,11 @@ describe('#OpenC2 #Producer', () => {
   describe('#Sad path', () => {
     it(`Should throw an error if the adapter is not valid`, () => {
       //@ts-ignore - Test environment
-      expect(() => new Producer(undefined, options)).toThrowError(
+      expect(() => new Producer(undefined, options)).toThrow(
         'AdapterWrapper requires an adapter instance'
       );
       //@ts-ignore - Test environment
-      expect(() => new Producer({ name: 'myAdapter' }, options)).toThrowError(
+      expect(() => new Producer({ name: 'myAdapter' }, options)).toThrow(
         'Adapter myAdapter does not implement the publish method'
       );
     }, 300);
@@ -393,3 +393,4 @@ describe('#OpenC2 #Producer', () => {
     }, 300);
   });
 });
+

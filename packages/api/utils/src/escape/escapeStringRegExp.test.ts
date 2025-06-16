@@ -20,7 +20,8 @@ describe('#SafeTypes #RegexEscapeExp', () => {
         //@ts-ignore Test environment
         escapeRegExp('-');
       };
-      expect(test).toThrowError('Expected a RegExp');
+      expect(test).toThrow('Expected a RegExp');
     });
   });
 });
+

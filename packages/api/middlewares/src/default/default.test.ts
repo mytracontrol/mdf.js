@@ -45,7 +45,7 @@ describe('#Middleware #default', () => {
           expect(response.body.detail).toEqual('Not Found');
           expect(response.body.source).toEqual({
             pointer: '/non',
-            parameter: { body: {}, query: {} },
+            parameter: { query: {} },
           });
           expect(response.body.links.default).toMatch(/http:\/\/127.0.0.1:[\d]*\/default/);
         })
@@ -56,3 +56,4 @@ describe('#Middleware #default', () => {
   });
 });
 // #endregion
+

@@ -1148,7 +1148,7 @@ describe('#Provider #API', () => {
           { myParam: 'myValue', fail: true }
         );
       };
-      expect(test).toThrowError('myError');
+      expect(test).toThrow('myError');
     }, 300);
     it('Should create an instance with default values if configuration is incorrect an show the error in the property "error"', () => {
       const provider = new Manager<MyPortInstance, MyPortConfig, MyWrapperPort>(
@@ -1238,7 +1238,7 @@ describe('#Provider #API', () => {
           { myParam: 'myValue', fail: true, asString: true }
         );
       };
-      expect(test).toThrowError('myError');
+      expect(test).toThrow('myError');
     }, 300);
     it('Should be able to manage malformed errors, for example, empty error', () => {
       const test = () => {
@@ -1265,3 +1265,4 @@ describe('#Provider #API', () => {
   });
 });
 // #endregion
+

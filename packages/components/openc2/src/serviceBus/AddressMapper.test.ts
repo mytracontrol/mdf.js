@@ -33,32 +33,29 @@ describe('#AddressMapper', () => {
     it('Should throw an error when try to get a Socket.IO id and pass and invalid OpenC2 id', () => {
       const addressMapper = new AddressMapper();
       //@ts-ignore - Test environment
-      expect(() => addressMapper.getByOpenC2Id(2)).toThrowError(
-        `An invalid OpenC2 id was provided`
-      );
+      expect(() => addressMapper.getByOpenC2Id(2)).toThrow(`An invalid OpenC2 id was provided`);
     });
     it('Should throw an error when try to get an OpenC2 id and pass and invalid URL', () => {
       const addressMapper = new AddressMapper();
       //@ts-ignore - Test environment
-      expect(() => addressMapper.getBySocketId(2)).toThrowError(
-        `An invalid Socket.IO id was provided`
-      );
+      expect(() => addressMapper.getBySocketId(2)).toThrow(`An invalid Socket.IO id was provided`);
     });
     it('Should throw an error when try to update the map and pass an non-string Socket.IO or OpenC2 id', () => {
       const addressMapper = new AddressMapper();
       //@ts-ignore - Test environment
-      expect(() => addressMapper.update(2, 'id1')).toThrowError(
+      expect(() => addressMapper.update(2, 'id1')).toThrow(
         `No valid parameters, Socket.IO and OpenC2 id should be strings`
       );
       //@ts-ignore - Test environment
-      expect(() => addressMapper.update('mK8mSuq2R0QxLDdHAAAF', 2)).toThrowError(
+      expect(() => addressMapper.update('mK8mSuq2R0QxLDdHAAAF', 2)).toThrow(
         `No valid parameters, Socket.IO and OpenC2 id should be strings`
       );
     });
     it('Should throw an error when try to delete and pass an non-string Socket.IO', () => {
       const addressMapper = new AddressMapper();
       //@ts-ignore - Test environment
-      expect(() => addressMapper.delete(2)).toThrowError(`An invalid Socket.IO id was provided`);
+      expect(() => addressMapper.delete(2)).toThrow(`An invalid Socket.IO id was provided`);
     });
   });
 });
+

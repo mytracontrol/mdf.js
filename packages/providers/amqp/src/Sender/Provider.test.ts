@@ -405,7 +405,7 @@ describe('#Port #AMQP #Sender', () => {
   describe('#Sad path', () => {
     it('Should throw an error if try to access to the Receiver but is not initialized', () => {
       const provider = Factory.create();
-      expect(() => provider.client).toThrowError('Sender is not initialized');
+      expect(() => provider.client).toThrow('Sender is not initialized');
     });
     it(`Should reject to start if session.createReceiver rejects`, () => {
       const port = new Port(DEFAULT_CONFIG, new FakeLogger() as LoggerInstance);
@@ -448,3 +448,4 @@ describe('#Port #AMQP #Sender', () => {
     }, 300);
   });
 });
+

@@ -243,15 +243,15 @@ describe('#OpenC2 #Consumer', () => {
   describe('#Sad path', () => {
     it(`Should throw an error if the adapter is not valid`, () => {
       //@ts-ignore - Test environment
-      expect(() => new Consumer(undefined, options)).toThrowError(
+      expect(() => new Consumer(undefined, options)).toThrow(
         'AdapterWrapper requires an adapter instance'
       );
       //@ts-ignore - Test environment
-      expect(() => new Consumer({ name: 'myAdapter' }, options)).toThrowError(
+      expect(() => new Consumer({ name: 'myAdapter' }, options)).toThrow(
         'Adapter myAdapter does not implement the subscribe method'
       );
       //@ts-ignore - Test environment
-      expect(() => new Consumer({ name: 'myAdapter', subscribe: () => {} }, options)).toThrowError(
+      expect(() => new Consumer({ name: 'myAdapter', subscribe: () => {} }, options)).toThrow(
         'Adapter myAdapter does not implement the unsubscribe method'
       );
     });
@@ -264,7 +264,7 @@ describe('#OpenC2 #Consumer', () => {
             //@ts-ignore - Test environment
             resolver: { 'wrong:x-netin:value': () => Promise.resolve('') },
           })
-      ).toThrowError('Invalid resolver entry, unknown action type: wrong');
+      ).toThrow('Invalid resolver entry, unknown action type: wrong');
       //@ts-ignore - Test environment
       expect(
         () =>
@@ -273,7 +273,7 @@ describe('#OpenC2 #Consumer', () => {
             //@ts-ignore - Test environment
             resolver: { 'query:x-netin': () => Promise.resolve('') },
           })
-      ).toThrowError('Invalid resolver entry, invalid format: query:x-netin');
+      ).toThrow('Invalid resolver entry, invalid format: query:x-netin');
       //@ts-ignore - Test environment
       expect(
         () =>
@@ -281,7 +281,7 @@ describe('#OpenC2 #Consumer', () => {
             ...options,
             resolver: { 'stop:x-netin:value': () => Promise.resolve('') },
           })
-      ).toThrowError('Invalid resolver entry, action type not supported: stop:x-netin:value');
+      ).toThrow('Invalid resolver entry, action type not supported: stop:x-netin:value');
       //@ts-ignore - Test environment
       expect(
         () =>
@@ -289,7 +289,7 @@ describe('#OpenC2 #Consumer', () => {
             ...options,
             resolver: { 'query:x-netin:value': () => Promise.resolve('') },
           })
-      ).toThrowError('Invalid resolver entry, target not supported: query:x-netin:value');
+      ).toThrow('Invalid resolver entry, target not supported: query:x-netin:value');
     });
     it(`Should fail to start if subscribe method rejects`, async () => {
       const adapter = new MyAdapter();
@@ -335,3 +335,4 @@ describe('#OpenC2 #Consumer', () => {
     }, 300);
   });
 });
+

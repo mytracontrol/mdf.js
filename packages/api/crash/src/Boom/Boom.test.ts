@@ -32,35 +32,35 @@ describe('In #Boom class the ', () => {
         //@ts-ignore - Test environment
         new Boom('Boom', uuidTest, 'code');
       };
-      expect(test).toThrowError('Code must be a number');
+      expect(test).toThrow('Code must be a number');
     });
     it('should throw an error if option.links.self is not a string', () => {
       const test = () => {
         //@ts-ignore - Test environment
         new Boom(msg, uuidTest, 500, { links: { self: 7 } });
       };
-      expect(test).toThrowError('Links and source must be strings');
+      expect(test).toThrow('Links and source must be strings');
     });
     it('should throw an error if option.links.related.href is not a string', () => {
       const test = () => {
         //@ts-ignore - Test environment
         new Boom(msg, uuidTest, 500, { links: { related: { href: 7 } } });
       };
-      expect(test).toThrowError('Links and source must be strings');
+      expect(test).toThrow('Links and source must be strings');
     });
     it('should throw an error if option.source.parameter without pointer', () => {
       const test = () => {
         //@ts-ignore - Test environment
         new Boom(msg, uuidTest, 500, { source: { parameter: '../' } });
       };
-      expect(test).toThrowError('Links and source must be strings');
+      expect(test).toThrow('Links and source must be strings');
     });
     it('should throw an error if option.source.pointer is not a string', () => {
       const test = () => {
         //@ts-ignore - Test environment
         new Boom(msg, uuidTest, 500, { source: { pointer: 7 } });
       };
-      expect(test).toThrowError('Links and source must be strings');
+      expect(test).toThrow('Links and source must be strings');
     });
     it('should create an error with default value 500', () => {
       const error = new Boom(msg, uuidTest);
@@ -597,3 +597,4 @@ describe('In #Boom class the ', () => {
     });
   });
 });
+

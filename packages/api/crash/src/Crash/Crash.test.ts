@@ -353,49 +353,50 @@ describe('#Crash error', () => {
         //@ts-ignore Test environment
         new Crash(5, uuidTest);
       };
-      expect(test).toThrowError('Message parameter must be a string');
+      expect(test).toThrow('Message parameter must be a string');
     });
     it('Should throw a Crash error if name!=string', () => {
       const test = () => {
         //@ts-ignore Test environment
         new Crash('Error', uuidTest, { name: 5 });
       };
-      expect(test).toThrowError('Parameter name must a string');
+      expect(test).toThrow('Parameter name must a string');
     });
     it('Should throw a Crash error if cause!=Error | Crash', () => {
       const test = () => {
         //@ts-ignore Test environment
         new Crash('Error', uuidTest, { cause: 5 });
       };
-      expect(test).toThrowError('Parameter cause must be an Error/Crash');
+      expect(test).toThrow('Parameter cause must be an Error/Crash');
     });
     it('Should throw a Crash error if the UUID is not valid', () => {
       const test = () => {
         //@ts-ignore Test environment
         new Crash('Error', 5, new Error(), {}, 'tooMuch');
       };
-      expect(test).toThrowError('uuid parameter must be an string and RFC 4122 based');
+      expect(test).toThrow('uuid parameter must be an string and RFC 4122 based');
     });
     it('Should throw a Crash error if options!=object', () => {
       const test = () => {
         //@ts-ignore Test environment
         new Crash('Error', uuidTest, []);
       };
-      expect(test).toThrowError('options parameter must be an object');
+      expect(test).toThrow('options parameter must be an object');
     });
     it('Should throw a Crash error if options.info.date!=Date | undefined', () => {
       const test = () => {
         //@ts-ignore Test environment
         new Crash('Error', uuidTest, { info: { date: 5 } });
       };
-      expect(test).toThrowError('Option Parameter info.date, if its setted, must be a Date');
+      expect(test).toThrow('Option Parameter info.date, if its setted, must be a Date');
     });
     it('Should throw a Crash error if options.info.subject!=string', () => {
       const test = () => {
         //@ts-ignore Test environment
         new Crash('Error', uuidTest, { info: { subject: 5 } });
       };
-      expect(test).toThrowError('Option Parameter info.subject, if it is setted, must be a string');
+      expect(test).toThrow('Option Parameter info.subject, if it is setted, must be a string');
     });
   });
 });
+

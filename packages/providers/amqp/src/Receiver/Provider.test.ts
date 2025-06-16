@@ -507,7 +507,7 @@ describe('#Port #AMQP #Receiver', () => {
     }, 300);
     it('Should throw an error if try to access to the Receiver but is not initialized', () => {
       const provider = Factory.create();
-      expect(() => provider.client).toThrowError('Receiver is not initialized');
+      expect(() => provider.client).toThrow('Receiver is not initialized');
     }, 300);
     it(`Should reject to start if session.createReceiver rejects`, () => {
       const port = new Port(DEFAULT_CONFIG, new FakeLogger() as LoggerInstance);
@@ -597,3 +597,4 @@ describe('#Port #AMQP #Receiver', () => {
     }, 300);
   });
 });
+

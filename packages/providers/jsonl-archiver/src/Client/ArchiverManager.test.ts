@@ -338,7 +338,6 @@ describe('#ArchiverManager', () => {
       jest.spyOn(fs, 'readdirSync').mockReturnValue([]);
       const mockStream = new PassThrough();
       jest.spyOn(fs, 'createWriteStream').mockReturnValue(mockStream as any);
-      //@ts-expect-error - Mocking write method
       jest.spyOn(mockStream, 'write').mockImplementation((chunk, encoding, callback) => {
         if (typeof encoding === 'function') {
           callback = encoding;

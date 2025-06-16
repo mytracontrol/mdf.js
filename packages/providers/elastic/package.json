@@ -30,7 +30,7 @@
     "test": "jest --detectOpenHandles --config ./jest.config.js"
   },
   "dependencies": {
-    "@elastic/elasticsearch": "^8.17.1",
+    "@elastic/elasticsearch": "^9.0.2",
     "@mdf.js/core": "*",
     "@mdf.js/crash": "*",
     "@mdf.js/logger": "*",
