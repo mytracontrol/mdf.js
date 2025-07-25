@@ -24,24 +24,20 @@ export const schema = Joi.object({
           servername: Joi.string(),
         })
       ),
-    sasl: Joi.alternatives().conditional('ssl', {
-      is: true,
-      then: Joi.object({
-        mechanism: Joi.string()
-          .allow(...MECHANISM_TYPES)
-          .required(),
-        username: Joi.when('mechanism', {
-          is: Joi.string().regex(/^(plain|scram-sha-256|scram-sha-512)$/i),
-          then: Joi.string().required(),
-          otherwise: Joi.forbidden(),
-        }),
-        password: Joi.when('mechanism', {
-          is: Joi.string().regex(/^(plain|scram-sha-256|scram-sha-512)$/i),
-          then: Joi.string().required(),
-          otherwise: Joi.forbidden(),
-        }),
+    sasl: Joi.object({
+      mechanism: Joi.string()
+        .allow(...MECHANISM_TYPES)
+        .required(),
+      username: Joi.when('mechanism', {
+        is: Joi.string().regex(/^(plain|scram-sha-256|scram-sha-512)$/i),
+        then: Joi.string().required(),
+        otherwise: Joi.forbidden(),
       }),
-      otherwise: Joi.forbidden(),
+      password: Joi.when('mechanism', {
+        is: Joi.string().regex(/^(plain|scram-sha-256|scram-sha-512)$/i),
+        then: Joi.string().required(),
+        otherwise: Joi.forbidden(),
+      }),
     }),
     connectionTimeout: Joi.number().positive(),
     authenticationTimeout: Joi.number().positive(),
@@ -74,3 +70,4 @@ export const schema = Joi.object({
     }).unknown(true),
   }).unknown(true),
 }).unknown(true);
+
